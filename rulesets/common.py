@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 
-# Clockwise from fore (PLAN 5.1; FT p.8 uses the same six arcs).
+# FB six arcs, clockwise from fore (PLAN 5.1). FT2 has its own four (rulesets/ft2/data.py).
 ARCS = ("F", "FS", "AS", "A", "AP", "FP")
 
 
@@ -18,11 +18,11 @@ def pct_mass(tmf: int, percent: int) -> int:
     return max(1, round_half_up(tmf * percent, 100))
 
 
-def arcs_valid(arcs: object) -> bool:
+def arcs_valid(arcs: object, allowed: tuple[str, ...] = ARCS) -> bool:
     return (
         isinstance(arcs, list)
         and len(arcs) > 0
-        and all(isinstance(a, str) and a in ARCS for a in arcs)
+        and all(isinstance(a, str) and a in allowed for a in arcs)
         and len(set(arcs)) == len(arcs)
     )
 

@@ -214,8 +214,10 @@ short random strings (`uuid4().hex[:12]`); catalog ids are readable (`fb:fb1:nac
 }
 ```
 
-Arcs use six arcs `F, FS, AS, A, AP, FP` (fore, fore-starboard, aft-starboard, aft, aft-port,
-fore-port). FT2 uses the same six-arc model (FT p.8).
+FB arcs are six: `F, FS, AS, A, AP, FP` (fore, fore-starboard, aft-starboard, aft, aft-port,
+fore-port). FT2 arcs are four 90-degree arcs, `F, S, A, P` (FT p.8), and no offensive weapon may
+fire through `A` (owner decision after checking the page image; this line earlier said FT2 used the
+six-arc model).
 
 Catalog designs are loaded from `data/catalog/*.json`, never written, and are **read-only**.
 Editing a catalog design creates a copy with `source.kind = "variant"`.
@@ -401,7 +403,7 @@ text layer is OCR, so verify every number against the page image.
 | Hull | "standard" (FT p.14 table) or "special" MASS up to 100 (above 100 only with the MT superships toggle) |
 | Class | warship: escort ≤18, cruiser 19-36, capital 37-100; merchants one class |
 | Hull cost | warship 2 x MASS, merchant 1.5 x MASS |
-| Damage points | warship MASS / 2, merchant MASS / 4 |
+| Damage points | warship MASS / 2, merchant MASS / 4; odd results round **up** (owner decision; the book is silent) |
 | System capacity | warship MASS / 2, merchant MASS / 10 (merchants: only C batteries, PDAF, L1 screens, submunitions; minimum 1 MASS of weaponry) |
 | FTL | cost = MASS (uses no MASS) |
 | Drives | points only, no MASS: escort 1 x MASS per 4 thrust, cruiser per 2, capital/merchant per 1; max thrust 8 |
@@ -412,8 +414,8 @@ text layer is OCR, so verify every number against the page image.
 | Needle beam / Pulse torpedo | 2 MASS 6 pts / 5 MASS 15 pts |
 | Nova cannon | 16 MASS, 50 points, capital only |
 | Submunition pack / Minelayer (3 mines) / Minesweeper | 1/3; 3/10; 5/20 |
-| Fire controls | 1 escort, 2 cruiser, 3 capital included; extra per the FT p.31 table (verify on the page) |
-| Damage track | escort 2 rows, cruiser 3, capital 4 (FT pp.10-12); thresholds 6, 5+, 4+ |
+| Fire controls | 1 escort, 2 cruiser, 3 capital, 1 merchant (FT p.15) included; extras 3 MASS, 10 points (FT p.31) |
+| Damage track | escort 2 rows, cruiser 3, capital 4 (FT pp.10-12), extra boxes on the **lower** rows (FT p.12); thresholds 6, 5+, 4+ |
 
 **More Thrust toggles** (fleet options; each enables system types and is printed on the roster):
 - `mt_systems`: MT missiles, AA batteries (capital only), wave gun, ortillery, reflex field,

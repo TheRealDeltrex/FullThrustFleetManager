@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from i18n import _
-from rulesets import QuickRefEntry, Race, SystemDef
+from rulesets import QuickRefEntry, Race, SystemDef, common
 from rulesets.fb import data, rules
 
 
@@ -11,6 +11,7 @@ class FBRuleset:
     id = "fb"
     accent_color = "--rs-fb"
     books = data.BOOKS
+    arcs = common.ARCS
     icon_set = None  # M6
 
     @property
@@ -35,6 +36,12 @@ class FBRuleset:
     cf_positions = staticmethod(rules.cf_positions)
     threshold_numbers = staticmethod(rules.threshold_numbers)
     suggest_type = staticmethod(rules.suggest_type)
+
+    def fighter_types(self, options: dict) -> list[str]:
+        return list(data.FIGHTER_POINTS)
+
+    def required_options(self, design: dict, loadout: dict | None) -> set[str]:
+        return set()
 
     def quickref(self, systems_present: set[str], options: dict) -> list[QuickRefEntry]:
         return []  # M9: original rulebook wording per system
