@@ -17,8 +17,9 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M3 are done: an empty Layout C shell plus the FB and FT2 (+ More Thrust) rules engines. No
-catalog, storage, fleets or UI on top of the engines yet; next is **M4** (catalog + NPV gate).
+M1-M4 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, and the
+96-design catalog behind the NPV gate. No storage, fleets or UI on top yet; next is **M5**
+(storage, library, import/export).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -40,13 +41,14 @@ What exists:
 - `scripts/build_browser_bundle.py` → `web/bundle.json` (gitignored), `web/index.html` (the
   Pyodide shell).
 - `rulesets/` — the `Ruleset` protocol, registry, FB and FT2 engines; see Rulesets below.
-- `data/errata.json` — book values that disagree with the rules, with the reason (PLAN 8).
+- `data/catalog/` — the read-only catalog; see Catalog below. `data/errata.json` — book values
+  that disagree with the rules, with the reason (PLAN 8).
 - `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` (manual).
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from `E:\RPG\Tabletop\Full Thurst\`.
 
-Modules of PLAN section 4 not listed here (`data/catalog`, `fleet_rules.py`, `store.py`, `migrations.py`,
+Modules of PLAN section 4 not listed here (`data/factions.json`, `fleet_rules.py`, `store.py`, `migrations.py`,
 `ssd_layout.py`, `pdf_export.py`, `data/`) are created by the milestone that needs them.
 
 ## Non-negotiable principles
@@ -132,11 +134,30 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - FT2 facts from the page images: 4 arcs, no offensive fire aft (FT p.8); extra damage boxes go
   on the LOWER rows (FT p.12); merchants have 1 free fire control and 4 rows at their size (FT
   p.15); non-FTL warships carry 75% (FT p.25); tugs pay FTL x3 (FT p.26); turn thrust rounds up
-  (FT p.5). Odd fractions round up (owner: damage points; the rest follow), except merchant
-  capacity, which rounds down with a minimum of 1 (FT p.29).
+  (FT p.5). Odd fractions round up (owner: damage points; the rest follow, and the FT p.15
+  Survey Cruiser confirms it for merchant capacity).
 - Tests: `tests/test_rules_fb.py`, `tests/test_rules_ft2.py` (golden designs, one test per costing
   rule and validator), `tests/test_rulesets.py` (protocol conformance).
   `docs/mockups/ssd.js` has a JS costing that agrees on 219 and 261; it is not the reference.
+
+## Catalog
+
+- `data/catalog/fb_fb1.json` (FB1 pp.13-42: 57 NAC/NSL/FSE/ESU warships, 8 merchant and support
+  vessels), `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs).
+  Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
+- **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
+  hold the curated ship tables and write the JSON; fix a ship there and re-run. The notation is
+  documented in `tools/catalog_common.py`. Default loadouts: standard fighters per bay/group,
+  all-standard salvos; each ship's single magazine feeds all its launchers.
+- How the tables were read: spec panels from the text layer (the FB1 script checks every TMF/NPV
+  against the page); arcs from the vector SSDs by `tools/ssd_arcs.py` (`rings()` = beam rings,
+  white segments are covered arcs; `pies()` = launcher/rack ring segments); the rest (torpedo
+  facing, submunitions, merchants, all of FT and MT) from rendered page images. FT2 beam pointers:
+  up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
+- `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
+  All 96 match their printed NPV; the only errata entry is the FT p.31 design example.
+- tools/ scripts need `pymupdf` (requirements-dev) and run from the repo root; the three rulebook
+  pipeline files are excluded from ruff, the extractors only from E501 (one row per ship).
 
 ## Sister project
 

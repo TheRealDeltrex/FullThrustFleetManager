@@ -25,5 +25,9 @@ extend-exclude = ["tools/build_rulebooks.py", "tools/tocs.py", "tools/dedup_text
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 
+[tool.ruff.lint.per-file-ignores]
+# Curated ship tables keep one row per ship.
+"tools/extract_catalog_*.py" = ["E501"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
