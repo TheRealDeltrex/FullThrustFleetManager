@@ -30,7 +30,11 @@ What exists:
   button, ruleset colour strip), flashes, `<main class="work cols-N">` grid. One template per
   tab plus `error.html`; tab bodies are placeholders.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
-  variables, panes stack below 1100 px. System font stack, no web fonts.
+  variables, panes stack below 1100 px.
+- `static/fonts/` — IBM Plex Sans (owner's choice) Regular, Italic, SemiBold, Bold as TTF from the
+  IBM/plex 1.1.0 release, with its OFL licence. The same files are for the PDF (M9). The web
+  shell rewrites `url("fonts/` to `url("static/fonts/` when it inlines the CSS; keep that exact
+  spelling in `@font-face`.
 - `i18n.py` + `translations/en.json` — see Translation below.
 - `paths.py`, `tray.py`, `idle_watchdog.py`, `run_app.py`, `fleetmanager.spec` — copied from
   Frostgrave and adapted (env prefix `FTFM_`).
