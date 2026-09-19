@@ -1,0 +1,61 @@
+name: Deploy Pages
+
+# Builds the Pyodide web build from a branch (default devversion) and deploys it to GitHub Pages.
+# Nothing is committed anywhere; main never carries generated files. Manually dispatched from the
+# Actions tab.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or tag to build the site from"
+        required: false
+        default: "devversion"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build web/bundle.json
+        run: python scripts/build_browser_bundle.py
+
+      - name: Assemble the site (shell + bundle, static files, rulebook PDFs)
+        # Rulebooks and binary static assets are served as plain files next to index.html, not
+        # through the text-only bundle.json (PLAN 12, 14).
+        run: |
+          mkdir -p _site
+          cp web/index.html web/bundle.json _site/
+          cp -r static _site/static
+          cp -r rulebooks _site/rulebooks
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

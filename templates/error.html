@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block work_class %}cols-1{% endblock %}
+{% block content %}
+  <section class="main-col">
+    <div class="panel empty">{{ message }} <a href="{{ url_for('home') }}">{{ _("Back to the fleet overview") }}</a></div>
+  </section>
+{% endblock %}

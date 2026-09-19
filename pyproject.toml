@@ -1,0 +1,29 @@
+[project]
+name = "full-thrust-fleet-manager"
+version = "0.1.0"
+description = "Ship design, fleet building, campaign tracking and fleet PDFs for Full Thrust"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "GPL-3.0-or-later" }
+dependencies = [
+    "flask>=3.0.0",
+    "fpdf2>=2.7.0",
+    "Pillow>=10.0.0",
+    "waitress>=3.0.0",
+    "pystray>=0.19.5",
+]
+
+# requirements.txt / requirements-dev.txt are what installers use; this file carries the version
+# (paths.app_version()) and tool config.
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+# The rulebook build pipeline predates the app and is only run by hand; tools added later are linted.
+extend-exclude = ["tools/build_rulebooks.py", "tools/tocs.py", "tools/dedup_text.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

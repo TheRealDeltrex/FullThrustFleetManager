@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% block work_class %}cols-3{% endblock %}
+{% block content %}
+  <aside class="panel">
+    <h3>{{ _("Library") }}</h3>
+    <div class="body muted">{{ _("No designs yet.") }}</div>
+  </aside>
+  <section class="main-col">
+    <div class="panel head">
+      <h2>{{ _("Design") }}</h2>
+    </div>
+    <div class="panel empty">{{ _("Pick a design from the library or start a new one.") }}</div>
+  </section>
+  <aside class="side-col">
+    <div class="panel">
+      <h3>{{ _("Ship diagram") }}</h3>
+      <div class="body muted">&ndash;</div>
+    </div>
+    <div class="panel">
+      <h3>{{ _("Budget") }}</h3>
+      <div class="body muted">&ndash;</div>
+    </div>
+  </aside>
+{% endblock %}

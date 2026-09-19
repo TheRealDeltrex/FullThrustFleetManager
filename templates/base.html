@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ LANG }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ _("Full Thrust Fleet Manager") }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      {# Thin strip in the current fleet's ruleset colour (PLAN 9.2); neutral until fleets exist. #}
+      <div class="ruleset-strip"></div>
+      <div class="topbar-row">
+        <a class="brand" href="{{ url_for('home') }}">
+          {{ _("FT Fleet Manager") }}{% if APP_VERSION %}<small>v{{ APP_VERSION }}</small>{% endif %}
+        </a>
+        <div class="fleet-select" title="{{ _('Current fleet') }}">
+          <span class="muted-chrome">{{ _("No fleet yet") }}</span>
+        </div>
+        <nav class="tabs" aria-label="{{ _('Main') }}">
+          <a href="{{ url_for('fleet_overview') }}" class="{% if active_tab == 'fleet_overview' %}on{% endif %}">{{ _("Fleet overview") }}</a>
+          <a href="{{ url_for('design') }}" class="{% if active_tab == 'design' %}on{% endif %}">{{ _("Design") }}</a>
+          <a href="{{ url_for('campaign') }}" class="{% if active_tab == 'campaign' %}on{% endif %}">{{ _("Campaign") }}</a>
+          <a href="{{ url_for('settings') }}" class="{% if active_tab == 'settings' %}on{% endif %}">{{ _("Settings") }}</a>
+        </nav>
+        <div class="spacer"></div>
+        <div class="meter">
+          <div class="lbl"><span>{{ _("Fleet points") }}</span><b>&ndash; / &ndash;</b></div>
+          <div class="bar"><i style="width:0"></i></div>
+        </div>
+        <button type="button" class="btn primary" disabled title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <li class="flash {{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <main class="work {% block work_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if IS_FROZEN %}
+      <script>
+        (function () {
+          // Windowless exe: idle_watchdog.py exits once no page pings any more. pagehide also
+          // fires on in-app navigation; the watchdog only acts if no fresh ping follows.
+          function ping(url) {
+            try { navigator.sendBeacon(url); }
+            catch (err) { fetch(url, { method: "POST", keepalive: true }).catch(function () {}); }
+          }
+          ping("/heartbeat");
+          setInterval(function () { ping("/heartbeat"); }, 5000);
+          window.addEventListener("pagehide", function () { ping("/heartbeat/closing"); });
+        })();
+      </script>
+    {% endif %}
+  </body>
+</html>
