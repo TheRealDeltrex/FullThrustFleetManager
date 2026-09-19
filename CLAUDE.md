@@ -17,8 +17,9 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1 (Scaffold) is done: an empty Layout C shell that runs on desktop and is ready for the web
-build. No rules engine, storage or fleets yet; next is **M2** (ruleset framework + FB engine).
+M1 (Scaffold) and M2 (ruleset framework + FB engine) are done: an empty Layout C shell plus the
+FB rules engine. No storage, fleets or UI on top of the engine yet; next is **M3** (FT2 + More
+Thrust engine).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -35,13 +36,13 @@ What exists:
   Frostgrave and adapted (env prefix `FTFM_`).
 - `scripts/build_browser_bundle.py` → `web/bundle.json` (gitignored), `web/index.html` (the
   Pyodide shell).
-- `rulesets/__init__.py` — empty `RULESETS` registry placeholder for M2.
+- `rulesets/` — the `Ruleset` protocol, registry and FB engine; see Rulesets below.
 - `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` (manual).
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from `E:\RPG\Tabletop\Full Thurst\`.
 
-Modules of PLAN section 4 not listed here (`fleet_rules.py`, `store.py`, `migrations.py`,
+Modules of PLAN section 4 not listed here (`rulesets/ft2`, `fleet_rules.py`, `store.py`, `migrations.py`,
 `ssd_layout.py`, `pdf_export.py`, `data/`) are created by the milestone that needs them.
 
 ## Non-negotiable principles
@@ -60,7 +61,7 @@ Full list in PLAN section 2. The ones most likely to be broken by accident:
 - **Every user-facing string goes through `_()`** (UI and PDF), even though only English exists.
 - **Catalog designs are read-only.** Editing one creates a variant.
 
-## Architecture (PLAN section 4; layers 1-3 arrive in M2-M5)
+## Architecture (PLAN section 4; layer 1 exists, layers 2-3 arrive in M5-M8)
 
 Four layers, strictly ordered — each may import only from layers above it:
 
@@ -75,6 +76,41 @@ Four layers, strictly ordered — each may import only from layers above it:
 
 Pure consumers: `ssd_layout.py` (design → drawing primitives) and `pdf_export.py` (primitives →
 PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
+
+## Rulesets
+
+- `rulesets/__init__.py`: dataclasses (`BookRef`, `Race`, `ParamDef`, `SystemDef`,
+  `BreakdownRow`, `Breakdown`, `Issue`, `QuickRefEntry`), the `Ruleset` protocol, `RULESETS`,
+  `register()`, `get_ruleset()`. Rulesets register at the bottom of that file (they import the
+  dataclasses, so the import has to come last).
+- The protocol is PLAN 6.1 plus `loadout_points(design, loadout, options)`: fleet totals need
+  loadout costs (PLAN 5.4) and only the ruleset knows them. `loadout=None` means the design's
+  default loadout. `icon_set` (M6) and `quickref()` (M9) are placeholders in FB.
+- `rulesets/common.py`: integer rounding (`round_half_up`, `pct_mass`: .5 up, never 0 MASS),
+  arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`), `split_rows`, `cf_positions`. Never compute
+  percentages with floats: 85 x 30% must be 25.5 exactly to round to 26.
+- `rulesets/fb/`: `data.py` (books, `system_defs()` for the picker, fighter points, FB1 p.12
+  classes, hull descriptors), `rules.py` (`SYSTEM_RULES` type -> (mass, points, label),
+  breakdown, validation, derived values), `__init__.py` (`RULESET`).
+- System dicts per type (the design `systems` list; `uid` + `type` always): `beam` {class,
+  arcs}, `pulse_torpedo`/`needle_beam`/`sm_launcher`/`nova_cannon`/`wave_gun` {arcs},
+  `submunition` {arcs optional}, `sm_magazine` {capacity (MASS), feeds [launcher uids]},
+  `sm_rack` {load std|er, arcs}, `screen` {level; >2 = backup generators}, `hangar` {bays},
+  `tender_bay` {capacity = MASS carried}, `minelayer` {mines}, `tug_drive` {tow_mass}, `hold`
+  {kind cargo|passenger|troop|lab, mass}; no params: `pds`, `fire_control`, `adfc`,
+  `mt_missile`, `ortillery`, `minesweeper`, `reflex_field`, `cloak`.
+- Rules code treats designs as semi-untrusted: bad numbers read as defaults (`_int`), unknown
+  types cost nothing and raise a violation. Nothing in a ruleset raises on a malformed design.
+- Labels and issue messages are translated at call time (`system_defs()` is a function for that
+  reason). Breakdown `derived` holds `hull_descriptor`, `turn_thrust`, `damage_track`,
+  `crew_factors`, `cf_positions`, `thresholds`, `holds`, `ftl_mass`, `drive_mass`.
+- FB judgment calls, recorded in the code comments: the hull minimum is the *rounded* 10% (FB2
+  says FB1's Fragile designs stay legal); pulse torpedo arcs must be adjacent ("traverse"), class
+  3+ beam arcs need not be; type suggestion picks the FB1 p.12 band whose centre is nearest (ties
+  to the smaller class), carriers from 2 fighter bays and MASS 80, never CVA; merchants suggest
+  "Merchant" / "M" (no book code exists).
+- Tests: `tests/test_rules_fb.py` (golden designs, one test per costing rule and validator).
+  `docs/mockups/ssd.js` has a JS costing that agrees on 219 and 261; it is not the reference.
 
 ## Sister project
 
