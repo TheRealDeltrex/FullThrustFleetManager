@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+*.spec.bak
+.idea/
+.vscode/
+*.log
+# generated web bundle (built in CI)
+web/bundle.json
+# local user data when running from source
+userdata/

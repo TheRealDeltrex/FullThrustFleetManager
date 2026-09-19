@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout B: Hangar Deck</title>
+<link rel="stylesheet" href="mockup.css">
+<style>
+  .tabs { display: flex; gap: 2px; margin-left: 10px; }
+  .tabs span { padding: 7px 14px; border-radius: 6px; color: var(--chrome-muted); cursor: pointer; white-space: nowrap; }
+  .tabs span.on { background: #23324a; color: #fff; font-weight: 600; }
+  .fleethead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 14px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .fleethead h2 { margin: 0; font-size: 20px; }
+  .fleethead .meter { min-width: 260px; }
+  .fleethead .meter .lbl { color: var(--muted); }
+  .fleethead .meter .lbl b { color: var(--ink); }
+  .board { padding: 14px 16px 18px; }
+  .squad { margin-bottom: 18px; }
+  .squad-h { display: flex; align-items: baseline; gap: 10px; margin: 0 0 8px; }
+  .squad-h h4 { margin: 0; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 9px; overflow: hidden; display: flex; flex-direction: column; }
+  .card.lost { opacity: .55; }
+  .card .top { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 6px; gap: 6px; }
+  .card .tid { font: 700 12px ui-monospace, Consolas, monospace; background: var(--chrome); color: #fff; padding: 2px 6px; border-radius: 4px; }
+  .card .nm { font-weight: 650; padding: 0 10px; }
+  .card .cls { font-size: 12px; color: var(--muted); padding: 0 10px 6px; }
+  .card .mini { margin: 0 10px; border: 1px solid #333; border-radius: 3px; background: #fff; padding: 4px 18px; }
+  .card .foot { display: flex; justify-content: space-between; padding: 8px 10px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 8px; }
+  .card .foot b { color: var(--ink); }
+  .card.add { border-style: dashed; align-items: center; justify-content: center; color: var(--accent); font-weight: 600; min-height: 200px; background: transparent; }
+  .screen-title { max-width: 1360px; margin: 26px auto 8px; padding: 0 16px; font-size: 16px; font-weight: 700; }
+  .screen-title span { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 8px; }
+  /* stepper */
+  .stepwrap { display: grid; grid-template-columns: 210px minmax(0, 1fr); min-height: 560px; }
+  .rail { background: var(--panel); border-right: 1px solid var(--line); padding: 14px 0; }
+  .rail .st { display: flex; gap: 10px; align-items: center; padding: 9px 16px; color: var(--muted); }
+  .rail .st i { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 700;
+    border: 1.5px solid var(--line); background: #fff; flex: none; }
+  .rail .st.done i { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .rail .st.on { color: var(--ink); font-weight: 600; background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .rail .st.on i { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .rail .st small { display: block; font-weight: 400; font-size: 11.5px; color: var(--muted); }
+  .stepmain { padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .tile { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 8px 10px; display: flex; gap: 8px; align-items: center; cursor: pointer; }
+  .tile:hover { border-color: var(--accent); }
+  .tile svg { width: 34px; height: 34px; flex: none; }
+  .tile b { display: block; font-size: 13px; }
+  .tile small { color: var(--muted); font-size: 11.5px; }
+  .pgrp { font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin: 4px 0 2px; }
+  .fitted { display: flex; flex-wrap: wrap; gap: 6px; }
+  .fitted .chip { font-size: 12.5px; padding: 3px 10px; background: #fff; }
+  .strip { display: flex; align-items: center; gap: 22px; padding: 10px 16px; background: var(--chrome); color: var(--chrome-ink); flex-wrap: wrap; }
+  .strip .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .strip .k { font-size: 11.5px; color: var(--chrome-muted); }
+  .strip .thumb { width: 64px; background: #fff; border-radius: 3px; padding: 2px; }
+  /* campaign */
+  .camp { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; padding: 14px 16px; }
+  .dmg-ssd { max-width: 300px; margin: 0 auto; }
+  .log div { padding: 6px 0; border-bottom: 1px solid #edf1f5; font-size: 13px; }
+  .log b { display: inline-block; width: 58px; color: var(--muted); }
+  @media (max-width: 1000px) { .stepwrap, .camp { grid-template-columns: 1fr; } .rail { display: flex; overflow-x: auto; } }
+</style>
+</head>
+<body>
+<div class="mock-note">
+  <h1>Layout B: "Hangar Deck" (fleet board + guided design)</h1>
+  Tabs across the top. The fleet is a board of ship cards showing status at a glance. Designing is a stepper that follows the
+  FB1 p.10 procedure. Below: <b>B1</b> the Fleet tab, <b>B2</b> the Designs tab mid-design, <b>B3</b> the Campaign tab after a battle.
+</div>
+
+<div class="screen-title">B1 · Fleet tab<span>squadrons as card rows, each card with a mini SSD and status</span></div>
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">FT Fleet Manager</div>
+    <div class="tabs"><span class="on">Fleet</span><span>Designs</span><span>Campaign</span><span>Print</span></div>
+    <div class="spacer"></div>
+    <div class="select">▾ 7th Cruiser Squadron · NAC</div>
+  </div>
+  <div class="fleethead">
+    <h2>7th Cruiser Squadron</h2><span class="chip">NAC</span><span class="chip">R.Adm. A. Brigstone</span>
+    <span class="chip info anno" data-anno="1">Core systems · Rerolls · Cinematic</span>
+    <div class="spacer"></div>
+    <div class="meter light anno" data-anno="2" style="padding-right:18px"><div class="lbl"><span>Points (lost ships excluded)</span><b id="pts"></b></div><div class="bar"><i id="bar"></i></div></div>
+    <button class="btn">+ Add ship</button><button class="btn primary">⎙ Print</button>
+  </div>
+  <div class="board" id="board"></div>
+</div>
+
+<div class="screen-title">B2 · Designs tab: guided design<span>steps from the book, a "jump to step" rail, and a live summary strip</span></div>
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">FT Fleet Manager</div>
+    <div class="tabs"><span>Fleet</span><span class="on">Designs</span><span>Campaign</span><span>Print</span></div>
+    <div class="spacer"></div>
+    <span class="chip" style="background:#1c2738;border-color:#2d3b52;color:#e8eef7">New class · Halberd/B (variant of Halberd)</span>
+  </div>
+  <div class="stepwrap">
+    <div class="rail anno" data-anno="3">
+      <div class="st done"><i>✓</i><div>Total MASS<small>30 · Destroyer (DD)</small></div></div>
+      <div class="st done"><i>✓</i><div>Hull integrity<small>9 boxes · 30% Average</small></div></div>
+      <div class="st done"><i>✓</i><div>Drives<small>Thrust 6 · FTL</small></div></div>
+      <div class="st on"><i>4</i><div>Weapons &amp; systems<small>9 MASS to fit</small></div></div>
+      <div class="st"><i>5</i><div>Review &amp; SSD<small>name, class, notes</small></div></div>
+    </div>
+    <div>
+      <div class="stepmain">
+        <div class="row" style="justify-content:space-between"><h2 style="margin:0;font-size:18px">Step 4 · Weapons &amp; systems</h2>
+          <span class="muted" style="font-size:12.5px">FB1 p.10-11 · click a tile to fit it, click a fitted chip to edit arcs</span></div>
+        <div class="panel"><h3>Fitted <span id="left" class="chip ok"></span></h3>
+          <div class="body fitted" id="fitted"></div></div>
+        <div class="panel anno" data-anno="4"><h3>Add system</h3>
+          <div class="body" id="palette"></div></div>
+        <div class="row" style="justify-content:space-between"><button class="btn">← Drives</button><button class="btn primary">Review →</button></div>
+      </div>
+      <div class="strip anno" data-anno="5">
+        <div><div class="k">MASS</div><div class="v" id="sMass"></div></div>
+        <div><div class="k">Points</div><div class="v" id="sPts"></div></div>
+        <div><div class="k">Hull / armour</div><div class="v">9 / 1</div></div>
+        <div><div class="k">Thrust</div><div class="v">6</div></div>
+        <div class="spacer"></div>
+        <span class="chip warn">1 warning: no fire control fitted yet</span>
+        <div class="thumb" id="thumb"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="screen-title">B3 · Campaign tab: after the battle<span>click boxes on the SSD to record damage; repairs and replenishment per campaign week</span></div>
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">FT Fleet Manager</div>
+    <div class="tabs"><span>Fleet</span><span>Designs</span><span class="on">Campaign</span><span>Print</span></div>
+    <div class="spacer"></div>
+    <span class="chip" style="background:#1c2738;border-color:#2d3b52;color:#e8eef7">Lafayette campaign · Week 4</span>
+  </div>
+  <div class="camp">
+    <div class="panel">
+      <h3>CE-1 RNS Nashville · Furious <span class="row"><span class="chip warn">Damaged</span><select class="input" style="padding:2px 6px;font-size:12px"><option>Status: Damaged</option><option>Docked for repair</option><option>Hulk</option><option>Destroyed</option></select></span></h3>
+      <div class="body" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px">
+        <div><div class="paper dmg-ssd anno" data-anno="6" id="dmgssd"></div></div>
+        <div>
+          <table class="grid">
+            <tr><td>Hull boxes lost</td><td class="num"><b>6 / 19</b></td></tr>
+            <tr><td>Armour lost</td><td class="num"><b>3 / 3</b></td></tr>
+            <tr><td>Crew factors left</td><td class="num"><b>3 / 4</b></td></tr>
+            <tr><td>Systems knocked out</td><td class="num"><b>1</b> <span class="muted">(PDS)</span></td></tr>
+          </table>
+          <div class="panel anno" data-anno="7" style="margin-top:12px;background:var(--panel-2)">
+            <h3>At naval base: New Toledo</h3>
+            <div class="body">
+              <div class="row" style="justify-content:space-between"><span>Hull repair (1D6 per week)</span><button class="btn sm">🎲 Roll</button></div>
+              <div class="row" style="justify-content:space-between;margin-top:6px"><span>PDS (3+ to repair, max 3/week)</span><button class="btn sm">🎲 Roll</button></div>
+              <div class="row" style="justify-content:space-between;margin-top:6px"><span>Or enter results from the table</span><input class="input" style="width:70px" placeholder="DP"></div>
+              <div class="muted" style="font-size:12px;margin-top:8px">Rolls are offered, never forced. Values can always be edited by hand.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Campaign log <span class="btn sm ghost">+ Entry</span></h3>
+      <div class="body log">
+        <div><b>Week 4</b>Battle at Merril's vs ESU raiders. Vigil lost, Nashville damaged.</div>
+        <div><b>Week 4</b>Tripoli docked at New Toledo (11 DP to repair).</div>
+        <div><b>Week 3</b>Replenished SMR and fighters at Baffin.</div>
+        <div><b>Week 2</b>Squadron jumped Hudson → Merril's (6 LY).</div>
+        <div><b>Week 1</b>Fleet formed, 1,031 pts.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div><b class="k">1</b>Fleet options (core systems, rerolls, movement) are set per fleet and printed on the roster.</div>
+  <div><b class="k">2</b>Points bar for the whole fleet; over the limit turns amber, never blocks.</div>
+  <div><b class="k">3</b>Steps follow FB1 p.10. Finished steps can be reopened directly from the rail.</div>
+  <div><b class="k">4</b>System tiles grouped by role, each showing MASS and points before you fit it.</div>
+  <div><b class="k">5</b>Summary strip with a live SSD thumbnail stays pinned while you scroll.</div>
+  <div><b class="k">6</b>Damage entry directly on the SSD: click boxes, circles and systems.</div>
+  <div><b class="k">7</b>FT p.35 repair rules as optional dice buttons, or type in results rolled at the table.</div>
+</div>
+
+<script src="ssd.js"></script>
+<script>
+  const pts = fleetPoints(FLEET);
+  document.getElementById("pts").textContent = pts + " / " + FLEET.limit;
+  document.getElementById("bar").style.width = Math.min(100, pts / FLEET.limit * 100) + "%";
+  const badge = { "Ready": "ok", "Damaged": "warn", "In repair": "info", "Lost": "bad" };
+  const squads = [["Battle group", ["CH-1", "CE-1", "CE-2"]], ["Screen", ["DD-1", "DD-2", "FF-1", "FF-2"]]];
+  let h = "";
+  squads.forEach(([title, ids]) => {
+    const ships = FLEET.ships.filter(s => ids.includes(s.id));
+    const sp = ships.filter(s => s.status !== "Lost").reduce((a, s) => a + designTotals(DESIGNS[s.d]).pts, 0);
+    h += `<div class="squad"><div class="squad-h"><h4>${title}</h4><span class="muted" style="font-size:12px">${ships.length} ships · ${sp} pts</span></div><div class="cards">`;
+    ships.forEach(s => {
+      const d = DESIGNS[s.d], t = designTotals(d), dm = s.damage;
+      const st = s.status + (dm ? ` ${dm.hull}/${d.hull}` : "");
+      h += `<div class="card${s.status === "Lost" ? " lost" : ""}">
+        <div class="top"><span class="tid">${s.id}</span><span class="chip ${badge[s.status]}">${st}</span></div>
+        <div class="nm">${s.name}</div><div class="cls">${d.name} class · ${d.type}</div>
+        <div class="mini">${ssdSVG(d, { damage: dm })}</div>
+        <div class="foot"><span>TMF <b>${d.tmf}</b></span><span>Thrust <b>${d.thrust}</b></span><span>NPV <b>${t.pts}</b></span></div></div>`;
+    });
+    if (title === "Screen") h += `<div class="card add">+ Add ship to squadron</div>`;
+    h += `</div></div>`;
+  });
+  document.getElementById("board").innerHTML = h;
+
+  // B2 stepper: Halberd variant mid-design
+  const v = JSON.parse(JSON.stringify(DESIGNS.halberd));
+  v.systems = v.systems.slice(0, 4);           // two C2 + two C1 fitted so far
+  const tv = designTotals(v);
+  document.getElementById("fitted").innerHTML = v.systems.map(s =>
+    `<span class="chip">${label(s)} · ${systemMass(s, v.tmf)} M · ${systemPoints(s, v.tmf)} pts ✎</span>`).join("");
+  document.getElementById("left").textContent = (v.tmf - tv.mass) + " MASS left";
+  document.getElementById("sMass").textContent = tv.mass + " / " + v.tmf;
+  document.getElementById("sPts").textContent = tv.pts;
+  document.getElementById("thumb").innerHTML = ssdSVG(v);
+  const tile = (s, name, m, p) => `<div class="tile"><svg viewBox="-17 -17 34 34">${icon(s, 0, 0)}</svg><div><b>${name}</b><small>${m} MASS · ${p} pts</small></div></div>`;
+  document.getElementById("palette").innerHTML =
+    `<div class="pgrp">Beams</div><div class="palette">
+      ${tile({ type: "beam", cls: 1, arcs: ARCS }, "Class-1 beam", 1, 3)}
+      ${tile({ type: "beam", cls: 2, arcs: ["FP", "F", "FS"] }, "Class-2 beam", "2-3", "6-9")}
+      ${tile({ type: "beam", cls: 3, arcs: ["F"] }, "Class-3 beam", "4+", "12+")}
+      ${tile({ type: "torp", arcs: ["F"] }, "Pulse torpedo", "4-6", "12-18")}</div>
+     <div class="pgrp" style="margin-top:10px">Missiles &amp; ordnance</div><div class="palette">
+      ${tile({ type: "sml" }, "SM launcher", 3, 9)}
+      ${tile({ type: "mag", salvos: 2 }, "SM magazine", "2/salvo", "6/salvo")}
+      ${tile({ type: "smp" }, "Submunitions", 1, 3)}</div>
+     <div class="pgrp" style="margin-top:10px">Defence &amp; sensors</div><div class="palette">
+      ${tile({ type: "pds" }, "Point defence", 1, 3)}
+      ${tile({ type: "fc" }, "Fire control", 1, 4)}
+      ${tile({ type: "adfc" }, "Area-defence FC", 2, 8)}
+      ${tile({ type: "screen", level: 1 }, "Screen L1", 3, 9)}</div>
+     <div class="pgrp" style="margin-top:10px">Hangars &amp; space</div><div class="palette">
+      ${tile({ type: "hangar", fighter: "" }, "Fighter bay", 9, 27)}</div>`;
+
+  // B3 damage SSD
+  const nash = FLEET.ships.find(s => s.id === "CE-1");
+  document.getElementById("dmgssd").innerHTML = ssdSVG(DESIGNS.furious, { damage: nash.damage });
+</script>
+</body>
+</html>

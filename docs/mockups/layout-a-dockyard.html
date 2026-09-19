@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout A: Dockyard</title>
+<link rel="stylesheet" href="mockup.css">
+<style>
+  .work { display: grid; grid-template-columns: 250px minmax(0, 1fr) 330px; gap: 12px; padding: 12px; min-height: 760px; }
+  .tree { padding: 6px 0; }
+  .tree .grp { padding: 8px 14px 4px; font-size: 11.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+    display: flex; justify-content: space-between; }
+  .tree .it { display: flex; align-items: center; gap: 8px; padding: 5px 14px; cursor: pointer; font-size: 13px; }
+  .tree .it:hover { background: var(--panel-2); }
+  .tree .it.sel { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .tree .it .id { font: 600 11px ui-monospace, Consolas, monospace; color: var(--muted); width: 36px; }
+  .tree .it .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .dot.Ready { background: var(--ok); } .dot.Damaged { background: #d98a00; } .dot.InRepair { background: var(--accent); } .dot.Lost { background: #9aa6b4; }
+  .it.lost .nm { text-decoration: line-through; color: var(--muted); }
+  .cat .it .pg { font-size: 11px; color: var(--muted); }
+  .search { margin: 6px 14px 8px; width: calc(100% - 28px); }
+  .editor { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .ed-head { display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; padding: 12px 14px; }
+  .ed-head h2 { margin: 0; font-size: 19px; white-space: nowrap; }
+  .fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .arcpick { width: 30px; height: 30px; vertical-align: middle; cursor: pointer; }
+  .sysrow td:last-child { width: 30px; text-align: center; color: var(--muted); cursor: pointer; }
+  .addrow td { background: var(--panel-2); }
+  .side { display: flex; flex-direction: column; gap: 12px; }
+  .budget .line { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+  .big { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .warns div { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; padding: 4px 0; }
+  .shipmeta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; padding: 2px 2px 6px; border-bottom: 1.5px solid #000; margin-bottom: 6px; }
+  .tabs-mini { display: flex; gap: 4px; }
+  .tabs-mini span { font-size: 12px; padding: 3px 9px; border-radius: 5px; color: var(--muted); cursor: pointer; }
+  .tabs-mini span.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  @media (max-width: 1100px) { .work { grid-template-columns: 1fr; } .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<div class="mock-note">
+  <h1>Layout A: "Dockyard" (three-pane workbench)</h1>
+  Fleet tree on the left, the design editor in the middle, a live SSD and budget on the right. Numbers are calculated
+  with the FB1 rules (see <code>ssd.js</code>): Furious comes out at 219 points, the same as the printed NPV. Yellow markers are explained below the frame.
+</div>
+
+<div class="frame">
+  <div class="topbar">
+    <div class="brand">FT Fleet Manager<small>Dockyard</small></div>
+    <div class="select">▾ 7th Cruiser Squadron · NAC</div>
+    <div class="tabs-mini" style="margin-left:6px">
+      <span class="on" style="background:#23324a;color:#fff">Design</span><span style="color:#93a3b8">Campaign</span><span style="color:#93a3b8">Settings</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="meter anno" data-anno="1" style="padding-right:18px">
+      <div class="lbl"><span>Fleet points</span><b id="fleetPts"></b></div>
+      <div class="bar"><i id="fleetBar"></i></div>
+    </div>
+    <button class="btn primary anno" data-anno="2">⎙ Print fleet PDF</button>
+  </div>
+
+  <div class="work">
+    <!-- LEFT: fleets + catalog -->
+    <div class="panel">
+      <h3>Fleets <span class="btn sm ghost">+ New</span></h3>
+      <div class="tree" id="tree"></div>
+      <h3 style="border-top:1px solid var(--line)">Class catalog <span class="chip">FB1 · FB2</span></h3>
+      <input class="input search" placeholder="Search classes…">
+      <div class="tree cat anno" data-anno="3" id="cat"></div>
+    </div>
+
+    <!-- CENTRE: editor -->
+    <div class="editor">
+      <div class="panel ed-head">
+        <h2>Furious class</h2><span class="chip">Escort Cruiser · CE</span>
+        <span class="chip info">Source FB1 p.16 ↗</span>
+        <span class="chip warn">Used by 2 ships</span>
+        <div class="spacer"></div>
+        <button class="btn">Save as variant…</button><button class="btn primary">Save class</button>
+      </div>
+
+      <div class="panel">
+        <h3>1 · Hull &amp; drives</h3>
+        <div class="body">
+          <div class="fields">
+            <div class="field"><label>Total MASS (TMF)</label><input class="input" value="64"></div>
+            <div class="field"><label>Hull boxes <span class="muted">(min 7)</span></label><input class="input" value="19"><span class="muted" style="font-size:12px">29.7% · Average · rows 5/5/5/4</span></div>
+            <div class="field"><label>Armour boxes</label><input class="input" value="3"></div>
+            <div class="field"><label>Streamlining</label><select class="input"><option>None</option><option>Partial (10%)</option><option>Full (20%)</option></select></div>
+            <div class="field"><label>Main drive thrust</label><input class="input" value="4"><span class="muted" style="font-size:12px">13 MASS · turns 2</span></div>
+            <div class="field"><label>FTL drive</label><select class="input"><option>Yes · 6 MASS</option><option>No (system defence)</option></select></div>
+            <div class="field"><label>Crew factors</label><div class="input" style="background:var(--panel-2)">4 CF · 4 DCP</div></div>
+            <div class="field"><label>Tech</label><select class="input"><option>Human (FB1)</option><option>Kra'Vak (FB2)</option><option>Phalon (FB2)</option><option>Sa'Vasku (FB2)</option></select></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel anno" data-anno="4">
+        <h3>2 · Weapons &amp; systems <span class="muted" style="text-transform:none;letter-spacing:0">click the hexagon to set fire arcs</span></h3>
+        <table class="grid" id="sys"></table>
+      </div>
+    </div>
+
+    <!-- RIGHT: live SSD + budget -->
+    <div class="side">
+      <div class="panel anno" data-anno="5">
+        <h3>Systems status display <span class="tabs-mini"><span class="on">Clean</span><span>Nashville (dmg)</span></span></h3>
+        <div class="body">
+          <div class="paper">
+            <div class="shipmeta"><span>ID: ____</span><span>Furious · CE · TMF 64</span></div>
+            <div id="ssd"></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel budget">
+        <h3>Budget</h3>
+        <div class="body">
+          <div class="line"><span>MASS used</span><b id="massTxt"></b></div>
+          <div class="bar light" style="margin-bottom:12px"><i id="massBar"></i></div>
+          <div class="row" style="justify-content:space-between;align-items:flex-end">
+            <div><div class="muted" style="font-size:12px">Points (NPV)</div><div class="big" id="ptsTxt"></div></div>
+            <span class="chip ok">✓ matches book NPV 219</span>
+          </div>
+          <div class="warns" style="margin-top:10px;border-top:1px solid var(--line);padding-top:8px">
+            <div><span class="chip ok">OK</span><span>All 64 MASS allocated.</span></div>
+            <div><span class="chip info">i</span><span>Editing this class changes 2 fleet ships. Use "Save as variant" for a refit.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div><b class="k">1</b>Fleet points against the limit, always visible. Lost ships don't count.</div>
+  <div><b class="k">2</b>One click to the printable fleet pack (see the print mockup).</div>
+  <div><b class="k">3</b>Published classes with rulebook page; drag onto a fleet or "copy as variant".</div>
+  <div><b class="k">4</b>Every system is a row with its MASS and points; arc picker right in the row.</div>
+  <div><b class="k">5</b>The SSD redraws on every change; the toggle shows a ship's campaign damage.</div>
+</div>
+
+<script src="ssd.js"></script>
+<script>
+  const d = DESIGNS.furious, t = designTotals(d);
+  const pts = fleetPoints(FLEET);
+  document.getElementById("fleetPts").textContent = pts + " / " + FLEET.limit;
+  document.getElementById("fleetBar").style.width = Math.min(100, pts / FLEET.limit * 100) + "%";
+  document.getElementById("ssd").innerHTML = ssdSVG(d);
+  document.getElementById("massTxt").textContent = t.mass + " / " + d.tmf;
+  document.getElementById("massBar").style.width = (t.mass / d.tmf * 100) + "%";
+  document.getElementById("ptsTxt").textContent = t.pts;
+
+  // tree
+  let h = `<div class="grp"><span>7th Cruiser Squadron</span><span>${pts}</span></div>`;
+  FLEET.ships.forEach(s => {
+    const sel = s.id === "CE-1" ? " sel" : "", lost = s.status === "Lost" ? " lost" : "";
+    h += `<div class="it${sel}${lost}"><span class="dot ${s.status.replace(' ', '').replace('Inrepair','InRepair')}"></span><span class="id">${s.id}</span>
+          <span class="nm">${s.name}</span><span class="muted" style="font-size:11.5px">${DESIGNS[s.d].name}</span></div>`;
+  });
+  h += `<div class="grp" style="margin-top:6px"><span>Home Fleet Reserve</span><span>2,340</span></div>
+        <div class="grp"><span>Kra'Vak raiders (opponent)</span><span>1,480</span></div>`;
+  document.getElementById("tree").innerHTML = h;
+  document.getElementById("cat").innerHTML =
+    [["NAC", "Harrison · Scout", "p.13"], ["NAC", "Arapaho · Corvette", "p.13"], ["NAC", "Minerva · Frigate", "p.14"],
+     ["NAC", "Ticonderoga · Destroyer", "p.15"], ["NAC", "Furious · Escort Cruiser", "p.16"],
+     ["NAC", "Vandenburg · Heavy Cruiser", "p.16"], ["NAC", "Majestic · Battlecruiser", "p.17"],
+     ["", "Show NSL, FSE, ESU, Kra'Vak, Sa'Vasku, Phalon…", ""]]
+      .map(([f, n, p]) => `<div class="it"><span class="id">${f}</span><span class="nm">${n}</span><span class="pg">${p}</span></div>`).join("");
+
+  // systems table
+  function hexPick(arcs) {
+    if (!arcs) return '<span class="muted">·</span>';
+    let p = "";
+    ARCS.forEach(a => {
+      const a0 = (ARC_ANGLE[a] - 30) * Math.PI / 180, a1 = (ARC_ANGLE[a] + 30) * Math.PI / 180;
+      p += `<path d="M15 15 L${15 + 13 * Math.cos(a0)} ${15 + 13 * Math.sin(a0)} L${15 + 13 * Math.cos(a1)} ${15 + 13 * Math.sin(a1)} Z"
+            fill="${arcs.includes(a) ? "#1f5fa8" : "#e3e9f1"}" stroke="#fff" stroke-width="1.2"/>`;
+    });
+    return `<svg class="arcpick" viewBox="0 0 30 30">${p}</svg>`;
+  }
+  let r = `<tr><th>System</th><th>Arcs</th><th class="num">MASS</th><th class="num">Points</th><th></th></tr>`;
+  t.rows.slice(0, 5).forEach(([n, m, p]) => r += `<tr class="muted"><td>${n}</td><td></td><td class="num">${m || "-"}</td><td class="num">${p}</td><td></td></tr>`);
+  d.systems.forEach(s => r += `<tr class="sysrow"><td>${label(s).replace(/ \(.*\)$/, "")}</td><td>${hexPick(s.arcs && s.arcs.length < 6 ? s.arcs : (s.arcs ? ARCS : null))}</td>
+      <td class="num">${systemMass(s, d.tmf)}</td><td class="num">${systemPoints(s, d.tmf)}</td><td>✕</td></tr>`);
+  r += `<tr class="addrow"><td colspan="5"><div class="row"><select class="input" style="flex:1">
+        <option>+ Add system… (beams, missiles, defences, hangars, cargo)</option></select><button class="btn">Add</button></div></td></tr>
+        <tr><td><b>Total</b></td><td></td><td class="num"><b>${t.mass} / ${d.tmf}</b></td><td class="num"><b>${t.pts}</b></td><td></td></tr>`;
+  document.getElementById("sys").innerHTML = r;
+</script>
+</body>
+</html>
