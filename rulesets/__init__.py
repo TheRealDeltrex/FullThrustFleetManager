@@ -94,6 +94,7 @@ class Ruleset(Protocol):
     short_label: str
     accent_color: str  # CSS variable name, e.g. "--rs-fb"
     books: tuple[BookRef, ...]
+    arcs: tuple[str, ...]  # fire arcs clockwise from fore: FB six, FT2 four (FT p.8)
     icon_set: Any  # filled in by M6 (ssd_layout)
 
     def races(self) -> list[Race]: ...
@@ -106,6 +107,15 @@ class Ruleset(Protocol):
 
     def loadout_points(self, design: dict, loadout: dict | None, options: dict) -> int:
         """Points of a loadout (fighters etc.), which design NPV excludes (PLAN 5.4)."""
+        ...
+
+    def fighter_types(self, options: dict) -> list[str]:
+        """Fighter group types a loadout may choose."""
+        ...
+
+    def required_options(self, design: dict, loadout: dict | None) -> set[str]:
+        """Fleet options (e.g. "mt_systems") the design or loadout needs; fleet conformance
+        flags the ones a fleet has switched off (PLAN 7). loadout=None: the default loadout."""
         ...
 
     def damage_track(self, design: dict) -> list[int]: ...
@@ -137,6 +147,7 @@ def get_ruleset(ruleset_id: str) -> Ruleset:
 
 
 # Registration imports come last: the packages import the dataclasses above.
-from rulesets import fb  # noqa: E402
+from rulesets import fb, ft2  # noqa: E402
 
 register(fb.RULESET)
+register(ft2.RULESET)

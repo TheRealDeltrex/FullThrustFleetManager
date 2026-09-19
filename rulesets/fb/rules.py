@@ -198,6 +198,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
     points = sum(r.points for r in rows)
     derived = {
         "tmf": tmf,
+        "mass_limit": tmf,  # FB: MASS used must equal TMF exactly
         "ftl_mass": ftl_mass,
         "drive_mass": drive_mass,
         "turn_thrust": _turn_thrust(thrust),

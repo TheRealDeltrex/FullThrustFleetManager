@@ -17,9 +17,8 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1 (Scaffold) and M2 (ruleset framework + FB engine) are done: an empty Layout C shell plus the
-FB rules engine. No storage, fleets or UI on top of the engine yet; next is **M3** (FT2 + More
-Thrust engine).
+M1-M3 are done: an empty Layout C shell plus the FB and FT2 (+ More Thrust) rules engines. No
+catalog, storage, fleets or UI on top of the engines yet; next is **M4** (catalog + NPV gate).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -40,13 +39,14 @@ What exists:
   Frostgrave and adapted (env prefix `FTFM_`).
 - `scripts/build_browser_bundle.py` → `web/bundle.json` (gitignored), `web/index.html` (the
   Pyodide shell).
-- `rulesets/` — the `Ruleset` protocol, registry and FB engine; see Rulesets below.
+- `rulesets/` — the `Ruleset` protocol, registry, FB and FT2 engines; see Rulesets below.
+- `data/errata.json` — book values that disagree with the rules, with the reason (PLAN 8).
 - `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` (manual).
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from `E:\RPG\Tabletop\Full Thurst\`.
 
-Modules of PLAN section 4 not listed here (`rulesets/ft2`, `fleet_rules.py`, `store.py`, `migrations.py`,
+Modules of PLAN section 4 not listed here (`data/catalog`, `fleet_rules.py`, `store.py`, `migrations.py`,
 `ssd_layout.py`, `pdf_export.py`, `data/`) are created by the milestone that needs them.
 
 ## Non-negotiable principles
@@ -65,7 +65,7 @@ Full list in PLAN section 2. The ones most likely to be broken by accident:
 - **Every user-facing string goes through `_()`** (UI and PDF), even though only English exists.
 - **Catalog designs are read-only.** Editing one creates a variant.
 
-## Architecture (PLAN section 4; layer 1 exists, layers 2-3 arrive in M5-M8)
+## Architecture (PLAN section 4; layer 1 exists, layers 2-3 arrive with M5-M8)
 
 Four layers, strictly ordered — each may import only from layers above it:
 
@@ -87,9 +87,15 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `BreakdownRow`, `Breakdown`, `Issue`, `QuickRefEntry`), the `Ruleset` protocol, `RULESETS`,
   `register()`, `get_ruleset()`. Rulesets register at the bottom of that file (they import the
   dataclasses, so the import has to come last).
-- The protocol is PLAN 6.1 plus `loadout_points(design, loadout, options)`: fleet totals need
-  loadout costs (PLAN 5.4) and only the ruleset knows them. `loadout=None` means the design's
-  default loadout. `icon_set` (M6) and `quickref()` (M9) are placeholders in FB.
+- The protocol is PLAN 6.1 plus: `arcs` (the ruleset's arc names), `loadout_points()` (fleet
+  totals include loadouts, PLAN 5.4), `fighter_types(options)` (loadout editor),
+  `required_options(design, loadout)` (the MT toggles a design needs). `loadout=None` means the
+  design's default loadout. `icon_set` (M6) and `quickref()` (M9) are placeholders.
+- `design_breakdown().derived["mass_limit"]` is the MASS budget for the UI bar: FB must use
+  exactly TMF, FT2 at most the system capacity (hull and drives take no MASS in FT2).
+- `validate_design(design, options)` also flags More Thrust content whose fleet toggle is off in
+  `options` (`mt_toggle_off`, `mass_over_100`), so fleet conformance is just validation with the
+  fleet's options.
 - `rulesets/common.py`: integer rounding (`round_half_up`, `pct_mass`: .5 up, never 0 MASS),
   arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`), `split_rows`, `cf_positions`. Never compute
   percentages with floats: 85 x 30% must be 25.5 exactly to round to 26.
@@ -113,7 +119,23 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   3+ beam arcs need not be; type suggestion picks the FB1 p.12 band whose centre is nearest (ties
   to the smaller class), carriers from 2 fighter bays and MASS 80, never CVA; merchants suggest
   "Merchant" / "M" (no book code exists).
-- Tests: `tests/test_rules_fb.py` (golden designs, one test per costing rule and validator).
+- `rulesets/ft2/`: `data.py` (books FT +1 / MT 0, arcs `F S A P`, FT p.31 table, FT p.14 basic
+  classes), `rules.py`, `mt.py` (MT systems, supership rows/fire controls, fighter surcharges),
+  `__init__.py` (`RULESET`, the picker; MT systems offered only with `mt_systems`).
+- FT2 system dicts: `beam` {class A|B|C, arcs}, `needle_beam`/`pulse_torpedo`/`nova_cannon`/
+  `aa_battery`/`wave_gun` {arcs, one arc}, `submunition` {arcs optional}, `screen` {level 1-3},
+  `fire_control` (the first N per class are free, then 3 MASS/10 points), `fighter_group` (one
+  group incl. bay; loadout `hangar` points at its uid), `tug_drive` (merchant, FTL x3); no params:
+  `pdaf`, `adaf`, `minelayer`, `minesweeper`, `mt_missile`, `ortillery`, `reflex_field`, `cloak`.
+  `hull_boxes`, `armour` and `streamlining` are FB fields; FT2 derives damage from MASS and flags
+  armour or streamlining.
+- FT2 facts from the page images: 4 arcs, no offensive fire aft (FT p.8); extra damage boxes go
+  on the LOWER rows (FT p.12); merchants have 1 free fire control and 4 rows at their size (FT
+  p.15); non-FTL warships carry 75% (FT p.25); tugs pay FTL x3 (FT p.26); turn thrust rounds up
+  (FT p.5). Odd fractions round up (owner: damage points; the rest follow), except merchant
+  capacity, which rounds down with a minimum of 1 (FT p.29).
+- Tests: `tests/test_rules_fb.py`, `tests/test_rules_ft2.py` (golden designs, one test per costing
+  rule and validator), `tests/test_rulesets.py` (protocol conformance).
   `docs/mockups/ssd.js` has a JS costing that agrees on 219 and 261; it is not the reference.
 
 ## Sister project
