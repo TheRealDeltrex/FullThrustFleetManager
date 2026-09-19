@@ -1,0 +1,7384 @@
+{
+ "schema_version": 1,
+ "designs": [
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-harrison",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Harrison",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 6,
+   "hull_boxes": 2,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 13,
+    "npv_book": 21
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-arapaho",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Arapaho",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 12,
+   "hull_boxes": 2,
+   "armour": 1,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 13,
+    "npv_book": 41
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-minerva",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Minerva",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 18,
+   "hull_boxes": 5,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 14,
+    "npv_book": 61
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-tacoma",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Tacoma",
+   "type_label": "Heavy Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 24,
+   "hull_boxes": 7,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 14,
+    "npv_book": 81
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-ticonderoga",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Ticonderoga",
+   "type_label": "Destroyer",
+   "type_code": "DD",
+   "hull_kind": "warship",
+   "tmf": 30,
+   "hull_boxes": 9,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 15,
+    "npv_book": 100
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-huron",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Huron",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 50,
+   "hull_boxes": 15,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 15,
+    "npv_book": 167
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-furious",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Furious",
+   "type_label": "Escort Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 64,
+   "hull_boxes": 19,
+   "armour": 3,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "adfc"
+    },
+    {
+     "uid": "s12",
+     "type": "screen",
+     "level": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 16,
+    "npv_book": 219
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-vandenburg",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Vandenburg",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 80,
+   "hull_boxes": 24,
+   "armour": 5,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "screen",
+     "level": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 16,
+    "npv_book": 261
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-majestic",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Majestic",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 106,
+   "hull_boxes": 32,
+   "armour": 5,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s6"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s7",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 17,
+    "npv_book": 358
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-victoria",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Victoria",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 120,
+   "hull_boxes": 36,
+   "armour": 5,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 17,
+    "npv_book": 406
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-excalibur",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Excalibur",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 140,
+   "hull_boxes": 42,
+   "armour": 7,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s15",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 18,
+    "npv_book": 472
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-valley-forge",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Valley Forge",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 190,
+   "hull_boxes": 57,
+   "armour": 7,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s18",
+      "type": "standard"
+     },
+     {
+      "hangar": "s19",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 18,
+    "npv_book": 642
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-inflexible",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Inflexible",
+   "type_label": "Light Fleet Carrier",
+   "type_code": "CVL",
+   "hull_kind": "warship",
+   "tmf": 140,
+   "hull_boxes": 28,
+   "armour": 9,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "screen",
+     "level": 2
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s12",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s13",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s11",
+      "type": "standard"
+     },
+     {
+      "hangar": "s12",
+      "type": "standard"
+     },
+     {
+      "hangar": "s13",
+      "type": "standard"
+     },
+     {
+      "hangar": "s14",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 19,
+    "npv_book": 483
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nac-ark-royal",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NAC",
+   "name": "Ark Royal",
+   "type_label": "Fleet Supercarrier",
+   "type_code": "CVH",
+   "hull_kind": "warship",
+   "tmf": 200,
+   "hull_boxes": 40,
+   "armour": 12,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "screen",
+     "level": 2
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s13",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s15",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s16",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s12",
+      "type": "standard"
+     },
+     {
+      "hangar": "s13",
+      "type": "standard"
+     },
+     {
+      "hangar": "s14",
+      "type": "standard"
+     },
+     {
+      "hangar": "s15",
+      "type": "standard"
+     },
+     {
+      "hangar": "s16",
+      "type": "standard"
+     },
+     {
+      "hangar": "s17",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 19,
+    "npv_book": 690
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-falke",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Falke",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 8,
+   "hull_boxes": 2,
+   "armour": 1,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 20,
+    "npv_book": 27
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-stroschen",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Stroschen",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 14,
+   "hull_boxes": 4,
+   "armour": 2,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pds"
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 20,
+    "npv_book": 47
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-ehrenhold",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Ehrenhold",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 20,
+   "hull_boxes": 6,
+   "armour": 2,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 21,
+    "npv_book": 67
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-waldburg",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Waldburg",
+   "type_label": "Destroyer",
+   "type_code": "DD",
+   "hull_kind": "warship",
+   "tmf": 30,
+   "hull_boxes": 9,
+   "armour": 3,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 21,
+    "npv_book": 100
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-waldburg-m",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Waldburg/M",
+   "type_label": "Missile Destroyer",
+   "type_code": "DD",
+   "hull_kind": "warship",
+   "tmf": 30,
+   "hull_boxes": 9,
+   "armour": 2,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "sm_magazine",
+     "capacity": 4,
+     "feeds": [
+      "s2"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s3",
+      "salvos": [
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 22,
+    "npv_book": 101
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-kronprinz-wilhelm",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Kronprinz Wilhelm",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 48,
+   "hull_boxes": 14,
+   "armour": 5,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "adfc"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 22,
+    "npv_book": 161
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-radetzky",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Radetzky",
+   "type_label": "Escort Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 58,
+   "hull_boxes": 17,
+   "armour": 6,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "adfc"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 23,
+    "npv_book": 195
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-markgraf",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Markgraf",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 82,
+   "hull_boxes": 25,
+   "armour": 10,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 23,
+    "npv_book": 271
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-maximilian",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Maximilian",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 100,
+   "hull_boxes": 30,
+   "armour": 10,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 24,
+    "npv_book": 333
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-richthofen",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Richthofen",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 104,
+   "hull_boxes": 31,
+   "armour": 6,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 24,
+    "npv_book": 351
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-maria-von-burgund",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Maria Von Burgund",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 120,
+   "hull_boxes": 36,
+   "armour": 10,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 25,
+    "npv_book": 414
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-szent-istvan",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Szent Istvan",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 150,
+   "hull_boxes": 60,
+   "armour": 14,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s16",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 25,
+    "npv_book": 500
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-von-tegetthoff",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Von Tegetthoff",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 200,
+   "hull_boxes": 80,
+   "armour": 14,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s12",
+     "type": "sm_magazine",
+     "capacity": 8,
+     "feeds": [
+      "s11"
+     ]
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "pds"
+    },
+    {
+     "uid": "s16",
+     "type": "pds"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s20",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s21",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s21",
+      "type": "standard"
+     }
+    ],
+    "magazines": [
+     {
+      "magazine": "s12",
+      "salvos": [
+       "std",
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 26,
+    "npv_book": 670
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:nsl-der-theuerdank",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "NSL",
+   "name": "Der Theuerdank",
+   "type_label": "Fighter Carrier",
+   "type_code": "CV",
+   "hull_kind": "warship",
+   "tmf": 220,
+   "hull_boxes": 88,
+   "armour": 14,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s20",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s21",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s18",
+      "type": "standard"
+     },
+     {
+      "hangar": "s19",
+      "type": "standard"
+     },
+     {
+      "hangar": "s20",
+      "type": "standard"
+     },
+     {
+      "hangar": "s21",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 26,
+    "npv_book": 737
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-mistral",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Mistral",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 8,
+   "hull_boxes": 2,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 27,
+    "npv_book": 28
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-athena",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Athena",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 14,
+   "hull_boxes": 4,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "submunition",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 27,
+    "npv_book": 48
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-ibiza",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Ibiza",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 18,
+   "hull_boxes": 5,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "submunition",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "submunition",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 28,
+    "npv_book": 61
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-san-miguel",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "San Miguel",
+   "type_label": "Destroyer",
+   "type_code": "DD",
+   "hull_kind": "warship",
+   "tmf": 34,
+   "hull_boxes": 10,
+   "armour": 2,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 28,
+    "npv_book": 112
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-trieste",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Trieste",
+   "type_label": "Super Destroyer",
+   "type_code": "DH",
+   "hull_kind": "warship",
+   "tmf": 42,
+   "hull_boxes": 13,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "sm_magazine",
+     "capacity": 4,
+     "feeds": [
+      "s3"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s4",
+      "salvos": [
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 29,
+    "npv_book": 139
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-suffren",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Suffren",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 54,
+   "hull_boxes": 16,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s3"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s4",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 29,
+    "npv_book": 181
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-milan",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Milan",
+   "type_label": "Escort Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 62,
+   "hull_boxes": 19,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s4"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s5",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 30,
+    "npv_book": 206
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-jerez",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Jerez",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 88,
+   "hull_boxes": 26,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "sm_magazine",
+     "capacity": 8,
+     "feeds": [
+      "s6",
+      "s7"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s8",
+      "salvos": [
+       "std",
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 30,
+    "npv_book": 293
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-ypres",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Ypres",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 96,
+   "hull_boxes": 29,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s6"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s7",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 31,
+    "npv_book": 318
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-roma",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Roma",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 110,
+   "hull_boxes": 33,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "sm_magazine",
+     "capacity": 12,
+     "feeds": [
+      "s8",
+      "s9"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": [
+     {
+      "magazine": "s10",
+      "salvos": [
+       "std",
+       "std",
+       "std",
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 31,
+    "npv_book": 377
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-bonaparte",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Bonaparte",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 160,
+   "hull_boxes": 48,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "sm_magazine",
+     "capacity": 8,
+     "feeds": [
+      "s7"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s17",
+      "type": "standard"
+     }
+    ],
+    "magazines": [
+     {
+      "magazine": "s8",
+      "salvos": [
+       "std",
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 32,
+    "npv_book": 531
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-foch",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Foch",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 250,
+   "hull_boxes": 75,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "sm_magazine",
+     "capacity": 18,
+     "feeds": [
+      "s7",
+      "s8",
+      "s9"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "pds"
+    },
+    {
+     "uid": "s16",
+     "type": "pds"
+    },
+    {
+     "uid": "s17",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s20",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s21",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s22",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s23",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s24",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s25",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s23",
+      "type": "standard"
+     },
+     {
+      "hangar": "s24",
+      "type": "standard"
+     },
+     {
+      "hangar": "s25",
+      "type": "standard"
+     }
+    ],
+    "magazines": [
+     {
+      "magazine": "s10",
+      "salvos": [
+       "std",
+       "std",
+       "std",
+       "std",
+       "std",
+       "std",
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 32,
+    "npv_book": 855
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-bologna",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Bologna",
+   "type_label": "Light Carrier",
+   "type_code": "CVL",
+   "hull_kind": "warship",
+   "tmf": 170,
+   "hull_boxes": 51,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s5"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s15",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s16",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s14",
+      "type": "standard"
+     },
+     {
+      "hangar": "s15",
+      "type": "standard"
+     },
+     {
+      "hangar": "s16",
+      "type": "standard"
+     },
+     {
+      "hangar": "s17",
+      "type": "standard"
+     }
+    ],
+    "magazines": [
+     {
+      "magazine": "s6",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 33,
+    "npv_book": 580
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fse-jeanne-d-arc",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "FSE",
+   "name": "Jeanne D'Arc",
+   "type_label": "Fleet Carrier",
+   "type_code": "CVH",
+   "hull_kind": "warship",
+   "tmf": 280,
+   "hull_boxes": 84,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "sm_launcher",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_magazine",
+     "capacity": 6,
+     "feeds": [
+      "s5"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s18",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s20",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s21",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s22",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s23",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s17",
+      "type": "standard"
+     },
+     {
+      "hangar": "s18",
+      "type": "standard"
+     },
+     {
+      "hangar": "s19",
+      "type": "standard"
+     },
+     {
+      "hangar": "s20",
+      "type": "standard"
+     },
+     {
+      "hangar": "s21",
+      "type": "standard"
+     },
+     {
+      "hangar": "s22",
+      "type": "standard"
+     },
+     {
+      "hangar": "s23",
+      "type": "standard"
+     }
+    ],
+    "magazines": [
+     {
+      "magazine": "s6",
+      "salvos": [
+       "std",
+       "std",
+       "std"
+      ]
+     }
+    ]
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 33,
+    "npv_book": 955
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-lenov",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Lenov",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 6,
+   "hull_boxes": 1,
+   "armour": 0,
+   "thrust": 8,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 34,
+    "npv_book": 21
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-nanuchka-ii",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Nanuchka II",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 14,
+   "hull_boxes": 4,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 34,
+    "npv_book": 48
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-novgorod",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Novgorod",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 22,
+   "hull_boxes": 7,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 35,
+    "npv_book": 73
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-warsaw",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Warsaw",
+   "type_label": "Destroyer",
+   "type_code": "DD",
+   "hull_kind": "warship",
+   "tmf": 28,
+   "hull_boxes": 8,
+   "armour": 3,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pds"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 35,
+    "npv_book": 93
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-volga",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Volga",
+   "type_label": "Super Destroyer",
+   "type_code": "DH",
+   "hull_kind": "warship",
+   "tmf": 34,
+   "hull_boxes": 10,
+   "armour": 2,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 36,
+    "npv_book": 115
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-tibet",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Tibet",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 48,
+   "hull_boxes": 14,
+   "armour": 3,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 36,
+    "npv_book": 162
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-beijing-b",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Beijing/B",
+   "type_label": "Escort Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 60,
+   "hull_boxes": 18,
+   "armour": 5,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pds"
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 37,
+    "npv_book": 201
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-gorshkov",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Gorshkov",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 70,
+   "hull_boxes": 21,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "sm_rack",
+     "load": "std",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "sm_rack",
+     "load": "std",
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 37,
+    "npv_book": 240
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-voroshilev",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Voroshilev",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 78,
+   "hull_boxes": 23,
+   "armour": 5,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 38,
+    "npv_book": 262
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-manchuria",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Manchuria",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 94,
+   "hull_boxes": 38,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 38,
+    "npv_book": 312
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-petrograd",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Petrograd",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 116,
+   "hull_boxes": 46,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 39,
+    "npv_book": 386
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-rostov",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Rostov",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 138,
+   "hull_boxes": 55,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s14",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 39,
+    "npv_book": 458
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-tsiolkovsky",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Tsiolkovsky",
+   "type_label": "Light Carrier",
+   "type_code": "CVL",
+   "hull_kind": "warship",
+   "tmf": 150,
+   "hull_boxes": 45,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pds"
+    },
+    {
+     "uid": "s8",
+     "type": "pds"
+    },
+    {
+     "uid": "s9",
+     "type": "pds"
+    },
+    {
+     "uid": "s10",
+     "type": "pds"
+    },
+    {
+     "uid": "s11",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s15",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s16",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s14",
+      "type": "standard"
+     },
+     {
+      "hangar": "s15",
+      "type": "standard"
+     },
+     {
+      "hangar": "s16",
+      "type": "standard"
+     },
+     {
+      "hangar": "s17",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 40,
+    "npv_book": 512
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-komarov",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Komarov",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 220,
+   "hull_boxes": 88,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 4,
+     "arcs": [
+      "F",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "beam",
+     "class": 4,
+     "arcs": [
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "screen",
+     "level": 2
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s19",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 40,
+    "npv_book": 751
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:esu-konstantin",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "ESU",
+   "name": "Konstantin",
+   "type_label": "Attack Carrier",
+   "type_code": "CVA",
+   "hull_kind": "warship",
+   "tmf": 240,
+   "hull_boxes": 72,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "pds"
+    },
+    {
+     "uid": "s16",
+     "type": "pds"
+    },
+    {
+     "uid": "s17",
+     "type": "screen",
+     "level": 2
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s20",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s21",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s22",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s23",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s24",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s25",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s20",
+      "type": "standard"
+     },
+     {
+      "hangar": "s21",
+      "type": "standard"
+     },
+     {
+      "hangar": "s22",
+      "type": "standard"
+     },
+     {
+      "hangar": "s23",
+      "type": "standard"
+     },
+     {
+      "hangar": "s24",
+      "type": "standard"
+     },
+     {
+      "hangar": "s25",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 41,
+    "npv_book": 842
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:heavy-freighter",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Heavy Freighter",
+   "type_label": "Heavy Freighter",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 120,
+   "hull_boxes": 12,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pds"
+    },
+    {
+     "uid": "s2",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 83
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 195
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:medium-freighter",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Medium Freighter",
+   "type_label": "Medium Freighter",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 80,
+   "hull_boxes": 8,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pds"
+    },
+    {
+     "uid": "s2",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 55
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 131
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:light-freighter",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Light Freighter",
+   "type_label": "Light Freighter",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 40,
+   "hull_boxes": 4,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pds"
+    },
+    {
+     "uid": "s2",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 27
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 67
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:free-trader",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Free Trader",
+   "type_label": "Free Trader",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 20,
+   "hull_boxes": 4,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s3",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 8
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 47
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:fleet-auxiliary",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Fleet Auxiliary",
+   "type_label": "Fleet Auxiliary",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 100,
+   "hull_boxes": 20,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 56
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 193
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:assault-transport",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Assault Transport",
+   "type_label": "Assault Transport",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 120,
+   "hull_boxes": 24,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s6",
+     "type": "tender_bay",
+     "capacity": 20
+    },
+    {
+     "uid": "s7",
+     "type": "hold",
+     "kind": "troop",
+     "mass": 32
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 337
+   },
+   "notes": "Carries four MASS 5 assault dropships in its tender bay: +40 points (FB1 p.42)."
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:bulk-carrier",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Bulk Carrier",
+   "type_label": "Bulk Carrier",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 200,
+   "hull_boxes": 20,
+   "armour": 0,
+   "thrust": 1,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pds"
+    },
+    {
+     "uid": "s2",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 149
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 303
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb1:starliner",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": null,
+   "name": "Starliner",
+   "type_label": "Starliner",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 120,
+   "hull_boxes": 12,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s3",
+     "type": "pds"
+    },
+    {
+     "uid": "s4",
+     "type": "pds"
+    },
+    {
+     "uid": "s5",
+     "type": "hold",
+     "kind": "passenger",
+     "mass": 80
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB1",
+    "page": 42,
+    "npv_book": 205
+   },
+   "notes": ""
+  }
+ ]
+}

@@ -223,6 +223,7 @@ def test_max_thrust_is_8():
         (25, "warship", True, 13),
         (14, "warship", False, 11),
         (60, "merchant", True, 6),
+        (48, "merchant", True, 5),
         (8, "merchant", True, 1),
         (100, "merchant", False, 10),
     ],

@@ -5,9 +5,8 @@ FT pp.10-12, More Thrust additions in mt.py. Checked against the page images.
 
 Rounding: FT2 prints no rule for odd results. Owner decision: damage points round up; the same
 direction is used for every other fraction (merchant hull 1.5 x MASS, drives, capacity), which
-is also what the FT p.25 example does ("75% of 14, rounded up"). The one exception is merchant
-capacity: FT p.29 grants "a MINIMUM of 1 MASS of weaponry" to small merchants, which only makes
-sense if 10% rounds down.
+is also what the book does where it shows one: FT p.25 ("75% of 14, rounded up") and the FT p.15
+Survey Cruiser (MASS 48 merchant carrying 5 MASS of systems).
 """
 
 from __future__ import annotations
@@ -113,7 +112,7 @@ def mass_limit(design: dict) -> int:
     """MASS available for weapons and systems (FT p.29, p.25; MT p.22)."""
     m = _mass(design)
     if _is_merchant(design):
-        return max(1, m // 10)
+        return max(1, _ceil_div(m, 10))  # FT p.15 Survey Cruiser: MASS 48 carries 5
     return _ceil_div(3 * m, 4) if design.get("ftl") is not True else _ceil_div(m, 2)
 
 
