@@ -64,3 +64,12 @@ def test_register_action_rejects_duplicates():
             appmod.register_action("_test_noop")(_noop)
     finally:
         appmod.ACTION_HANDLERS.pop("_test_noop", None)
+
+
+def test_vendored_fonts_exist_with_licence():
+    css = (ROOT / "static" / "style.css").read_text(encoding="utf-8")
+    urls = re.findall(r'url\("(fonts/[^"]+)"\)', css)
+    assert urls
+    for url in urls:
+        assert (ROOT / "static" / url).is_file(), url
+    assert (ROOT / "static" / "fonts" / "OFL-IBMPlexSans.txt").is_file()

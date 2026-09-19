@@ -1,6 +1,12 @@
 /* Full Thrust Fleet Manager: Layout C (docs/mockups/layout-c-dockyard-fleet.html).
-   Local file, no web fonts: the UI uses the system font stack so the desktop build needs no
-   network. The web build inlines this file into every page (web/index.html). */
+   IBM Plex Sans is vendored in static/fonts/ (OFL, licence alongside); the same TTFs serve the
+   PDF. The web build inlines this file into every page and rewrites url(fonts/...) to
+   static/fonts/ (web/index.html renderPage). */
+
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; src: url("fonts/IBMPlexSans-Regular.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: italic; src: url("fonts/IBMPlexSans-Italic.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; src: url("fonts/IBMPlexSans-SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 700; font-style: normal; src: url("fonts/IBMPlexSans-Bold.ttf") format("truetype"); }
 
 :root {
   --bg: #eef1f5; --panel: #ffffff; --panel-2: #f6f8fb; --ink: #17202c; --muted: #5d6b7c;
@@ -16,7 +22,7 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body { background: var(--bg); color: var(--ink);
-  font: 14px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+  font: 14px/1.45 "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
 a { color: var(--accent); }
 
 /* ---- Top bar ---- */
