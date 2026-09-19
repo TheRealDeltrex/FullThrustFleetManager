@@ -1,0 +1,84 @@
+/* Full Thrust Fleet Manager: Layout C (docs/mockups/layout-c-dockyard-fleet.html).
+   Local file, no web fonts: the UI uses the system font stack so the desktop build needs no
+   network. The web build inlines this file into every page (web/index.html). */
+
+:root {
+  --bg: #eef1f5; --panel: #ffffff; --panel-2: #f6f8fb; --ink: #17202c; --muted: #5d6b7c;
+  --line: #d6dde6; --accent: #1f5fa8; --accent-soft: #e3edf9; --ok: #237a4b; --ok-soft: #e2f3ea;
+  --warn: #9a5b00; --warn-soft: #fcf0dc; --bad: #b3261e; --bad-soft: #fbe6e4;
+  --chrome: #101826; --chrome-ink: #e8eef7; --chrome-muted: #93a3b8;
+  /* Status colours (PLAN 9): ready green, damaged amber, docked blue, lost grey. */
+  --st-ready: #237a4b; --st-damaged: #d98a00; --st-docked: #1f5fa8; --st-lost: #9aa6b4;
+  /* Ruleset accents (PLAN 9.2). */
+  --rs-ft2: #d98a00; --rs-fb: #1f5fa8; --rs-ftcd: #237a4b; --rs-ftpc: #6b3fa0;
+  --rs-current: #2d3b52;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink);
+  font: 14px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+a { color: var(--accent); }
+
+/* ---- Top bar ---- */
+.topbar { background: var(--chrome); color: var(--chrome-ink); }
+.ruleset-strip { height: 3px; background: var(--rs-current); }
+.topbar-row { display: flex; align-items: center; gap: 18px; padding: 10px 16px; flex-wrap: wrap; }
+.brand { font-weight: 700; letter-spacing: .3px; white-space: nowrap; color: var(--chrome-ink); text-decoration: none; }
+.brand small { color: var(--chrome-muted); font-weight: 400; margin-left: 6px; }
+.fleet-select { background: #1c2738; border: 1px solid #2d3b52; color: var(--chrome-ink); border-radius: 6px;
+  padding: 6px 10px; white-space: nowrap; min-width: 180px; }
+.muted-chrome { color: var(--chrome-muted); }
+.tabs { display: flex; gap: 2px; }
+.tabs a { padding: 6px 13px; border-radius: 6px; color: var(--chrome-muted); text-decoration: none;
+  white-space: nowrap; font-size: 13.5px; }
+.tabs a:hover { color: #fff; }
+.tabs a.on { background: #23324a; color: #fff; font-weight: 600; }
+.spacer { flex: 1; }
+.meter { min-width: 200px; }
+.meter .lbl { display: flex; justify-content: space-between; font-size: 12px; color: var(--chrome-muted); }
+.meter .lbl b { color: var(--chrome-ink); }
+.bar { height: 7px; border-radius: 4px; background: #2a3950; overflow: hidden; margin-top: 3px; }
+.bar > i { display: block; height: 100%; background: #4f9be8; }
+
+/* ---- Controls ---- */
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); border-radius: 6px; padding: 6px 12px; font: inherit; cursor: pointer; white-space: nowrap; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.ghost { background: transparent; }
+.btn.sm { padding: 3px 8px; font-size: 12px; }
+.input { border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; background: #fff; font: inherit; min-width: 0; }
+.chip { display: inline-block; font-size: 11.5px; padding: 1px 8px; border-radius: 10px; background: var(--panel-2);
+  border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.chip.ok { background: var(--ok-soft); border-color: #bfe3cf; color: var(--ok); }
+.chip.warn { background: var(--warn-soft); border-color: #f0d6a8; color: var(--warn); }
+.chip.bad { background: var(--bad-soft); border-color: #f1c3be; color: var(--bad); }
+.chip.info { background: var(--accent-soft); border-color: #c4d8f1; color: var(--accent); }
+.muted { color: var(--muted); }
+
+/* ---- Flash messages ---- */
+.flashes { list-style: none; margin: 12px 12px 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.flash { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); }
+.flash.success { background: var(--ok-soft); border-color: #bfe3cf; color: var(--ok); }
+.flash.error { background: var(--bad-soft); border-color: #f1c3be; color: var(--bad); }
+
+/* ---- Work area: left pane, centre, right pane ---- */
+.work { display: grid; gap: 12px; padding: 12px; }
+.work.cols-1 { grid-template-columns: minmax(0, 1fr); max-width: 1100px; }
+.work.cols-2 { grid-template-columns: 250px minmax(0, 1fr); }
+.work.cols-3 { grid-template-columns: 250px minmax(0, 1fr) 330px; }
+.main-col, .side-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.panel h3 { margin: 0; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px;
+  color: var(--muted); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+.panel h3.sep { border-top: 1px solid var(--line); }
+.panel .body { padding: 12px 14px; }
+.panel.head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; }
+.panel.head h2 { margin: 0; font-size: 19px; }
+.panel.empty { padding: 28px 14px; text-align: center; color: var(--muted); }
+
+/* Below ~1100 px the panes stack (PLAN 9.7). */
+@media (max-width: 1100px) {
+  .work.cols-2, .work.cols-3 { grid-template-columns: minmax(0, 1fr); }
+  .meter { min-width: 140px; }
+}

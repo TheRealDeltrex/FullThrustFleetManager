@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Fleet overview") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% block work_class %}cols-2{% endblock %}
+{% block content %}
+  <aside class="panel">
+    <h3>{{ _("Fleets") }}</h3>
+    <div class="body muted">{{ _("No fleets yet.") }}</div>
+    <h3 class="sep">{{ _("Squadrons") }}</h3>
+    <div class="body muted">&ndash;</div>
+  </aside>
+  <section class="main-col">
+    <div class="panel head">
+      <h2>{{ _("Fleet overview") }}</h2>
+    </div>
+    <div class="panel empty">{{ _("Create a fleet to see its ships here.") }}</div>
+  </section>
+{% endblock %}
