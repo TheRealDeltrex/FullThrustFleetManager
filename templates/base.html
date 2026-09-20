@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="{{ LANG }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ _("Full Thrust Fleet Manager") }}{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header class="topbar">
+      {# Thin strip in the current fleet's ruleset colour (PLAN 9.2); neutral until fleets exist. #}
+      <div class="ruleset-strip {% if current_fleet %}rs-{{ current_fleet.ruleset }}{% endif %}"></div>
+      <div class="topbar-row">
+        <a class="brand" href="{{ url_for('home') }}">
+          {{ _("FT Fleet Manager") }}{% if APP_VERSION %}<small>v{{ APP_VERSION }}</small>{% endif %}
+        </a>
+        <div class="fleet-select" title="{{ _('Current fleet') }}">
+          {% if all_fleets %}
+            {# Every fleet is prefixed with its ruleset (PLAN 9.2). #}
+            <form method="get" action="{{ url_for('fleet_overview') }}" class="row">
+              <label class="sr-only" for="fleet-select">{{ _("Current fleet") }}</label>
+              <select class="input sm" id="fleet-select" name="go"
+                      onchange="location.href='/fleet/' + this.value">
+                {% for f in all_fleets %}
+                  <option value="{{ f.id }}" {% if current_fleet and current_fleet.id == f.id %}selected{% endif %}>
+                    {{ f.ruleset|upper }} · {{ f.name }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          {% else %}
+            <span class="muted-chrome">{{ _("No fleet yet") }}</span>
+          {% endif %}
+        </div>
+        <nav class="tabs" aria-label="{{ _('Main') }}">
+          <a href="{{ url_for('fleet_overview') }}" class="{% if active_tab == 'fleet_overview' %}on{% endif %}">{{ _("Fleet overview") }}</a>
+          <a href="{{ url_for('design') }}" class="{% if active_tab == 'design' %}on{% endif %}">{{ _("Design") }}</a>
+          <a href="{{ url_for('campaign') }}" class="{% if active_tab == 'campaign' %}on{% endif %}">{{ _("Campaign") }}</a>
+          <a href="{{ url_for('settings') }}" class="{% if active_tab == 'settings' %}on{% endif %}">{{ _("Settings") }}</a>
+        </nav>
+        <div class="spacer"></div>
+        <div class="meter">
+          <div class="lbl"><span>{{ _("Fleet points") }}</span>
+            <b>{% if current_fleet %}{{ fleet_points }} / {{ current_fleet.points_limit or "&ndash;"|safe }}{% else %}&ndash; / &ndash;{% endif %}</b></div>
+          <div class="bar"><i style="width: {{ (100 * fleet_points / current_fleet.points_limit) | round | int if current_fleet and current_fleet.points_limit else 0 }}%"></i></div>
+        </div>
+        {% if current_fleet and fleet_badges and fleet_badges.non_conforming %}
+          <span class="chip bad">{{ _("Non-conforming") }}</span>
+        {% endif %}
+        {% if current_fleet %}
+          <a class="btn primary" href="{{ url_for('print_dialog') }}">&#9113; {{ _("Print fleet PDF") }}</a>
+        {% else %}
+          <button type="button" class="btn primary" disabled
+                  title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+        {% endif %}
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes" role="status" aria-live="polite">
+          {% for category, message in messages %}
+            <li class="flash {{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <main class="work {% block work_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if IS_FROZEN %}
+      <script>
+        (function () {
+          // Windowless exe: idle_watchdog.py exits once no page pings any more. pagehide also
+          // fires on in-app navigation; the watchdog only acts if no fresh ping follows.
+          function ping(url) {
+            try { navigator.sendBeacon(url); }
+            catch (err) { fetch(url, { method: "POST", keepalive: true }).catch(function () {}); }
+          }
+          ping("/heartbeat");
+          setInterval(function () { ping("/heartbeat"); }, 5000);
+          window.addEventListener("pagehide", function () { ping("/heartbeat/closing"); });
+        })();
+      </script>
+    {% endif %}
+  </body>
+</html>
