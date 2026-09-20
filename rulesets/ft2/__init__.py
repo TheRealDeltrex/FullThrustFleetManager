@@ -59,7 +59,7 @@ class FT2Ruleset:
     accent_color = "--rs-ft2"
     books = data.BOOKS
     arcs = data.ARCS
-    icon_set = None  # M6
+    icon_set = "ft2"  # the icon table in ssd_layout.ICON_SETS
 
     @property
     def name(self) -> str:
