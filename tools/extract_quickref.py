@@ -45,7 +45,7 @@ ENTRIES = [
     ("fb", "crew", "Crew casualties", "FB1", "CREW CASUALTIES"),
     ("fb", "sm_launcher", "Salvo missile systems", "FB1", "SALVO MISSILE MOUNTINGS AND MAGAZINES:"),
     ("fb", "sm_magazine", "Magazine capacities", "FB1", "MAGAZINE CAPACITIES"),
-    ("fb", "hangar", "Fighter movement", "FB1", "FIGHTER MOVE SEQUENCE"),
+    ("fb", "hangar", "Fighter movement", "FB1", "FIGHTER MOVEMENT"),
     ("fb", "hold", "Cargo holds and passengers", "FB1", "CARGO HOLDS AND PASSENGER ACCOMMODATIONS"),
     ("fb", "tug_drive", "Tugs and tenders", "FB1", "TUGS AND TENDERS:"),
     ("fb", "arcs", "Arcs of fire", "FB1", "ARCS OF FIRE"),
@@ -74,15 +74,111 @@ ENTRIES = [
 ]
 # fmt: on
 
+# Entries the page layout defeats: a two-column page with a figure caption or a spec panel in
+# the middle gives the reader's line order, not the sentence order, and a section that breaks
+# across a column ends mid-sentence. These were transcribed from the page images by hand, in
+# the book's own words (PLAN 2.5), trimmed the same way the rest are. Everything else comes
+# straight out of the page text. Check the page image before editing one.
+# fmt: off
+OVERRIDES = {
+    ("ft2", "turn_sequence"):
+        "The game is played as a series of GAME TURNS, each Turn consisting of both (or all) "
+        "players having the opportunity to move and fire their ships. Each Game Turn starts with "
+        "both players simultaneously (and secretly) writing the MOVEMENT ORDERS for all the ships "
+        "they own, using the spaces on the lower portion of the Ship Record Sheets. Once all "
+        "orders for that Turn have been completed, any Asteroids or similar objects (such as "
+        "Installations or Starbases) that may be in play are moved if necessary, in accordance "
+        "with the rules given for such objects. Now each player must move all of his ships, in "
+        "strict accordance with the orders he has written for them.",
+    ("ft2", "arcs"):
+        "The 360 degree space around each ship is divided into four equal (90 degree) ARCS, "
+        "labelled FORE, AFT, PORT and STARBOARD. IMPORTANT NOTE! NO ship may fire OFFENSIVE "
+        "WEAPONRY through its AFT arc; this is due to the spatial distortions of the ship's Drive "
+        "fields, which make it impossible to accurately track a distant target through the rear "
+        "90° of the ship's arcs. These Fire Arcs determine which of a ship's weapon batteries "
+        "may be brought to bear on a particular target ship, as some Batteries will be unable to "
+        "fire through certain arcs.",
+    ("ft2", "fighter_group"):
+        "Each Fighter is armed with a single weapon, similar to a shorter-ranged 'C' Battery in "
+        "effect. The RANGE of Fighter weaponry is 6\", and a Group may ONLY fire at targets in the "
+        "Fighters' FORE arc. All Fighters in the Group must engage the SAME target ship. ROLL 1D6 "
+        "PER FIGHTER IN THE GROUP: Hits and damage are scored per die, using the same results as "
+        "Beam Battery Fire. Screens protect as normal against Fighter weapon fire. Fighters "
+        "operate in GROUPS of 1 to 6 craft, with each Group moving and firing as a single unit.",
+    ("ft2", "nova_cannon"):
+        "The NOVA CANNON is a massive weapon that can only be mounted in the spinal core of a "
+        "Capital ship, and fires only DIRECTLY FORWARD - not just through the Fore arc, but "
+        "actually on the centreline of the ship only. In other words, the weapon fires in whatever "
+        "direction the ship's bow is pointing. Firing a Nova Cannon draws a massive amount of "
+        "power from the ship's Power Plant; on the Turn it is to be fired the player must note "
+        "this in his movement orders for that ship, and the ship may not expend ANY other power at "
+        "all for that Turn, ie: it may not apply any Thrust (to accelerate or manoeuvre), may not "
+        "fire ANY other weapons, and even its Screens may not function for that Turn!",
+    ("ft2", "wave_gun"):
+        "The Wave Gun is a smaller and slightly less over-the-top variant on the Nova Cannon given "
+        "in the Full Thrust rulebook. The system fires a Plasma charge that expands as it travels "
+        "along its line of flight, causing damage to any vessels in its path. As with the Nova "
+        "Cannon, the Wave Gun may fire only along the main axis of the carrying ship, ie: in a "
+        "straight line bearing directly forward along the ship's current course. The ship may not "
+        "fire ANY other weaponry in the turn that it fires the Wave Gun, and also counts as "
+        "UNSHIELDED through its entire frontal arc while the weapon is being fired.",
+    ("ft2", "ortillery"):
+        "This is a system used for ground support fire from orbiting Starships or Monitors. It has "
+        "no function in Space Combat, and cannot be used as an anti-ship weapon. The use of this "
+        "system is fully described in the section on Ortillery Fire in the \"DIRTSIDE II\" "
+        "INTERFACE rules; if you are using FULL THRUST with a different Ground Combat rules system "
+        "then the rules given should allow you to relate this weapon to your chosen game with a "
+        "little thought.",
+    ("ft2", "mt_missile"):
+        "When a ship ENDS its plotted movement within 6\" of an active enemy missile, the missile "
+        "may attack the ship. This is carried out at the same point in the turn as Fighter group "
+        "attacks. Before the missile attacks, the ship has a chance to try and intercept it using "
+        "any PDAF systems it has, in a similar way to firing on fighter groups; as missiles are "
+        "smaller and more agile than fighters, however, it needs a roll of 6 by the PDAF to kill "
+        "the missile. Each PDAF (or ADAF, using the same proximity rules as for fighter defence) "
+        "can attempt to kill only one missile per turn. \"NORMAL\" MISSILES are assumed to carry "
+        "nuclear detonation warheads, and roll 2 dice when attacking – the total score rolled "
+        "is the number of damage points inflicted on the target, and is NOT reduced by screens.",
+    ("ft2", "streamlining"):
+        "The great majority of Starships are not built to ever enter a planetary atmosphere or "
+        "attempt to land. Such ships are characterised by their totally unstreamlined structure "
+        "and often square, blocky or fragile-looking designs. Some ships, on the other hand, ARE "
+        "built to operate in atmosphere as well as in deep space, to varying degrees of "
+        "efficiency; a vessel that is FULLY STREAMLINED is completely atmosphere-capable, and can "
+        "\"fly\" like an Aerospace craft. Other ships may be classed as PARTIALLY STREAMLINED, "
+        "which gives them some capability of atmospheric operations and landing, usually by sheer "
+        "brute thrust from their Drives rather than any kind of aerodynamic lift.",
+}
+# fmt: on
+
 LIMIT = 700  # trimmed where needlessly wordy (PLAN 2.5)
 HEADING = re.compile(r"^[A-Z][A-Z \-/()&.,0-9’'\"]{6,60}:?$")
 
 
 def clean(text: str) -> str:
-    text = text.replace("�", "'").replace("’", "'").replace("“", '"').replace("”", '"')
-    text = re.sub(r"-\n(?=[a-z])", "", text)      # hyphenation across a line break
+    text = (text.replace("�", "'").replace("‘", "'").replace("’", "'")
+                .replace("“", '"').replace("”", '"'))
+    # Hyphenation across a line break: "danger-\nous" is one word, "Anti-\nAircraft" keeps its
+    # hyphen. Both reach us as "danger- ous" once the page text is read line by line.
+    text = re.sub(r"(?<=[a-z])-\s*\n\s*(?=[a-z])", "", text)
+    text = re.sub(r"(?<=[A-Za-z])-\s*\n\s*(?=[A-Z])", "-", text)
     text = re.sub(r"\s+", " ", text).strip()
-    return text
+    text = re.sub(r"(?<=[a-z])-\s+(?=[a-z])", "", text)
+    text = re.sub(r"(?<=[A-Za-z])-\s+(?=[A-Z])", "-", text)
+    text = re.sub(r"\s+[0-9]{1,3}$", "", text)    # a page number swept up with the last line
+    text = re.sub(r"\s+([.,;:])", r"", text)     # the line break left a space before it
+    for wrong, right in LOST_HYPHENS.items():
+        text = text.replace(wrong, right)
+    return text.strip()
+
+
+# Words whose hyphen the book's own text layer drops (the overprinted "bold" copies confuse it).
+LOST_HYPHENS = {
+    "pointdefence": "point-defence",
+    "antifighter/antimissile": "anti-fighter/anti-missile",
+    "fragilelooking": "fragile-looking",
+    "atmospherecapable": "atmosphere-capable",
+}
 
 
 def trim(text: str) -> str:
@@ -135,8 +231,11 @@ def main() -> int:
             missing.append(f"{ruleset}/{key} ({book}: {heading})")
             continue
         body, index = found
+        text = OVERRIDES.get((ruleset, key)) or trim(body)
+        # `index` is 0-based, so the PDF's own page number is index + 1 and the printed number
+        # is that minus the book's offset (FT prints 1 on its second PDF page).
         out.setdefault(ruleset, []).append({
-            "key": key, "title": title, "text": trim(body), "book": book, "page": index - offset,
+            "key": key, "title": title, "text": text, "book": book, "page": index + 1 - offset,
         })
     target = ROOT / "data" / "quickref"
     target.mkdir(parents=True, exist_ok=True)
