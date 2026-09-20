@@ -15,9 +15,12 @@
     </div>
     {# pdf.js is vendored under static/pdfjs (Apache-2.0, licence alongside): no CDN, and the
        viewer reads the bundled PDF through our own route. #}
+    {# In the web build the app runs inside the page, so a Flask route is not a URL pdf.js can
+       fetch: there the PDFs sit next to index.html as plain files (deploy-pages.yml). #}
+    {% set file_url = ("/rulebooks/" + book.file) if BROWSER_MODE else url_for('rulebook_file', code=book.code) %}
     <div class="panel viewer">
       <iframe title="{{ book.title }}"
-              src="{{ url_for('static', filename='pdfjs/web/viewer.html') }}?file={{ url_for('rulebook_file', code=book.code) | urlencode }}#page={{ pdf_page }}"></iframe>
+              src="{{ url_for('static', filename='pdfjs/web/viewer.html') }}?file={{ file_url | urlencode }}#page={{ pdf_page }}"></iframe>
     </div>
   </section>
 {% endblock %}

@@ -396,3 +396,20 @@ Verifying a build: run the exe with `PORT` and `FTFM_DATA_DIR` pointed at a scra
 exercise it over HTTP. **It opens a browser tab on launch**, and that tab's heartbeat keeps the
 idle watchdog from exiting, so stop a test instance by PID from the port (never by process
 name), not by waiting for the watchdog.
+
+## Web build (M13)
+
+`python scripts/build_browser_bundle.py`, then serve a copy of what `deploy-pages.yml`
+assembles: `web/index.html`, `web/bundle.json`, `static/`, `rulebooks/` in one folder
+(`python -m http.server`). Two web-only facts the desktop build hides:
+
+- `bundle.json` is **text only**. Binary files the Python side opens (the PDF's TTFs) are
+  fetched by the shell and written into the Pyodide filesystem under `/app`
+  (`BINARY_ASSETS` / `copyBinaryAssets` in the shell). Add to that list when the app starts
+  reading another binary file.
+- Flask routes do not exist for anything outside the page: pdf.js must be pointed at
+  `/rulebooks/<file>.pdf` in `BROWSER_MODE`, not at `/rulebook/<code>/file`.
+- An inline binary response (the fleet PDF) is opened from a blob in a new tab; an attachment
+  is downloaded.
+
+Deployment is manual (`deploy-pages.yml`, workflow_dispatch) and belongs to the owner.
