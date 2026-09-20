@@ -111,7 +111,11 @@ What exists:
   figure captions, spec panels and half sentences:  repairs hyphenation and stray page
   numbers, and  in the tool holds entries transcribed from the page image where the
   layout defeats it.  guards both the text and the page numbers. `Ruleset.quickref()` filters it to the systems present plus a few always-on
-  entries and the fleet's optional rules.
+  entries, the fleet's optional rules and the races in the fleet. Race entries are key-prefixed
+  (`kv_kgun`), so a mixed fleet still gets the FB1 entry for its human designs. **FB2 repeats
+  FB1's headings once per race** and `body_after()` keeps the longest body wherever it is, so a
+  Kra'Vak key can silently resolve to the Phalon section: pin such an entry to its printed pages
+  in the tool's `PAGES` map, and check the page reference against the page image.
 - `tests/test_pdf_export.py` reads the generated pages back with pymupdf. Render pages to PNG
   for a visual check when the layout changes.
 
@@ -160,8 +164,11 @@ What exists:
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system; drag-to-arrange can write them later.
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
   a damaged drive; black on paper. `damage=None` is a blank copy.
-- Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set
-  (`icon_set = "fb"` / `"ft2"`) rather than drawing itself, because drawing is a consumer's job.
+- Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race
+  (`icon_set_for(race)` -> `"fb"` / `"ft2"` / `"fb_kravak"`, falling back to the `icon_set`
+  attribute) rather than drawing itself, because drawing is a consumer's job. A set may also
+  supply `"main_drive"` and draw the drive itself, as `fb_kravak` does for the Advanced Grav
+  Drive that FB2 p.9 says looks different and is written "4A".
   An unknown type falls back to a labelled box, so a new system never breaks a sheet. Boxed
   abbreviations take a callable so the label is translated at draw time.
 - `box_size()` gives the sheet width band (small/medium/large/xlarge) the packed PDF sorts by.
@@ -240,9 +247,18 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `register()`, `get_ruleset()`. Rulesets register at the bottom of that file (they import the
   dataclasses, so the import has to come last).
 - The protocol is PLAN 6.1 plus: `arcs` (the ruleset's arc names), `loadout_points()` (fleet
-  totals include loadouts, PLAN 5.4), `fighter_types(options)` (loadout editor),
-  `required_options(design, loadout)` (the MT toggles a design needs). `loadout=None` means the
-  design's default loadout. `icon_set` (M6) and `quickref()` (M9) are placeholders.
+  totals include loadouts, PLAN 5.4), `fighter_types(options, race)` (loadout editor),
+  `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)` and
+  `quickref(systems_present, options, races)`. `loadout=None` means the design's default loadout.
+- **Races are additive modules inside a ruleset, never new rulesets** (PLAN 3 decision 3). A tech
+  module is a plain module exposing the per-design half of the protocol (`system_defs()`,
+  `design_breakdown`, `validate_design`, `loadout_points`, `damage_track`, `crew_factors`,
+  `cf_positions`, `threshold_numbers`, `suggest_type`, `ICON_SET`, `FIGHTER_POINTS`);
+  `rulesets/fb/tech.py` maps race id -> module and `FBRuleset` dispatches every per-design call
+  on `design["race"]`. An unknown race falls back to human rather than raising. Adding a race is:
+  write the module, add it to `_TECH`, add its icon set to `ssd_layout`, add its catalog
+  extractor and its quick-reference rows. Nothing above the ruleset layer knows races exist
+  beyond passing one along.
 - `design_breakdown().derived["mass_limit"]` is the MASS budget for the UI bar: FB must use
   exactly TMF, FT2 at most the system capacity (hull and drives take no MASS in FT2).
 - `validate_design(design, options)` also flags More Thrust content whose fleet toggle is off in
@@ -252,8 +268,21 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`), `split_rows`, `cf_positions`. Never compute
   percentages with floats: 85 x 30% must be 25.5 exactly to round to 26.
 - `rulesets/fb/`: `data.py` (books, `system_defs()` for the picker, fighter points, FB1 p.12
-  classes, hull descriptors), `rules.py` (`SYSTEM_RULES` type -> (mass, points, label),
-  breakdown, validation, derived values), `__init__.py` (`RULESET`).
+  classes, hull descriptors), `rules.py` (human tech: `SYSTEM_RULES` type -> (mass, points,
+  label), breakdown, validation, derived values), `kravak.py` (Kra'Vak tech, FB2 pp.9-11),
+  `tech.py` (the race -> module table), `__init__.py` (`RULESET`).
+- Kra'Vak tech (`kravak.py`): hull, damage track, crew factors, thresholds, holds and tender bays
+  are the human rules, which FB2 p.9 says outright, so they are imported from `rules.py` rather
+  than restated. What differs: the Advanced Grav Drive costs 3 points per MASS (FB2 p.9, and it
+  is the one rule that makes the race); `kgun` {class, arcs} on the FB2 p.9 MASS table (class 1
+  all six arcs, class 2 one or two adjacent, class 3+ exactly one, +3 MASS per class above 6) at
+  4 points per MASS; one-shot `mkp` {arcs, one} at 1/4 and `scattergun` at 1/5; fire control
+  1/4; no screens (FB2 p.8), no ADFC (scatterguns area-defend themselves, FB2 p.10), no salvo
+  missiles, no beams. `turn_thrust` is the full thrust rating, not half (FB2 p.9). Anything else
+  raises `race_system`.
+- **FB2 p.10 prints "9 MASS and costs 18 points" for a Kra'Vak fighter bay and that is wrong**:
+  every design in the book (Lo'Vok 626, Yu'Kas 883, Ko'San 917) prices a bay at the human 27, and
+  the printed 18 is the Ra'San group's own cost from the same page. Do not "fix" it back.
 - System dicts per type (the design `systems` list; `uid` + `type` always): `beam` {class,
   arcs}, `pulse_torpedo`/`needle_beam`/`sm_launcher`/`nova_cannon`/`wave_gun` {arcs},
   `submunition` {arcs optional}, `sm_magazine` {capacity (MASS), feeds [launcher uids]},
@@ -293,7 +322,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 ## Catalog
 
 - `data/catalog/fb_fb1.json` (FB1 pp.13-42: 57 NAC/NSL/FSE/ESU warships, 8 merchant and support
-  vessels), `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs).
+  vessels), `fb_fb2_kravak.json` (FB2 pp.12-19, 15 Kra'Vak warships and 1 merchant),
+  `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
   hold the curated ship tables and write the JSON; fix a ship there and re-run. The notation is
@@ -305,7 +335,12 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   facing, submunitions, merchants, all of FT and MT) from rendered page images. FT2 beam pointers:
   up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
 - `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
-  All 96 match their printed NPV; the only errata entry is the FT p.31 design example.
+  110 of the 112 match their printed NPV; the two errata entries are the FT p.31 design example
+  and the FB2 p.18 Do'San.
+- **Kra'Vak arcs need no image pass.** `ssd_arcs.py` finds nothing on FB2 pp.12-19: the Kra'Vak
+  icon is a plain numbered hexagon with no arc pointer (the key is on FB2 p.11), filled for a
+  one-arc gun and outline for an all-arc one. The class already fixes that, and the book's prose
+  names the arc as fore (FB2 pp.11, 13, 15).
 - tools/ scripts need `pymupdf` (requirements-dev) and run from the repo root; the three rulebook
   pipeline files are excluded from ruff, the extractors only from E501 (one row per ship).
 
@@ -404,7 +439,13 @@ name), not by waiting for the watchdog.
 
 `python scripts/build_browser_bundle.py`, then serve a copy of what `deploy-pages.yml`
 assembles: `web/index.html`, `web/bundle.json`, `static/`, `rulebooks/` in one folder
-(`python -m http.server`). Two web-only facts the desktop build hides:
+(`python -m http.server`). The deployed site has two levels: `web/landing.html` becomes the site
+root (`index.html`: play online + Windows download, no preview pages) and the Pyodide app sits
+under `app/` with its `static/` and `rulebooks/`. The landing page reads its logo and fonts from
+`app/static/`. `scripts/stamp_landing_page_versions.py _site/index.html` fills the version badges
+and the Windows link from the newest release with a `-win64.zip` asset (the asset name carries the
+version, so the link cannot be hard-coded); keep the `data-version-badge` / `data-download`
+markers in `landing.html`. Two web-only facts the desktop build hides:
 
 - `bundle.json` is **text only**. Binary files the Python side opens (the PDF's TTFs) are
   fetched by the shell and written into the Pyodide filesystem under `/app`
