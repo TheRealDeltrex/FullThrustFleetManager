@@ -735,10 +735,11 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 
 1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs)
 2. FTPC ruleset (incl. the 2017 errata)
-3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20) **done**, Sa'Vasku (pp.21-33),
+3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20) **done**, Sa'Vasku (pp.21-33) **done**,
    Phalon (pp.35-46); golden test: the FB2 p.11 Kra'Vak example = 384. Races are additive tech
    modules inside a ruleset (decision 3), not new rulesets. (The Phalon span read pp.34-46 here;
-   printed 34 is blank and the section opens on 35.)
+   printed 34 is blank and the section opens on 35.) Sa'Vasku needed no data-model change: the
+   power pools are per-turn play state, so the sheet prints a box for them and nothing is stored.
 4. Campaign module (11.3) with installations and the random campaign generator
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
