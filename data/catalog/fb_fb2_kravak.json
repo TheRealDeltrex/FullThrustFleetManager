@@ -2,7 +2,7 @@
  "schema_version": 1,
  "designs": [
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-lu-dak",
    "ruleset": "fb",
    "race": "kravak",
@@ -14,6 +14,7 @@
    "tmf": 11,
    "hull_boxes": 3,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -44,6 +45,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -58,7 +60,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-ka-tak",
    "ruleset": "fb",
    "race": "kravak",
@@ -70,6 +72,7 @@
    "tmf": 20,
    "hull_boxes": 6,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -111,6 +114,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -125,7 +129,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-da-kak",
    "ruleset": "fb",
    "race": "kravak",
@@ -137,6 +141,7 @@
    "tmf": 30,
    "hull_boxes": 9,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -171,6 +176,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -185,7 +191,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-di-tok",
    "ruleset": "fb",
    "race": "kravak",
@@ -197,6 +203,7 @@
    "tmf": 40,
    "hull_boxes": 12,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -248,6 +255,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -262,7 +270,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-vo-bok",
    "ruleset": "fb",
    "race": "kravak",
@@ -274,6 +282,7 @@
    "tmf": 60,
    "hull_boxes": 18,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -333,6 +342,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -347,7 +357,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-si-tek",
    "ruleset": "fb",
    "race": "kravak",
@@ -359,6 +369,7 @@
    "tmf": 70,
    "hull_boxes": 21,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -435,6 +446,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -449,7 +461,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-ko-tek",
    "ruleset": "fb",
    "race": "kravak",
@@ -461,6 +473,7 @@
    "tmf": 70,
    "hull_boxes": 21,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -520,6 +533,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -534,7 +548,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-va-dok",
    "ruleset": "fb",
    "race": "kravak",
@@ -546,6 +560,7 @@
    "tmf": 84,
    "hull_boxes": 27,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -605,6 +620,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -619,7 +635,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-ti-dak",
    "ruleset": "fb",
    "race": "kravak",
@@ -631,6 +647,7 @@
    "tmf": 100,
    "hull_boxes": 36,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -711,6 +728,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -725,7 +743,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-ko-vol",
    "ruleset": "fb",
    "race": "kravak",
@@ -737,6 +755,7 @@
    "tmf": 121,
    "hull_boxes": 48,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -834,6 +853,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -848,7 +868,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-lo-vok",
    "ruleset": "fb",
    "race": "kravak",
@@ -860,6 +880,7 @@
    "tmf": 160,
    "hull_boxes": 54,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -986,6 +1007,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s19",
@@ -1005,7 +1027,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-yu-kas",
    "ruleset": "fb",
    "race": "kravak",
@@ -1017,6 +1039,7 @@
    "tmf": 220,
    "hull_boxes": 72,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 3,
    "ftl": true,
    "streamlining": "none",
@@ -1197,6 +1220,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s28",
@@ -1216,7 +1240,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-do-san",
    "ruleset": "fb",
    "race": "kravak",
@@ -1228,6 +1252,7 @@
    "tmf": 180,
    "hull_boxes": 54,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1365,6 +1390,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s18",
@@ -1396,7 +1422,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-ko-san",
    "ruleset": "fb",
    "race": "kravak",
@@ -1408,6 +1434,7 @@
    "tmf": 240,
    "hull_boxes": 72,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1584,6 +1611,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s23",
@@ -1623,7 +1651,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-to-rok",
    "ruleset": "fb",
    "race": "kravak",
@@ -1635,6 +1663,7 @@
    "tmf": 60,
    "hull_boxes": 18,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1685,6 +1714,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1699,7 +1729,7 @@
    "notes": "Shuttle bay holds 2 x MASS-2 interface shuttles (4 points each, not in the NPV)."
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:kv-sha-ken",
    "ruleset": "fb",
    "race": "kravak",
@@ -1711,6 +1741,7 @@
    "tmf": 40,
    "hull_boxes": 10,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -1744,6 +1775,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },

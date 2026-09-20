@@ -2,7 +2,7 @@
  "schema_version": 1,
  "designs": [
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-harrison",
    "ruleset": "fb",
    "race": "human",
@@ -14,6 +14,7 @@
    "tmf": 6,
    "hull_boxes": 2,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -37,6 +38,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -51,7 +53,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-arapaho",
    "ruleset": "fb",
    "race": "human",
@@ -63,6 +65,7 @@
    "tmf": 12,
    "hull_boxes": 2,
    "armour": 1,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -103,6 +106,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -117,7 +121,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-minerva",
    "ruleset": "fb",
    "race": "human",
@@ -129,6 +133,7 @@
    "tmf": 18,
    "hull_boxes": 5,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -179,6 +184,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -193,7 +199,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-tacoma",
    "ruleset": "fb",
    "race": "human",
@@ -205,6 +211,7 @@
    "tmf": 24,
    "hull_boxes": 7,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -265,6 +272,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -279,7 +287,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-ticonderoga",
    "ruleset": "fb",
    "race": "human",
@@ -291,6 +299,7 @@
    "tmf": 30,
    "hull_boxes": 9,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -355,6 +364,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -369,7 +379,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-huron",
    "ruleset": "fb",
    "race": "human",
@@ -381,6 +391,7 @@
    "tmf": 50,
    "hull_boxes": 15,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -464,6 +475,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -478,7 +490,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-furious",
    "ruleset": "fb",
    "race": "human",
@@ -490,6 +502,7 @@
    "tmf": 64,
    "hull_boxes": 19,
    "armour": 3,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -573,6 +586,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -587,7 +601,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-vandenburg",
    "ruleset": "fb",
    "race": "human",
@@ -599,6 +613,7 @@
    "tmf": 80,
    "hull_boxes": 24,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -669,6 +684,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -683,7 +699,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-majestic",
    "ruleset": "fb",
    "race": "human",
@@ -695,6 +711,7 @@
    "tmf": 106,
    "hull_boxes": 32,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -806,6 +823,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -829,7 +847,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-victoria",
    "ruleset": "fb",
    "race": "human",
@@ -841,6 +859,7 @@
    "tmf": 120,
    "hull_boxes": 36,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -959,6 +978,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -973,7 +993,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-excalibur",
    "ruleset": "fb",
    "race": "human",
@@ -985,6 +1005,7 @@
    "tmf": 140,
    "hull_boxes": 42,
    "armour": 7,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1101,6 +1122,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s15",
@@ -1120,7 +1142,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-valley-forge",
    "ruleset": "fb",
    "race": "human",
@@ -1132,6 +1154,7 @@
    "tmf": 190,
    "hull_boxes": 57,
    "armour": 7,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1277,6 +1300,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s18",
@@ -1300,7 +1324,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-inflexible",
    "ruleset": "fb",
    "race": "human",
@@ -1312,6 +1336,7 @@
    "tmf": 140,
    "hull_boxes": 28,
    "armour": 9,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1406,6 +1431,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s11",
@@ -1437,7 +1463,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nac-ark-royal",
    "ruleset": "fb",
    "race": "human",
@@ -1449,6 +1475,7 @@
    "tmf": 200,
    "hull_boxes": 40,
    "armour": 12,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1566,6 +1593,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s12",
@@ -1605,7 +1633,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-falke",
    "ruleset": "fb",
    "race": "human",
@@ -1617,6 +1645,7 @@
    "tmf": 8,
    "hull_boxes": 2,
    "armour": 1,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -1640,6 +1669,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1654,7 +1684,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-stroschen",
    "ruleset": "fb",
    "race": "human",
@@ -1666,6 +1696,7 @@
    "tmf": 14,
    "hull_boxes": 4,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1690,6 +1721,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1704,7 +1736,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-ehrenhold",
    "ruleset": "fb",
    "race": "human",
@@ -1716,6 +1748,7 @@
    "tmf": 20,
    "hull_boxes": 6,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1750,6 +1783,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1764,7 +1798,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-waldburg",
    "ruleset": "fb",
    "race": "human",
@@ -1776,6 +1810,7 @@
    "tmf": 30,
    "hull_boxes": 9,
    "armour": 3,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1840,6 +1875,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1854,7 +1890,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-waldburg-m",
    "ruleset": "fb",
    "race": "human",
@@ -1866,6 +1902,7 @@
    "tmf": 30,
    "hull_boxes": 9,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1910,6 +1947,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -1932,7 +1970,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-kronprinz-wilhelm",
    "ruleset": "fb",
    "race": "human",
@@ -1944,6 +1982,7 @@
    "tmf": 48,
    "hull_boxes": 14,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -2026,6 +2065,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2040,7 +2080,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-radetzky",
    "ruleset": "fb",
    "race": "human",
@@ -2052,6 +2092,7 @@
    "tmf": 58,
    "hull_boxes": 17,
    "armour": 6,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -2148,6 +2189,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2162,7 +2204,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-markgraf",
    "ruleset": "fb",
    "race": "human",
@@ -2174,6 +2216,7 @@
    "tmf": 82,
    "hull_boxes": 25,
    "armour": 10,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -2266,6 +2309,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2280,7 +2324,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-maximilian",
    "ruleset": "fb",
    "race": "human",
@@ -2292,6 +2336,7 @@
    "tmf": 100,
    "hull_boxes": 30,
    "armour": 10,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -2398,6 +2443,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2412,7 +2458,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-richthofen",
    "ruleset": "fb",
    "race": "human",
@@ -2424,6 +2470,7 @@
    "tmf": 104,
    "hull_boxes": 31,
    "armour": 6,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -2540,6 +2587,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2554,7 +2602,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-maria-von-burgund",
    "ruleset": "fb",
    "race": "human",
@@ -2566,6 +2614,7 @@
    "tmf": 120,
    "hull_boxes": 36,
    "armour": 10,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -2709,6 +2758,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -2723,7 +2773,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-szent-istvan",
    "ruleset": "fb",
    "race": "human",
@@ -2735,6 +2785,7 @@
    "tmf": 150,
    "hull_boxes": 60,
    "armour": 14,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -2851,6 +2902,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s16",
@@ -2870,7 +2922,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-von-tegetthoff",
    "ruleset": "fb",
    "race": "human",
@@ -2882,6 +2934,7 @@
    "tmf": 200,
    "hull_boxes": 80,
    "armour": 14,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -3060,6 +3113,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s21",
@@ -3089,7 +3143,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:nsl-der-theuerdank",
    "ruleset": "fb",
    "race": "human",
@@ -3101,6 +3155,7 @@
    "tmf": 220,
    "hull_boxes": 88,
    "armour": 14,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -3258,6 +3313,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s18",
@@ -3289,7 +3345,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-mistral",
    "ruleset": "fb",
    "race": "human",
@@ -3301,6 +3357,7 @@
    "tmf": 8,
    "hull_boxes": 2,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3337,6 +3394,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -3351,7 +3409,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-athena",
    "ruleset": "fb",
    "race": "human",
@@ -3363,6 +3421,7 @@
    "tmf": 14,
    "hull_boxes": 4,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3410,6 +3469,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -3424,7 +3484,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-ibiza",
    "ruleset": "fb",
    "race": "human",
@@ -3436,6 +3496,7 @@
    "tmf": 18,
    "hull_boxes": 5,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3490,6 +3551,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -3504,7 +3566,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-san-miguel",
    "ruleset": "fb",
    "race": "human",
@@ -3516,6 +3578,7 @@
    "tmf": 34,
    "hull_boxes": 10,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3580,6 +3643,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -3594,7 +3658,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-trieste",
    "ruleset": "fb",
    "race": "human",
@@ -3606,6 +3670,7 @@
    "tmf": 42,
    "hull_boxes": 13,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3660,6 +3725,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -3682,7 +3748,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-suffren",
    "ruleset": "fb",
    "race": "human",
@@ -3694,6 +3760,7 @@
    "tmf": 54,
    "hull_boxes": 16,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3753,6 +3820,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -3776,7 +3844,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-milan",
    "ruleset": "fb",
    "race": "human",
@@ -3788,6 +3856,7 @@
    "tmf": 62,
    "hull_boxes": 19,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -3860,6 +3929,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -3883,7 +3953,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-jerez",
    "ruleset": "fb",
    "race": "human",
@@ -3895,6 +3965,7 @@
    "tmf": 88,
    "hull_boxes": 26,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -4003,6 +4074,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -4027,7 +4099,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-ypres",
    "ruleset": "fb",
    "race": "human",
@@ -4039,6 +4111,7 @@
    "tmf": 96,
    "hull_boxes": 29,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -4146,6 +4219,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -4169,7 +4243,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-roma",
    "ruleset": "fb",
    "race": "human",
@@ -4181,6 +4255,7 @@
    "tmf": 110,
    "hull_boxes": 33,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -4326,6 +4401,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": [
      {
@@ -4352,7 +4428,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-bonaparte",
    "ruleset": "fb",
    "race": "human",
@@ -4364,6 +4440,7 @@
    "tmf": 160,
    "hull_boxes": 48,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -4492,6 +4569,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s17",
@@ -4521,7 +4599,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-foch",
    "ruleset": "fb",
    "race": "human",
@@ -4533,6 +4611,7 @@
    "tmf": 250,
    "hull_boxes": 75,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -4706,6 +4785,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s23",
@@ -4748,7 +4828,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-bologna",
    "ruleset": "fb",
    "race": "human",
@@ -4760,6 +4840,7 @@
    "tmf": 170,
    "hull_boxes": 51,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -4884,6 +4965,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s14",
@@ -4924,7 +5006,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fse-jeanne-d-arc",
    "ruleset": "fb",
    "race": "human",
@@ -4936,6 +5018,7 @@
    "tmf": 280,
    "hull_boxes": 84,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5078,6 +5161,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s17",
@@ -5130,7 +5214,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-lenov",
    "ruleset": "fb",
    "race": "human",
@@ -5142,6 +5226,7 @@
    "tmf": 6,
    "hull_boxes": 1,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -5165,6 +5250,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5179,7 +5265,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-nanuchka-ii",
    "ruleset": "fb",
    "race": "human",
@@ -5191,6 +5277,7 @@
    "tmf": 14,
    "hull_boxes": 4,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -5228,6 +5315,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5242,7 +5330,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-novgorod",
    "ruleset": "fb",
    "race": "human",
@@ -5254,6 +5342,7 @@
    "tmf": 22,
    "hull_boxes": 7,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -5304,6 +5393,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5318,7 +5408,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-warsaw",
    "ruleset": "fb",
    "race": "human",
@@ -5330,6 +5420,7 @@
    "tmf": 28,
    "hull_boxes": 8,
    "armour": 3,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5390,6 +5481,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5404,7 +5496,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-volga",
    "ruleset": "fb",
    "race": "human",
@@ -5416,6 +5508,7 @@
    "tmf": 34,
    "hull_boxes": 10,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5493,6 +5586,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5507,7 +5601,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-tibet",
    "ruleset": "fb",
    "race": "human",
@@ -5519,6 +5613,7 @@
    "tmf": 48,
    "hull_boxes": 14,
    "armour": 3,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5605,6 +5700,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5619,7 +5715,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-beijing-b",
    "ruleset": "fb",
    "race": "human",
@@ -5631,6 +5727,7 @@
    "tmf": 60,
    "hull_boxes": 18,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5714,6 +5811,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5728,7 +5826,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-gorshkov",
    "ruleset": "fb",
    "race": "human",
@@ -5740,6 +5838,7 @@
    "tmf": 70,
    "hull_boxes": 21,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5843,6 +5942,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5857,7 +5957,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-voroshilev",
    "ruleset": "fb",
    "race": "human",
@@ -5869,6 +5969,7 @@
    "tmf": 78,
    "hull_boxes": 23,
    "armour": 5,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -5962,6 +6063,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -5976,7 +6078,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-manchuria",
    "ruleset": "fb",
    "race": "human",
@@ -5988,6 +6090,7 @@
    "tmf": 94,
    "hull_boxes": 38,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -6078,6 +6181,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -6092,7 +6196,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-petrograd",
    "ruleset": "fb",
    "race": "human",
@@ -6104,6 +6208,7 @@
    "tmf": 116,
    "hull_boxes": 46,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -6238,6 +6343,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -6252,7 +6358,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-rostov",
    "ruleset": "fb",
    "race": "human",
@@ -6264,6 +6370,7 @@
    "tmf": 138,
    "hull_boxes": 55,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -6367,6 +6474,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s14",
@@ -6386,7 +6494,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-tsiolkovsky",
    "ruleset": "fb",
    "race": "human",
@@ -6398,6 +6506,7 @@
    "tmf": 150,
    "hull_boxes": 45,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -6519,6 +6628,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s14",
@@ -6550,7 +6660,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-komarov",
    "ruleset": "fb",
    "race": "human",
@@ -6562,6 +6672,7 @@
    "tmf": 220,
    "hull_boxes": 88,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -6710,6 +6821,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s19",
@@ -6729,7 +6841,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:esu-konstantin",
    "ruleset": "fb",
    "race": "human",
@@ -6741,6 +6853,7 @@
    "tmf": 240,
    "hull_boxes": 72,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -6920,6 +7033,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s20",
@@ -6959,7 +7073,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:heavy-freighter",
    "ruleset": "fb",
    "race": "human",
@@ -6971,6 +7085,7 @@
    "tmf": 120,
    "hull_boxes": 12,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -6987,6 +7102,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7001,7 +7117,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:medium-freighter",
    "ruleset": "fb",
    "race": "human",
@@ -7013,6 +7129,7 @@
    "tmf": 80,
    "hull_boxes": 8,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -7029,6 +7146,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7043,7 +7161,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:light-freighter",
    "ruleset": "fb",
    "race": "human",
@@ -7055,6 +7173,7 @@
    "tmf": 40,
    "hull_boxes": 4,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -7071,6 +7190,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7085,7 +7205,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:free-trader",
    "ruleset": "fb",
    "race": "human",
@@ -7097,6 +7217,7 @@
    "tmf": 20,
    "hull_boxes": 4,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -7126,6 +7247,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7140,7 +7262,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:fleet-auxiliary",
    "ruleset": "fb",
    "race": "human",
@@ -7152,6 +7274,7 @@
    "tmf": 100,
    "hull_boxes": 20,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -7189,6 +7312,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7203,7 +7327,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:assault-transport",
    "ruleset": "fb",
    "race": "human",
@@ -7215,6 +7339,7 @@
    "tmf": 120,
    "hull_boxes": 24,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -7262,6 +7387,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7276,7 +7402,7 @@
    "notes": "Carries four MASS 5 assault dropships in its tender bay: +40 points (FB1 p.42)."
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:bulk-carrier",
    "ruleset": "fb",
    "race": "human",
@@ -7288,6 +7414,7 @@
    "tmf": 200,
    "hull_boxes": 20,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 1,
    "ftl": true,
    "streamlining": "none",
@@ -7304,6 +7431,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -7318,7 +7446,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb1:starliner",
    "ruleset": "fb",
    "race": "human",
@@ -7330,6 +7458,7 @@
    "tmf": 120,
    "hull_boxes": 12,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -7367,6 +7496,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },

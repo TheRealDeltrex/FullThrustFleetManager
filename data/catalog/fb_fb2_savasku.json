@@ -2,7 +2,7 @@
  "schema_version": 1,
  "designs": [
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-sa-an-tha",
    "ruleset": "fb",
    "race": "savasku",
@@ -14,6 +14,7 @@
    "tmf": 10,
    "hull_boxes": 3,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -38,6 +39,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -52,7 +54,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-sa-kess-tha",
    "ruleset": "fb",
    "race": "savasku",
@@ -64,6 +66,7 @@
    "tmf": 11,
    "hull_boxes": 2,
    "armour": 1,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -88,6 +91,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -102,7 +106,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-fo-kiir-tha",
    "ruleset": "fb",
    "race": "savasku",
@@ -114,6 +118,7 @@
    "tmf": 18,
    "hull_boxes": 5,
    "armour": 1,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -142,6 +147,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -156,7 +162,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-fo-sath-aan",
    "ruleset": "fb",
    "race": "savasku",
@@ -168,6 +174,7 @@
    "tmf": 24,
    "hull_boxes": 8,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -196,6 +203,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -210,7 +218,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-fo-vur-ath",
    "ruleset": "fb",
    "race": "savasku",
@@ -222,6 +230,7 @@
    "tmf": 40,
    "hull_boxes": 12,
    "armour": 2,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -266,6 +275,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -280,7 +290,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-var-arr-sha",
    "ruleset": "fb",
    "race": "savasku",
@@ -292,6 +302,7 @@
    "tmf": 52,
    "hull_boxes": 16,
    "armour": 3,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -344,6 +355,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -358,7 +370,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-var-kiir-sha",
    "ruleset": "fb",
    "race": "savasku",
@@ -370,6 +382,7 @@
    "tmf": 64,
    "hull_boxes": 18,
    "armour": 4,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -435,6 +448,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -449,7 +463,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-var-thee-sha",
    "ruleset": "fb",
    "race": "savasku",
@@ -461,6 +475,7 @@
    "tmf": 70,
    "hull_boxes": 20,
    "armour": 6,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -526,6 +541,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -540,7 +556,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-thy-sa-teth",
    "ruleset": "fb",
    "race": "savasku",
@@ -552,6 +568,7 @@
    "tmf": 94,
    "hull_boxes": 36,
    "armour": 6,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -604,6 +621,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s9",
@@ -627,7 +645,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-shyy-tha-var",
    "ruleset": "fb",
    "race": "savasku",
@@ -639,6 +657,7 @@
    "tmf": 100,
    "hull_boxes": 25,
    "armour": 8,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -719,6 +738,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -733,7 +753,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-ann-var-teth",
    "ruleset": "fb",
    "race": "savasku",
@@ -745,6 +765,7 @@
    "tmf": 120,
    "hull_boxes": 30,
    "armour": 9,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -838,6 +859,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -852,7 +874,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-sla-tha-rosh",
    "ruleset": "fb",
    "race": "savasku",
@@ -864,6 +886,7 @@
    "tmf": 160,
    "hull_boxes": 40,
    "armour": 12,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -983,6 +1006,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s19",
@@ -1002,7 +1026,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-vas-sa-rosh",
    "ruleset": "fb",
    "race": "savasku",
@@ -1014,6 +1038,7 @@
    "tmf": 220,
    "hull_boxes": 60,
    "armour": 16,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -1170,6 +1195,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s25",
@@ -1189,7 +1215,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "fb:fb2:sv-vas-sa-teth",
    "ruleset": "fb",
    "race": "savasku",
@@ -1201,6 +1227,7 @@
    "tmf": 240,
    "hull_boxes": 80,
    "armour": 12,
+   "armour_layers": [],
    "thrust": 0,
    "ftl": true,
    "streamlining": "none",
@@ -1315,6 +1342,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s18",

@@ -1,0 +1,1615 @@
+{
+ "schema_version": 1,
+ "designs": [
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-phyaa",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Phyaa",
+   "type_label": "Recon Scout",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 10,
+   "hull_boxes": 1,
+   "armour": 1,
+   "armour_layers": [
+    1
+   ],
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 38,
+    "npv_book": 39
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-vlath",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Vlath",
+   "type_label": "Battle Scout",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 12,
+   "hull_boxes": 2,
+   "armour": 1,
+   "armour_layers": [
+    1
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 38,
+    "npv_book": 51
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-dorrth",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Dorrth",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 16,
+   "hull_boxes": 2,
+   "armour": 2,
+   "armour_layers": [
+    2
+   ],
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 39,
+    "npv_book": 60
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-tyaph",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Tyaph",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 21,
+   "hull_boxes": 3,
+   "armour": 2,
+   "armour_layers": [
+    2
+   ],
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s4",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 39,
+    "npv_book": 84
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-phuun",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Phuun",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 24,
+   "hull_boxes": 3,
+   "armour": 2,
+   "armour_layers": [
+    2
+   ],
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "plasma_bolt_launcher",
+     "class": 1,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s4",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 40,
+    "npv_book": 89
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-dinth",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Dinth",
+   "type_label": "Heavy Destroyer",
+   "type_code": "DH",
+   "hull_kind": "warship",
+   "tmf": 41,
+   "hull_boxes": 7,
+   "armour": 4,
+   "armour_layers": [
+    4
+   ],
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "plasma_bolt_launcher",
+     "class": 1,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 40,
+    "npv_book": 150
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-tsaara",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Tsaara",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 58,
+   "hull_boxes": 10,
+   "armour": 5,
+   "armour_layers": [
+    3,
+    2
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "plasma_bolt_launcher",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 41,
+    "npv_book": 225
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-huulth",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Huulth",
+   "type_label": "Medium Cruiser",
+   "type_code": "",
+   "hull_kind": "warship",
+   "tmf": 70,
+   "hull_boxes": 12,
+   "armour": 7,
+   "armour_layers": [
+    4,
+    3
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "plasma_bolt_launcher",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 41,
+    "npv_book": 276
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-tuuloth",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Tuuloth",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 80,
+   "hull_boxes": 16,
+   "armour": 9,
+   "armour_layers": [
+    6,
+    3
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "plasma_bolt_launcher",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s6",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 42,
+    "npv_book": 299
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-keraph",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Keraph",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 104,
+   "hull_boxes": 20,
+   "armour": 12,
+   "armour_layers": [
+    8,
+    4
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "plasma_bolt_launcher",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "adfc"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 42,
+    "npv_book": 398
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-ptath",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Ptath",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 132,
+   "hull_boxes": 24,
+   "armour": 16,
+   "armour_layers": [
+    8,
+    4,
+    4
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "plasma_bolt_launcher",
+     "class": 4,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 43,
+    "npv_book": 522
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-saath",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Saath",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 170,
+   "hull_boxes": 30,
+   "armour": 18,
+   "armour_layers": [
+    9,
+    5,
+    4
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "plasma_bolt_launcher",
+     "class": 5,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "plasma_bolt_launcher",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 43,
+    "npv_book": 658
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-voth",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Voth",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 250,
+   "hull_boxes": 42,
+   "armour": 40,
+   "armour_layers": [
+    16,
+    10,
+    8,
+    6
+   ],
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s12",
+     "type": "plasma_bolt_launcher",
+     "class": 6,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s13",
+     "type": "plasma_bolt_launcher",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s14",
+     "type": "plasma_bolt_launcher",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s15",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s20",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 44,
+    "npv_book": 1041
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-taanis",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Taanis",
+   "type_label": "Light Carrier",
+   "type_code": "CVL",
+   "hull_kind": "warship",
+   "tmf": 170,
+   "hull_boxes": 30,
+   "armour": 16,
+   "armour_layers": [
+    8,
+    4,
+    4
+   ],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "plasma_bolt_launcher",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s10",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s11",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s12",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s13",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [
+     {
+      "hangar": "s10",
+      "type": "standard"
+     },
+     {
+      "hangar": "s11",
+      "type": "standard"
+     },
+     {
+      "hangar": "s12",
+      "type": "standard"
+     },
+     {
+      "hangar": "s13",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 44,
+    "npv_book": 641
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:fb2:ph-draath",
+   "ruleset": "fb",
+   "race": "phalon",
+   "faction": "PH",
+   "name": "Draath",
+   "type_label": "Heavy Carrier",
+   "type_code": "CVH",
+   "hull_kind": "warship",
+   "tmf": 250,
+   "hull_boxes": 40,
+   "armour": 30,
+   "armour_layers": [
+    12,
+    8,
+    6,
+    4
+   ],
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulser",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pulser",
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "plasma_bolt_launcher",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "vapour_shroud"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s14",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s15",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s16",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s17",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s18",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s20",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [
+     {
+      "hangar": "s13",
+      "type": "standard"
+     },
+     {
+      "hangar": "s14",
+      "type": "standard"
+     },
+     {
+      "hangar": "s15",
+      "type": "standard"
+     },
+     {
+      "hangar": "s16",
+      "type": "standard"
+     },
+     {
+      "hangar": "s17",
+      "type": "standard"
+     },
+     {
+      "hangar": "s18",
+      "type": "standard"
+     },
+     {
+      "hangar": "s19",
+      "type": "standard"
+     },
+     {
+      "hangar": "s20",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 45,
+    "npv_book": 1002
+   },
+   "notes": ""
+  }
+ ]
+}
