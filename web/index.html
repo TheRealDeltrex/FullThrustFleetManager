@@ -144,6 +144,37 @@
         isNetwork ? detail.replace(/^.*NETWORK:\s*/, "") : (detail || "");
     }
 
+    // The fleet PDF embeds IBM Plex Sans from static/fonts. Those are binary files served next
+    // to this page (deploy-pages.yml copies static/ verbatim), so they have to be fetched and
+    // placed in the virtual filesystem under /app, exactly where the desktop build finds them.
+    var BINARY_ASSETS = [
+      "static/fonts/IBMPlexSans-Regular.ttf",
+      "static/fonts/IBMPlexSans-Bold.ttf",
+      "static/fonts/IBMPlexSans-Italic.ttf",
+      "static/fonts/IBMPlexSans-SemiBold.ttf",
+    ];
+
+    async function copyBinaryAssets() {
+      for (var i = 0; i < BINARY_ASSETS.length; i++) {
+        var name = BINARY_ASSETS[i];
+        try {
+          var resp = await fetch(name);
+          if (!resp.ok) throw new Error(resp.status);
+          var bytes = new Uint8Array(await resp.arrayBuffer());
+          var dir = "/app/" + name.slice(0, name.lastIndexOf("/"));
+          dir.split("/").reduce(function (acc, part) {
+            var next = acc + (acc.endsWith("/") ? "" : "/") + part;
+            if (part) { try { pyodide.FS.mkdir(next); } catch (e) { /* exists */ } }
+            return next;
+          }, "");
+          pyodide.FS.writeFile("/app/" + name, bytes);
+        } catch (e) {
+          // Without the fonts the PDF route fails; everything else still works.
+          console.warn("Could not load " + name + ":", e);
+        }
+      }
+    }
+
     // ---- Python side: unpack the bundle, drive the real Flask app through its test client. ----
     var BOOTSTRAP_PY = [
       "import os, sys, json, io, base64",
@@ -307,6 +338,18 @@
         return;
       }
       var cd = res.content_disposition || "";
+      if (res.is_binary && !/attachment/i.test(cd)) {
+        // An inline binary response is the fleet PDF: the desktop browser opens it in a tab, so
+        // do the same here from a blob rather than rendering base64 into the frame.
+        document.body.style.cursor = "";
+        var blobUrl = URL.createObjectURL(
+          new Blob([base64ToUint8(res.body)], { type: res.content_type || "application/pdf" }));
+        if (!window.open(blobUrl, "_blank")) {
+          showToast("Allow pop-ups to open the PDF, or use Export to download it.", 8000);
+        }
+        setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 60000);
+        return;
+      }
       if (/attachment/i.test(cd)) {
         // Exports and PDFs arrive as downloads.
         document.body.style.cursor = "";
@@ -376,7 +419,7 @@
 
         setMsg("Loading the fleet manager…");
         // build_browser_bundle.py stamps a content hash here on every build.
-        var resp = await fetch("bundle.json?v=__BUNDLE_VERSION__");
+        var resp = await fetch("bundle.json?v=86f1548e4fd1");
         if (!resp.ok) throw new Error("Could not fetch bundle.json (" + resp.status + ")");
         var bundle = await resp.json();
         Object.keys(bundle.files).forEach(function (k) {
@@ -386,6 +429,9 @@
 
         pyodide.globals.set("BUNDLE_JSON", JSON.stringify(bundle));
         await pyodide.runPythonAsync(BOOTSTRAP_PY);
+        // bundle.json carries text only, so the PDF's bundled fonts are fetched as files and
+        // written into the Pyodide filesystem where pdf_export.py looks for them.
+        await copyBinaryAssets();
         navigatePy = pyodide.globals.get("navigate");
 
         setMsg("Restoring your library…");
