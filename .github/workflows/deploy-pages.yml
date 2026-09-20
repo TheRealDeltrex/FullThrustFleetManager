@@ -36,14 +36,21 @@ jobs:
       - name: Build web/bundle.json
         run: python scripts/build_browser_bundle.py
 
-      - name: Assemble the site (shell + bundle, static files, rulebook PDFs)
-        # Rulebooks and binary static assets are served as plain files next to index.html, not
-        # through the text-only bundle.json (PLAN 12, 14).
+      - name: Assemble the site (landing page at the root, the app under app/)
+        # Rulebooks and binary static assets are served as plain files next to the shell, not
+        # through the text-only bundle.json (PLAN 12, 14). The landing page reads its logo and
+        # fonts from app/static/, so there is one copy of them.
         run: |
-          mkdir -p _site
-          cp web/index.html web/bundle.json _site/
-          cp -r static _site/static
-          cp -r rulebooks _site/rulebooks
+          mkdir -p _site/app
+          cp web/landing.html _site/index.html
+          cp web/index.html web/bundle.json _site/app/
+          cp -r static _site/app/static
+          cp -r rulebooks _site/app/rulebooks
+
+      - name: Stamp the landing page's version badges and download link
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/stamp_landing_page_versions.py _site/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
