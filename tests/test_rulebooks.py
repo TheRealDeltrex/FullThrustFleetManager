@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import paths
@@ -85,6 +87,62 @@ def test_a_catalog_design_links_to_its_page(client):
     page = text(client.get("/design/fb:fb1:nac-furious"))
     design = store.get_design("fb:fb1:nac-furious")
     assert f"/rulebook/FB1?page={design['source']['page']}" in page
+
+
+# ---- Quick reference text (PLAN 2.5) -------------------------------------------------------------
+#
+# The FT and MT text layers are OCR, and both books are two-column pages with figure captions and
+# spec panels in them, so extraction used to pull in page numbers, captions and half sentences.
+# These guard the result; entries the layout defeats are hand-transcribed in the extractor.
+
+
+def quickref_entries():
+    for ruleset in RULESETS.values():
+        for entry in ruleset.quickref(set(), {}) or []:
+            yield ruleset.id, entry
+        # quickref() filters by the systems present, so ask for everything the books cover too.
+        for entry in ruleset.quickref({"beam", "pulse_torpedo", "needle_beam", "submunition",
+                                       "nova_cannon", "wave_gun", "hangar", "fighter_group",
+                                       "sm_launcher", "sm_magazine", "pds", "pdaf", "adfc",
+                                       "screen", "armour", "hold", "tug_drive", "ortillery",
+                                       "cloak", "reflex_field", "mt_missile", "streamlining",
+                                       "ftl", "crew", "hull_track"},
+                                      {"core_systems": True, "rerolls": True,
+                                       "vector_movement": True}):
+            yield ruleset.id, entry
+
+
+def test_every_quickref_entry_is_readable():
+    seen = 0
+    for ruleset_id, entry in quickref_entries():
+        seen += 1
+        where = f"{ruleset_id}/{entry.key}"
+        assert "�" not in entry.text, where          # OCR could not read a character
+        assert not re.search(r"[a-z]- [a-z]", entry.text), where   # "danger- ous"
+        assert not re.search(r"\s[.,;:]", entry.text), where       # " ." from a line break
+        assert entry.text.rstrip()[-1] in ".!?", where             # never cut mid-sentence
+        assert not re.search(r"\b(MASS|POINTS COST|SYMBOL):", entry.text), where  # spec panel
+        assert not re.search(r"\bFIG(URE)? \d", entry.text), where  # figure caption
+        assert len(entry.text) > 100, where
+        assert entry.title and entry.book
+    assert seen > 30
+
+
+def test_quickref_pages_point_at_the_right_page():
+    """The page reference is the PRINTED page; the viewer adds each book's offset."""
+    import fitz  # pymupdf
+
+    books = {b.code: b for rs in RULESETS.values() for b in rs.books}
+    checked = 0
+    for ruleset_id, entry in quickref_entries():
+        book = books[entry.book]
+        with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:
+            page = doc[entry.page + book.page_offset - 1]        # printed -> 0-based PDF index
+            words = {w.lower().strip(".,:;()") for w in page.get_text().split()}
+        sample = [w.lower().strip('.,:;()"\'') for w in entry.text.split()[:12] if len(w) > 4]
+        assert any(w in words for w in sample), f"{ruleset_id}/{entry.key} is not on p.{entry.page}"
+        checked += 1
+    assert checked > 30
 
 
 def test_the_viewer_may_be_framed_by_its_own_page(client):
