@@ -72,7 +72,7 @@ Two builds of the same code:
 |---|---|---|
 | 1 | Platform | Local desktop app + Pyodide web build on GitHub Pages |
 | 2 | Book content | Catalog designs and rules wording ship in the public repo and web build. GZG gives the books away free (shop.groundzerogames.co.uk/rules.html) |
-| 3 | v1 races | Human only. Tech-module structure in place so each alien race is additive |
+| 3 | v1 races | Human only in v1. Tech-module structure in place so each alien race is additive; after v1 the FB ruleset gained Kra'Vak this way (`rulesets/fb/tech.py`) |
 | 4 | Rulesets | Selectable **FT2, FB, FTCD, FTPC** |
 | 5 | Ruleset scope | Per fleet, fixed at creation; designs belong to one ruleset; very visible everywhere |
 | 6 | v1 rulesets | **FB + FT2**. FTCD and FTPC after v1 works |
@@ -735,8 +735,10 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 
 1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs)
 2. FTPC ruleset (incl. the 2017 errata)
-3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Phalon (pp.34-46), Sa'Vasku (pp.21-33);
-   golden test: the FB2 p.11 Kra'Vak example = 384
+3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20) **done**, Sa'Vasku (pp.21-33),
+   Phalon (pp.35-46); golden test: the FB2 p.11 Kra'Vak example = 384. Races are additive tech
+   modules inside a ruleset (decision 3), not new rulesets. (The Phalon span read pp.34-46 here;
+   printed 34 is blank and the section opens on 35.)
 4. Campaign module (11.3) with installations and the random campaign generator
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
