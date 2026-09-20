@@ -12,7 +12,7 @@ class FBRuleset:
     accent_color = "--rs-fb"
     books = data.BOOKS
     arcs = common.ARCS
-    icon_set = None  # M6
+    icon_set = "fb"  # the icon table in ssd_layout.ICON_SETS
 
     @property
     def name(self) -> str:

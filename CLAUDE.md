@@ -17,9 +17,9 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M5 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the
-96-design catalog behind the NPV gate, and the storage layer (library, fleets, import/export).
-No UI on top of the store yet; next is **M6** (SSD layout engine and icon sets).
+M1-M6 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the
+96-design catalog behind the NPV gate, the storage layer (library, fleets, import/export) and
+the SSD layout engine. No UI on top of them yet; next is **M7** (Design tab).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -50,8 +50,34 @@ What exists:
 
 - `fleet_rules.py`, `store.py`, `migrations.py`, `data/factions.json` — see Storage below.
 
-Modules of PLAN section 4 not listed here (`ssd_layout.py`, `pdf_export.py`) are created by the
-milestone that needs them.
+- `ssd_layout.py` — the record sheet; see Ship diagram below.
+
+`pdf_export.py` (PLAN section 4) arrives with M9.
+
+## Ship diagram (`ssd_layout.py`)
+
+- `layout(design, ruleset=None, damage=None, loadout=None, box="auto") -> Diagram(width, height,
+  primitives)`. Pure. Primitives are frozen dataclasses (`Rect`, `Circle`, `Line`, `Path`,
+  `Text`) in points with a top-left origin, so the screen and the paper use the same numbers:
+  `to_svg()` renders them for the app, `pdf_export` (M9) renders the same tuple with fpdf2.
+- Placement is arc-aware: `_side()` sorts each weapon into fore / port / starboard / aft /
+  centre from its arcs, bigger classes first (`_weight`), then fore rows across the top, the
+  side columns flanking a central block of all-round systems, aft weapons under it, the armour
+  circles and damage track (stars on the crew-factor boxes), and a bottom row with FTL, the
+  drive lozenge with its thrust, the FB core-systems box and any holds or tug drives.
+  `layout_hints[uid] = {"x": .., "y": ..}` pins a system; drag-to-arrange can write them later.
+- Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
+  a damaged drive; black on paper. `damage=None` is a blank copy.
+- Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set
+  (`icon_set = "fb"` / `"ft2"`) rather than drawing itself, because drawing is a consumer's job.
+  An unknown type falls back to a labelled box, so a new system never breaks a sheet. Boxed
+  abbreviations take a callable so the label is translated at draw time.
+- `box_size()` gives the sheet width band (small/medium/large/xlarge) the packed PDF sorts by.
+- `tests/test_ssd_layout.py` covers placement, damage and the size bands, asserts every catalog
+  design draws inside its own box, and holds SVG snapshots of 3 reference ships per ruleset in
+  `tests/snapshots/`. Regenerate them with
+  `.venv/Scripts/python.exe tests/test_ssd_layout.py --update` and read the diff: a changed
+  snapshot means every record sheet changed.
 
 ## Storage (layers 2-3)
 
