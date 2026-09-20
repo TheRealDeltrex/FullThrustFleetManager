@@ -248,3 +248,23 @@ def test_a_kravak_catalog_design_is_listed_under_its_race(client):
     body = client.get("/design").get_data(as_text=True)
     assert "Lo&#39;Vok" in body or "Lo'Vok" in body
     assert "FB2" in body
+
+
+def test_the_picker_offers_savasku_nodes_for_a_savasku_design(client):
+    created, _msg = store.new_design("fb", "savasku", "SV", "Construct")
+    body = client.get(f"/design/{created['id']}").get_data(as_text=True)
+    assert "Stinger node" in body and "Power generators" in body
+    assert "K-gun" not in body and "Beam battery" not in body
+
+
+def test_a_savasku_design_shows_power_instead_of_a_thrust_field(client):
+    """A construct has no thrust rating to edit; it buys thrust with power each turn (FB2 p.22),
+    so the workbench shows what it generates and posts a fixed 0."""
+    body = client.get("/design/fb:fb2:sv-vas-sa-rosh").get_data(as_text=True)
+    assert 'name="thrust" value="0"' in body and 'type="hidden" name="thrust"' in body
+    assert "power per turn: 40" in body
+
+
+def test_other_races_keep_the_thrust_field(client):
+    body = client.get("/design/fb:fb2:kv-lo-vok").get_data(as_text=True)
+    assert 'type="number" min="0" name="thrust"' in body

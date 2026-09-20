@@ -167,3 +167,7 @@ a { color: var(--accent); }
 /* Rulebook viewer (PLAN 12) */
 .viewer { padding: 0; overflow: hidden; }
 .viewer iframe { width: 100%; height: 78vh; border: 0; display: block; }
+
+/* A field the rules compute rather than the player setting it (a Sa'Vasku thrust rating, which
+   is bought with power each turn): reads like an input, but is not one. */
+.input.static { display: block; background: var(--panel-2, #f3f4f6); color: var(--muted, #555); }

@@ -242,3 +242,12 @@ def test_a_kravak_fleet_can_be_created_and_is_not_mixed_faction(client):
 def test_a_race_a_ruleset_does_not_have_is_refused(client):
     created, _msg = store.create_fleet("ft2", "Wrong race", "kravak")
     assert created is None
+
+
+def test_a_savasku_fleet_is_not_mixed_faction(client):
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Constructs", "race": "savasku",
+                                    "faction": "SV"}, follow_redirects=True)
+    fleet = next(f for f in store.list_fleets() if f["name"] == "Constructs")
+    assert fleet["race"] == "savasku"
+    assert "SV" in {f["id"] for f in store.builtin_factions("fb")}
+    assert not fleet_rules.badges(fleet, store.designs_for_fleet(fleet))["mixed_faction"]

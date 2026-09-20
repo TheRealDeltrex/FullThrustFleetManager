@@ -348,7 +348,7 @@ def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         if not design or ship["status"] in ("destroyed", "hulk"):
             continue
         for system in design["systems"]:
-            if system["type"] in ("hangar", "fighter_group"):
+            if system["type"] in ("hangar", "fighter_group", "drone_womb"):
                 rows.append((f"{ship['table_id']} {ship['name']}", _("Fighter group"), 6, "fighters"))
             elif system["type"] in ("sm_magazine", "sm_rack"):
                 salvos = max(1, int(system.get("capacity", 2) or 2) // 2)
