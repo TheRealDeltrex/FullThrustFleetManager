@@ -1,0 +1,1761 @@
+{
+ "schema_version": 1,
+ "designs": [
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-lu-dak",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Lu'Dak",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 11,
+   "hull_boxes": 3,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "mkp",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 12,
+    "npv_book": 44
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-ka-tak",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Ka'Tak",
+   "type_label": "Striker or Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 20,
+   "hull_boxes": 6,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "mkp",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "mkp",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 12,
+    "npv_book": 79
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-da-kak",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Da'Kak",
+   "type_label": "Heavy Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 30,
+   "hull_boxes": 9,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 2,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 2,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 13,
+    "npv_book": 119
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-di-tok",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Di'Tok",
+   "type_label": "Heavy Destroyer",
+   "type_code": "DH",
+   "hull_kind": "warship",
+   "tmf": 40,
+   "hull_boxes": 12,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 2,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 2,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 13,
+    "npv_book": 159
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-vo-bok",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Vo'Bok",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 60,
+   "hull_boxes": 18,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 14,
+    "npv_book": 238
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-si-tek",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Si'Tek",
+   "type_label": "Patrol or Escort Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 70,
+   "hull_boxes": 21,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s8",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 14,
+    "npv_book": 278
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-ko-tek",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Ko'Tek",
+   "type_label": "Strike Cruiser",
+   "type_code": "CE",
+   "hull_kind": "warship",
+   "tmf": 70,
+   "hull_boxes": 21,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 15,
+    "npv_book": 275
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-va-dok",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Va'Dok",
+   "type_label": "Heavy Cruiser",
+   "type_code": "CH",
+   "hull_kind": "warship",
+   "tmf": 84,
+   "hull_boxes": 27,
+   "armour": 0,
+   "thrust": 6,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 4,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 4,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s8",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s9",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 15,
+    "npv_book": 329
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-ti-dak",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Ti'Dak",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 100,
+   "hull_boxes": 36,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s8",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s11",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 16,
+    "npv_book": 393
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-ko-vol",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Ko'Vol",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 121,
+   "hull_boxes": 48,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s7",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s8",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s11",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s12",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s13",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s14",
+     "type": "fire_control"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 16,
+    "npv_book": 467
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-lo-vok",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Lo'Vok",
+   "type_label": "Battledreadnought",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 160,
+   "hull_boxes": 54,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 5,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s11",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s12",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s13",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s14",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s19",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 17,
+    "npv_book": 626
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-yu-kas",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Yu'Kas",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 220,
+   "hull_boxes": 72,
+   "armour": 0,
+   "thrust": 3,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 6,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 6,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 6,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 6,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s11",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s12",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s13",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s14",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s15",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s16",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s17",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s18",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s19",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s20",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s21",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s22",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s23",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s24",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s25",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s26",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s27",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s28",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s28",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 17,
+    "npv_book": 883
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-do-san",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Do'San",
+   "type_label": "Tactical (Light) Carrier",
+   "type_code": "CVL",
+   "hull_kind": "warship",
+   "tmf": 180,
+   "hull_boxes": 54,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s11",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s12",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s13",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s14",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s15",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s16",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s19",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s20",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s21",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s18",
+      "type": "standard"
+     },
+     {
+      "hangar": "s19",
+      "type": "standard"
+     },
+     {
+      "hangar": "s20",
+      "type": "standard"
+     },
+     {
+      "hangar": "s21",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 18,
+    "npv_book": 671
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-ko-san",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Ko'San",
+   "type_label": "Heavy Carrier",
+   "type_code": "CVH",
+   "hull_kind": "warship",
+   "tmf": 240,
+   "hull_boxes": 72,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "kgun",
+     "class": 3,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s10",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s11",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s12",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s13",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s14",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s15",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s16",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s17",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s18",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s19",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s20",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s21",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s22",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s23",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s24",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s25",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s26",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s27",
+     "type": "hangar",
+     "bays": 1
+    },
+    {
+     "uid": "s28",
+     "type": "hangar",
+     "bays": 1
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s23",
+      "type": "standard"
+     },
+     {
+      "hangar": "s24",
+      "type": "standard"
+     },
+     {
+      "hangar": "s25",
+      "type": "standard"
+     },
+     {
+      "hangar": "s26",
+      "type": "standard"
+     },
+     {
+      "hangar": "s27",
+      "type": "standard"
+     },
+     {
+      "hangar": "s28",
+      "type": "standard"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 18,
+    "npv_book": 917
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-to-rok",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "To'Rok",
+   "type_label": "Explorer or Recon Ship",
+   "type_code": "",
+   "hull_kind": "warship",
+   "tmf": 60,
+   "hull_boxes": 18,
+   "armour": 0,
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 2,
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s4",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s5",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s6",
+     "type": "hold",
+     "kind": "lab",
+     "mass": 10
+    },
+    {
+     "uid": "s7",
+     "type": "tender_bay",
+     "capacity": 4
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 19,
+    "npv_book": 196
+   },
+   "notes": "Shuttle bay holds 2 x MASS-2 interface shuttles (4 points each, not in the NPV)."
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:kv-sha-ken",
+   "ruleset": "fb",
+   "race": "kravak",
+   "faction": "KV",
+   "name": "Sha'Ken",
+   "type_label": "Light Freighter or Fleet Tender",
+   "type_code": "M",
+   "hull_kind": "merchant",
+   "tmf": 40,
+   "hull_boxes": 10,
+   "armour": 0,
+   "thrust": 2,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "kgun",
+     "class": 1,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "scattergun"
+    },
+    {
+     "uid": "s3",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s4",
+     "type": "hold",
+     "kind": "cargo",
+     "mass": 18
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 19,
+    "npv_book": 97
+   },
+   "notes": ""
+  }
+ ]
+}
