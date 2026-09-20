@@ -454,6 +454,7 @@
  "{n} designs imported.": "{n} designs imported.",
  "{n} items restored from the backup.": "{n} items restored from the backup.",
  "{n} ships use this design: refit them or save as a variant.": "{n} ships use this design: refit them or save as a variant.",
+ "{n}A": "{n}A",
  "{used} points": "{used} points",
  "{used} points exceed the limit of {limit}.": "{used} points exceed the limit of {limit}."
 }

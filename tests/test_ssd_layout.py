@@ -26,7 +26,31 @@ REFERENCE = [
     "ft2:ft:courier",           # the smallest FT2 hull
     "ft2:ft:battleship",        # four-arc capital ship
     "ft2:ft:bulk-tanker",       # merchant: holds and a tug drive
+    "fb:fb2:kv-lo-vok",         # Kra'Vak: hexagon icons, scatterguns, the advanced drive
+    "fb:fb2:kv-to-rok",         # Kra'Vak non-combatant: lab space and a tender bay
 ]
+
+
+def test_kravak_designs_use_the_fb2_icon_set():
+    """A Kra'Vak sheet is drawn with FB2's hexagons, not Fleet Book 1's circles and boxes, and
+    nothing on it falls back to a labelled box (PLAN decision 10)."""
+    d = design("fb:fb2:kv-lo-vok")
+    types = {s["type"] for s in d["systems"]}
+    assert types <= set(ssd_layout.ICON_SETS["fb_kravak"])
+    # The race's own weapons exist only in its set; the human sheet would fall back to a box.
+    assert not {"kgun", "mkp", "scattergun"} & set(ssd_layout.ICON_SETS["fb"])
+    assert ssd_layout.ICON_SETS["fb_kravak"]["fire_control"] is not ssd_layout.ICON_SETS["fb"][
+        "fire_control"
+    ]
+    prims = ssd_layout.layout(d, RULESETS["fb"]).primitives
+    # The advanced drive is a hexagon reading "4A", never the human lozenge (FB2 p.9).
+    assert any(getattr(p, "text", "") == "4A" for p in prims)
+
+
+def test_human_designs_keep_the_fb1_icon_set():
+    d = design("fb:fb1:nac-furious")
+    prims = ssd_layout.layout(d, RULESETS["fb"]).primitives
+    assert any(getattr(p, "text", "") == "4" for p in prims)  # plain thrust, no "A"
 
 
 def design(design_id: str) -> dict:
