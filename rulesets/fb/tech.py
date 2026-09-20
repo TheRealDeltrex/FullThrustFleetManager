@@ -16,13 +16,14 @@ from types import ModuleType
 
 from i18n import _
 from rulesets import Race
-from rulesets.fb import kravak, rules, savasku
+from rulesets.fb import kravak, phalon, rules, savasku
 
 # race id -> (name factory, module). The name is a callable so it follows the language.
 _TECH: dict[str, tuple[object, ModuleType]] = {
     "human": (lambda: _("Human"), rules),
     "kravak": (lambda: _("Kra'Vak"), kravak),
     "savasku": (lambda: _("Sa'Vasku"), savasku),
+    "phalon": (lambda: _("Phalon"), phalon),
 }
 
 

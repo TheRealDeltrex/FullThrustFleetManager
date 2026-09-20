@@ -6,6 +6,7 @@ import json
 
 import pytest
 
+import migrations
 import store
 
 CATALOG_FB = "fb:fb1:nac-harrison"
@@ -254,7 +255,7 @@ def test_normalize_design_rejects_nonsense_and_clamps_fields():
     assert d["notes"] == "" and d["layout_hints"] == {}
     assert d["source"] == {"kind": "custom"}
     assert d["systems"] == [{"uid": "s1", "type": "beam", "class": 9, "arcs": ["F"]}]
-    assert d["schema_version"] == 1
+    assert d["schema_version"] == migrations.CURRENT
 
 
 def test_normalize_fleet_repairs_squadrons_ships_and_options():
