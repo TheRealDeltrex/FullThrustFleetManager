@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% block work_class %}cols-3{% endblock %}
+{% block content %}
+  {# ---- Left: library tree (PLAN 9.4) ---- #}
+  <aside class="panel lib">
+    <h3>{{ _("Library") }}</h3>
+    <div class="body">
+      <form method="get" action="{{ url_for('design') }}" class="row">
+        <input class="input grow" type="search" name="q" value="{{ library.query }}"
+               placeholder="{{ _('Search designs') }}" aria-label="{{ _('Search designs') }}" />
+        <button class="btn sm" type="submit">{{ _("Search") }}</button>
+      </form>
+    </div>
+
+    <h3 class="sep">{{ _("My designs") }}</h3>
+    <div class="body">
+      {% for ruleset_id, designs in library.mine.items() %}
+        <div class="lib-group">
+          <span class="badge rs-{{ ruleset_id }}">{{ ruleset_id|upper }}</span>
+          <ul class="lib-list">
+            {% for d in designs %}
+              <li><a href="{{ url_for('design_detail', design_id=d.id) }}"
+                     class="{% if selected and selected.design.id == d.id %}on{% endif %}">{{ d.name }}</a>
+                <span class="muted">{{ d.type_code }}</span></li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <p class="muted">{{ _("No designs yet.") }}</p>
+      {% endfor %}
+    </div>
+
+    <h3 class="sep">{{ _("Catalog") }}</h3>
+    <div class="body">
+      {% for book, designs in library.catalog.items() %}
+        <details class="lib-group" {% if library.query %}open{% endif %}>
+          <summary>{{ book|upper }} <span class="muted">({{ designs|length }})</span></summary>
+          <ul class="lib-list">
+            {% for d in designs %}
+              <li><a href="{{ url_for('design_detail', design_id=d.id) }}"
+                     class="{% if selected and selected.design.id == d.id %}on{% endif %}">{{ d.name }}</a>
+                <span class="muted">{{ d.type_code }}</span></li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% endfor %}
+    </div>
+
+    <h3 class="sep">{{ _("New design") }}</h3>
+    <div class="body">
+      <form method="post" action="{{ url_for('design_new') }}" class="stack">
+        <input class="input" type="text" name="name" placeholder="{{ _('Name') }}"
+               aria-label="{{ _('Name') }}" />
+        <select class="input" name="ruleset" aria-label="{{ _('Ruleset') }}">
+          {% for rs in rulesets %}<option value="{{ rs.id }}">{{ rs.name }}</option>{% endfor %}
+        </select>
+        <button class="btn primary" type="submit">{{ _("Create design") }}</button>
+      </form>
+    </div>
+  </aside>
+
+  {# ---- Centre: the workbench ---- #}
+  <section class="main-col">
+    {% if not selected %}
+      <div class="panel empty">{{ _("Pick a design from the library or start a new one.") }}</div>
+    {% else %}
+      {% set d = selected.design %}
+      <div class="panel head">
+        <span class="badge rs-{{ d.ruleset }}">{{ selected.ruleset.short_label }}</span>
+        <h2>{{ d.name }}</h2>
+        <span class="muted">{{ d.type_label }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</span>
+        {% if selected.npv_book %}
+          <span class="chip info">{{ _("Book NPV {n}", n=selected.npv_book) }}
+            {% if d.source.book %}
+              {# The page reference opens the bundled rulebook at that page (PLAN 12). #}
+              · <a href="{{ book_url(d.source.book|upper, d.source.page) }}"
+                   >{{ d.source.book|upper }} p.{{ d.source.page }}</a>
+            {% endif %}</span>
+        {% endif %}
+        {% if selected.used_by %}
+          <span class="chip">{{ _("Used by {n} ships", n=selected.used_by|length) }}</span>
+        {% endif %}
+        {% if selected.dirty %}<span class="chip warn">{{ _("Unsaved changes") }}</span>{% endif %}
+        <div class="spacer"></div>
+        {% if selected.read_only %}
+          <form method="post" action="{{ url_for('design_update', design_id=d.id) }}">
+            <input type="hidden" name="action" value="make_variant" />
+            <button class="btn primary" type="submit">{{ _("Make a variant") }}</button>
+          </form>
+        {% endif %}
+      </div>
+
+      {% if selected.read_only %}
+        <div class="panel body muted">{{ _("This is a catalog design and cannot be edited.") }}</div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('design_update', design_id=d.id) }}" class="workbench"
+            {% if selected.read_only %}inert{% endif %}>
+        <div class="panel">
+          <h3>{{ _("Hull and drives") }}</h3>
+          <div class="body grid-fields">
+            <label>{{ _("Name") }}<input class="input" name="name" value="{{ d.name }}" /></label>
+            <label>{{ _("Type") }}<input class="input" name="type_label" value="{{ d.type_label }}" /></label>
+            <label>{{ _("Type code") }}<input class="input" name="type_code" value="{{ d.type_code }}" /></label>
+            <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
+            <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
+            <label>{{ _("Armour") }}<input class="input" type="number" min="0" name="armour" value="{{ d.armour }}" /></label>
+            <label>{{ _("Thrust") }}<input class="input" type="number" min="0" name="thrust" value="{{ d.thrust }}" /></label>
+            <label>{{ _("Streamlining") }}
+              <select class="input" name="streamlining">
+                {% for value, text in (("none", _("None")), ("partial", _("Partial")), ("full", _("Full"))) %}
+                  <option value="{{ value }}" {% if d.streamlining == value %}selected{% endif %}>{{ text }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>{{ _("Hull kind") }}
+              <select class="input" name="hull_kind">
+                <option value="warship" {% if d.hull_kind == 'warship' %}selected{% endif %}>{{ _("Warship") }}</option>
+                <option value="merchant" {% if d.hull_kind == 'merchant' %}selected{% endif %}>{{ _("Merchant") }}</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" name="ftl" {% if d.ftl %}checked{% endif %} /> {{ _("FTL drive") }}</label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>{{ _("Systems") }}</h3>
+          <table class="tbl">
+            <thead>
+              <tr><th>{{ _("System") }}</th><th>{{ _("Arcs") }}</th><th class="num">{{ _("MASS") }}</th>
+                  <th class="num">{{ _("Points") }}</th><th></th></tr>
+            </thead>
+            <tbody>
+              {% for row in selected.breakdown.rows %}
+                {% set system = (d.systems | selectattr('uid', 'equalto', row.system_uid) | list | first) if row.system_uid else None %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td class="arcs">
+                    {% if system and 'arcs' in system %}
+                      <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
+                      {% for arc in selected.ruleset.arcs %}
+                        <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
+                          {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
+                      {% endfor %}
+                    {% elif system %}
+                      {% for key, value in system.items() if key not in ('uid', 'type') %}
+                        <label class="param">{{ key }}
+                          <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
+                      {% endfor %}
+                    {% endif %}
+                  </td>
+                  <td class="num">{{ row.mass }}</td>
+                  <td class="num">{{ row.points }}</td>
+                  <td>
+                    {% if system %}
+                      {# The uid rides on the button's formaction, so removing needs no script. #}
+                      <button class="btn sm ghost" type="submit" name="action" value="remove_system"
+                              formnovalidate title="{{ _('Remove') }}"
+                              formaction="{{ url_for('design_update', design_id=d.id, uid=system.uid) }}">&times;</button>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="body row">
+            <select class="input grow" name="system_type" aria-label="{{ _('System to add') }}">
+              {% for definition in selected.system_types %}
+                <option value="{{ definition.type }}">{{ definition.group }} · {{ definition.label }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn" type="submit" name="action" value="add_system">{{ _("Add system") }}</button>
+          </div>
+        </div>
+
+        {% set carriers = d.systems | selectattr('type', 'in', ('hangar', 'fighter_group')) | list %}
+        {% set magazines = d.systems | selectattr('type', 'equalto', 'sm_magazine') | list %}
+        {% if carriers or magazines %}
+          <div class="panel">
+            <h3>{{ _("Default loadout") }}</h3>
+            <div class="body stack">
+              {% for system in carriers %}
+                {% set chosen = (d.default_loadout.fighters | selectattr('hangar', 'equalto', system.uid) | list | first) %}
+                <label>{{ _("Fighters in bay {uid}", uid=system.uid) }}
+                  <select class="input" name="loadout-{{ system.uid }}">
+                    {% for fighter in selected.fighter_types %}
+                      <option value="{{ fighter }}" {% if chosen and chosen.type == fighter %}selected{% endif %}>{{ fighter }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+              {% endfor %}
+              {% for system in magazines %}
+                <p class="muted">{{ _("Magazine {uid}: standard salvos", uid=system.uid) }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="panel">
+          <h3>{{ _("Notes") }}</h3>
+          <div class="body"><textarea class="input wide" name="notes" rows="3">{{ d.notes }}</textarea></div>
+        </div>
+
+        <div class="panel head" {% if selected.read_only %}hidden{% endif %}>
+          <label class="check"><input type="checkbox" name="allow_rule_breaking"
+            {% if d.allow_rule_breaking %}checked{% endif %} />
+            {{ _("Allow rule-breaking (calculation-only bookkeeping)") }}</label>
+          <div class="spacer"></div>
+          <button class="btn" type="submit" name="action" value="apply">{{ _("Recalculate") }}</button>
+          {% if selected.dirty %}
+            <button class="btn ghost" type="submit" name="action" value="discard" formnovalidate>{{ _("Discard changes") }}</button>
+          {% endif %}
+          {% if selected.used_by %}
+            <button class="btn" type="submit" name="action" value="variant"
+                    {% if not selected.can_save %}disabled{% endif %}>{{ _("Save as new variant") }}</button>
+            <button class="btn primary" type="submit" name="action" value="refit"
+                    {% if not selected.can_save %}disabled{% endif %}>{{ _("Refit all {n} ships", n=selected.used_by|length) }}</button>
+          {% else %}
+            <button class="btn primary" type="submit" name="action" value="save"
+                    {% if not selected.can_save %}disabled{% endif %}>{{ _("Save") }}</button>
+          {% endif %}
+        </div>
+        {% if d.allow_rule_breaking and selected.violations %}
+          <p class="notice">{{ _("This design counts as non-conforming for as long as it breaks the rules.") }}</p>
+        {% endif %}
+      </form>
+    {% endif %}
+  </section>
+
+  {# ---- Right: SSD, budget, issues ---- #}
+  <aside class="side-col">
+    <div class="panel">
+      <h3>{{ _("Ship diagram") }}</h3>
+      <div class="body ssd-wrap">{% if selected %}{{ selected.svg }}{% else %}<span class="muted">&ndash;</span>{% endif %}</div>
+    </div>
+    <div class="panel">
+      <h3>{{ _("Budget") }}</h3>
+      <div class="body">
+        {% if selected %}
+          <div class="meter light">
+            <div class="lbl"><span>{{ _("MASS") }}</span><b>{{ selected.breakdown.mass_used }} / {{ selected.mass_limit }}</b></div>
+            <div class="bar"><i style="width: {{ (100 * selected.breakdown.mass_used / selected.mass_limit) | round | int if selected.mass_limit else 0 }}%"></i></div>
+          </div>
+          <p><b>{{ _("NPV") }}: {{ selected.breakdown.points }}</b>
+            {% if selected.npv_book and selected.npv_book != selected.breakdown.points %}
+              <span class="chip bad">{{ _("Book says {n}", n=selected.npv_book) }}</span>
+            {% endif %}
+          </p>
+        {% else %}<span class="muted">&ndash;</span>{% endif %}
+      </div>
+    </div>
+    <div class="panel">
+      <h3>{{ _("Issues") }}</h3>
+      <div class="body">
+        {% if selected and selected.issues %}
+          <ul class="issues">
+            {% for issue in selected.issues %}
+              <li class="{{ issue.severity }}">{{ issue.message }}</li>
+            {% endfor %}
+          </ul>
+        {% elif selected %}
+          <p class="muted">{{ _("No issues: this design is legal.") }}</p>
+        {% else %}<span class="muted">&ndash;</span>{% endif %}
+      </div>
+    </div>
+  </aside>
+{% endblock %}

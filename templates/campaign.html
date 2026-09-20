@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Campaign") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% block work_class %}cols-1{% endblock %}
+{% block content %}
+  {% if not selected %}
+    <div class="panel empty">{{ _("Create a fleet to keep a campaign log.") }}</div>
+  {% else %}
+    {% set f = selected.fleet %}
+    <section class="main-col">
+      <div class="panel head">
+        <span class="badge rs-{{ f.ruleset }}">{{ selected.ruleset.short_label }}</span>
+        <h2>{{ _("Campaign") }}: {{ f.name }}</h2>
+        <span class="muted">{{ _("Click a hull box, an armour circle or a system to mark it.") }}</span>
+      </div>
+
+      {% for row in selected.ships %}
+        {% set ship = row.ship %}
+        <div class="panel campaign-ship">
+          <h3>{{ ship.table_id }} · {{ ship.name }}
+            <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
+            {% if row.crippled %}<span class="chip bad">{{ _("Crippled") }}</span>{% endif %}
+          </h3>
+          <div class="body ship-grid">
+            {# Clicking the diagram posts one damage edit; the fields below do the same without
+               a mouse or a script. #}
+            <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}"
+                  class="ssd-click" data-ssd-form>
+              <input type="hidden" name="action" value="click_ssd" />
+              <input type="hidden" name="uid" value="{{ ship.uid }}" />
+              <input type="hidden" name="ref" value="" />
+              <div class="ssd-wrap">{{ row.svg }}</div>
+            </form>
+
+            <div class="stack">
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="stack">
+                <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                <div class="grid-fields">
+                  <label>{{ _("Hull damage") }}
+                    <input class="input" type="number" min="0" max="{{ row.hull_boxes }}"
+                           name="hull" value="{{ ship.damage.hull }}" />
+                    <span class="muted">{{ _("of {n} boxes", n=row.hull_boxes) }}</span></label>
+                  <label>{{ _("Armour gone") }}
+                    <input class="input" type="number" min="0" name="armour"
+                           value="{{ ship.damage.armour }}" /></label>
+                  <label>{{ _("Drive hits") }}
+                    <input class="input" type="number" min="0" max="2" name="drive_hits"
+                           value="{{ ship.damage.drive_hits }}" /></label>
+                  <label>{{ _("Crew factors") }}
+                    <b>{{ row.crew_factors }} / {{ row.crew_factors_total }}</b></label>
+                </div>
+                {% if row.design %}
+                  <fieldset class="options">
+                    <legend>{{ _("Systems knocked out") }}</legend>
+                    {% for system in row.design.systems %}
+                      <label class="check"><input type="checkbox" name="systems_out" value="{{ system.uid }}"
+                        {% if system.uid in ship.damage.systems_out %}checked{% endif %} />
+                        {{ system.type }}</label>
+                    {% endfor %}
+                  </fieldset>
+                {% endif %}
+                <div class="row">
+                  <button class="btn primary" type="submit" name="action" value="set_damage">{{ _("Record damage") }}</button>
+                </div>
+              </form>
+
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
+                <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                <select class="input" name="status" aria-label="{{ _('Status') }}">
+                  {% for status in statuses %}
+                    <option value="{{ status }}" {% if ship.status == status %}selected{% endif %}>{{ status }}</option>
+                  {% endfor %}
+                </select>
+                <input class="input" name="location" value="{{ ship.location }}"
+                       placeholder="{{ _('Location') }}" aria-label="{{ _('Location') }}" />
+                <button class="btn" type="submit" name="action" value="update_ship">{{ _("Apply") }}</button>
+              </form>
+
+              {# Repairs and replenishment at a base: FT p.35. Dice are optional; type a result. #}
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="stack repair">
+                <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                <div class="row">
+                  <label class="check">{{ _("Hull points repaired (1D6)") }}
+                    <input class="input sm" type="number" min="0" name="hull_repaired" value="0" /></label>
+                  <button class="btn sm ghost" type="button" data-roll="6"
+                          data-target="hull_repaired">{{ _("Roll") }}</button>
+                  <label class="check">{{ _("Drive repair successes") }}
+                    <input class="input sm" type="number" min="0" max="2" name="drive_successes" value="0" /></label>
+                </div>
+                {% if row.systems_out %}
+                  <fieldset class="options">
+                    <legend>{{ _("Repair up to three systems (3+ on 1D6)") }}</legend>
+                    {% for uid in row.systems_out %}
+                      <label class="check"><input type="checkbox" name="repair_system" value="{{ uid }}" />
+                        {{ uid }}</label>
+                      <label class="check"><input type="checkbox" name="repair_success" value="{{ uid }}" />
+                        {{ _("succeeded") }}</label>
+                    {% endfor %}
+                  </fieldset>
+                {% endif %}
+                <div class="row">
+                  <button class="btn" type="submit" name="action" value="repair">{{ _("Apply a week of repairs") }}</button>
+                  <button class="btn" type="submit" name="action" value="replenish">{{ _("Replenish") }}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="panel empty">{{ _("This fleet has no ships yet.") }}</div>
+      {% endfor %}
+
+      <div class="panel">
+        <h3>{{ _("Fleet log") }}</h3>
+        <div class="body stack">
+          {% for entry in f.log %}
+            <p><b>{{ _("Week {n}", n=entry.week) }}</b> · {{ entry.text }}</p>
+          {% else %}
+            <p class="muted">{{ _("No entries yet.") }}</p>
+          {% endfor %}
+          <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
+            <input class="input sm" type="number" min="0" name="week" value="0"
+                   aria-label="{{ _('Week') }}" />
+            <input class="input grow" name="text" placeholder="{{ _('What happened') }}"
+                   aria-label="{{ _('What happened') }}" />
+            <button class="btn" type="submit" name="action" value="add_log">{{ _("Add entry") }}</button>
+          </form>
+        </div>
+      </div>
+    </section>
+    <script src="{{ url_for('static', filename='campaign.js') }}"></script>
+  {% endif %}
+{% endblock %}
