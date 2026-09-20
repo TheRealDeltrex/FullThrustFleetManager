@@ -122,11 +122,16 @@ def system_defs() -> list[SystemDef]:
 # ---- Derived: power generators and the thrust table ---------------------------------------------
 
 
-def generator_row_split(total: int) -> list[int]:
-    """The four generators at the ends of the damage-track rows, top row first. FB2 p.24: "the
-    stronger PGs are always on the lower damage track rows (so that the weaker ones are lost
-    first)", so 22 becomes 5/5/6/6 rather than split_rows()'s 6/6/5/5."""
-    return list(reversed(split_rows(max(0, total), 4)))
+def generator_row_split(total: int, rows: int = 4) -> list[int]:
+    """The generators at the ends of the damage-track rows, top row first.
+
+    FB2 p.24: "the stronger PGs are always on the lower damage track rows (so that the weaker
+    ones are lost first)", so 22 over four rows is 5/5/6/6, not split_rows()'s 6/6/5/5. `rows` is
+    how many damage rows the ship actually has: a construct too small for four rows spreads its
+    power over the rows it has, which is why the Sa'Kess'Tha (2 biomass, 3 power, FB2 p.26)
+    prints 1 and 2 rather than four generators with two of them zero.
+    """
+    return list(reversed(split_rows(max(0, total), max(1, rows))))
 
 
 def power_total(design: dict) -> int:
@@ -229,9 +234,11 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "cf_positions": [],
         "thresholds": threshold_numbers(design),
         "holds": [],
-        "core_systems": True,
+        # A construct has no command bridge, life support or power core: the FB2 p.25 key lists
+        # no core systems box, and damage control is paid for out of the Repair pool (p.24).
+        "core_systems": False,
         "power": power,
-        "power_generators": generator_row_split(power),
+        "power_generators": generator_row_split(power, sum(1 for n in split_rows(biomass, 4) if n)),
         "thrust_table": thrust_table(tmf, power),
     }
     return Breakdown(tuple(rows), mass_used, points, derived)

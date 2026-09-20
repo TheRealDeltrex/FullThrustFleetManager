@@ -382,10 +382,109 @@ _KRAVAK_ICONS = dict(_SHARED_ICONS) | {
     "hangar": _kv_hangar,
 }
 
+# ---- Sa'Vasku icons (FB2 p.25 key) -------------------------------------------------------------
+#
+# The Sa'Vasku sheet is drawn with cogged discs: a stinger node carries an arc ring, a pod
+# launcher an arrow along its single arc, and a power generator its power value. The drive node
+# is the Kra'Vak hexagon with a star instead of a number, because a Sa'Vasku drive has no rating
+# (FB2 p.22).
+
+
+def _cog(cx: float, cy: float, r: float, teeth: int = 10) -> str:
+    """The cogged disc FB2 draws every Sa'Vasku node with."""
+    points = []
+    for i in range(teeth * 2):
+        angle = math.radians(-90 + i * 180 / teeth)
+        rr = r if i % 2 == 0 else r * 0.78
+        points.append(("L" if i else "M")
+                      + f"{_fmt(cx + rr * math.cos(angle))} {_fmt(cy + rr * math.sin(angle))}")
+    return " ".join(points) + " Z"
+
+
+def _stinger(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [
+        Path(_cog(x, y, 7.5), fill=BLACK, stroke=0.8),
+        Circle(x, y, 3.0, fill=WHITE, stroke=0),
+        *_arc_ring(x, y, 11.5, system.get("arcs", []), arcs),
+    ]
+
+
+def _pod_launcher(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """Cog plus an arrow pointing along the launcher's single arc (FB2 p.25 key)."""
+    covered = system.get("arcs") or []
+    index = arcs.index(covered[0]) if covered and covered[0] in arcs else 0
+    angle = math.radians(-90 + index * 360.0 / len(arcs))
+    ux, uy = math.cos(angle), math.sin(angle)
+    px, py = -uy, ux  # perpendicular, for the arrow's width
+    tip = (x + ux * 15, y + uy * 15)
+    base = (x + ux * 6.5, y + uy * 6.5)
+    return [
+        Path(_cog(x, y, 7.0), fill=BLACK, stroke=0.8),
+        Circle(x, y, 2.8, fill=WHITE, stroke=0),
+        Path(f"M{_fmt(tip[0])} {_fmt(tip[1])} "
+             f"L{_fmt(base[0] + px * 4.5)} {_fmt(base[1] + py * 4.5)} "
+             f"L{_fmt(base[0] - px * 4.5)} {_fmt(base[1] - py * 4.5)} Z", fill=BLACK, stroke=0),
+    ]
+
+
+def _spicule(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """A circle with the bowtie the book uses for point defence."""
+    return [
+        Circle(x, y, 6.0, fill=WHITE, stroke=1.2),
+        Path(f"M{_fmt(x - 4)} {_fmt(y - 4)} L{_fmt(x + 4)} {_fmt(y - 4)} "
+             f"L{_fmt(x - 4)} {_fmt(y + 4)} L{_fmt(x + 4)} {_fmt(y + 4)} Z", fill=BLACK, stroke=0),
+    ]
+
+
+def _cortex(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [Circle(x, y, 5.0, fill=WHITE, stroke=1.2), Circle(x, y, 2.0, fill=BLACK, stroke=0)]
+
+
+def _screen_node(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """The power the node needs is printed inside it (FB2 p.25); it equals the node's MASS."""
+    mass = int(system.get("mass") or 0)
+    return [
+        Circle(x, y, 9.0, fill=WHITE, stroke=1.0),
+        Circle(x, y, 6.5, fill=WHITE, stroke=0.7),
+        Text(x, y + 3.0, str(mass) if mass else _("S"), size=8, bold=True),
+    ]
+
+
+def _drone_womb(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """The egg shape the broodship sheets use."""
+    return [Path(f"M{_fmt(x)} {_fmt(y - 9)} C{_fmt(x + 7)} {_fmt(y - 5)} {_fmt(x + 7)} {_fmt(y + 8)} "
+                 f"{_fmt(x)} {_fmt(y + 8)} C{_fmt(x - 7)} {_fmt(y + 8)} {_fmt(x - 7)} {_fmt(y - 5)} "
+                 f"{_fmt(x)} {_fmt(y - 9)} Z", fill=WHITE, stroke=1.3)]
+
+
+def _sv_drive(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """The Kra'Vak advanced-drive hexagon, "a star rather than a thrust number printed in the
+    drive icon" because a Sa'Vasku drive has no set rating (FB2 p.22)."""
+    return [Path(_hexagon(x, y, 11.0), fill=WHITE, stroke=1.3), _star(x, y, 6.5)]
+
+
+def _power_generator(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """Drawn at the damage-track row ends by layout(), not in the system block."""
+    return []
+
+
+_SAVASKU_ICONS = dict(_SHARED_ICONS) | {
+    "main_drive": _sv_drive,
+    "stinger": _stinger,
+    "pod_launcher": _pod_launcher,
+    "spicule": _spicule,
+    "cortex": _cortex,
+    "screen_node": _screen_node,
+    "drone_womb": _drone_womb,
+    "power_generator": _power_generator,
+}
+
+
 ICON_SETS: dict[str, dict] = {
     "fb": dict(_SHARED_ICONS),
     "ft2": dict(_SHARED_ICONS),
     "fb_kravak": _KRAVAK_ICONS,
+    "fb_savasku": _SAVASKU_ICONS,
 }
 
 
@@ -404,7 +503,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
 
 WEAPONS = {
     "beam", "pulse_torpedo", "needle_beam", "nova_cannon", "wave_gun", "aa_battery",
-    "sm_launcher", "sm_rack", "submunition", "kgun", "mkp",
+    "sm_launcher", "sm_rack", "submunition", "kgun", "mkp", "stinger", "pod_launcher",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay"}
 
@@ -490,6 +589,16 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     systems_out = set(damage.get("systems_out") or [])
     hints = design.get("layout_hints") if isinstance(design.get("layout_hints"), dict) else {}
 
+    # The ruleset's derived values drive the parts of a sheet that are not systems: a race may
+    # ask for generators on the damage track, a thrust table or a power box just by deriving
+    # them, so nothing here branches on the race.
+    try:
+        breakdown = rs.design_breakdown(design, {})
+        derived = breakdown.derived
+        mass_by_uid = {r.system_uid: r.mass for r in breakdown.rows if r.system_uid}
+    except Exception:  # a ruleset never raises, but a sheet must draw even if one does
+        derived, mass_by_uid = {}, {}
+
     size = box if box != "auto" else box_size(design, rs.id)
     width = BOX_WIDTHS.get(size, BOX_WIDTHS["medium"])
     prims: list[Primitive] = []
@@ -503,7 +612,10 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         if pinned:
             x = float(pinned.get("x", x))
             cy = float(pinned.get("y", cy))
-        prims.extend(_icon(icon_set, system, x, cy, arcs, system.get("uid") in systems_out))
+        shown = system if system.get("uid") not in mass_by_uid else {
+            **system, "mass": mass_by_uid[system["uid"]]
+        }
+        prims.extend(_icon(icon_set, shown, x, cy, arcs, system.get("uid") in systems_out))
 
     # Fore weapons: rows across the top, largest first.
     per_row = max(1, int((width - 40) // gap))
@@ -576,6 +688,19 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
                 prims.append(_star(bx + cell / 2, by + cell / 2, cell * 0.3))
             if numbered <= hull_done:
                 prims.append(_slash(bx, by, cell))
+    # A row-end generator per damage-track row (FB2 p.22: the generator at the end of a row is
+    # lost automatically when damage reaches it).
+    generators = derived.get("power_generators") or []
+    filled = [i for i, row_len in enumerate(track) if row_len]
+    for row_index, value in zip(filled, generators):
+        if not value:
+            continue  # the book prints no generator rather than a zero
+        gx = left + columns * cell + 10
+        gy = y + row_index * cell + cell / 2
+        prims.append(Path(_cog(gx, gy, 8.0), fill=BLACK, stroke=0.8))
+        prims.append(Text(gx, gy + 3.0, str(value), size=8, bold=True, fill=WHITE))
+        if sum(track[:row_index + 1]) <= hull_done:
+            prims.append(_cross(gx, gy, 7.0))
     y += len(track) * cell + 8
 
     # Bottom row: FTL, main drive with its thrust, core systems (FB), holds and tugs.
@@ -594,8 +719,10 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         prims.append(Text(55, y + 13.5, str(thrust), size=9.5, bold=True))
     if int(damage.get("drive_hits") or 0):
         prims.append(_cross(55, y + 8, 9))
-    # The core systems box is part of every FB sheet; FT2 has no such box (FT p.14).
-    if rs.id == "fb":
+    # The core systems box is part of a human or Kra'Vak FB sheet but not an FT2 one (FT p.14),
+    # and not a Sa'Vasku one: a construct has no bridge or life support, and the FB2 p.25 key
+    # lists no such box. The ruleset says which, through derived["core_systems"].
+    if derived.get("core_systems", rs.id == "fb"):
         bx = width - 86
         prims.append(Rect(bx, y - 2, 70, 20, r=4, fill=WHITE, stroke=1.1))
         for i, letter in enumerate((_("B"), _("L"), _("P"))):
@@ -610,7 +737,47 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
             place(system, x0 + i * 2 * WIDE_RADIUS, y + 7)
         y += 20
 
+    y = _play_aids(prims, derived, width, y)
     return Diagram(width, round(y + 6, 2), tuple(prims))
+
+
+def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) -> float:
+    """The parts of a sheet a player writes on or reads off during a turn, when the ruleset
+    derives them: the thrust table and the power-allocation box a Sa'Vasku ship needs (FB2 p.22
+    and the record chart on p.33). A race that derives neither gets nothing."""
+    table = derived.get("thrust_table") or []
+    power = derived.get("power") or 0
+    if not table and not power:
+        return y
+
+    y += 6
+    top = y
+    if table:
+        # Two columns when the table is long, so a big ship's sheet does not grow a tail.
+        per_column = len(table) if len(table) <= 8 else (len(table) + 1) // 2
+        col_w, row_h = 46.0, 9.5
+        prims.append(Text(16 + col_w / 2, y + 7, _("Thrust / power"), size=6.5, bold=True))
+        y += 10
+        for index, (thrust, cost, damaged) in enumerate(table):
+            cx = 16 + (index // per_column) * (col_w + 6)
+            cy = y + (index % per_column) * row_h
+            prims.append(Rect(cx, cy, 18, row_h - 1, fill=WHITE, stroke=0.6))
+            prims.append(Text(cx + 9, cy + row_h - 3, str(thrust), size=6.5))
+            prims.append(Rect(cx + 19, cy, col_w - 19, row_h - 1, fill=WHITE, stroke=0.6))
+            label = f"{cost}/{damaged if damaged is not None else '-'}"
+            prims.append(Text(cx + 19 + (col_w - 19) / 2, cy + row_h - 3, label, size=6.5))
+        y += min(len(table), per_column) * row_h
+
+    if power:
+        # Empty boxes: allocation is rewritten every turn and never stored (FB2 p.22).
+        bx = width - 96
+        prims.append(Text(bx + 40, top + 7, _("Power {n} per turn", n=power), size=6.5, bold=True))
+        for i, pool in enumerate((_("M"), _("A"), _("D"), _("R"))):
+            px = bx + i * 20
+            prims.append(Text(px + 9, top + 18, pool, size=7, bold=True))
+            prims.append(Rect(px, top + 20, 18, 14, fill=WHITE, stroke=0.9))
+        y = max(y, top + 36)
+    return y
 
 
 # ---- SVG (the app renders the same primitives the PDF does) -------------------------------------
