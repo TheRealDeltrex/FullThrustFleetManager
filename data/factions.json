@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "note": "Built-in factions per ruleset. Names from the FB1 fleet chapters (pp.13, 20, 27, 34); FB1 prints 'Federal Stats Europa', a typo for States.",
+  "factions": {
+    "fb": [
+      {"id": "NAC", "name": "New Anglian Confederation"},
+      {"id": "NSL", "name": "Neu Swabian League"},
+      {"id": "FSE", "name": "Federal States Europa"},
+      {"id": "ESU", "name": "Eurasian Solar Union"}
+    ],
+    "ft2": [
+      {"id": "NAC", "name": "New Anglian Confederation"},
+      {"id": "NSL", "name": "Neu Swabian League"},
+      {"id": "FSE", "name": "Federal States Europa"},
+      {"id": "ESU", "name": "Eurasian Solar Union"}
+    ]
+  }
+}

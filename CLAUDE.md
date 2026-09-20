@@ -17,9 +17,9 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M4 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, and the
-96-design catalog behind the NPV gate. No storage, fleets or UI on top yet; next is **M5**
-(storage, library, import/export).
+M1-M5 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the
+96-design catalog behind the NPV gate, and the storage layer (library, fleets, import/export).
+No UI on top of the store yet; next is **M6** (SSD layout engine and icon sets).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -48,8 +48,40 @@ What exists:
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from `E:\RPG\Tabletop\Full Thurst\`.
 
-Modules of PLAN section 4 not listed here (`data/factions.json`, `fleet_rules.py`, `store.py`, `migrations.py`,
-`ssd_layout.py`, `pdf_export.py`, `data/`) are created by the milestone that needs them.
+- `fleet_rules.py`, `store.py`, `migrations.py`, `data/factions.json` — see Storage below.
+
+Modules of PLAN section 4 not listed here (`ssd_layout.py`, `pdf_export.py`) are created by the
+milestone that needs them.
+
+## Storage (layers 2-3)
+
+- `fleet_rules.py` (pure): `fleet_options()`, `design_points()` / `ship_points()` (NPV plus the
+  ship's loadout, its own or the design default) / `fleet_points()` (skips destroyed ships),
+  `design_issues()`, `fleet_report()` (the tournament check: fleet issues + a `ShipReport` each),
+  `badges()` (`non_conforming`, `mixed_faction`, `custom_ships`), `ship_counts()`. Conformance is
+  "no violation": campaign damage, ship status and `allow_rule_breaking` never enter into it. A
+  ship also violates on `missing_design`, `wrong_ruleset`, `race_mixing`, `mt_toggle_off`; a
+  fleet on `over_points` (a limit of 0 means no limit).
+- `store.py`: everything that touches disk, plus every mutation. Mutators take the fleet dict,
+  change it in place and return `(ok, msg)`; the route saves iff ok. `save_design(design, mode)`
+  is the refit-or-variant decision: `save` refuses when ships use the design, `refit` rewrites
+  it under them, `variant` writes a new id. Catalog designs are never written: their ids contain
+  `:` so `_safe_id()` rejects them as file names too. Strict mode blocks saving a design with
+  violations unless `allow_rule_breaking` — note a blank `new_design()` is under its TMF, so
+  tests that save one set that flag.
+- **Normalisation is the trust boundary.** Everything read from the library or an import goes
+  through `normalize_design()` / `normalize_fleet()`, which clamp types and drop junk and are the
+  only place new fields are accepted. Add every new field there in the same commit.
+- Export/import (PLAN 5.6): `.FTFleet` (fleet + its non-catalog designs + custom factions),
+  `.FTDesign`, `.FTBackup` (a zip of the library). `import_file()` returns
+  `(ok, msg, conflicts)`; a *newer local copy* is kept and named in `conflicts`, and the caller
+  re-calls with `overwrite_newer=True` after the player confirms. `modified` is an ISO string at
+  second resolution, so tests that need "strictly newer" backdate the local copy.
+- `migrations.py`: `CURRENT`, `STEPS[kind][from_version]`, `upgrade()`. A missing or malformed
+  `schema_version` counts as 1; anything above `CURRENT` raises `TooNewError` and is refused
+  rather than guessed at. Write the step and its test in the commit that bumps `CURRENT`.
+- `data/factions.json` holds the built-in factions per ruleset; custom factions live in the
+  user library and travel with exports.
 
 ## Non-negotiable principles
 
