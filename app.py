@@ -14,7 +14,7 @@ import webbrowser
 from collections.abc import Callable
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, Response, abort, flash, redirect, render_template, request, url_for
+from flask import Flask, Response, abort, flash, redirect, render_template, request, session, url_for
 from markupsafe import Markup
 
 import fleet_rules
@@ -169,9 +169,177 @@ def home() -> Response:
     return redirect(url_for("fleet_overview"))
 
 
+# ---- Fleet overview tab (PLAN 9.3) -------------------------------------------------------------
+
+VIEWS = ("cards", "sheet", "roster")
+
+
+def current_fleet() -> dict | None:
+    """The fleet the top bar shows, remembered per browser session."""
+    fleet_id = session.get("fleet_id")
+    fleet = store.get_fleet(fleet_id) if fleet_id else None
+    if not fleet:
+        fleets = store.list_fleets()
+        fleet = fleets[0] if fleets else None
+        session["fleet_id"] = fleet["id"] if fleet else None
+    return fleet
+
+
+@app.context_processor
+def _inject_current_fleet() -> dict:
+    """The top bar carries the fleet selector, the points meter and the ruleset strip."""
+    fleet = current_fleet()
+    if not fleet:
+        return {"current_fleet": None, "all_fleets": store.list_fleets(), "fleet_points": 0}
+    designs = store.designs_for_fleet(fleet)
+    return {
+        "current_fleet": fleet,
+        "all_fleets": store.list_fleets(),
+        "fleet_points": fleet_rules.fleet_points(fleet, designs),
+        "fleet_badges": fleet_rules.badges(fleet, designs),
+    }
+
+
+def _fleet_context(fleet: dict, view: str) -> dict:
+    designs = store.designs_for_fleet(fleet)
+    report = fleet_rules.fleet_report(fleet, designs)
+    sheets = {
+        s["uid"]: Markup(ssd_layout.to_svg(ssd_layout.layout(
+            designs[s["design_id"]], damage=s["damage"])))
+        for s in fleet["ships"] if s["design_id"] in designs
+    }
+    return {
+        "fleet": fleet,
+        "designs": designs,
+        "ruleset": RULESETS.get(fleet["ruleset"]),
+        "view": view if view in VIEWS else "cards",
+        "report": report,
+        "badges": fleet_rules.badges(fleet, designs),
+        "counts": fleet_rules.ship_counts(fleet),
+        "sheets": sheets,
+        "ship_points": {s["uid"]: fleet_rules.ship_points(s, designs.get(s["design_id"]),
+                                                          fleet_rules.fleet_options(fleet))
+                        for s in fleet["ships"]},
+        "hull_damage": sum(s["damage"]["hull"] for s in fleet["ships"]),
+        "library": sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
+                          key=lambda d: d["name"].lower()),
+        "factions": store.builtin_factions(fleet["ruleset"]) + store.custom_factions(),
+        "option_keys": fleet_rules.FLEET_OPTION_KEYS,
+    }
+
+
 @app.route("/fleet")
 def fleet_overview() -> str:
-    return render_template("fleet.html", active_tab="fleet_overview")
+    fleet = current_fleet()
+    if not fleet:
+        return render_template("fleet.html", active_tab="fleet_overview", selected=None,
+                               rulesets=list(RULESETS.values()))
+    return render_template("fleet.html", active_tab="fleet_overview",
+                           selected=_fleet_context(fleet, request.args.get("view", "cards")),
+                           rulesets=list(RULESETS.values()))
+
+
+@app.route("/fleet/<fleet_id>")
+def fleet_select(fleet_id: str) -> Response:
+    if not store.get_fleet(fleet_id):
+        abort(404)
+    session["fleet_id"] = fleet_id
+    return redirect(url_for("fleet_overview", view=request.args.get("view")))
+
+
+@app.route("/fleet/new", methods=["POST"])
+def fleet_new() -> Response:
+    created, msg = store.create_fleet(
+        request.form.get("ruleset", ""), request.form.get("name", ""),
+        request.form.get("race", "human"), request.form.get("faction") or None,
+        int(request.form.get("points_limit") or 0),
+        request.form.get("allow_race_mixing") == "on",
+        request.form.get("admiral", ""),
+    )
+    flash(msg, "success" if created else "error")
+    if created:
+        session["fleet_id"] = created["id"]
+    return redirect(url_for("fleet_overview"))
+
+
+@register_action("update_details")
+def _update_details(fleet: dict) -> tuple[bool, str]:
+    form = request.form
+    return store.update_fleet_details(
+        fleet, name=form.get("name"), admiral=form.get("admiral", ""),
+        faction=form.get("faction") or None,
+        points_limit=int(form.get("points_limit") or 0),
+        allow_race_mixing=form.get("allow_race_mixing") == "on",
+        options={k: form.get("opt-" + k) == "on" for k in fleet_rules.FLEET_OPTION_KEYS},
+        notes=form.get("notes", ""),
+    )
+
+
+@register_action("add_squadron")
+def _add_squadron(fleet: dict) -> tuple[bool, str]:
+    return store.add_squadron(fleet, request.form.get("name", ""))
+
+
+@register_action("rename_squadron")
+def _rename_squadron(fleet: dict) -> tuple[bool, str]:
+    return store.rename_squadron(fleet, request.form.get("squadron", ""), request.form.get("name", ""))
+
+
+@register_action("move_squadron")
+def _move_squadron(fleet: dict) -> tuple[bool, str]:
+    return store.move_squadron(fleet, request.form.get("squadron", ""),
+                               int(request.form.get("delta") or 0))
+
+
+@register_action("remove_squadron")
+def _remove_squadron(fleet: dict) -> tuple[bool, str]:
+    return store.remove_squadron(fleet, request.form.get("squadron", ""))
+
+
+@register_action("add_ship")
+def _add_ship(fleet: dict) -> tuple[bool, str]:
+    return store.add_ship(fleet, request.form.get("design_id", ""), request.form.get("name", ""),
+                          request.form.get("table_id", ""), request.form.get("squadron", ""))
+
+
+@register_action("remove_ship")
+def _remove_ship(fleet: dict) -> tuple[bool, str]:
+    return store.remove_ship(fleet, request.form.get("uid", ""))
+
+
+@register_action("update_ship")
+def _update_ship(fleet: dict) -> tuple[bool, str]:
+    form = request.form
+    return store.update_ship(fleet, form.get("uid", ""), name=form.get("name"),
+                             table_id=form.get("table_id"), squadron=form.get("squadron"),
+                             status=form.get("status"), location=form.get("location"))
+
+
+@app.route("/fleet/<fleet_id>/action", methods=["POST"])
+def fleet_action(fleet_id: str) -> Response:
+    fleet = store.get_fleet(fleet_id)
+    if not fleet:
+        abort(404)
+    if request.form.get("action") == "delete_fleet":
+        ok, msg = store.delete_fleet(fleet_id)
+        flash(msg, "success" if ok else "error")
+        session.pop("fleet_id", None)
+        return redirect(url_for("fleet_overview"))
+    if dispatch_action(fleet):
+        store.save_fleet(fleet)
+    return redirect(url_for("fleet_overview", view=request.args.get("view")))
+
+
+@app.route("/fleet/<fleet_id>/check")
+def fleet_check(fleet_id: str) -> str:
+    """The tournament check (PLAN 7): every violation and info, grouped by ship. Blocks nothing."""
+    fleet = store.get_fleet(fleet_id)
+    if not fleet:
+        abort(404)
+    designs = store.designs_for_fleet(fleet)
+    return render_template("tournament_check.html", active_tab="fleet_overview", fleet=fleet,
+                           designs=designs, report=fleet_rules.fleet_report(fleet, designs),
+                           ruleset=RULESETS.get(fleet["ruleset"]))
 
 
 # ---- Design tab (PLAN 9.4) --------------------------------------------------------------------
