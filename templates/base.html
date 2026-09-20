@@ -9,13 +9,27 @@
   <body>
     <header class="topbar">
       {# Thin strip in the current fleet's ruleset colour (PLAN 9.2); neutral until fleets exist. #}
-      <div class="ruleset-strip"></div>
+      <div class="ruleset-strip {% if current_fleet %}rs-{{ current_fleet.ruleset }}{% endif %}"></div>
       <div class="topbar-row">
         <a class="brand" href="{{ url_for('home') }}">
           {{ _("FT Fleet Manager") }}{% if APP_VERSION %}<small>v{{ APP_VERSION }}</small>{% endif %}
         </a>
         <div class="fleet-select" title="{{ _('Current fleet') }}">
-          <span class="muted-chrome">{{ _("No fleet yet") }}</span>
+          {% if all_fleets %}
+            {# Every fleet is prefixed with its ruleset (PLAN 9.2). #}
+            <form method="get" action="{{ url_for('fleet_overview') }}" class="row">
+              <label class="sr-only" for="fleet-select">{{ _("Current fleet") }}</label>
+              <select class="input sm" id="fleet-select" name="go"
+                      onchange="location.href='/fleet/' + this.value">
+                {% for f in all_fleets %}
+                  <option value="{{ f.id }}" {% if current_fleet and current_fleet.id == f.id %}selected{% endif %}>
+                    {{ f.ruleset|upper }} · {{ f.name }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          {% else %}
+            <span class="muted-chrome">{{ _("No fleet yet") }}</span>
+          {% endif %}
         </div>
         <nav class="tabs" aria-label="{{ _('Main') }}">
           <a href="{{ url_for('fleet_overview') }}" class="{% if active_tab == 'fleet_overview' %}on{% endif %}">{{ _("Fleet overview") }}</a>
@@ -25,10 +39,15 @@
         </nav>
         <div class="spacer"></div>
         <div class="meter">
-          <div class="lbl"><span>{{ _("Fleet points") }}</span><b>&ndash; / &ndash;</b></div>
-          <div class="bar"><i style="width:0"></i></div>
+          <div class="lbl"><span>{{ _("Fleet points") }}</span>
+            <b>{% if current_fleet %}{{ fleet_points }} / {{ current_fleet.points_limit or "&ndash;"|safe }}{% else %}&ndash; / &ndash;{% endif %}</b></div>
+          <div class="bar"><i style="width: {{ (100 * fleet_points / current_fleet.points_limit) | round | int if current_fleet and current_fleet.points_limit else 0 }}%"></i></div>
         </div>
-        <button type="button" class="btn primary" disabled title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+        {% if current_fleet and fleet_badges and fleet_badges.non_conforming %}
+          <span class="chip bad">{{ _("Non-conforming") }}</span>
+        {% endif %}
+        <button type="button" class="btn primary" disabled
+                title="{{ _('The print dialog arrives with the fleet PDF') }}">&#9113; {{ _("Print fleet PDF") }}</button>
       </div>
     </header>
 

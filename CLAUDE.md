@@ -17,10 +17,10 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M7 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
+M1-M8 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
 catalog behind the NPV gate, the storage layer (library, fleets, import/export), the SSD layout
-engine and the Design tab workbench. Next is **M8** (Fleet overview tab); the Fleet, Campaign
-and Settings tabs are still placeholders.
+engine, the Design tab workbench and the Fleet overview tab. Next is **M9** (fleet PDF); the
+Campaign and Settings tabs are still placeholders.
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -74,6 +74,23 @@ What exists:
   `derived["mass_limit"]`, NPV against the book value for catalog designs, issue list, and the
   live SSD as inline SVG (`Markup`, from `ssd_layout`).
 - `tests/test_design_tab.py` uses the `client` fixture with a per-test `FTFM_DATA_DIR`.
+
+## Fleet overview tab
+
+- Routes: `GET /fleet` (the current fleet, `?view=cards|sheet|roster`), `GET /fleet/<id>`
+  (select and redirect), `POST /fleet/new`, `POST /fleet/<id>/action`, `GET /fleet/<id>/check`
+  (the tournament check of PLAN 7, which blocks nothing).
+- **The current fleet lives in the Flask session** (`session["fleet_id"]`, falling back to the
+  first fleet). `_inject_current_fleet()` is a context processor, so the top bar's selector,
+  points meter, ruleset strip and non-conforming chip work on every tab.
+- Fleet mutations go through `@register_action` handlers and `dispatch_action(fleet)`: the
+  handler mutates the fleet dict via `store`, the route saves iff ok. That is the pattern for
+  every state-changing form from here on. `delete_fleet` is handled before dispatch because it
+  has no fleet left to save.
+- Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
+  record sheets (docked, hulk and destroyed ships are listed but not drawn, PLAN 10.2) and the
+  roster table. All three use the same `ssd_layout` diagrams the PDF will.
+- `tests/test_fleet_tab.py` covers the routes, the views, every badge row and the check page.
 
 `pdf_export.py` (PLAN section 4) arrives with M9.
 

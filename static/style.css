@@ -121,6 +121,35 @@ a { color: var(--accent); }
 .notice { margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--warn-soft);
   border: 1px solid #f0d6a8; color: var(--warn); font-size: 13px; }
 
+/* Fleet overview (PLAN 9.3) */
+.ruleset-strip.rs-fb { background: var(--rs-fb); }
+.ruleset-strip.rs-ft2 { background: var(--rs-ft2); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.views { display: flex; gap: 4px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px;
+  display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.tile b { font-size: 21px; }
+.tile .bar { background: var(--panel-2); border: 1px solid var(--line); }
+.tile .bar > i { background: var(--accent); }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: flex;
+  flex-direction: column; gap: 6px; background: var(--panel-2); font-size: 13px; }
+.card header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.card .mini svg { width: 100%; height: auto; max-height: 220px; background: #fff; }
+.card.st-destroyed, tr.st-destroyed { opacity: .55; }
+.chip.st-ready { background: var(--ok-soft); color: var(--ok); }
+.chip.st-damaged { background: var(--warn-soft); color: var(--warn); }
+.chip.st-docked { background: var(--accent-soft); color: var(--accent); }
+.chip.st-hulk, .chip.st-destroyed { background: var(--panel-2); color: var(--muted); }
+.sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.sheet { margin: 0; }
+.sheet figcaption { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.sheet svg { width: 100%; height: auto; background: #fff; }
+.options { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; display: flex;
+  gap: 14px; flex-wrap: wrap; }
+.options legend { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+
 /* Below ~1100 px the panes stack (PLAN 9.7). */
 @media (max-width: 1100px) {
   .work.cols-2, .work.cols-3 { grid-template-columns: minmax(0, 1fr); }
