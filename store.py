@@ -359,10 +359,12 @@ def save_design(design: dict, mode: str = "save",
         clean["id"] = new_id()
         clean["source"] = {"kind": "variant", "of": original["id"] if original else clean["id"]}
         _write_design(clean)
+        discard_draft(original["id"] if original else clean["id"])
         return True, _("Saved as a new variant."), clean["id"]
     if used and mode != "refit":
         return False, _("{n} ships use this design: refit them or save as a variant.", n=len(used)), None
     _write_design(clean)
+    discard_draft(clean["id"])
     if used:
         return True, _("Saved; {n} ships refitted.", n=len(used)), clean["id"]
     return True, _("Design saved."), clean["id"]
@@ -382,7 +384,91 @@ def delete_design(design_id: str) -> tuple[bool, str]:
     if not path or not path.is_file():
         return False, _("Design not found.")
     path.unlink()
+    discard_draft(design_id)
     return True, _("Design deleted.")
+
+
+# Design mutators: change the design dict in place; the caller saves the draft iff ok.
+
+
+def add_system(design: dict, system_type: str) -> tuple[bool, str]:
+    """Append a system of `system_type` with the ruleset's default parameters."""
+    rs = RULESETS.get(design.get("ruleset"))
+    if not rs:
+        return False, _("Unknown ruleset.")
+    options = {k: True for k in fleet_rules.FLEET_OPTION_KEYS}
+    definition = next((s for s in rs.system_types(design.get("race", "human"), options)
+                       if s.type == system_type), None)
+    if not definition:
+        return False, _("This ruleset has no such system.")
+    uids = {s["uid"] for s in design["systems"]}
+    n = len(uids) + 1
+    while f"s{n}" in uids:
+        n += 1
+    system = {"uid": f"s{n}", "type": system_type}
+    for param in definition.params:
+        if param.kind == "arcs":
+            system[param.name] = [rs.arcs[0]] * max(1, param.min or 1)
+        elif param.default is not None:
+            system[param.name] = param.default
+    design["systems"].append(system)
+    return True, _("{name} added.", name=definition.label)
+
+
+def remove_system(design: dict, uid: str) -> tuple[bool, str]:
+    if not any(s["uid"] == uid for s in design["systems"]):
+        return False, _("System not found.")
+    design["systems"] = [s for s in design["systems"] if s["uid"] != uid]
+    for s in design["systems"]:  # a magazine may feed the launcher just removed
+        if isinstance(s.get("feeds"), list):
+            s["feeds"] = [u for u in s["feeds"] if u != uid]
+    return True, _("System removed.")
+
+
+# ---- Drafts ----------------------------------------------------------------------------------
+#
+# The Design tab edits a draft, not the library copy: strict mode (PLAN 9.4) refuses to save a
+# violating design, so the workbench has to hold changes that are not saveable yet. A draft
+# lives beside the library under drafts/ and disappears on save or discard. Catalog designs are
+# read-only and never get one (their ids are not safe file names either).
+
+
+def _draft_path(design_id: str) -> Path | None:
+    sid = _safe_id(design_id)
+    return _dir("drafts") / f"{sid}.json" if sid else None
+
+
+def get_draft(design_id: str) -> dict | None:
+    path = _draft_path(design_id)
+    return normalize_design(_read_json(path)) if path and path.is_file() else None
+
+
+def save_draft(design: dict) -> tuple[bool, str]:
+    clean = normalize_design(design)
+    if not clean or is_catalog(clean["id"]):
+        return False, _("Not a valid design.")
+    path = _draft_path(clean["id"])
+    if not path:
+        return False, _("Not a valid design.")
+    clean["modified"] = now()
+    _write_json(path, clean)
+    return True, ""
+
+
+def discard_draft(design_id: str) -> tuple[bool, str]:
+    path = _draft_path(design_id)
+    if path and path.is_file():
+        path.unlink()
+        return True, _("Changes discarded.")
+    return False, _("Nothing to discard.")
+
+
+def working_design(design_id: str) -> tuple[dict | None, bool]:
+    """(design, has unsaved changes): the draft if one exists, else the saved design."""
+    draft = get_draft(design_id)
+    if draft:
+        return draft, True
+    return get_design(design_id), False
 
 
 # ---- Factions -------------------------------------------------------------------------------------
