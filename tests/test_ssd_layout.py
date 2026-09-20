@@ -8,6 +8,7 @@ Read the diff before committing one: a changed snapshot means every record sheet
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -28,7 +29,72 @@ REFERENCE = [
     "ft2:ft:bulk-tanker",       # merchant: holds and a tug drive
     "fb:fb2:kv-lo-vok",         # Kra'Vak: hexagon icons, scatterguns, the advanced drive
     "fb:fb2:kv-to-rok",         # Kra'Vak non-combatant: lab space and a tender bay
+    "fb:fb2:sv-vas-sa-rosh",    # Sa'Vasku: generators on the track, thrust table, power box
+    "fb:fb2:sv-sa-an-tha",      # the smallest Sa'Vasku construct
 ]
+
+
+def test_savasku_sheets_carry_the_play_aids_the_book_prints():
+    """FB2 p.22 puts a thrust table on every Sa'Vasku SSD, and the record chart (p.33) a power
+    allocation grid; neither is design data, both are drawn from derived values."""
+    d = design("fb:fb2:sv-vas-sa-rosh")
+    prims = ssd_layout.layout(d, RULESETS["fb"]).primitives
+    texts = [getattr(p, "text", "") for p in prims]
+    assert "Thrust / power" in texts
+    assert [t for t in texts if t in ("M", "A", "D", "R")] == ["M", "A", "D", "R"]
+    assert "Power 40 per turn" in texts
+    # The four power generators sit at the ends of the damage-track rows (FB2 p.22).
+    assert texts.count("10") == 4
+
+
+def test_a_savasku_sheet_has_no_core_systems_box():
+    """A construct has no bridge, life support or power core, and the FB2 p.25 key shows no
+    such box - unlike the human and Kra'Vak FB sheets, which both have one."""
+    sv = [getattr(p, "text", "") for p in
+          ssd_layout.layout(design("fb:fb2:sv-sa-an-tha"), RULESETS["fb"]).primitives]
+    kv = [getattr(p, "text", "") for p in
+          ssd_layout.layout(design("fb:fb2:kv-lo-vok"), RULESETS["fb"]).primitives]
+    assert "B" not in sv and "L" not in sv and "P" not in sv
+    assert "B" in kv and "L" in kv and "P" in kv
+
+
+def test_a_savasku_drive_is_a_star_and_carries_no_rating():
+    """FB2 p.22: "there is a star rather than a thrust number printed in the drive icon"."""
+    d = design("fb:fb2:sv-sa-an-tha")
+    prims = ssd_layout.layout(d, RULESETS["fb"]).primitives
+    assert d["thrust"] == 0
+    # The Kra'Vak drive writes its rating ("4A"); this one writes no rating at all.
+    assert not [p for p in prims if re.fullmatch(r"\d+A", getattr(p, "text", ""))]
+    assert ssd_layout.ICON_SETS["fb_savasku"]["main_drive"] is not ssd_layout.ICON_SETS[
+        "fb_kravak"
+    ]["main_drive"]
+
+
+def test_generators_follow_the_rows_a_small_construct_actually_has():
+    """The Sa'Kess'Tha has 2 biomass, so two damage rows, and prints its 3 power as 1 and 2
+    rather than four generators with two of them zero (FB2 p.26)."""
+    prims = ssd_layout.layout(design("fb:fb2:sv-sa-kess-tha"), RULESETS["fb"]).primitives
+    # A generator's value is the white-on-black number on its cog; nothing else on the sheet is.
+    assert [p.text for p in prims if getattr(p, "fill", "") == "white" and p.kind == "text"] == [
+        "1", "2"
+    ]
+
+
+def test_pod_launcher_arrows_point_along_their_arc():
+    """The Vas'Sa'Rosh is the one ship whose three launchers do not all bear fore (FB2 p.32)."""
+    import math
+    import re
+
+    d = design("fb:fb2:sv-vas-sa-rosh")
+    prims = ssd_layout.layout(d, RULESETS["fb"]).primitives
+    seen = {}
+    for system in (s for s in d["systems"] if s["type"] == "pod_launcher"):
+        own = [p for p in prims if getattr(p, "ref", "") == f"system:{system['uid']}"]
+        disc = next(p for p in own if p.kind == "circle")
+        arrow = next(p for p in own if p.kind == "path" and p.fill == "black" and p.d.count("L") == 2)
+        x, y = (float(v) for v in re.findall(r"-?\d+\.?\d*", arrow.d)[:2])
+        seen[system["arcs"][0]] = round(math.degrees(math.atan2(y - disc.cy, x - disc.cx)))
+    assert seen == {"F": -90, "FP": -150, "FS": -30}
 
 
 def test_kravak_designs_use_the_fb2_icon_set():
