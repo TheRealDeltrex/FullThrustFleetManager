@@ -385,3 +385,14 @@ text layer is OCR: verify numbers against the page image (`page.get_pixmap(dpi=2
 PLAN.md records settled decisions. If a decision there turns out to be impossible or clearly
 wrong, stop and ask instead of re-deciding. Facts (costs, page contents, file layouts) are looked
 up, not asked.
+
+## Desktop build (M12)
+
+`.venv/Scripts/python.exe -m PyInstaller --noconfirm fleetmanager.spec` produces a onedir build
+at `dist/FullThrustFleetManager/` (~63 MB; the rulebooks and pdf.js are most of it). The spec
+adds whole folders, so new static or data files need no edit there.
+
+Verifying a build: run the exe with `PORT` and `FTFM_DATA_DIR` pointed at a scratch dir, then
+exercise it over HTTP. **It opens a browser tab on launch**, and that tab's heartbeat keeps the
+idle watchdog from exiting, so stop a test instance by PID from the port (never by process
+name), not by waiting for the watchdog.
