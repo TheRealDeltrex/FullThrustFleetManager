@@ -504,6 +504,7 @@ def test_system_types_cover_every_costed_type():
 
 
 def test_races_and_books():
-    assert [r.id for r in FB.races()] == ["human"]
+    # Human is this module's subject; the alien tech modules are tested beside it.
+    assert [r.id for r in FB.races()][0] == "human"
     assert {b.code for b in FB.books} == {"FB1", "FB2"}
     assert all(b.page_offset == 0 for b in FB.books)
