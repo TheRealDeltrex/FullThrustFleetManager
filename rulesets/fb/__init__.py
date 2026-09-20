@@ -72,11 +72,14 @@ class FBRuleset:
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
         always = {"turn_sequence", "arcs", "hull_track", "threshold", "crew", "fire_control"}
+        wanted = set(systems_present)
         if "kravak" in races:
-            # FB2's own summaries: the race's movement, damage and crew rules read differently
-            # enough that a Kra'Vak sheet must not carry the FB1 wording for the same headings.
-            always |= {"kv_thrust", "kv_kgun", "kv_mkp", "kv_scattergun", "kv_crew"}
-        return _quickref("fb", systems_present, tuple(sorted(always)), options)
+            # FB2 restates movement, crew and fire control for the race, so a Kra'Vak sheet gets
+            # its own entries beside the shared ones. The keys are prefixed, so the FB1 entry for
+            # the same system still appears for the human designs in a mixed fleet.
+            always |= {"kv_thrust", "kv_crew"}
+            wanted |= {f"kv_{t}" for t in systems_present}
+        return _quickref("fb", wanted, tuple(sorted(always)), options)
 
 
 def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:

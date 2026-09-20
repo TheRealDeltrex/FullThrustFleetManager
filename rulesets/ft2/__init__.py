@@ -88,10 +88,14 @@ class FT2Ruleset:
     threshold_numbers = staticmethod(rules.threshold_numbers)
     suggest_type = staticmethod(rules.suggest_type)
 
-    def fighter_types(self, options: dict) -> list[str]:
+    def fighter_types(self, options: dict, race: str = "human") -> list[str]:
         return list(mt.FIGHTER_SURCHARGE) if options.get("mt_fighters") else ["standard"]
 
-    def quickref(self, systems_present: set[str], options: dict) -> list[QuickRefEntry]:
+    def icon_set_for(self, race: str) -> str:
+        return self.icon_set  # FT2 has human tech only
+
+    def quickref(self, systems_present: set[str], options: dict,
+                 races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
         return _quickref("ft2", systems_present, ("turn_sequence", "arcs", "fire_control", "screen"), options)
 
 

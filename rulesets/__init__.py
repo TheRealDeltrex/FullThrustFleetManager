@@ -95,11 +95,16 @@ class Ruleset(Protocol):
     accent_color: str  # CSS variable name, e.g. "--rs-fb"
     books: tuple[BookRef, ...]
     arcs: tuple[str, ...]  # fire arcs clockwise from fore: FB six, FT2 four (FT p.8)
-    icon_set: Any  # filled in by M6 (ssd_layout)
+    icon_set: Any  # the human icon table in ssd_layout.ICON_SETS; per race, icon_set_for()
 
     def races(self) -> list[Race]: ...
 
     def system_types(self, race: str, options: dict) -> list[SystemDef]: ...
+
+    def icon_set_for(self, race: str) -> str:
+        """The ssd_layout.ICON_SETS id for a race, so each race's sheets look like its own part
+        of the book (PLAN decision 10); `icon_set` is the human default."""
+        ...
 
     def design_breakdown(self, design: dict, options: dict) -> Breakdown: ...
 
@@ -109,7 +114,7 @@ class Ruleset(Protocol):
         """Points of a loadout (fighters etc.), which design NPV excludes (PLAN 5.4)."""
         ...
 
-    def fighter_types(self, options: dict) -> list[str]:
+    def fighter_types(self, options: dict, race: str = "human") -> list[str]:
         """Fighter group types a loadout may choose."""
         ...
 
@@ -128,7 +133,8 @@ class Ruleset(Protocol):
 
     def suggest_type(self, design: dict) -> tuple[str, str]: ...
 
-    def quickref(self, systems_present: set[str], options: dict) -> list[QuickRefEntry]: ...
+    def quickref(self, systems_present: set[str], options: dict,
+                 races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]: ...
 
 
 RULESETS: dict[str, Ruleset] = {}

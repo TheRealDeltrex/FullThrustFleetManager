@@ -52,6 +52,16 @@ ENTRIES = [
     ("fb", "vector_movement", "Vector movement", "FB1", "MOVING SHIPS UNDER THE VECTOR SYSTEM"),
     ("fb", "rerolls", "Rerolls (penetrating damage)", "FB1", "REROLLS (PENETRATING DAMAGE)"),
 
+    # Kra'Vak (FB2 pp.9-10). Keys are prefixed kv_ so a Kra'Vak entry never displaces the FB1
+    # one for the same system on a mixed-race fleet's sheet.
+    ("fb", "kv_thrust", "Kra'Vak thrust and manoeuvre", "FB2", "KRA’VAK THRUST AND MANOEUVRE"),
+    ("fb", "kv_kgun", "Kinetic guns (K-guns)", "FB2", "KINETIC GUNS (K-GUNS)"),
+    ("fb", "kv_mkp", "Multiple kinetic penetrator packs", "FB2", "MULTIPLE KINETIC PENETRATOR (MKP) PACKS"),
+    ("fb", "kv_scattergun", "Scatterguns", "FB2", "SCATTERGUNS:"),
+    ("fb", "kv_fire_control", "Kra'Vak fire control", "FB2", "FIRE CONTROL SYSTEMS"),
+    ("fb", "kv_crew", "Kra'Vak crew factors and damage control", "FB2", "CREW FACTORS AND DAMAGE CONTROL"),
+    ("fb", "kv_hangar", "Kra'Vak fighters", "FB2", "FIGHTERS"),
+
     ("ft2", "turn_sequence", "Sequence of play", "FT", "SEQUENCE OF PLAY:"),
     ("ft2", "beam", "Beam weapon batteries", "FT", "BEAM WEAPON BATTERIES:"),
     ("ft2", "arcs", "Fire arcs", "FT", "FIRE ARCS:"),
@@ -148,8 +158,39 @@ OVERRIDES = {
         "\"fly\" like an Aerospace craft. Other ships may be classed as PARTIALLY STREAMLINED, "
         "which gives them some capability of atmospheric operations and landing, usually by sheer "
         "brute thrust from their Drives rather than any kind of aerodynamic lift.",
+    # FB2 p.11's summary panel. Both are the panel's own words, cut where the next thing on the
+    # page is not rules text: the K-gun entry ends before its "ICONS (examples):" caption, and
+    # the MKP entry before the SCATTERGUNS panel beside it, which the extractor runs on into
+    # because the MKP body is too short to end the section.
+    ("fb", "kv_kgun"):
+        "Range 0 - 6 mu: 2+ to hit Range 6 - 12 mu: 3+ to hit Range 12 - 18 mu: 4+ to hit "
+        "Range 18 - 24 mu: 5+ to hit Range 24 - 30 mu: 6 to hit If hit scored, roll again; roll "
+        "GREATER than K-gun class = DP equal to class, roll LESS THAN OR EQUAL to class = DP "
+        "equal to class x 2. Natural roll of 6 is always class x 1 DP, even for K-6 and larger. "
+        "First DP of hit taken on armour, remainder penetrates. Class-1 K-guns ONLY can fire in "
+        "limited point-defence mode: 1 fighter/missile kill is scored on a roll of 5 or 6; no "
+        "rerolls.",
+    ("fb", "kv_mkp"):
+        "One-shot system, range 12 mu. 1 die rolled: 1-3 = no hits, 4 or 5 = 1 hit, 6 = 2 hits "
+        "(no rerolls). Each hit does 4 damage points, one to armour (if any) and remainder on "
+        "hull.",
 }
 # fmt: on
+
+# Printed-page window for an entry whose heading is not unique in its book. FB2 repeats
+# "FIRE CONTROL SYSTEMS", "HULL INTEGRITY" and "FIGHTERS" once per race, and body_after() keeps
+# the longest body, so without a window a Kra'Vak key can pick up the Phalon section's text.
+# The window also aims the weapon entries at the book's own summary panel (FB2 p.11) rather
+# than at the long rules pages.
+PAGES = {
+    ("fb", "kv_kgun"): (11, 11),
+    ("fb", "kv_mkp"): (11, 11),
+    ("fb", "kv_scattergun"): (11, 11),
+    ("fb", "kv_thrust"): (9, 9),
+    ("fb", "kv_fire_control"): (10, 10),
+    ("fb", "kv_crew"): (10, 10),
+    ("fb", "kv_hangar"): (10, 10),
+}
 
 LIMIT = 700  # trimmed where needlessly wordy (PLAN 2.5)
 HEADING = re.compile(r"^[A-Z][A-Z \-/()&.,0-9’'\"]{6,60}:?$")
@@ -190,11 +231,15 @@ def trim(text: str) -> str:
     return cut[:end + 1].strip() if end > 200 else cut.rstrip() + "..."
 
 
-def body_after(pages: list[str], heading: str, first: int = 0) -> tuple[str, int] | None:
+def body_after(pages: list[str], heading: str, first: int = 0,
+               window: tuple[int, int] | None = None) -> tuple[str, int] | None:
     """The best match for `heading`: the contents page repeats every heading with no body under
-    it, so the longest body wins."""
+    it, so the longest body wins. `window` is an inclusive range of 0-based page indices, for a
+    heading that appears more than once in the book."""
     # Contents and introduction pages repeat every heading with the wrong text under it.
     matches = [m for m in _matches(pages, heading) if m and m[1] >= first]
+    if window:
+        matches = [m for m in matches if window[0] <= m[1] <= window[1]]
     return max(matches, key=lambda m: len(m[0])) if matches else None
 
 
@@ -226,7 +271,10 @@ def main() -> int:
     missing = []
     for ruleset, key, title, book, heading in ENTRIES:
         pages, offset, first = texts[book]
-        found = body_after(pages, heading, first)
+        printed = PAGES.get((ruleset, key))
+        # PAGES is in printed pages; page index = printed + offset - 1 (see the comment below).
+        window = (printed[0] + offset - 1, printed[1] + offset - 1) if printed else None
+        found = body_after(pages, heading, first, window)
         if not found or len(found[0]) < 60:
             missing.append(f"{ruleset}/{key} ({book}: {heading})")
             continue
