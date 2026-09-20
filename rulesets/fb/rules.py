@@ -456,5 +456,6 @@ def _validate_fighters(design: dict, systems: list[dict], by_uid: dict, violatio
 # ---- Tech-module interface (rulesets/fb/tech.py) -------------------------------------------------
 
 ICON_SET = "fb"
+CREWED = True
 FIGHTER_POINTS = data.FIGHTER_POINTS
 system_defs = data.system_defs

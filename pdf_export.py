@@ -38,6 +38,7 @@ class PrintOptions:
     damage: bool = True          # pre-mark campaign damage
     include_docked: bool = False
     blank: bool = False          # clean sheets, no campaign state at all
+    blank_pulsers: bool = False  # Phalon: print the pulser icons empty to write L/M/C in
     turns: int = 10
     fields: dict = field(default_factory=dict)
 
@@ -194,6 +195,22 @@ def _stroke(pdf: FPDF, points: list[tuple[float, float]]) -> None:
 # ---- Sections -----------------------------------------------------------------------------------
 
 
+def _sheet_loadout(ship: dict, design: dict, options: PrintOptions) -> dict | None:
+    """The loadout a record sheet is drawn with.
+
+    FB2 p.35 prints Phalon pulser icons blank so the player can write L, M or C into them before
+    each battle, and the print dialog offers that: with `blank_pulsers` the sheet drops whatever
+    configuration is recorded and prints the blanks the book does.
+    """
+    loadout = ship["loadout"]
+    if not options.blank_pulsers:
+        return loadout
+    effective = loadout if loadout is not None else design.get("default_loadout")
+    if not isinstance(effective, dict) or not effective.get("pulsers"):
+        return loadout
+    return {**effective, "pulsers": []}
+
+
 def _ship_damage(ship: dict, options: PrintOptions) -> dict | None:
     if options.blank or not options.damage:
         return None
@@ -294,7 +311,7 @@ def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         if not design:
             continue
         diagram = ssd_layout.layout(design, damage=_ship_damage(ship, options),
-                                    loadout=ship["loadout"])
+                                    loadout=_sheet_loadout(ship, design, options))
         width = min(usable, diagram.width * PT * 1.35)
         height = diagram.height / diagram.width * width + 6
         if x + width > MARGIN + usable + 0.5:

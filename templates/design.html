@@ -115,6 +115,13 @@
             <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
             <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
             <label>{{ _("Armour") }}<input class="input" type="number" min="0" name="armour" value="{{ d.armour }}" /></label>
+            {% if selected.breakdown.derived.shell_layers is defined %}
+              {# A Phalon shell stacks in layers whose cost rises with the layer (FB2 p.35). #}
+              <label>{{ _("Shell layers (inner first)") }}
+                <input class="input" type="text" name="armour_layers"
+                       placeholder="{{ _('e.g. 8, 4, 4') }}"
+                       value="{{ d.armour_layers | join(', ') }}" /></label>
+            {% endif %}
             {% if selected.breakdown.derived.thrust_table is defined %}
               {# The race buys thrust with power each turn and has no rating to edit; the sheet
                  carries the table instead (FB2 p.22). #}
@@ -192,9 +199,10 @@
           </div>
         </div>
 
-        {% set carriers = d.systems | selectattr('type', 'in', ('hangar', 'fighter_group')) | list %}
+        {% set carriers = d.systems | selectattr('type', 'in', ('hangar', 'fighter_group', 'drone_womb')) | list %}
         {% set magazines = d.systems | selectattr('type', 'equalto', 'sm_magazine') | list %}
-        {% if carriers or magazines %}
+        {% set pulsers = d.systems | selectattr('type', 'equalto', 'pulser') | list %}
+        {% if carriers or magazines or pulsers %}
           <div class="panel">
             <h3>{{ _("Default loadout") }}</h3>
             <div class="body stack">
@@ -210,6 +218,20 @@
               {% endfor %}
               {% for system in magazines %}
                 <p class="muted">{{ _("Magazine {uid}: standard salvos", uid=system.uid) }}</p>
+              {% endfor %}
+              {% for system in pulsers %}
+                {# FB2 p.35: chosen before each battle, never changed during one. #}
+                {% set chosen = (d.default_loadout.pulsers | selectattr('pulser', 'equalto', system.uid) | list | first) %}
+                <label>{{ _("Pulser {uid} configuration", uid=system.uid) }}
+                  <select class="input" name="pulser-{{ system.uid }}">
+                    <option value="">{{ _("Not configured") }}</option>
+                    {% for mode, label in (("L", _("L - long range (1 die, 36mu)")),
+                                           ("M", _("M - medium range (2 dice, 24mu)")),
+                                           ("C", _("C - close range (6 dice, 12mu)"))) %}
+                      <option value="{{ mode }}" {% if chosen and chosen.mode == mode %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
               {% endfor %}
             </div>
           </div>

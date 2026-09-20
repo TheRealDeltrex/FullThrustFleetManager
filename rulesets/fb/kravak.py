@@ -49,6 +49,7 @@ __all__ = [
 ]
 
 ICON_SET = "fb_kravak"
+CREWED = True  # crew factors and damage control parties
 
 
 def kgun_mass(cls: int, arc_count: int) -> int:
