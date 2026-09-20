@@ -113,7 +113,9 @@ def quickref_entries():
         # Each race brings its own entries, from its own pages (FB2's Kra'Vak section repeats
         # FB1's headings, so a wrong page reference here is a real risk).
         for race in {r.id for r in ruleset.races()} - {"human"}:
-            for entry in ruleset.quickref({"kgun", "mkp", "scattergun", "fire_control", "hangar"},
+            for entry in ruleset.quickref({"kgun", "mkp", "scattergun", "fire_control", "hangar",
+                                           "stinger", "pod_launcher", "spicule", "cortex",
+                                           "screen_node", "drone_womb", "power_generator"},
                                           {}, frozenset({race})):
                 yield ruleset.id, entry
 

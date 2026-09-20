@@ -115,7 +115,16 @@
             <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
             <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
             <label>{{ _("Armour") }}<input class="input" type="number" min="0" name="armour" value="{{ d.armour }}" /></label>
-            <label>{{ _("Thrust") }}<input class="input" type="number" min="0" name="thrust" value="{{ d.thrust }}" /></label>
+            {% if selected.breakdown.derived.thrust_table is defined %}
+              {# The race buys thrust with power each turn and has no rating to edit; the sheet
+                 carries the table instead (FB2 p.22). #}
+              <label>{{ _("Thrust") }}
+                <span class="input static">{{ _("power per turn: {n}", n=selected.breakdown.derived.power or 0) }}</span>
+                <input type="hidden" name="thrust" value="0" />
+              </label>
+            {% else %}
+              <label>{{ _("Thrust") }}<input class="input" type="number" min="0" name="thrust" value="{{ d.thrust }}" /></label>
+            {% endif %}
             <label>{{ _("Streamlining") }}
               <select class="input" name="streamlining">
                 {% for value, text in (("none", _("None")), ("partial", _("Partial")), ("full", _("Full"))) %}

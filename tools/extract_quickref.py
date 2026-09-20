@@ -62,6 +62,20 @@ ENTRIES = [
     ("fb", "kv_crew", "Kra'Vak crew factors and damage control", "FB2", "CREW FACTORS AND DAMAGE CONTROL"),
     ("fb", "kv_hangar", "Kra'Vak fighters", "FB2", "FIGHTERS"),
 
+    # Sa'Vasku (FB2 pp.22-25). The weapon and defence entries come from the book's own summary
+    # panel on p.25, the rest from the rules pages.
+    ("fb", "sv_power", "Allocating power", "FB2", "ALLOCATING POWER"),
+    ("fb", "sv_thrust", "Sa'Vasku thrust and manoeuvre", "FB2", "SA'VASKU THRUST AND MANOEUVRE"),
+    ("fb", "sv_biomass", "Biomass boxes", "FB2", "BIOMASS BOXES"),
+    ("fb", "sv_power_generator", "Power generators", "FB2", "POWER GENERATORS"),
+    ("fb", "sv_stinger", "Stinger nodes", "FB2", "STINGER NODES"),
+    ("fb", "sv_pod_launcher", "Pod launcher nodes", "FB2", "POD LAUNCHER NODES"),
+    ("fb", "sv_screen_node", "Screen nodes", "FB2", "SCREEN NODES"),
+    ("fb", "sv_spicule", "Spicules", "FB2", "SPICULES"),
+    ("fb", "sv_cortex", "Cortex nodes", "FB2", "CORTEX NODES"),
+    ("fb", "sv_drone_womb", "Drone wombs", "FB2", "DRONE WOMBS"),
+    ("fb", "sv_repair", "Sa'Vasku damage control", "FB2", "DAMAGE CONTROL"),
+
     ("ft2", "turn_sequence", "Sequence of play", "FT", "SEQUENCE OF PLAY:"),
     ("ft2", "beam", "Beam weapon batteries", "FT", "BEAM WEAPON BATTERIES:"),
     ("ft2", "arcs", "Fire arcs", "FT", "FIRE ARCS:"),
@@ -190,6 +204,17 @@ PAGES = {
     ("fb", "kv_fire_control"): (10, 10),
     ("fb", "kv_crew"): (10, 10),
     ("fb", "kv_hangar"): (10, 10),
+    ("fb", "sv_power"): (22, 22),
+    ("fb", "sv_thrust"): (22, 22),
+    ("fb", "sv_biomass"): (22, 22),
+    ("fb", "sv_power_generator"): (22, 22),
+    ("fb", "sv_stinger"): (22, 22),
+    ("fb", "sv_pod_launcher"): (22, 22),
+    ("fb", "sv_screen_node"): (23, 23),
+    ("fb", "sv_spicule"): (23, 23),
+    ("fb", "sv_cortex"): (24, 24),
+    ("fb", "sv_drone_womb"): (23, 23),
+    ("fb", "sv_repair"): (24, 24),
 }
 
 LIMIT = 700  # trimmed where needlessly wordy (PLAN 2.5)

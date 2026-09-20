@@ -196,6 +196,83 @@
    "text": "Kra'Vak fighters, like human ones, operate in groups of 6 craft. They have 6 Combat Endurance Factors, which may be used up to make attacks and/or to make secondary moves. The standard Kra'Vak fighter is the Ra'San (literally \"Little Sliver of Mother\", UN codename KIP) and the heavy variant is the Va'San (\"Great Sliver of Mother\", UN codename KART). The Ra'San is treated as a regular multirole fighter, and the Va'san gets the defensive bonus for being a \"heavy\" fighter. The costs per group of 6 are 18 points per Ra'San group (3 per fighter) and 30 points per Va'San group (5 per fighter).",
    "book": "FB2",
    "page": 10
+  },
+  {
+   "key": "sv_power",
+   "title": "Allocating power",
+   "text": "Each turn during the orders phase, the ship's available power (the sum of the functioning power generators) must be divided between 4 \"power pools\"; MOVEMENT, ATTACK, DEFENCE, and REPAIR, noted on the record chart as M, A, D and R. The division of the available power points between the four pools is entirely at the player's discretion, and there is no requirement to place any power points into any one pool - power may be allocated to all four pools, or concentrated in just one or two, to choice. Power allocated to the MOVEMENT (M) pool is available for powering the Main Drive Node to apply thrust, or to power up the FTL Drive Node to make an FTL jump off-table.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_thrust",
+   "title": "Sa'Vasku thrust and manoeuvre",
+   "text": "Sa'Vasku drives count as Advanced Drives, and use the same rules for movement in either Cinematic or Vector mode as for the Kra'Vak drives. Refer to the Kra'Vak movement rules section of this volume, and apply the same rules and restrictions. The icon used for a Sa'Vasku drive node is the same as that used for the Kra'Vak advanced drives, as a little reminder that the same movement rules are used in both cases; as there is no set thrust rating for Sa'Vasku drives, however, there is a star rather than a thrust number printed in the drive icon.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_biomass",
+   "title": "Biomass boxes",
+   "text": "The damage track of a Sa'vasku ship is composed of biomass boxes in the same way as other ships have hull integrity boxes. Where damage is concerned, a biomass box works exactly like a hull box - one is crossed off for every damage point inflicted on the ship's structure, working along each row from left to right. A threshold check is made for the ship's systems when the end of a row of the damage track is reached. Biomass differs from other races' ship hulls in that it can be deliberately consumed by the ship itself, to produce drone (fighter) groups or ammunition for pod launchers nodes, and also to repair damaged ship systems.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_power_generator",
+   "title": "Power generators",
+   "text": "A Sa'vasku ship has a number of Power Generators (usually four) placed at the end of the rows of its biomass boxes. The total amount of power points available to the ship for each game turn is the sum of the numbers in all the still-functioning Power Generators. As accumulated damage reaches the end of a row of biomass boxes, the Power Generator at the end of that line is AUTOMATICALLY lost; it does not have to be rolled for during the threshold check. Full rows of biomass consumed by the ship does NOT cause the loss of a power generator. MASS required for generators is 1 per power point value. Cost is 2 points per MASS.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_stinger",
+   "title": "Stinger nodes",
+   "text": "The Stinger Node is the Sa'Vasku equivalent of a standard FT beam weapon, except that its output is variable according to how much power is allocated to each shot. One power point channelled through a stinger node produces a 1-die beam shot at up to 12 mu range.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_pod_launcher",
+   "title": "Pod launcher nodes",
+   "text": "A Pod Launcher Node is a projectile launcher which can fire a number of different munitions, which are created by consuming biomass and then fired using power points from the Attack (A) pool. The type of munition to be fired may be decided by the player at the time of launch - it does not have to be specified earlier. Three different munition (\"pod\") types are detailed below - the Lance, Leech and Interceptor Pods, but the Sa'Vasku are versatile enough to use many others - we may add a few more types later, or players are free to come up with some as house rules provided everyone in the playing group is happy with them.",
+   "book": "FB2",
+   "page": 22
+  },
+  {
+   "key": "sv_screen_node",
+   "title": "Screen nodes",
+   "text": "A Screen Node requires power points allocated to the Defence (D) pool equal to the MASS of the node in order to operate. When powered, each screen node is the equivalent of a single level of standard screen generator. A ship that carries two screen nodes may choose to power one, both or neither in a given turn, depending on how much power it allocates to the D pool. As with human screens, more than two screen nodes may be carried as redundant backups, but no more than two will have an effect at any one time. MASS required per Screen Node is 5% of ship MASS, with a MINIMUM size of 3 MASS. Cost is 3 points per MASS of node.",
+   "book": "FB2",
+   "page": 23
+  },
+  {
+   "key": "sv_spicule",
+   "title": "Spicules",
+   "text": "Spicules are the Sa'Vasku equivalent of Point Defence Systems; each Spicule may fire once per turn at any one target that is attacking the ship, and requires one power point from the ATTACK (A) pool to fire (though they are technically \"defensive\" weapons, they are active weapons rather than passive systems and hence draw power from the A pool rather than the D). A spicule has all-arc fire, and when fired rolls one die with exactly the same effects as a standard PDS. Note that the Sa'Vasku do not use an equivalent of an ADFC, and hence Spicules are not capable of area-defence fire - that role is filled by the \"interceptor pods\" that may be fired from Pod Launchers.",
+   "book": "FB2",
+   "page": 23
+  },
+  {
+   "key": "sv_cortex",
+   "title": "Cortex nodes",
+   "text": "A Cortex Node is the Sa'Vasku version of a Fire Control system, and it works in exactly the same way as a standard fire control. Cortex Nodes do NOT require power allocated to them. Each Cortex Node occupies 1 MASS, and costs 4 points.",
+   "book": "FB2",
+   "page": 24
+  },
+  {
+   "key": "sv_drone_womb",
+   "title": "Drone wombs",
+   "text": "Sa'Vasku drones (fighters) may only be grown and launched by ships which have Drone Wombs - each womb can grow (or launch) one 6-drone group at a time. Sa'vasku ships produce drones by converting hull biomass into the necessary components - it takes 1 biomass to \"grow\" 1 drone, and they may only be produced in full groups of 6 - if a ship has less than 6 available biomass then it cannot grow a drone group. Drones that survive their mission and return to their ship are \"reabsorbed\" - they are broken down into their constituents and the biomass that created them is available for reuse, either as more drones or for other purposes.",
+   "book": "FB2",
+   "page": 23
+  },
+  {
+   "key": "sv_repair",
+   "title": "Sa'Vasku damage control",
+   "text": "Ship systems lost at threshold checks may have repairs to them attempted by expending power points from the Repair (R) pool equal to the MASS of the system being repaired, AND making a die roll for success; 4+ on a D6 is required to successfully repair the system. If the roll succeeds, then 1 biomass is consumed to fabricate the components for the repair. If the roll fails, then the biomass is not consumed but the power used IS wasted. Only one roll is permitted per damaged system each turn. Lost Power Generator systems MAY be replaced in this manner, but only if enough power points are available from the surviving PGs for the task.",
+   "book": "FB2",
+   "page": 24
   }
  ]
 }

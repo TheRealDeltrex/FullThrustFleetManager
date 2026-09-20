@@ -489,7 +489,7 @@ def _apply_form(design: dict) -> dict:
 def _read_loadout(design: dict) -> dict:
     fighters = [
         {"hangar": system["uid"], "type": request.form.get(f"loadout-{system['uid']}", "standard")}
-        for system in design["systems"] if system["type"] in ("hangar", "fighter_group")
+        for system in design["systems"] if system["type"] in ("hangar", "fighter_group", "drone_womb")
     ]
     magazines = [
         {"magazine": system["uid"],

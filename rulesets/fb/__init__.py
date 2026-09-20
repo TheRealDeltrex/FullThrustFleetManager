@@ -71,14 +71,25 @@ class FBRuleset:
 
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
-        always = {"turn_sequence", "arcs", "hull_track", "threshold", "crew", "fire_control"}
+        races = frozenset(races)
+        always = {"turn_sequence", "arcs", "hull_track", "threshold"}
+        if races & {"human", "kravak"}:
+            # A Sa'Vasku construct has no crew factors and no fire control (it has cortex
+            # nodes), so FB1's entries for those belong on a sheet only when a crewed race is
+            # in the fleet.
+            always |= {"crew", "fire_control"}
         wanted = set(systems_present)
+        # FB2 restates movement, damage and the weapon summaries per race, so an alien sheet gets
+        # its own entries beside the shared ones. The keys are prefixed, so the FB1 entry for the
+        # same system still appears for the human designs in a mixed fleet.
         if "kravak" in races:
-            # FB2 restates movement, crew and fire control for the race, so a Kra'Vak sheet gets
-            # its own entries beside the shared ones. The keys are prefixed, so the FB1 entry for
-            # the same system still appears for the human designs in a mixed fleet.
             always |= {"kv_thrust", "kv_crew"}
             wanted |= {f"kv_{t}" for t in systems_present}
+        if "savasku" in races:
+            # Power allocation, biomass and repair are the race's whole economy, so they are on
+            # every Sa'Vasku sheet whatever nodes the ship carries.
+            always |= {"sv_power", "sv_thrust", "sv_biomass", "sv_repair"}
+            wanted |= {f"sv_{t}" for t in systems_present}
         return _quickref("fb", wanted, tuple(sorted(always)), options)
 
 
