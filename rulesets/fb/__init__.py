@@ -1,4 +1,9 @@
-"""FB ruleset: Fleet Book 1 design system with the Fleet Book 2 amendments (PLAN 6.2)."""
+"""FB ruleset: Fleet Book 1 design system with the Fleet Book 2 amendments (PLAN 6.2), plus the
+Fleet Book 2 alien races as tech modules (rulesets/fb/tech.py).
+
+Every per-design call dispatches on `design["race"]`, so a race is added by writing its module,
+never by branching here.
+"""
 
 from __future__ import annotations
 
@@ -6,8 +11,8 @@ import json
 
 import paths
 from i18n import _
-from rulesets import QuickRefEntry, Race, SystemDef, common
-from rulesets.fb import data, rules
+from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common
+from rulesets.fb import data, tech
 
 
 class FBRuleset:
@@ -15,7 +20,7 @@ class FBRuleset:
     accent_color = "--rs-fb"
     books = data.BOOKS
     arcs = common.ARCS
-    icon_set = "fb"  # the icon table in ssd_layout.ICON_SETS
+    icon_set = "fb"  # human default; per race, use icon_set_for()
 
     @property
     def name(self) -> str:
@@ -26,29 +31,52 @@ class FBRuleset:
         return "FB"
 
     def races(self) -> list[Race]:
-        return [Race("human", _("Human"))]
+        return tech.races()
+
+    def icon_set_for(self, race: str) -> str:
+        return tech.module_for(race).ICON_SET
 
     def system_types(self, race: str, options: dict) -> list[SystemDef]:
-        return data.system_defs() if race == "human" else []
+        return tech.module_for(race).system_defs() if race in tech.race_ids() else []
 
-    design_breakdown = staticmethod(rules.design_breakdown)
-    validate_design = staticmethod(rules.validate_design)
-    loadout_points = staticmethod(rules.loadout_points)
-    damage_track = staticmethod(rules.damage_track)
-    crew_factors = staticmethod(rules.crew_factors)
-    cf_positions = staticmethod(rules.cf_positions)
-    threshold_numbers = staticmethod(rules.threshold_numbers)
-    suggest_type = staticmethod(rules.suggest_type)
+    def design_breakdown(self, design: dict, options: dict) -> Breakdown:
+        return tech.module_for_design(design).design_breakdown(design, options)
 
-    def fighter_types(self, options: dict) -> list[str]:
-        return list(data.FIGHTER_POINTS)
+    def validate_design(self, design: dict, options: dict) -> list[Issue]:
+        return tech.module_for_design(design).validate_design(design, options)
+
+    def loadout_points(self, design: dict, loadout: dict | None, options: dict) -> int:
+        return tech.module_for_design(design).loadout_points(design, loadout, options)
+
+    def damage_track(self, design: dict) -> list[int]:
+        return tech.module_for_design(design).damage_track(design)
+
+    def crew_factors(self, design: dict) -> int:
+        return tech.module_for_design(design).crew_factors(design)
+
+    def cf_positions(self, design: dict) -> list[int]:
+        return tech.module_for_design(design).cf_positions(design)
+
+    def threshold_numbers(self, design: dict) -> list[int]:
+        return tech.module_for_design(design).threshold_numbers(design)
+
+    def suggest_type(self, design: dict) -> tuple[str, str]:
+        return tech.module_for_design(design).suggest_type(design)
+
+    def fighter_types(self, options: dict, race: str = "human") -> list[str]:
+        return list(tech.module_for(race).FIGHTER_POINTS)
 
     def required_options(self, design: dict, loadout: dict | None) -> set[str]:
         return set()
 
-    def quickref(self, systems_present: set[str], options: dict) -> list[QuickRefEntry]:
-        always = ("turn_sequence", "arcs", "hull_track", "threshold", "crew", "fire_control")
-        return _quickref("fb", systems_present, always, options)
+    def quickref(self, systems_present: set[str], options: dict,
+                 races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
+        always = {"turn_sequence", "arcs", "hull_track", "threshold", "crew", "fire_control"}
+        if "kravak" in races:
+            # FB2's own summaries: the race's movement, damage and crew rules read differently
+            # enough that a Kra'Vak sheet must not carry the FB1 wording for the same headings.
+            always |= {"kv_thrust", "kv_kgun", "kv_mkp", "kv_scattergun", "kv_crew"}
+        return _quickref("fb", systems_present, tuple(sorted(always)), options)
 
 
 def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:

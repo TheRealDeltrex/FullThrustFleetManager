@@ -451,3 +451,10 @@ def _validate_fighters(design: dict, systems: list[dict], by_uid: dict, violatio
                 _("{groups} fighter groups in a hangar with {bays} bays.", groups=groups, bays=bays),
                 uid,
             )
+
+
+# ---- Tech-module interface (rulesets/fb/tech.py) -------------------------------------------------
+
+ICON_SET = "fb"
+FIGHTER_POINTS = data.FIGHTER_POINTS
+system_defs = data.system_defs
