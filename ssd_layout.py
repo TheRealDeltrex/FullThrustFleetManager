@@ -17,7 +17,7 @@ position; the catalog may ship them and drag-to-arrange can write them later.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Literal
 
 from i18n import _
@@ -35,6 +35,7 @@ class Rect:
     r: float = 0.0  # corner radius
     fill: str = "none"
     stroke: float = 0.9
+    ref: str = ""  # what a click on this shape means (campaign tab)
     kind: str = "rect"
 
 
@@ -45,6 +46,7 @@ class Circle:
     r: float
     fill: str = "none"
     stroke: float = 0.9
+    ref: str = ""  # what a click on this shape means (campaign tab)
     kind: str = "circle"
 
 
@@ -55,6 +57,7 @@ class Line:
     x2: float
     y2: float
     stroke: float = 0.9
+    ref: str = ""  # what a click on this shape means (campaign tab)
     kind: str = "line"
 
 
@@ -63,6 +66,7 @@ class Path:
     d: str
     fill: str = "none"
     stroke: float = 0.9
+    ref: str = ""  # what a click on this shape means (campaign tab)
     kind: str = "path"
 
 
@@ -75,6 +79,7 @@ class Text:
     anchor: Literal["start", "middle", "end"] = "middle"
     bold: bool = False
     fill: str = "black"
+    ref: str = ""  # what a click on this shape means (campaign tab)
     kind: str = "text"
 
 
@@ -310,7 +315,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
     draw = ICON_SETS.get(icon_set, ICON_SETS["fb"]).get(system.get("type"))
     if draw is None:
         draw = _labelled(str(system.get("type", "?"))[:4].upper(), wide=True)
-    prims = list(draw(system, x, y, arcs))
+    prims = [replace(shape, ref=f"system:{system.get('uid', '')}") for shape in draw(system, x, y, arcs)]
     if out:
         prims.append(_cross(x, y, 10.5))
     return prims
@@ -471,7 +476,8 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         for i in range(armour):
             ccx = left + (i % per) * cell + cell / 2
             ccy = y + (i // per) * cell + cell / 2
-            prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9))
+            prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9,
+                                ref=f"armour:{i + 1}"))
             if i < int(damage.get("armour") or 0):
                 prims.append(_slash(ccx - cell / 2, ccy - cell / 2, cell))
         y += math.ceil(armour / per) * cell + 2
@@ -482,7 +488,8 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         for column in range(row_len):
             numbered += 1
             bx, by = left + column * cell, y + row_index * cell
-            prims.append(Rect(bx, by, cell, cell, fill=WHITE, stroke=0.9))
+            prims.append(Rect(bx, by, cell, cell, fill=WHITE, stroke=0.9,
+                              ref=f"hull:{numbered}"))
             if numbered in cf:
                 prims.append(_star(bx + cell / 2, by + cell / 2, cell * 0.3))
             if numbered <= hull_done:
@@ -531,23 +538,25 @@ def to_svg(diagram: Diagram, class_name: str = "ssd") -> str:
         f'xmlns="http://www.w3.org/2000/svg" class="{class_name}">'
     ]
     for p in diagram.primitives:
+        ref = f' data-ref="{p.ref}"' if p.ref else ""
         if isinstance(p, Rect):
             radius = f' rx="{_fmt(p.r)}"' if p.r else ""
             parts.append(f'<rect x="{_fmt(p.x)}" y="{_fmt(p.y)}" width="{_fmt(p.w)}" height="{_fmt(p.h)}"'
                          f'{radius} fill="{p.fill}" stroke="{"none" if not p.stroke else "black"}" '
-                         f'stroke-width="{_fmt(p.stroke)}"/>')
+                         f'stroke-width="{_fmt(p.stroke)}"{ref}/>')
         elif isinstance(p, Circle):
+            stroke = "none" if not p.stroke else "black"
             parts.append(f'<circle cx="{_fmt(p.cx)}" cy="{_fmt(p.cy)}" r="{_fmt(p.r)}" fill="{p.fill}" '
-                         f'stroke="{"none" if not p.stroke else "black"}" stroke-width="{_fmt(p.stroke)}"/>')
+                         f'stroke="{stroke}" stroke-width="{_fmt(p.stroke)}"{ref}/>')
         elif isinstance(p, Line):
             parts.append(f'<line x1="{_fmt(p.x1)}" y1="{_fmt(p.y1)}" x2="{_fmt(p.x2)}" y2="{_fmt(p.y2)}" '
-                         f'stroke="black" stroke-width="{_fmt(p.stroke)}"/>')
+                         f'stroke="black" stroke-width="{_fmt(p.stroke)}"{ref}/>')
         elif isinstance(p, Path):
             parts.append(f'<path d="{p.d}" fill="{p.fill}" stroke="{"none" if not p.stroke else "black"}" '
-                         f'stroke-width="{_fmt(p.stroke)}"/>')
+                         f'stroke-width="{_fmt(p.stroke)}"{ref}/>')
         else:
             weight = ' font-weight="700"' if p.bold else ""
             parts.append(f'<text x="{_fmt(p.x)}" y="{_fmt(p.y)}" font-size="{_fmt(p.size)}" '
-                         f'text-anchor="{p.anchor}" fill="{p.fill}"{weight}>{_escape(p.text)}</text>')
+                         f'text-anchor="{p.anchor}" fill="{p.fill}"{weight}{ref}>{_escape(p.text)}</text>')
     parts.append("</svg>")
     return "".join(parts)
