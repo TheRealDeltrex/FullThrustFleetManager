@@ -62,7 +62,9 @@ def collect() -> dict[str, str]:
     for p in sorted((ROOT / "translations").glob("*.json")):
         add(p)
     for p in sorted((ROOT / "static").rglob("*")):
-        if p.is_file() and p.suffix in STATIC_SUFFIXES:
+        # Vendored pdf.js is megabytes of third-party code that the viewer loads from its own
+        # URL, not from a page the shell renders: it is copied next to index.html instead.
+        if p.is_file() and p.suffix in STATIC_SUFFIXES and "pdfjs" not in p.parts:
             add(p)
     add(ROOT / "pyproject.toml")
     return files

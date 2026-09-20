@@ -72,7 +72,11 @@
         <span class="muted">{{ d.type_label }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</span>
         {% if selected.npv_book %}
           <span class="chip info">{{ _("Book NPV {n}", n=selected.npv_book) }}
-            {% if d.source.book %}· {{ d.source.book|upper }} p.{{ d.source.page }}{% endif %}</span>
+            {% if d.source.book %}
+              {# The page reference opens the bundled rulebook at that page (PLAN 12). #}
+              · <a href="{{ book_url(d.source.book|upper, d.source.page) }}"
+                   >{{ d.source.book|upper }} p.{{ d.source.page }}</a>
+            {% endif %}</span>
         {% endif %}
         {% if selected.used_by %}
           <span class="chip">{{ _("Used by {n} ships", n=selected.used_by|length) }}</span>
