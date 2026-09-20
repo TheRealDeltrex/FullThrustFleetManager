@@ -169,7 +169,7 @@ it lives outside the repo on purpose because it holds code-signing setup).
 
 ## 5. Data model
 
-All files are UTF-8 JSON with a top-level `"schema_version": 1`. `migrations.py` upgrades older
+All files are UTF-8 JSON with a top-level `"schema_version"` (currently 2). `migrations.py` upgrades older
 files on load; write the migration and its test in the same commit as any schema change. IDs are
 short random strings (`uuid4().hex[:12]`); catalog ids are readable (`fb:fb1:nac-furious`).
 
@@ -188,7 +188,8 @@ short random strings (`uuid4().hex[:12]`); catalog ids are readable (`fb:fb1:nac
   "hull_kind": "warship",             // warship | merchant
   "tmf": 64,                          // total MASS
   "hull_boxes": 19,                   // FB; FT2 derives damage points from MASS
-  "armour": 3,
+  "armour": 3,                        // total armour/shell boxes
+  "armour_layers": [],                // Phalon shell, inner first; [] = one layer
   "thrust": 4,
   "ftl": true,
   "streamlining": "none",             // none | partial | full
@@ -203,7 +204,8 @@ short random strings (`uuid4().hex[:12]`); catalog ids are readable (`fb:fb1:nac
   ],
   "default_loadout": {                // section 5.4
     "fighters": [{"hangar": "s5", "type": "standard"}],
-    "magazines": [{"magazine": "s6", "salvos": ["std", "std", "std"]}]
+    "magazines": [{"magazine": "s6", "salvos": ["std", "std", "std"]}],
+    "pulsers": []                   // Phalon pulser L/M/C, set per ship before a battle
   },
   "allow_rule_breaking": false,       // bookkeeping checkbox; does NOT mean non-conforming
   "layout_hints": {},                 // optional icon positions (catalog; later drag layout)
@@ -735,11 +737,13 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 
 1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs)
 2. FTPC ruleset (incl. the 2017 errata)
-3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20) **done**, Sa'Vasku (pp.21-33) **done**,
-   Phalon (pp.35-46); golden test: the FB2 p.11 Kra'Vak example = 384. Races are additive tech
-   modules inside a ruleset (decision 3), not new rulesets. (The Phalon span read pp.34-46 here;
-   printed 34 is blank and the section opens on 35.) Sa'Vasku needed no data-model change: the
-   power pools are per-turn play state, so the sheet prints a box for them and nothing is stored.
+3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
+   (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37
+   Phalon one = 379. Races are additive tech modules inside a ruleset (decision 3), not new
+   rulesets. (The Phalon span read pp.34-46 here; printed 34 is blank.) Sa'Vasku needed no
+   data-model change - the power pools are per-turn play state, so the sheet prints a box and
+   nothing is stored - but the Phalon layered shell did: `armour_layers` beside `armour`,
+   which stays the total, at `schema_version` 2.
 4. Campaign module (11.3) with installations and the random campaign generator
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
