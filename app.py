@@ -15,7 +15,18 @@ import webbrowser
 from collections.abc import Callable
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, Response, abort, flash, redirect, render_template, request, session, url_for
+from flask import (
+    Flask,
+    Response,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    session,
+    url_for,
+)
 from markupsafe import Markup
 
 import fleet_rules
@@ -121,9 +132,10 @@ def _reject_cross_site() -> Response | None:
 @app.after_request
 def _security_headers(resp: Response) -> Response:
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
-    resp.headers.setdefault("X-Frame-Options", "DENY")
+    # SAMEORIGIN, not DENY: the rulebook viewer frames our own vendored pdf.js page (PLAN 12).
+    resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     resp.headers.setdefault("Referrer-Policy", "same-origin")
-    resp.headers.setdefault("Content-Security-Policy", "frame-ancestors 'none'")
+    resp.headers.setdefault("Content-Security-Policy", "frame-ancestors 'self'")
     return resp
 
 
@@ -672,9 +684,61 @@ def dice(sides: int) -> Response:
     return Response(str(secrets.randbelow(sides) + 1), mimetype="text/plain")
 
 
+# ---- Rulebooks (PLAN 12) --------------------------------------------------------------------------
+
+
+def books() -> dict[str, object]:
+    """Every book any ruleset knows, by its code (FB1, FT, ...)."""
+    return {b.code: b for rs in RULESETS.values() for b in rs.books}
+
+
+def book_url(code: str, page: int | None = None) -> str:
+    """The link behind every "FB1 p.16" in the UI."""
+    return url_for("rulebook", code=code, page=page or 0)
+
+
+app.jinja_env.globals["book_url"] = book_url
+
+
+@app.route("/rulebook/<code>")
+def rulebook(code: str) -> str | Response:
+    book = books().get(code)
+    if not book:
+        abort(404)
+    page = max(0, int(request.args.get("page") or 0))
+    pdf_page = page + book.page_offset if page else 1
+    if store.load_settings()["pdf_viewer"] == "system" and not BROWSER_MODE:
+        # The player asked for their own PDF viewer: hand the file over and let the browser or
+        # the OS open it (desktop only; the web build has nowhere to hand it to).
+        return redirect(url_for("rulebook_file", code=code) + f"#page={pdf_page}")
+    return render_template("rulebook.html", active_tab="settings", book=book, page=page,
+                           pdf_page=pdf_page, books=sorted(books().values(), key=lambda b: b.code))
+
+
+@app.route("/rulebook/<code>/file")
+def rulebook_file(code: str) -> Response:
+    book = books().get(code)
+    if not book:
+        abort(404)
+    path = paths.bundle_dir() / "rulebooks" / book.file
+    if not path.is_file():
+        abort(404)
+    return send_file(path, mimetype="application/pdf", download_name=book.file)
+
+
 @app.route("/settings")
 def settings() -> str:
-    return render_template("settings.html", active_tab="settings", languages=i18n.LANGUAGES)
+    return render_template("settings.html", active_tab="settings", languages=i18n.LANGUAGES,
+                           settings=store.load_settings(),
+                           books=sorted(books().values(), key=lambda b: b.code))
+
+
+@app.route("/settings", methods=["POST"])
+def settings_save() -> Response:
+    ok, msg = store.save_settings(paper=request.form.get("paper", "A4"),
+                                  pdf_viewer=request.form.get("pdf_viewer", "app"))
+    flash(msg, "success" if ok else "error")
+    return redirect(url_for("settings"))
 
 
 @app.route("/heartbeat", methods=["POST"])

@@ -17,10 +17,11 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M10 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
-catalog behind the NPV gate, the storage layer (library, fleets, import/export), the SSD layout
-engine, the Design tab, the Fleet overview tab, the fleet PDF and campaign bookkeeping. Next is
-**M11** (rulebook viewer); the Settings tab is still a placeholder.
+M1-M11 are done: the whole v1 feature set — the Layout C shell, the FB and FT2 (+ More Thrust)
+rules engines, the 96-design catalog behind the NPV gate, the storage layer, the SSD layout
+engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF and the rulebook
+viewer. What remains is packaging: **M12** (desktop exe), **M13** (web build) and M14 (release,
+the owner's).
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -125,6 +126,20 @@ What exists:
   do the same thing, so the tab works with scripting off; the dice buttons are optional too.
 - Hooks reserved for the later campaign module (PLAN 11.2) are in use but not repurposed:
   `ship.location`, `log[].week`, statuses `docked` and `hulk`, `fleet.campaign_id` (unused).
+
+## Rulebook viewer
+
+- `GET /rulebook/<code>?page=N` (the viewer page) and `/rulebook/<code>/file` (the bundled PDF).
+  `book_url()` is a Jinja global, so every "FB1 p.16" in the UI is a link; page numbers are
+  **printed** ones and the route adds the book's `page_offset`.
+- pdf.js 4.6.82 (legacy build) is vendored under `static/pdfjs/`, Apache-2.0, licence
+  alongside. Trimmed: no source maps, no locale, no cmaps, no debugger. It is excluded from the
+  web bundle (served as plain files) and from `test_shell.py`'s remote-URL scan, because it is
+  third-party code with URLs in comments that fetches nothing at runtime.
+- The viewer is framed, so the security headers are `X-Frame-Options: SAMEORIGIN` and
+  `frame-ancestors 'self'` — do not tighten them back to DENY without replacing the frame.
+- The Settings tab writes `pdf_viewer` (`app` / `system`) and `paper`; with `system`, a page
+  reference redirects to the file itself so the browser or the OS opens it.
 
 `pdf_export.py` (PLAN section 4) arrives with M9.
 

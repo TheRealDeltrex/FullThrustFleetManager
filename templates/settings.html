@@ -7,6 +7,33 @@
       <h2>{{ _("Settings") }}</h2>
     </div>
     <div class="panel">
+      <h3>{{ _("Rulebooks") }}</h3>
+      <div class="body stack">
+        <form method="post" action="{{ url_for('settings_save') }}" class="row">
+          <label>{{ _("Open page references in") }}
+            <select class="input" name="pdf_viewer">
+              <option value="app" {% if settings.pdf_viewer == 'app' %}selected{% endif %}>{{ _("The in-app viewer") }}</option>
+              <option value="system" {% if settings.pdf_viewer == 'system' %}selected{% endif %}>{{ _("My own PDF viewer") }}</option>
+            </select>
+          </label>
+          <label>{{ _("Paper size") }}
+            <select class="input" name="paper">
+              {% for value in ("A4", "Letter") %}
+                <option value="{{ value }}" {% if settings.paper == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <button class="btn primary" type="submit">{{ _("Save settings") }}</button>
+        </form>
+        <div class="row">
+          {% for book in books %}
+            <a class="btn sm" href="{{ book_url(book.code) }}">{{ book.title }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
       <h3>{{ _("Language") }}</h3>
       <div class="body">
         <select class="input" disabled>
