@@ -48,7 +48,7 @@ What exists:
 - `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` (manual).
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
-  rebuild them from `E:\RPG\Tabletop\Full Thurst\`.
+  rebuild them from the bought originals (source folder set in `tools/build_rulebooks.py`).
 
 - `fleet_rules.py`, `store.py`, `migrations.py`, `data/factions.json` — see Storage below.
 
@@ -308,7 +308,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 
 ## Sister project
 
-`E:\ClaudeCodeFolder\FrostgraveWarbandKeeper` uses the same stack. Copy and adapt (never import)
+The `FrostgraveWarbandKeeper` checkout beside this one uses the same stack. Copy and adapt (never import)
 its infrastructure: `paths.py`, `tray.py`, `idle_watchdog.py`, `run_app.py`, the PyInstaller spec,
 `scripts/build_browser_bundle.py`, the Pyodide shell, `.github/workflows/deploy-pages.yml`. Read
 its `CLAUDE.md` for the reasoning behind those pieces before copying them.
@@ -347,7 +347,7 @@ spell them. The one exception is `web/index.html`'s loading screen, which runs b
 from source, `%APPDATA%\FullThrustFleetManager` when frozen. For a scratch server set
 `FTFM_DATA_DIR` to a temp dir and `PORT` to something other than 5000 (the owner may run a real
 instance there); stop it by PID from the port, never by process name. The session preview config
-`ftfm-dev-scratch` (in `E:\ClaudeCodeFolder\.claude\launch.json`, outside the repo) does this
+`ftfm-dev-scratch` (in the parent folder's `.claude/launch.json`, outside the repo) does this
 on port 5123. Reach the server as `127.0.0.1`/`localhost`; other Host headers get 403.
 `FTFM_DEBUG=1` enables the Werkzeug debugger.
 
