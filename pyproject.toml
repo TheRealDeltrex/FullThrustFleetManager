@@ -1,6 +1,6 @@
 [project]
 name = "full-thrust-fleet-manager"
-version = "0.1.0"
+version = "0.1.1"
 description = "Ship design, fleet building, campaign tracking and fleet PDFs for Full Thrust"
 readme = "README.md"
 requires-python = ">=3.11"
