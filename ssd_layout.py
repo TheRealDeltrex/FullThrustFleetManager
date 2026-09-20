@@ -131,11 +131,15 @@ def _arc_ring(cx: float, cy: float, r: float, arcs: list[str], all_arcs: tuple[s
         a0 = math.radians(centre - span * 0.45)
         a1 = math.radians(centre + span * 0.45)
         covered = name in arcs
-        out.append(Path(
-            f"M{_fmt(cx + r * math.cos(a0))} {_fmt(cy + r * math.sin(a0))} "
-            f"A{_fmt(r)} {_fmt(r)} 0 0 1 {_fmt(cx + r * math.cos(a1))} {_fmt(cy + r * math.sin(a1))}",
-            stroke=2.4 if covered else 0.5,
-        ))
+        # Sampled as a polyline rather than an SVG "A" command: the PDF renderer draws the very
+        # same points, so screen and paper cannot drift apart.
+        steps = 8
+        points = []
+        for step in range(steps + 1):
+            angle = a0 + (a1 - a0) * step / steps
+            points.append(("L" if step else "M")
+                          + f"{_fmt(cx + r * math.cos(angle))} {_fmt(cy + r * math.sin(angle))}")
+        out.append(Path(" ".join(points), stroke=2.4 if covered else 0.5))
     return out
 
 

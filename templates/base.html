@@ -46,8 +46,12 @@
         {% if current_fleet and fleet_badges and fleet_badges.non_conforming %}
           <span class="chip bad">{{ _("Non-conforming") }}</span>
         {% endif %}
-        <button type="button" class="btn primary" disabled
-                title="{{ _('The print dialog arrives with the fleet PDF') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+        {% if current_fleet %}
+          <a class="btn primary" href="{{ url_for('print_dialog') }}">&#9113; {{ _("Print fleet PDF") }}</a>
+        {% else %}
+          <button type="button" class="btn primary" disabled
+                  title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+        {% endif %}
       </div>
     </header>
 

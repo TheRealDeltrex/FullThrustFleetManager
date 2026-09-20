@@ -20,6 +20,7 @@ from markupsafe import Markup
 import fleet_rules
 import i18n
 import paths
+import pdf_export
 import ssd_layout
 import store
 from i18n import _
@@ -514,6 +515,55 @@ def design_update(design_id: str) -> Response:
 
     store.save_draft(working)
     return redirect(url_for("design_detail", design_id=design_id))
+
+
+# ---- Print dialog (PLAN 10.3) -------------------------------------------------------------------
+
+
+@app.route("/print")
+def print_dialog() -> str:
+    fleet = current_fleet()
+    if not fleet:
+        abort(404)
+    others = [f for f in store.list_fleets() if f["id"] != fleet["id"]]
+    return render_template("print.html", active_tab="fleet_overview", fleet=fleet, others=others,
+                           paper=store.load_settings()["paper"])
+
+
+@app.route("/print", methods=["POST"])
+def print_pdf() -> Response:
+    fleet = current_fleet()
+    if not fleet:
+        abort(404)
+    fleets = [fleet]
+    second_id = request.form.get("second_fleet")
+    if second_id:
+        second = store.get_fleet(second_id)
+        if not second:
+            flash(_("The second fleet was not found."), "error")
+            return redirect(url_for("print_dialog"))
+        fleets.append(second)
+    problem = pdf_export.battle_pack_error(fleets)
+    if problem:
+        flash(problem, "error")
+        return redirect(url_for("print_dialog"))
+
+    form = request.form
+    options = pdf_export.PrintOptions(
+        paper=form.get("paper", "A4"),
+        roster=form.get("roster") == "on",
+        sheets=form.get("sheets") == "on",
+        orders=form.get("orders") == "on",
+        tracker=form.get("tracker") == "on",
+        quickref=form.get("quickref") == "on",
+        damage=form.get("damage") == "on",
+        include_docked=form.get("include_docked") == "on",
+        blank=form.get("blank") == "on",
+    )
+    data = pdf_export.fleet_pdf(fleets, [store.designs_for_fleet(f) for f in fleets], options)
+    name = "_".join(f["name"].replace(" ", "_") for f in fleets)[:60] or "fleet"
+    return Response(data, mimetype="application/pdf",
+                    headers={"Content-Disposition": f'inline; filename="{name}.pdf"'})
 
 
 @app.route("/campaign")
