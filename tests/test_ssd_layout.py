@@ -31,7 +31,60 @@ REFERENCE = [
     "fb:fb2:kv-to-rok",         # Kra'Vak non-combatant: lab space and a tender bay
     "fb:fb2:sv-vas-sa-rosh",    # Sa'Vasku: generators on the track, thrust table, power box
     "fb:fb2:sv-sa-an-tha",      # the smallest Sa'Vasku construct
+    "fb:fb2:ph-voth",           # Phalon: a four-layer shell, pulser stars, plasma bolts
+    "fb:fb2:ph-phyaa",          # the smallest Phalon hull, one shell layer
 ]
+
+
+def test_a_phalon_shell_draws_one_row_per_layer_outermost_on_top():
+    """FB2 p.35: the layers stack with the inner one nearest the hull, so the sheet draws the
+    outermost at the top. The Voth's shell is 16/10/8/6 from the inside out."""
+    d = design("fb:fb2:ph-voth")
+    assert d["armour_layers"] == [16, 10, 8, 6] and d["armour"] == 40
+    circles = [p for p in ssd_layout.layout(d, RULESETS["fb"]).primitives
+               if p.kind == "circle" and p.ref.startswith("armour:")]
+    rows: dict[float, int] = {}
+    for c in circles:
+        rows[round(c.cy, 1)] = rows.get(round(c.cy, 1), 0) + 1
+    assert [n for _y, n in sorted(rows.items())] == [6, 8, 10, 16]
+
+
+def test_shell_boxes_are_numbered_in_the_order_damage_removes_them():
+    """Shell boxes are crossed off the outermost layer first (FB2 p.35), so box 1 is the first
+    box of the top row - which is what the campaign tab's armour counter marks off."""
+    d = design("fb:fb2:ph-voth")
+    circles = [p for p in ssd_layout.layout(d, RULESETS["fb"]).primitives
+               if p.kind == "circle" and p.ref.startswith("armour:")]
+    first = min(circles, key=lambda c: int(c.ref.split(":")[1]))
+    assert first.cy == min(c.cy for c in circles)
+
+
+def test_a_single_layer_shell_draws_as_one_row():
+    d = design("fb:fb2:ph-phyaa")
+    assert d["armour_layers"] == [1]
+    circles = [p for p in ssd_layout.layout(d, RULESETS["fb"]).primitives
+               if p.kind == "circle" and p.ref.startswith("armour:")]
+    assert len(circles) == 1
+
+
+def test_a_pulser_carries_its_configured_letter():
+    """The star's centre is the blank the player writes L, M or C into (FB2 p.35); an unset
+    battery stays blank, as the printed sheets do."""
+    d = design("fb:fb2:ph-phyaa")
+    uid = next(s["uid"] for s in d["systems"] if s["type"] == "pulser")
+    blank = [getattr(p, "text", "") for p in ssd_layout.layout(d, RULESETS["fb"]).primitives]
+    assert "M" not in blank
+    loadout = {"fighters": [], "magazines": [], "pulsers": [{"pulser": uid, "mode": "M"}]}
+    set_ = [getattr(p, "text", "")
+            for p in ssd_layout.layout(d, RULESETS["fb"], loadout=loadout).primitives]
+    assert "M" in set_
+
+
+def test_human_armour_is_unaffected_by_the_layer_code():
+    d = design("fb:fb1:nac-furious")
+    circles = [p for p in ssd_layout.layout(d, RULESETS["fb"]).primitives
+               if p.kind == "circle" and p.ref.startswith("armour:")]
+    assert len(circles) == d["armour"] == 3
 
 
 def test_savasku_sheets_carry_the_play_aids_the_book_prints():

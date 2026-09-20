@@ -480,11 +480,82 @@ _SAVASKU_ICONS = dict(_SHARED_ICONS) | {
 }
 
 
+# ---- Phalon icons (FB2 p.37 key) ---------------------------------------------------------------
+#
+# A pulser is a six-pointed star: the hexagon in the middle is the blank the player writes L, M
+# or C into before a battle, and the six points around it are the arcs, white where the battery
+# bears and black where it does not. Plasma bolt launchers are cogs carrying their class.
+
+
+def _star_points(cx: float, cy: float, r_in: float, r_out: float,
+                 arcs: tuple[str, ...], covered: list[str]) -> list[Primitive]:
+    """One triangle per arc, white when the arc is covered (FB2 p.37)."""
+    out: list[Primitive] = []
+    span = 360.0 / len(arcs)
+    for index, name in enumerate(arcs):
+        middle = math.radians(-90.0 + index * span)
+        base = math.radians(-90.0 + index * span - span / 2)
+        tip = math.radians(-90.0 + index * span + span / 2)
+        out.append(Path(
+            f"M{_fmt(cx + r_out * math.cos(middle))} {_fmt(cy + r_out * math.sin(middle))} "
+            f"L{_fmt(cx + r_in * math.cos(base))} {_fmt(cy + r_in * math.sin(base))} "
+            f"L{_fmt(cx + r_in * math.cos(tip))} {_fmt(cy + r_in * math.sin(tip))} Z",
+            fill=WHITE if name in covered else BLACK, stroke=0.7))
+    return out
+
+
+def _pulser(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    mode = str(system.get("mode") or "")
+    return [
+        *_star_points(x, y, 5.5, 11.0, arcs, system.get("arcs", []) or []),
+        Path(_hexagon(x, y, 5.5), fill=WHITE, stroke=1.0),
+        *([Text(x, y + 3.0, mode, size=8, bold=True)] if mode else []),
+    ]
+
+
+def _plasma_bolt_launcher(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    cls = system.get("class", 1)
+    return [
+        Path(_cog(x, y, 9.0, teeth=11), fill=WHITE, stroke=1.1),
+        Text(x, y + 3.2, str(cls), size=9, bold=True),
+        *_arc_ring(x, y, 12.5, system.get("arcs", []), arcs),
+    ]
+
+
+def _vapour_shroud(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """The gland: a ring of droplets around a centre (FB2 p.37)."""
+    out: list[Primitive] = [Circle(x, y, 3.4, fill=BLACK, stroke=0)]
+    for i in range(8):
+        angle = math.radians(-90 + i * 45)
+        out.append(Circle(x + 7.5 * math.cos(angle), y + 7.5 * math.sin(angle), 1.9,
+                          fill=BLACK, stroke=0))
+    return out
+
+
+def _ph_adfc(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [
+        Rect(x - 6, y - 6, 12, 12, fill=BLACK, stroke=1.0),
+        Path(f"M{_fmt(x - 3.5)} {_fmt(y - 3.5)} L{_fmt(x + 3.5)} {_fmt(y - 3.5)} "
+             f"L{_fmt(x - 3.5)} {_fmt(y + 3.5)} L{_fmt(x + 3.5)} {_fmt(y + 3.5)} Z",
+             fill=WHITE, stroke=0),
+    ]
+
+
+_PHALON_ICONS = dict(_SHARED_ICONS) | {
+    "pulser": _pulser,
+    "plasma_bolt_launcher": _plasma_bolt_launcher,
+    "vapour_shroud": _vapour_shroud,
+    "adfc": _ph_adfc,
+    "hangar": _kv_hangar,   # the same plain triangle the Kra'Vak sheets use (FB2 p.37 key)
+}
+
+
 ICON_SETS: dict[str, dict] = {
     "fb": dict(_SHARED_ICONS),
     "ft2": dict(_SHARED_ICONS),
     "fb_kravak": _KRAVAK_ICONS,
     "fb_savasku": _SAVASKU_ICONS,
+    "fb_phalon": _PHALON_ICONS,
 }
 
 
@@ -504,6 +575,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
 WEAPONS = {
     "beam", "pulse_torpedo", "needle_beam", "nova_cannon", "wave_gun", "aa_battery",
     "sm_launcher", "sm_rack", "submunition", "kgun", "mkp", "stinger", "pod_launcher",
+    "pulser", "plasma_bolt_launcher",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay"}
 
@@ -596,8 +668,14 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         breakdown = rs.design_breakdown(design, {})
         derived = breakdown.derived
         mass_by_uid = {r.system_uid: r.mass for r in breakdown.rows if r.system_uid}
+        # A per-ship loadout overrides the design's (the Phalon pulser L/M/C setting, FB2 p.35).
+        modes = dict(derived.get("pulser_modes") or {})
+        if loadout is not None and hasattr(rs, "design_breakdown"):
+            for entry in (loadout.get("pulsers") or []) if isinstance(loadout, dict) else []:
+                if isinstance(entry, dict) and isinstance(entry.get("pulser"), str):
+                    modes[entry["pulser"]] = str(entry.get("mode") or "")
     except Exception:  # a ruleset never raises, but a sheet must draw even if one does
-        derived, mass_by_uid = {}, {}
+        derived, mass_by_uid, modes = {}, {}, {}
 
     size = box if box != "auto" else box_size(design, rs.id)
     width = BOX_WIDTHS.get(size, BOX_WIDTHS["medium"])
@@ -612,9 +690,12 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         if pinned:
             x = float(pinned.get("x", x))
             cy = float(pinned.get("y", cy))
-        shown = system if system.get("uid") not in mass_by_uid else {
-            **system, "mass": mass_by_uid[system["uid"]]
-        }
+        extra = {}
+        if system.get("uid") in mass_by_uid:
+            extra["mass"] = mass_by_uid[system["uid"]]
+        if system.get("uid") in modes:
+            extra["mode"] = modes[system["uid"]]
+        shown = {**system, **extra} if extra else system
         prims.extend(_icon(icon_set, shown, x, cy, arcs, system.get("uid") in systems_out))
 
     # Fore weapons: rows across the top, largest first.
@@ -665,16 +746,24 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     left = width / 2 - columns * cell / 2
 
     armour = int(design.get("armour") or 0)
-    if armour:
-        per = min(armour, int((width - 24) // cell) or 1)
-        for i in range(armour):
+    armour_done = int(damage.get("armour") or 0)
+    per = max(1, int((width - 24) // cell))
+    # A ruleset may stack the armour in layers (the Phalon shell, FB2 p.35): one row per layer,
+    # outermost at the top, which is also the order damage takes them off.
+    layers = derived.get("shell_layers") or ([armour] if armour else [])
+    box_index = 0
+    for row_len in reversed(layers):
+        for i in range(row_len):
             ccx = left + (i % per) * cell + cell / 2
             ccy = y + (i // per) * cell + cell / 2
+            box_index += 1
             prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9,
-                                ref=f"armour:{i + 1}"))
-            if i < int(damage.get("armour") or 0):
+                                ref=f"armour:{box_index}"))
+            if box_index <= armour_done:
                 prims.append(_slash(ccx - cell / 2, ccy - cell / 2, cell))
-        y += math.ceil(armour / per) * cell + 2
+        y += max(1, math.ceil(row_len / per)) * cell
+    if layers:
+        y += 2
 
     hull_done = int(damage.get("hull") or 0)
     numbered = 0
