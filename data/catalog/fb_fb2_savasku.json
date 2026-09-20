@@ -1,0 +1,1349 @@
+{
+ "schema_version": 1,
+ "designs": [
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-sa-an-tha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Sa'An'Tha",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 10,
+   "hull_boxes": 3,
+   "armour": 0,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 2
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 26,
+    "npv_book": 34
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-sa-kess-tha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Sa'Kess'Tha",
+   "type_label": "Scoutship",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 11,
+   "hull_boxes": 2,
+   "armour": 1,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 3
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 26,
+    "npv_book": 37
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-fo-kiir-tha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Fo'Kiir'Tha",
+   "type_label": "Corvette",
+   "type_code": "CT",
+   "hull_kind": "warship",
+   "tmf": 18,
+   "hull_boxes": 5,
+   "armour": 1,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 4
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "spicule"
+    },
+    {
+     "uid": "s4",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 27,
+    "npv_book": 59
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-fo-sath-aan",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Fo'Sath'Aan",
+   "type_label": "Frigate",
+   "type_code": "FF",
+   "hull_kind": "warship",
+   "tmf": 24,
+   "hull_boxes": 8,
+   "armour": 2,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 6
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "spicule"
+    },
+    {
+     "uid": "s4",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 27,
+    "npv_book": 77
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-fo-vur-ath",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Fo'Vur'Ath",
+   "type_label": "Heavy Destroyer",
+   "type_code": "DH",
+   "hull_kind": "warship",
+   "tmf": 40,
+   "hull_boxes": 12,
+   "armour": 2,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 9
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "spicule"
+    },
+    {
+     "uid": "s6",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 28,
+    "npv_book": 130
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-var-arr-sha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Var'Arr'Sha",
+   "type_label": "Light Cruiser",
+   "type_code": "CL",
+   "hull_kind": "warship",
+   "tmf": 52,
+   "hull_boxes": 16,
+   "armour": 3,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 12
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "spicule"
+    },
+    {
+     "uid": "s6",
+     "type": "spicule"
+    },
+    {
+     "uid": "s7",
+     "type": "cortex"
+    },
+    {
+     "uid": "s8",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 28,
+    "npv_book": 169
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-var-kiir-sha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Var'Kiir'Sha",
+   "type_label": "Cruiser",
+   "type_code": "",
+   "hull_kind": "warship",
+   "tmf": 64,
+   "hull_boxes": 18,
+   "armour": 4,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 16
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "spicule"
+    },
+    {
+     "uid": "s7",
+     "type": "spicule"
+    },
+    {
+     "uid": "s8",
+     "type": "spicule"
+    },
+    {
+     "uid": "s9",
+     "type": "cortex"
+    },
+    {
+     "uid": "s10",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 29,
+    "npv_book": 208
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-var-thee-sha",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Var'Thee'Sha",
+   "type_label": "Cruiser",
+   "type_code": "",
+   "hull_kind": "warship",
+   "tmf": 70,
+   "hull_boxes": 20,
+   "armour": 6,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 16
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "spicule"
+    },
+    {
+     "uid": "s7",
+     "type": "spicule"
+    },
+    {
+     "uid": "s8",
+     "type": "spicule"
+    },
+    {
+     "uid": "s9",
+     "type": "cortex"
+    },
+    {
+     "uid": "s10",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 29,
+    "npv_book": 226
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-thy-sa-teth",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Thy'Sa'Teth",
+   "type_label": "Escort Carrier",
+   "type_code": "CVE",
+   "hull_kind": "warship",
+   "tmf": 94,
+   "hull_boxes": 36,
+   "armour": 6,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 16
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s4",
+     "type": "spicule"
+    },
+    {
+     "uid": "s5",
+     "type": "spicule"
+    },
+    {
+     "uid": "s6",
+     "type": "spicule"
+    },
+    {
+     "uid": "s7",
+     "type": "cortex"
+    },
+    {
+     "uid": "s8",
+     "type": "cortex"
+    },
+    {
+     "uid": "s9",
+     "type": "drone_womb"
+    },
+    {
+     "uid": "s10",
+     "type": "drone_womb"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s9",
+      "type": "drone"
+     },
+     {
+      "hangar": "s10",
+      "type": "drone"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 30,
+    "npv_book": 302
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-shyy-tha-var",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Shyy'Tha'Var",
+   "type_label": "Battlecruiser",
+   "type_code": "BC",
+   "hull_kind": "warship",
+   "tmf": 100,
+   "hull_boxes": 25,
+   "armour": 8,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 24
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s8",
+     "type": "spicule"
+    },
+    {
+     "uid": "s9",
+     "type": "spicule"
+    },
+    {
+     "uid": "s10",
+     "type": "spicule"
+    },
+    {
+     "uid": "s11",
+     "type": "cortex"
+    },
+    {
+     "uid": "s12",
+     "type": "cortex"
+    },
+    {
+     "uid": "s13",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 30,
+    "npv_book": 326
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-ann-var-teth",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Ann'Var'Teth",
+   "type_label": "Battleship",
+   "type_code": "BB",
+   "hull_kind": "warship",
+   "tmf": 120,
+   "hull_boxes": 30,
+   "armour": 9,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 30
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s9",
+     "type": "spicule"
+    },
+    {
+     "uid": "s10",
+     "type": "spicule"
+    },
+    {
+     "uid": "s11",
+     "type": "spicule"
+    },
+    {
+     "uid": "s12",
+     "type": "spicule"
+    },
+    {
+     "uid": "s13",
+     "type": "cortex"
+    },
+    {
+     "uid": "s14",
+     "type": "cortex"
+    },
+    {
+     "uid": "s15",
+     "type": "cortex"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 31,
+    "npv_book": 390
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-sla-tha-rosh",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Sla'Tha'Rosh",
+   "type_label": "Battledreadnought/Heavy Battleship",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 160,
+   "hull_boxes": 40,
+   "armour": 12,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 32
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "stinger",
+     "arcs": [
+      "AS",
+      "A",
+      "AP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s11",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s12",
+     "type": "spicule"
+    },
+    {
+     "uid": "s13",
+     "type": "spicule"
+    },
+    {
+     "uid": "s14",
+     "type": "spicule"
+    },
+    {
+     "uid": "s15",
+     "type": "spicule"
+    },
+    {
+     "uid": "s16",
+     "type": "cortex"
+    },
+    {
+     "uid": "s17",
+     "type": "cortex"
+    },
+    {
+     "uid": "s18",
+     "type": "cortex"
+    },
+    {
+     "uid": "s19",
+     "type": "drone_womb"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s19",
+      "type": "drone"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 31,
+    "npv_book": 527
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-vas-sa-rosh",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Vas'Sa'Rosh",
+   "type_label": "Superdreadnought",
+   "type_code": "SDN",
+   "hull_kind": "warship",
+   "tmf": 220,
+   "hull_boxes": 60,
+   "armour": 16,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 40
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "stinger",
+     "arcs": [
+      "AS",
+      "A",
+      "AP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "stinger",
+     "arcs": [
+      "AS",
+      "A",
+      "AP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "pod_launcher",
+     "arcs": [
+      "FP"
+     ]
+    },
+    {
+     "uid": "s12",
+     "type": "pod_launcher",
+     "arcs": [
+      "FS"
+     ]
+    },
+    {
+     "uid": "s13",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s14",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s15",
+     "type": "spicule"
+    },
+    {
+     "uid": "s16",
+     "type": "spicule"
+    },
+    {
+     "uid": "s17",
+     "type": "spicule"
+    },
+    {
+     "uid": "s18",
+     "type": "spicule"
+    },
+    {
+     "uid": "s19",
+     "type": "spicule"
+    },
+    {
+     "uid": "s20",
+     "type": "spicule"
+    },
+    {
+     "uid": "s21",
+     "type": "cortex"
+    },
+    {
+     "uid": "s22",
+     "type": "cortex"
+    },
+    {
+     "uid": "s23",
+     "type": "cortex"
+    },
+    {
+     "uid": "s24",
+     "type": "cortex"
+    },
+    {
+     "uid": "s25",
+     "type": "drone_womb"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s25",
+      "type": "drone"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 32,
+    "npv_book": 724
+   },
+   "notes": ""
+  },
+  {
+   "schema_version": 1,
+   "id": "fb:fb2:sv-vas-sa-teth",
+   "ruleset": "fb",
+   "race": "savasku",
+   "faction": "SV",
+   "name": "Vas'Sa'Teth",
+   "type_label": "Heavy Fighter Carrier",
+   "type_code": "CVH",
+   "hull_kind": "warship",
+   "tmf": 240,
+   "hull_boxes": 80,
+   "armour": 12,
+   "thrust": 0,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "power_generator",
+     "capacity": 44
+    },
+    {
+     "uid": "s2",
+     "type": "stinger",
+     "arcs": [
+      "AP",
+      "FP",
+      "F"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "stinger",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "stinger",
+     "arcs": [
+      "AS",
+      "A",
+      "AP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "stinger",
+     "arcs": [
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pod_launcher",
+     "arcs": [
+      "F"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s8",
+     "type": "screen_node"
+    },
+    {
+     "uid": "s9",
+     "type": "spicule"
+    },
+    {
+     "uid": "s10",
+     "type": "spicule"
+    },
+    {
+     "uid": "s11",
+     "type": "spicule"
+    },
+    {
+     "uid": "s12",
+     "type": "spicule"
+    },
+    {
+     "uid": "s13",
+     "type": "spicule"
+    },
+    {
+     "uid": "s14",
+     "type": "spicule"
+    },
+    {
+     "uid": "s15",
+     "type": "cortex"
+    },
+    {
+     "uid": "s16",
+     "type": "cortex"
+    },
+    {
+     "uid": "s17",
+     "type": "cortex"
+    },
+    {
+     "uid": "s18",
+     "type": "drone_womb"
+    },
+    {
+     "uid": "s19",
+     "type": "drone_womb"
+    },
+    {
+     "uid": "s20",
+     "type": "drone_womb"
+    },
+    {
+     "uid": "s21",
+     "type": "drone_womb"
+    }
+   ],
+   "default_loadout": {
+    "fighters": [
+     {
+      "hangar": "s18",
+      "type": "drone"
+     },
+     {
+      "hangar": "s19",
+      "type": "drone"
+     },
+     {
+      "hangar": "s20",
+      "type": "drone"
+     },
+     {
+      "hangar": "s21",
+      "type": "drone"
+     }
+    ],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "FB2",
+    "page": 32,
+    "npv_book": 779
+   },
+   "notes": ""
+  }
+ ]
+}

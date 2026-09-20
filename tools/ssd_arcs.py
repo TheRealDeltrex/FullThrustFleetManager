@@ -159,6 +159,47 @@ def pies(page: pymupdf.Page) -> list[dict]:
     return sorted(found, key=lambda f: (round(f["y"] / 6), f["x"]))
 
 
+def arrows(page: pymupdf.Page) -> list[dict]:
+    """[{x, y, arc}] for every Sa'Vasku Pod Launcher Node (FB2 pp.26-32).
+
+    A pod launcher is drawn as a cogged disc with an arrow beside it pointing along its single
+    fire arc; the arrow is two black paths, a quad shaft and a triangular head. Stinger nodes and
+    power generators use the same cogged disc with no arrow, so the arrowhead is what identifies
+    a launcher, and the direction from the disc's centre to the head gives the arc.
+    """
+    drawings = page.get_drawings()
+    discs = [
+        d for d in drawings
+        if d.get("fill") is not None and not _is_white(d["fill"])
+        and len(d["items"]) == 12 and all(it[0] == "c" for it in d["items"])
+    ]
+    heads = [
+        d for d in drawings
+        if d.get("fill") is not None and not _is_white(d["fill"])
+        and sum(1 for it in d["items"] if it[0] == "l") == 3
+        and all(it[0] == "l" for it in d["items"])
+    ]
+    found = []
+    for disc in discs:
+        r = disc["rect"]
+        cx, cy = (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2
+        near = [
+            h for h in heads
+            if math.hypot((h["rect"].x0 + h["rect"].x1) / 2 - cx,
+                          (h["rect"].y0 + h["rect"].y1) / 2 - cy) < r.width * 1.4
+        ]
+        if not near:
+            continue
+        head = min(near, key=lambda h: math.hypot((h["rect"].x0 + h["rect"].x1) / 2 - cx,
+                                                  (h["rect"].y0 + h["rect"].y1) / 2 - cy))
+        hx = (head["rect"].x0 + head["rect"].x1) / 2
+        hy = (head["rect"].y0 + head["rect"].y1) / 2
+        degrees = math.degrees(math.atan2(hy - cy, hx - cx))
+        arc = min(ARC_ANGLES, key=lambda a: abs((degrees - ARC_ANGLES[a] + 180) % 360 - 180))
+        found.append({"x": round(cx, 1), "y": round(cy, 1), "arc": arc})
+    return sorted(found, key=lambda f: (round(f["y"] / 6), f["x"]))
+
+
 def main() -> None:
     doc = pymupdf.open(ROOT / "rulebooks" / sys.argv[1])
     for p in map(int, sys.argv[2:]):
@@ -167,6 +208,8 @@ def main() -> None:
             print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) [{f['label']:>2}] {arcs}")
         for f in pies(doc[p - 1]):
             print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) pie {','.join(f['arcs'])}")
+        for f in arrows(doc[p - 1]):
+            print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) arrow {f['arc']}")
 
 
 if __name__ == "__main__":

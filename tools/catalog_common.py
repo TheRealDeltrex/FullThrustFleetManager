@@ -16,6 +16,9 @@ System notation, space separated, `*n` repeats a token:
   K<class>[:arcs]   Kra'Vak K-gun (class 1 defaults to all arcs, the rest to F)
   MKP[:arc]         Kra'Vak MKP pack (defaults to F)      SG   Kra'Vak scattergun
   S:<mass>          science-lab space
+  PG:<n>            Sa'Vasku power generators (n power points)   ST:arcs  stinger node
+  PL:arc            pod launcher node      SP  spicule    CX  cortex node
+  SN                screen node            DW  drone womb (one drone group by default)
 Arcs are comma separated ("F,FS,FP") or "all".
 """
 
@@ -76,6 +79,16 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
             add({"type": "mkp", "arcs": _arcs(rest, ruleset) if rest else ["F"]})
         elif head == "SG":
             add({"type": "scattergun"})
+        elif head == "PG":
+            add({"type": "power_generator", "capacity": int(rest)})
+        elif head == "ST":
+            add({"type": "stinger", "arcs": _arcs(rest, ruleset)})
+        elif head == "PL":
+            add({"type": "pod_launcher", "arcs": _arcs(rest, ruleset)})
+        elif head in ("SP", "CX", "SN"):
+            add({"type": {"SP": "spicule", "CX": "cortex", "SN": "screen_node"}[head]})
+        elif head == "DW":
+            fighters.append({"hangar": add({"type": "drone_womb"})["uid"], "type": "drone"})
         elif head == "PT":
             add({"type": "pulse_torpedo", "arcs": _arcs(rest, ruleset)})
         elif head == "NB":
