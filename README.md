@@ -5,7 +5,11 @@ build fleets to a points limit, track campaign damage, and print a fleet PDF for
 Supports the Full Thrust 2nd edition and Fleet Book rulesets; Cross Dimensions and Project
 Continuum later.
 
-![Full Thrust Fleet Manager](static/logo.jpg)
+[![Full Thrust Fleet Manager](static/logo.jpg)](https://therealdeltrex.github.io/FullThrustFleetManager/)
+
+**Just want to use it? Go to the [download page](https://therealdeltrex.github.io/FullThrustFleetManager/)**
+to play in your browser or download the Windows build, no code needed. You can also take the
+[latest release](../../releases/latest) directly.
 
 **Status:** v0.1.1, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
 [NOTICE.md](NOTICE.md), full build plan in [docs/PLAN.md](docs/PLAN.md).
@@ -30,7 +34,7 @@ Everything runs locally: no account, no server, plain JSON files you can back up
 - **Windows:** download the zip from the [latest release](../../releases/latest), unpack it
   anywhere and run `FullThrustFleetManager.exe`. It needs no installation and works offline;
   your library lives in `%APPDATA%\FullThrustFleetManager`.
-- **In the browser:** the same app runs on GitHub Pages via Pyodide. Nothing is uploaded; the
+- **In the browser:** the same app (landing page at the site root, the app under `app/`) runs on GitHub Pages via Pyodide. Nothing is uploaded; the
   library is stored in that browser only, so export a backup file to keep it.
 
 ## Running from source
