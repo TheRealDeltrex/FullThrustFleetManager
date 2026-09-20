@@ -4,9 +4,11 @@ Pure and side-effect free. `layout()` returns a `Diagram` of primitives in a top
 coordinate system, in points (1 pt = 1/72 in), so the same numbers serve the screen (SVG, via
 `to_svg()`) and the paper (fpdf2, M9): screen = paper.
 
-Icons come from the ruleset's `icon_set` id, so an FT2 sheet looks like the FT book and an FB
-sheet like Fleet Book 1 (FT p.14 / FB1 p.12 keys). The tables live here rather than in the
-rulesets because drawing is a consumer's job; a ruleset only names its set.
+Icons come from the ruleset's icon set for the design's race (`icon_set_for(race)`, falling back
+to the `icon_set` attribute), so an FT2 sheet looks like the FT book, a human FB sheet like Fleet
+Book 1 and a Kra'Vak one like Fleet Book 2 (FT p.14 / FB1 p.12 / FB2 p.11 keys). The tables live
+here rather than in the rulesets because drawing is a consumer's job; a ruleset only names its
+set.
 
 Placement is arc-aware (PLAN 10.1): fore weapons top centre, port-covering ones in a left
 column, starboard-covering in a right column, aft-only at the bottom, all-round systems in a
@@ -307,7 +309,84 @@ _SHARED_ICONS = {
     "hold": _labelled(lambda: _("HOLD"), wide=True),
 }
 
-ICON_SETS: dict[str, dict] = {"fb": dict(_SHARED_ICONS), "ft2": dict(_SHARED_ICONS)}
+# ---- Kra'Vak icons (FB2 p.11 key) -------------------------------------------------------------
+#
+# The Kra'Vak sheet is drawn with hexagons, not the human circles and boxes. On the printed SSD
+# the hexagon's fill IS the arc information: an outline hexagon is an all-arc (class-1) K-gun and
+# a filled one bears through a single arc. We keep that, and add the arc ring under a single-arc
+# gun, because this app lets a designer point it anywhere while the book only ever prints fore.
+
+
+def _hexagon(cx: float, cy: float, r: float) -> str:
+    """Flat-topped hexagon path, the shape FB2 uses for every Kra'Vak weapon."""
+    points = []
+    for i in range(6):
+        angle = math.radians(-90 + i * 60)
+        points.append(("L" if i else "M")
+                      + f"{_fmt(cx + r * math.cos(angle))} {_fmt(cy + r * math.sin(angle))}")
+    return " ".join(points) + " Z"
+
+
+def _kgun(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    cls = system.get("class", 1)
+    covered = system.get("arcs", []) or []
+    all_round = len(covered) >= len(arcs)
+    return [
+        Path(_hexagon(x, y, 8.5), fill=WHITE if all_round else BLACK, stroke=1.3),
+        Text(x, y + 3.2, str(cls), size=9.5, bold=True, fill=BLACK if all_round else WHITE),
+        *([] if all_round else _arc_ring(x, y, 12.0, covered, arcs)),
+    ]
+
+
+def _mkp(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """One-shot: the book crosses the icon through once fired (FB2 p.9)."""
+    return [
+        Path(_hexagon(x, y, 8.5), fill=WHITE, stroke=1.3),
+        Path(f"M{_fmt(x - 4.5)} {_fmt(y - 4)} L{_fmt(x + 4.5)} {_fmt(y - 4)} "
+             f"L{_fmt(x)} {_fmt(y + 5)} Z", fill=BLACK, stroke=0),
+        *_arc_ring(x, y, 12.0, system.get("arcs", []), arcs),
+    ]
+
+
+def _scattergun(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [
+        Path(_hexagon(x, y, 7.5), fill=BLACK, stroke=1.0),
+        Path(f"M{_fmt(x - 4)} {_fmt(y + 3.5)} L{_fmt(x)} {_fmt(y - 4.5)} "
+             f"L{_fmt(x + 4)} {_fmt(y + 3.5)} Z", fill=WHITE, stroke=0),
+    ]
+
+
+def _kv_fire_control(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [Circle(x, y, 5.5, fill=WHITE, stroke=1.2), Circle(x, y, 2.2, fill=BLACK, stroke=0)]
+
+
+def _kv_hangar(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [Path(f"M{_fmt(x - 7)} {_fmt(y + 8)} L{_fmt(x)} {_fmt(y - 8)} "
+                 f"L{_fmt(x + 7)} {_fmt(y + 8)} Z", fill=WHITE, stroke=1.3)]
+
+
+def _kv_drive(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    """FB2 p.9: a different icon from the human drive, and the rating is written "4A"."""
+    return [
+        Path(_hexagon(x, y, 11.0), fill=WHITE, stroke=1.3),
+        Text(x, y + 3.4, _("{n}A", n=system.get("thrust", 0)), size=9.5, bold=True),
+    ]
+
+
+_KRAVAK_ICONS = dict(_SHARED_ICONS) | {
+    "main_drive": _kv_drive,
+    "kgun": _kgun,
+    "mkp": _mkp,
+    "scattergun": _scattergun,
+    "fire_control": _kv_fire_control,
+    "hangar": _kv_hangar,
+}
+
+ICON_SETS: dict[str, dict] = {
+    "fb": dict(_SHARED_ICONS),
+    "ft2": dict(_SHARED_ICONS),
+    "fb_kravak": _KRAVAK_ICONS,
+}
 
 
 def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...],
@@ -325,7 +404,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
 
 WEAPONS = {
     "beam", "pulse_torpedo", "needle_beam", "nova_cannon", "wave_gun", "aa_battery",
-    "sm_launcher", "sm_rack", "submunition",
+    "sm_launcher", "sm_rack", "submunition", "kgun", "mkp",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay"}
 
@@ -403,7 +482,10 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     if rs is None:
         return Diagram(0, 0, ())
     arcs = tuple(rs.arcs)
-    icon_set = getattr(rs, "icon_set", None) or rs.id
+    # Per race, so each race's sheets look like its own part of the book (PLAN decision 10).
+    icon_set_for = getattr(rs, "icon_set_for", None)
+    icon_set = (icon_set_for(design.get("race", "human")) if icon_set_for
+                else getattr(rs, "icon_set", None) or rs.id)
     damage = damage or {}
     systems_out = set(damage.get("systems_out") or [])
     hints = design.get("layout_hints") if isinstance(design.get("layout_hints"), dict) else {}
@@ -501,9 +583,15 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         prims.append(Rect(16, y, 20, 16, fill=WHITE, stroke=1.2))
         prims.append(Text(26, y + 11.5, _("FTL"), size=7, bold=True))
     thrust = int(design.get("thrust") or 0)
-    prims.append(Path(f"M44 {_fmt(y + 16)} L44 {_fmt(y + 5)} L55 {_fmt(y - 1)} L66 {_fmt(y + 5)} "
-                      f"L66 {_fmt(y + 16)} Z", fill=WHITE, stroke=1.3))
-    prims.append(Text(55, y + 13.5, str(thrust), size=9.5, bold=True))
+    # An icon set may draw the main drive itself: FB2 p.9 gives the Kra'Vak Advanced Grav Drive
+    # its own icon and writes the rating with an "A".
+    draw_drive = ICON_SETS.get(icon_set, {}).get("main_drive")
+    if draw_drive:
+        prims.extend(draw_drive({"type": "main_drive", "thrust": thrust}, 55, y + 7.5, arcs))
+    else:
+        prims.append(Path(f"M44 {_fmt(y + 16)} L44 {_fmt(y + 5)} L55 {_fmt(y - 1)} L66 {_fmt(y + 5)} "
+                          f"L66 {_fmt(y + 16)} Z", fill=WHITE, stroke=1.3))
+        prims.append(Text(55, y + 13.5, str(thrust), size=9.5, bold=True))
     if int(damage.get("drive_hits") or 0):
         prims.append(_cross(55, y + 8, 9))
     # The core systems box is part of every FB sheet; FT2 has no such box (FT p.14).
