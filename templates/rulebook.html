@@ -11,16 +11,37 @@
         <a class="btn sm {% if other.code == book.code %}primary{% endif %}"
            href="{{ book_url(other.code) }}">{{ other.code }}</a>
       {% endfor %}
-      <a class="btn sm" href="{{ url_for('rulebook_file', code=book.code) }}">{{ _("Open the file") }}</a>
+      {% if BROWSER_MODE %}
+        {# A relative URL, so it resolves against the app's own folder on the host, not the domain root. #}
+        <a class="btn sm" href="rulebooks/{{ book.file | urlencode }}" target="_blank" rel="noopener">{{ _("Open the file") }}</a>
+      {% else %}
+        <a class="btn sm" href="{{ url_for('rulebook_file', code=book.code) }}">{{ _("Open the file") }}</a>
+      {% endif %}
     </div>
     {# pdf.js is vendored under static/pdfjs (Apache-2.0, licence alongside): no CDN, and the
        viewer reads the bundled PDF through our own route. #}
     {# In the web build the app runs inside the page, so a Flask route is not a URL pdf.js can
        fetch: there the PDFs sit next to index.html as plain files (deploy-pages.yml). #}
-    {% set file_url = ("/rulebooks/" + book.file) if BROWSER_MODE else url_for('rulebook_file', code=book.code) %}
-    <div class="panel viewer">
-      <iframe title="{{ book.title }}"
-              src="{{ url_for('static', filename='pdfjs/web/viewer.html') }}?file={{ file_url | urlencode }}#page={{ pdf_page }}"></iframe>
-    </div>
+    {% if BROWSER_MODE %}
+      {# The page runs in an srcdoc frame whose base URL is the shell's, so the app may sit in a
+         sub-folder of the host (GitHub Pages serves it under /<repo>/app/). Absolute "/..." URLs
+         would point at the domain root; build both URLs from the base instead. #}
+      <div class="panel viewer">
+        <iframe id="rulebook-frame" title="{{ book.title }}"></iframe>
+      </div>
+      <script>
+        (function () {
+          var viewer = new URL("static/pdfjs/web/viewer.html", document.baseURI);
+          var file = new URL("rulebooks/{{ book.file | urlencode }}", document.baseURI);
+          document.getElementById("rulebook-frame").src =
+            viewer.href + "?file=" + encodeURIComponent(file.href) + "#page={{ pdf_page }}";
+        })();
+      </script>
+    {% else %}
+      <div class="panel viewer">
+        <iframe title="{{ book.title }}"
+                src="{{ url_for('static', filename='pdfjs/web/viewer.html') }}?file={{ url_for('rulebook_file', code=book.code) | urlencode }}#page={{ pdf_page }}"></iframe>
+      </div>
+    {% endif %}
   </section>
 {% endblock %}
