@@ -4,9 +4,27 @@ Fleet management tool for the *Full Thrust* starship wargame (Ground Zero Games)
 build fleets to a points limit, track campaign damage, and print a fleet PDF for the table.
 Supports the FT2 and Fleet Book rulesets first; Cross Dimensions and Project Continuum later.
 
-**Status:** in development (app shell only; milestones are tracked as GitHub issues). See [docs/PLAN.md](docs/PLAN.md) for the full plan
-and [docs/mockups/](docs/mockups/) for the UI mockups. Licensed GPL-3.0; GZG content notice in
+![Full Thrust Fleet Manager](static/logo.jpg)
+
+**Status:** v0.1.0, the first release. Both rulesets, the ship catalog, the design workbench,
+fleets, campaign bookkeeping, the fleet PDF and the rulebook viewer are in. See
+[docs/PLAN.md](docs/PLAN.md) for the full plan. Licensed GPL-3.0; GZG content notice in
 [NOTICE.md](NOTICE.md).
+
+## What it does
+
+- **Design ships** to the Fleet Book or Full Thrust 2nd edition rules, with live MASS and NPV,
+  an arc picker and a rules check. Break the rules deliberately if you want to; the design is
+  then marked non-conforming.
+- **Build fleets** to a points limit, in squadrons, from your own designs or the 96 ship classes
+  of the books, with a tournament check that lists every violation.
+- **Track a campaign**: damage marked by clicking the ship diagram, crew factors, repairs and
+  replenishment, a fleet log.
+- **Print** a fleet pack or a two-fleet battle pack: roster, record sheets, orders chart,
+  ordnance tracker and a quick reference in the rulebooks' own wording.
+- **Read the rulebooks** in the app, with every page reference in the UI linking into them.
+
+Everything runs locally: no account, no server, plain JSON files you can back up and share.
 
 ## Running from source
 
