@@ -155,6 +155,63 @@ def badges(fleet: dict, designs: dict) -> dict[str, bool]:
     }
 
 
+# ---- Campaign maths (PLAN 11.1; the repair rules are FT p.35) ----------------------------------
+
+REPAIR_SYSTEMS_PER_WEEK = 3   # "you may roll for up to three systems on each ship ... per Turn"
+REPAIR_TARGET = 3             # "on a D6 roll of 3 or more the system ... is repaired"
+DRIVE_SUCCESSES = 2           # "Drive systems require TWO successful repair rolls if fully disabled"
+
+
+def hull_boxes(design: dict | None) -> int:
+    rs = RULESETS.get(design.get("ruleset")) if design else None
+    return sum(rs.damage_track(design)) if rs and design else 0
+
+
+def crew_factors_left(design: dict | None, damage: dict | None) -> tuple[int, int]:
+    """(crew factors left, total). A CF is lost when its marked box is crossed off (FB1 p.7)."""
+    rs = RULESETS.get(design.get("ruleset")) if design else None
+    if not rs or not design:
+        return 0, 0
+    positions = rs.cf_positions(design)
+    done = int((damage or {}).get("hull") or 0)
+    return sum(1 for position in positions if position > done), len(positions)
+
+
+def ship_is_crippled(design: dict | None, damage: dict | None) -> bool:
+    """Every hull box crossed off: the ship is a hulk for campaign purposes (FB1 p.4)."""
+    total = hull_boxes(design)
+    return bool(total) and int((damage or {}).get("hull") or 0) >= total
+
+
+def repairable_systems(design: dict | None, damage: dict | None) -> list[str]:
+    out = (damage or {}).get("systems_out") or []
+    known = {s["uid"] for s in (design or {}).get("systems", [])}
+    return [uid for uid in out if uid in known]
+
+
+def repair_plan(design: dict | None, damage: dict | None, hull_rolled: int,
+                system_uids: list[str], successes: dict[str, int]) -> dict:
+    """What a week at a repair facility does (FT p.35), given rolls the player made or typed.
+
+    hull_rolled: damage points repaired (1D6 at a base). system_uids: up to three systems the
+    player rolled for; successes maps a uid to how many successful rolls it got. A drive needs
+    two (`drive_hits` counts down by one per success)."""
+    hull_done = int((damage or {}).get("hull") or 0)
+    repaired_hull = max(0, min(hull_done, int(hull_rolled or 0)))
+    chosen = [uid for uid in system_uids[:REPAIR_SYSTEMS_PER_WEEK]
+              if uid in repairable_systems(design, damage)]
+    fixed = [uid for uid in chosen if int(successes.get(uid, 0)) >= 1]
+    drive_hits = int((damage or {}).get("drive_hits") or 0)
+    drive_success = int(successes.get("drive", 0))
+    drive_repaired = min(drive_hits, drive_success)
+    return {
+        "hull": repaired_hull,
+        "systems": fixed,
+        "drive_hits": drive_repaired,
+        "too_many": len(system_uids) > REPAIR_SYSTEMS_PER_WEEK,
+    }
+
+
 def ship_counts(fleet: dict) -> dict[str, int]:
     counts: dict[str, int] = {}
     for s in fleet.get("ships", []):

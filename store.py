@@ -741,6 +741,73 @@ def set_ship_loadout(fleet: dict, uid: str, loadout: dict | None) -> tuple[bool,
     return True, _("Loadout updated.")
 
 
+def set_ship_damage(fleet: dict, uid: str, *, hull: int | None = None, armour: int | None = None,
+                    drive_hits: int | None = None, systems_out: list[str] | None = None,
+                    fighters_lost: dict | None = None, salvos_spent: dict | None = None,
+                    one_shot_used: list[str] | None = None) -> tuple[bool, str]:
+    """Campaign damage (PLAN 9.5). Clamped to what the design actually has."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return False, _("Ship not found.")
+    design = get_design(ship["design_id"])
+    damage = ship["damage"]
+    if hull is not None:
+        damage["hull"] = max(0, min(int(hull), fleet_rules.hull_boxes(design) or int(hull)))
+    if armour is not None:
+        damage["armour"] = max(0, min(int(armour), (design or {}).get("armour", 0)))
+    if drive_hits is not None:
+        damage["drive_hits"] = max(0, min(2, int(drive_hits)))
+    if systems_out is not None:
+        known = {s["uid"] for s in (design or {}).get("systems", [])}
+        damage["systems_out"] = [u for u in systems_out if u in known]
+    if fighters_lost is not None:
+        damage["fighters_lost"] = {k: max(0, int(v)) for k, v in fighters_lost.items()}
+    if salvos_spent is not None:
+        damage["salvos_spent"] = {k: max(0, int(v)) for k, v in salvos_spent.items()}
+    if one_shot_used is not None:
+        damage["one_shot_used"] = list(one_shot_used)
+    return True, _("Damage recorded.")
+
+
+def toggle_system_out(fleet: dict, uid: str, system_uid: str) -> tuple[bool, str]:
+    """Clicking a system on the SSD knocks it out or brings it back."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return False, _("Ship not found.")
+    out = ship["damage"]["systems_out"]
+    if system_uid in out:
+        out.remove(system_uid)
+        return True, _("System restored.")
+    design = get_design(ship["design_id"])
+    if system_uid not in {s["uid"] for s in (design or {}).get("systems", [])}:
+        return False, _("System not found.")
+    out.append(system_uid)
+    return True, _("System knocked out.")
+
+
+def repair_ship(fleet: dict, uid: str, plan: dict) -> tuple[bool, str]:
+    """Apply a week of repairs computed by fleet_rules.repair_plan()."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return False, _("Ship not found.")
+    damage = ship["damage"]
+    damage["hull"] = max(0, damage["hull"] - int(plan.get("hull") or 0))
+    damage["drive_hits"] = max(0, damage["drive_hits"] - int(plan.get("drive_hits") or 0))
+    fixed = set(plan.get("systems") or [])
+    damage["systems_out"] = [u for u in damage["systems_out"] if u not in fixed]
+    return True, _("{hull} damage points and {n} systems repaired.",
+                   hull=int(plan.get("hull") or 0), n=len(fixed))
+
+
+def replenish_ship(fleet: dict, uid: str) -> tuple[bool, str]:
+    """A week at a base restocks fighters, salvos and one-shot systems in full (FT p.35)."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return False, _("Ship not found.")
+    ship["damage"].update(fighters_lost={}, salvos_spent={}, one_shot_used=[])
+    return True, _("Ship replenished.")
+
+
 def add_log_entry(fleet: dict, week: int, text: str) -> tuple[bool, str]:
     if not text.strip():
         return False, _("Enter a log entry.")

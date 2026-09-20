@@ -17,10 +17,10 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M9 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
+M1-M10 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
 catalog behind the NPV gate, the storage layer (library, fleets, import/export), the SSD layout
-engine, the Design tab workbench, the Fleet overview tab and the fleet PDF. Next is **M10**
-(campaign bookkeeping); the Campaign and Settings tabs are still placeholders.
+engine, the Design tab, the Fleet overview tab, the fleet PDF and campaign bookkeeping. Next is
+**M11** (rulebook viewer); the Settings tab is still a placeholder.
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -110,6 +110,21 @@ What exists:
   entries and the fleet's optional rules.
 - `tests/test_pdf_export.py` reads the generated pages back with pymupdf. Render pages to PNG
   for a visual check when the layout changes.
+
+## Campaign tab
+
+- `GET /campaign` (the current fleet), `POST /campaign/<id>/action`, `GET /dice/6`.
+- Campaign maths is pure and lives in `fleet_rules`: `hull_boxes`, `crew_factors_left`,
+  `ship_is_crippled`, `repairable_systems`, `repair_plan` (FT p.35: 1D6 hull a week at a base,
+  up to three systems on 3+, a disabled drive needs two successes). `store` applies it:
+  `set_ship_damage` (clamped to what the design has), `toggle_system_out`, `repair_ship`,
+  `replenish_ship` (fighters, salvos and one-shot systems in one week).
+- **Clicking the diagram**: every primitive carries a `ref` (`hull:7`, `armour:2`,
+  `system:s3`), `to_svg()` emits it as `data-ref`, and `static/campaign.js` posts the ref of the
+  shape that was clicked. Clicking the last marked box unmarks it. The fields under the diagram
+  do the same thing, so the tab works with scripting off; the dice buttons are optional too.
+- Hooks reserved for the later campaign module (PLAN 11.2) are in use but not repurposed:
+  `ship.location`, `log[].week`, statuses `docked` and `hulk`, `fleet.campaign_id` (unused).
 
 `pdf_export.py` (PLAN section 4) arrives with M9.
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import secrets
 import sys
 import threading
 import webbrowser
@@ -566,9 +567,109 @@ def print_pdf() -> Response:
                     headers={"Content-Disposition": f'inline; filename="{name}.pdf"'})
 
 
+# ---- Campaign tab (PLAN 9.5, 11.1) ---------------------------------------------------------------
+
+
 @app.route("/campaign")
 def campaign() -> str:
-    return render_template("campaign.html", active_tab="campaign")
+    fleet = current_fleet()
+    if not fleet:
+        return render_template("campaign.html", active_tab="campaign", selected=None)
+    designs = store.designs_for_fleet(fleet)
+    ships = []
+    for ship in fleet["ships"]:
+        design = designs.get(ship["design_id"])
+        left, total = fleet_rules.crew_factors_left(design, ship["damage"])
+        ships.append({
+            "ship": ship,
+            "design": design,
+            "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design, damage=ship["damage"])))
+            if design else Markup(""),
+            "hull_boxes": fleet_rules.hull_boxes(design),
+            "crew_factors": left,
+            "crew_factors_total": total,
+            "crippled": fleet_rules.ship_is_crippled(design, ship["damage"]),
+            "systems_out": fleet_rules.repairable_systems(design, ship["damage"]),
+        })
+    return render_template("campaign.html", active_tab="campaign", statuses=store.STATUSES,
+                           selected={"fleet": fleet, "ships": ships,
+                                     "ruleset": RULESETS.get(fleet["ruleset"])})
+
+
+@register_action("set_damage")
+def _set_damage(fleet: dict) -> tuple[bool, str]:
+    form = request.form
+    return store.set_ship_damage(
+        fleet, form.get("uid", ""),
+        hull=int(form.get("hull") or 0), armour=int(form.get("armour") or 0),
+        drive_hits=int(form.get("drive_hits") or 0),
+        systems_out=form.getlist("systems_out"),
+    )
+
+
+@register_action("click_ssd")
+def _click_ssd(fleet: dict) -> tuple[bool, str]:
+    """One click on the diagram: a hull box, an armour circle or a system (PLAN 9.5)."""
+    uid = request.form.get("uid", "")
+    kind, _sep, value = (request.form.get("ref") or "").partition(":")
+    if kind == "system":
+        return store.toggle_system_out(fleet, uid, value)
+    if kind in ("hull", "armour"):
+        # Clicking box N marks damage up to N; clicking the last marked box unmarks it.
+        ship = next((s for s in fleet["ships"] if s["uid"] == uid), None)
+        if not ship:
+            return False, _("Ship not found.")
+        number = int(value or 0)
+        current = ship["damage"][kind]
+        return store.set_ship_damage(fleet, uid, **{kind: number - 1 if current == number else number})
+    return False, _("Nothing to change there.")
+
+
+@register_action("repair")
+def _repair(fleet: dict) -> tuple[bool, str]:
+    form = request.form
+    ship = next((s for s in fleet["ships"] if s["uid"] == form.get("uid")), None)
+    if not ship:
+        return False, _("Ship not found.")
+    design = store.get_design(ship["design_id"])
+    chosen = form.getlist("repair_system")
+    successes = {uid: 1 for uid in form.getlist("repair_success")}
+    successes["drive"] = int(form.get("drive_successes") or 0)
+    plan = fleet_rules.repair_plan(design, ship["damage"], int(form.get("hull_repaired") or 0),
+                                   chosen, successes)
+    if plan["too_many"]:
+        return False, _("Only {n} systems may be repaired in a week.",
+                        n=fleet_rules.REPAIR_SYSTEMS_PER_WEEK)
+    return store.repair_ship(fleet, ship["uid"], plan)
+
+
+@register_action("replenish")
+def _replenish(fleet: dict) -> tuple[bool, str]:
+    return store.replenish_ship(fleet, request.form.get("uid", ""))
+
+
+@register_action("add_log")
+def _add_log(fleet: dict) -> tuple[bool, str]:
+    return store.add_log_entry(fleet, int(request.form.get("week") or 0),
+                               request.form.get("text", ""))
+
+
+@app.route("/campaign/<fleet_id>/action", methods=["POST"])
+def campaign_action(fleet_id: str) -> Response:
+    fleet = store.get_fleet(fleet_id)
+    if not fleet:
+        abort(404)
+    if dispatch_action(fleet):
+        store.save_fleet(fleet)
+    return redirect(url_for("campaign"))
+
+
+@app.route("/dice/<int:sides>")
+def dice(sides: int) -> Response:
+    """Optional dice for the repair panel; results can always be typed in instead (PLAN 9.5)."""
+    if sides not in (6,):
+        abort(404)
+    return Response(str(secrets.randbelow(sides) + 1), mimetype="text/plain")
 
 
 @app.route("/settings")
