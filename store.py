@@ -127,7 +127,13 @@ def _norm_loadout(v: object) -> dict | None:
         for m in v.get("magazines", [])
         if isinstance(m, dict) and isinstance(m.get("magazine"), str)
     ] if isinstance(v.get("magazines"), list) else []
-    return {"fighters": fighters, "magazines": magazines}
+    pulsers = [
+        {"pulser": x["pulser"], "mode": x["mode"][:1].upper()}
+        for x in v.get("pulsers", [])
+        if isinstance(x, dict) and isinstance(x.get("pulser"), str)
+        and isinstance(x.get("mode"), str) and x["mode"][:1].upper() in ("L", "M", "C")
+    ] if isinstance(v.get("pulsers"), list) else []
+    return {"fighters": fighters, "magazines": magazines, "pulsers": pulsers}
 
 
 def normalize_design(doc: object) -> dict | None:
@@ -165,11 +171,16 @@ def normalize_design(doc: object) -> dict | None:
         "tmf": _as_int(doc.get("tmf"), 10, 0, 10000),
         "hull_boxes": _as_int(doc.get("hull_boxes"), 0, 0, 10000),
         "armour": _as_int(doc.get("armour"), 0, 0, 10000),
+        # Phalon shells stack in layers whose cost depends on the layer (FB2 p.35); every other
+        # race leaves this empty and uses `armour` alone, which stays the total box count.
+        "armour_layers": [_as_int(n, 0, 0, 10000) for n in doc.get("armour_layers", [])[:8]]
+        if isinstance(doc.get("armour_layers"), list) else [],
         "thrust": _as_int(doc.get("thrust"), 0, 0, 20),
         "ftl": doc.get("ftl") is True,
         "streamlining": streamlining,
         "systems": systems,
-        "default_loadout": _norm_loadout(doc.get("default_loadout")) or {"fighters": [], "magazines": []},
+        "default_loadout": _norm_loadout(doc.get("default_loadout"))
+        or {"fighters": [], "magazines": [], "pulsers": []},
         "allow_rule_breaking": doc.get("allow_rule_breaking") is True,
         "layout_hints": doc.get("layout_hints") if isinstance(doc.get("layout_hints"), dict) else {},
         "source": clean_source,
