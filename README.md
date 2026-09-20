@@ -7,7 +7,7 @@ Continuum later.
 
 ![Full Thrust Fleet Manager](static/logo.jpg)
 
-**Status:** v0.1.0, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
+**Status:** v0.1.1, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
 [NOTICE.md](NOTICE.md), full build plan in [docs/PLAN.md](docs/PLAN.md).
 
 ## What it does
