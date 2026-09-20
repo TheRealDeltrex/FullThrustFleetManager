@@ -73,10 +73,10 @@ class FBRuleset:
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
         races = frozenset(races)
         always = {"turn_sequence", "arcs", "hull_track", "threshold"}
-        if races & {"human", "kravak"}:
+        if any(tech.module_for(race).CREWED for race in races):
             # A Sa'Vasku construct has no crew factors and no fire control (it has cortex
             # nodes), so FB1's entries for those belong on a sheet only when a crewed race is
-            # in the fleet.
+            # in the fleet. Each tech module says which it is.
             always |= {"crew", "fire_control"}
         wanted = set(systems_present)
         # FB2 restates movement, damage and the weapon summaries per race, so an alien sheet gets
@@ -85,6 +85,11 @@ class FBRuleset:
         if "kravak" in races:
             always |= {"kv_thrust", "kv_crew"}
             wanted |= {f"kv_{t}" for t in systems_present}
+        if "phalon" in races:
+            # The shell and the pulsers' double duty as point defence are the race's whole
+            # defensive economy, so they are on every Phalon sheet.
+            always |= {"ph_shell", "ph_pds"}
+            wanted |= {f"ph_{t}" for t in systems_present}
         if "savasku" in races:
             # Power allocation, biomass and repair are the race's whole economy, so they are on
             # every Sa'Vasku sheet whatever nodes the ship carries.

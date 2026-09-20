@@ -55,6 +55,7 @@ __all__ = [
 ]
 
 ICON_SET = "fb_phalon"
+CREWED = True  # crew factors and damage control parties
 
 # FB2 p.36: the Phalons use the standard fighter types and "the usual points costs".
 FIGHTER_POINTS = dict(data.FIGHTER_POINTS)

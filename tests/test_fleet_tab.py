@@ -251,3 +251,12 @@ def test_a_savasku_fleet_is_not_mixed_faction(client):
     assert fleet["race"] == "savasku"
     assert "SV" in {f["id"] for f in store.builtin_factions("fb")}
     assert not fleet_rules.badges(fleet, store.designs_for_fleet(fleet))["mixed_faction"]
+
+
+def test_a_phalon_fleet_is_not_mixed_faction(client):
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Grand Fleet", "race": "phalon",
+                                    "faction": "PH"}, follow_redirects=True)
+    fleet = next(f for f in store.list_fleets() if f["name"] == "Grand Fleet")
+    assert fleet["race"] == "phalon"
+    assert "PH" in {f["id"] for f in store.builtin_factions("fb")}
+    assert not fleet_rules.badges(fleet, store.designs_for_fleet(fleet))["mixed_faction"]

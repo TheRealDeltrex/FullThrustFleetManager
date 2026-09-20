@@ -76,6 +76,15 @@ ENTRIES = [
     ("fb", "sv_drone_womb", "Drone wombs", "FB2", "DRONE WOMBS"),
     ("fb", "sv_repair", "Sa'Vasku damage control", "FB2", "DAMAGE CONTROL"),
 
+    # Phalon (FB2 pp.35-36). The rules pages are single-column and read cleanly; p.45's summary
+    # panel is multi-column and runs its sections together, as the Sa'Vasku one does.
+    ("fb", "ph_shell", "Hull integrity and shell armour", "FB2", 'HULL INTEGRITY AND "SHELL" ARMOUR'),
+    ("fb", "ph_pulser", "Pulser batteries", "FB2", "PULSER BATTERIES"),
+    ("fb", "ph_pds", "Phalon point and area defence", "FB2", "POINT-DEFENCE AND AREA-DEFENCE"),
+    ("fb", "ph_plasma_bolt_launcher", "Plasma bolt launchers", "FB2", "PLASMA BOLT LAUNCHERS"),
+    ("fb", "ph_vapour_shroud", "Vapour shrouds", "FB2", "VAPOUR SHROUDS"),
+    ("fb", "ph_hangar", "Phalon fighters", "FB2", "FIGHTERS"),
+
     ("ft2", "turn_sequence", "Sequence of play", "FT", "SEQUENCE OF PLAY:"),
     ("ft2", "beam", "Beam weapon batteries", "FT", "BEAM WEAPON BATTERIES:"),
     ("ft2", "arcs", "Fire arcs", "FT", "FIRE ARCS:"),
@@ -215,6 +224,12 @@ PAGES = {
     ("fb", "sv_cortex"): (24, 24),
     ("fb", "sv_drone_womb"): (23, 23),
     ("fb", "sv_repair"): (24, 24),
+    ("fb", "ph_shell"): (35, 35),
+    ("fb", "ph_pulser"): (35, 35),
+    ("fb", "ph_pds"): (35, 35),
+    ("fb", "ph_plasma_bolt_launcher"): (36, 36),
+    ("fb", "ph_vapour_shroud"): (36, 36),
+    ("fb", "ph_hangar"): (36, 36),
 }
 
 LIMIT = 700  # trimmed where needlessly wordy (PLAN 2.5)

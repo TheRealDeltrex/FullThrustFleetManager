@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import secrets
 import sys
 import threading
@@ -466,6 +467,12 @@ def _apply_form(design: dict) -> dict:
     for field in ("tmf", "hull_boxes", "armour", "thrust"):
         if form.get(field) is not None:
             design[field] = max(0, int(form.get(field) or 0))
+    if form.get("armour_layers") is not None:
+        # The Phalon shell, inner layer first, as "8, 4, 4" (FB2 p.35). Blank means one layer.
+        design["armour_layers"] = [
+            max(0, int(part)) for part in re.split(r"[,\s]+", form["armour_layers"].strip())
+            if part.isdigit()
+        ]
     design["ftl"] = form.get("ftl") == "on"
     design["streamlining"] = form.get("streamlining", "none")
     design["allow_rule_breaking"] = form.get("allow_rule_breaking") == "on"
@@ -496,7 +503,17 @@ def _read_loadout(design: dict) -> dict:
          "salvos": request.form.getlist(f"salvos-{system['uid']}")}
         for system in design["systems"] if system["type"] == "sm_magazine"
     ]
-    return {"fighters": [f for f in fighters if f["type"]], "magazines": magazines}
+    # FB2 p.35: a Phalon pulser is configured L, M or C before a battle. "" leaves it blank,
+    # which is what the book's own sheets print.
+    pulsers = [
+        {"pulser": system["uid"], "mode": request.form.get(f"pulser-{system['uid']}", "")}
+        for system in design["systems"] if system["type"] == "pulser"
+    ]
+    return {
+        "fighters": [f for f in fighters if f["type"]],
+        "magazines": magazines,
+        "pulsers": [x for x in pulsers if x["mode"] in ("L", "M", "C")],
+    }
 
 
 @app.route("/design/<design_id>", methods=["POST"])
@@ -592,6 +609,7 @@ def print_pdf() -> Response:
         damage=form.get("damage") == "on",
         include_docked=form.get("include_docked") == "on",
         blank=form.get("blank") == "on",
+        blank_pulsers=form.get("blank_pulsers") == "on",
     )
     data = pdf_export.fleet_pdf(fleets, [store.designs_for_fleet(f) for f in fleets], options)
     name = "_".join(f["name"].replace(" ", "_") for f in fleets)[:60] or "fleet"

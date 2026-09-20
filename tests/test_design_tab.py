@@ -268,3 +268,37 @@ def test_a_savasku_design_shows_power_instead_of_a_thrust_field(client):
 def test_other_races_keep_the_thrust_field(client):
     body = client.get("/design/fb:fb2:kv-lo-vok").get_data(as_text=True)
     assert 'type="number" min="0" name="thrust"' in body
+
+
+def test_the_picker_offers_phalon_systems_for_a_phalon_design(client):
+    created, _msg = store.new_design("fb", "phalon", "PH", "Warrior")
+    body = client.get(f"/design/{created['id']}").get_data(as_text=True)
+    assert "Pulser battery" in body and "Plasma bolt launcher" in body
+    assert "K-gun" not in body and "Stinger node" not in body
+
+
+def test_a_pulser_can_be_configured_in_the_loadout(client):
+    """FB2 p.35: L, M or C, chosen before a battle; the design holds the default."""
+    created, _msg = store.new_design("fb", "phalon", "PH", "Warrior")
+    client.post(f"/design/{created['id']}", data={"action": "add_system", "system_type": "pulser"},
+                follow_redirects=True)
+    draft, _dirty = store.working_design(created["id"])
+    uid = next(s["uid"] for s in draft["systems"] if s["type"] == "pulser")
+
+    client.post(f"/design/{created['id']}", data={
+        "action": "apply", "name": "Warrior", "tmf": "100", "hull_boxes": "20", "armour": "12",
+        "armour_layers": "8, 4", "thrust": "4", "ftl": "on", "streamlining": "none",
+        "hull_kind": "warship", "type_label": "", "type_code": "", "notes": "",
+        f"pulser-{uid}": "C", f"sys-{uid}-arcs-present": "1", f"sys-{uid}-arcs": "F",
+    }, follow_redirects=True)
+
+    draft, _dirty = store.working_design(created["id"])
+    assert draft["default_loadout"]["pulsers"] == [{"pulser": uid, "mode": "C"}]
+    assert draft["armour_layers"] == [8, 4]
+
+
+def test_the_shell_layer_field_is_only_shown_to_races_that_stack_armour(client):
+    phalon = client.get("/design/fb:fb2:ph-voth").get_data(as_text=True)
+    human = client.get("/design/fb:fb1:nac-furious").get_data(as_text=True)
+    assert 'name="armour_layers"' in phalon and "16, 10, 8, 6" in phalon
+    assert 'name="armour_layers"' not in human

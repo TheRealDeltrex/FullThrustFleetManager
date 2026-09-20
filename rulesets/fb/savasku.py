@@ -49,6 +49,8 @@ __all__ = [
 ]
 
 ICON_SET = "fb_savasku"
+# A construct is a single bioconstruct with no crew (FB2 p.21); repairs come out of the R pool.
+CREWED = False
 
 # Drones are grown from biomass in play, never bought, so a drone group adds nothing to the NPV
 # ("not including the necessary biomass to convert into drones", FB2 p.23).

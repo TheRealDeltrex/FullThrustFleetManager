@@ -273,6 +273,48 @@
    "text": "Ship systems lost at threshold checks may have repairs to them attempted by expending power points from the Repair (R) pool equal to the MASS of the system being repaired, AND making a die roll for success; 4+ on a D6 is required to successfully repair the system. If the roll succeeds, then 1 biomass is consumed to fabricate the components for the repair. If the roll fails, then the biomass is not consumed but the power used IS wasted. Only one roll is permitted per damaged system each turn. Lost Power Generator systems MAY be replaced in this manner, but only if enough power points are available from the surviving PGs for the task.",
    "book": "FB2",
    "page": 24
+  },
+  {
+   "key": "ph_shell",
+   "title": "Hull integrity and shell armour",
+   "text": "Phalon hull integrity (the inner structure of the ship) takes 1 MASS per hull box, and costs 2 points per MASS. The hull boxes are arranged in four rows using the standard rules, with the upper rows being the longer ones if the hull integrity does not divide exactly by four. One hull box is lost to each point of damage that penetrates the shell and other defences. Typically, the hull integrity of a Phalon ship is quite low - around 20% of the ship mass - but it is protected by the shell armour.",
+   "book": "FB2",
+   "page": 35
+  },
+  {
+   "key": "ph_pulser",
+   "title": "Pulser batteries",
+   "text": "The Phalons' primary anti-ship weapon is the Pulser, which is an energy weapon very like the standard human beam systems. There is only one \"class\" of pulser, and it may have one, three or six arcs of fire - the MASS requirement is 2, 3 or 4 MASS respectively according to the number of fire arcs chosen, and the cost is 5 points per MASS used.",
+   "book": "FB2",
+   "page": 35
+  },
+  {
+   "key": "ph_pds",
+   "title": "Phalon point and area defence",
+   "text": "Phalon ships do not have separate point-defence system (PDS); instead, they may elect to use any of their pulser batteries as PDS during the point-defence phase, firing at any one fighter group, missile salvo or plasma bolt that is attacking the firing ship. A pulser used in this mode fires exactly as for a standard PDS shot, with the same die rolls and effects. Any pulser used in the PDS mode rolls only ONE die, regardless of how the pulser is currently configured.",
+   "book": "FB2",
+   "page": 35
+  },
+  {
+   "key": "ph_plasma_bolt_launcher",
+   "title": "Plasma bolt launchers",
+   "text": "The Phalon Plasma Bolt Launchers (PBLs) are available in sizes from class-1 upwards, with class-6 being the largest commonly seen (though larger ones are possible). The launcher is a 3-arc (180 degree) system, and is normally (but not always) mounted to fire through the forward arcs of the ship (FP/F/FS). A plasma bolt launcher of any size must spend 1 turn recharging between shots, so can only fire every OTHER game turn - whenever a ship fires a PBL, a note or mark should be made in the order-writing box for the next turn to indicate that the launcher is recharging and cannot be fired.",
+   "book": "FB2",
+   "page": 36
+  },
+  {
+   "key": "ph_vapour_shroud",
+   "title": "Vapour shrouds",
+   "text": "The Phalons have the ability to puff out a shroud of vapour droplets and ice crystals around their ships, which shields them from incoming fire but also blocks outgoing fire as well. Deploying the shroud must be noted in movement orders, and affects the ship for the entire turn. A shrouded ship may move as normal, but may not fire any weapons at all, including point-defence fire. A deployed shroud acts like a level-2 screen against all energy weapon attacks, including Phalon pulsers and plasma bolt damage, human beams etc. Weapons normally unaffected by screens (K-guns, Pulse Torps, SMs etc) are unaffected by vapour shrouds.",
+   "book": "FB2",
+   "page": 36
+  },
+  {
+   "key": "ph_hangar",
+   "title": "Phalon fighters",
+   "text": "The Phalons use fighters in much the same way as human fleets, with each fighter being piloted by one to three Phalon crew. Several different types of Phalon fighters have been observed, the most common being the Nith class multirole (UN codename PEG), the Tuus class heavy fighter (UN codename PUD) and the Vaan class interceptor (UN codename PAM). Phalon fighter groups follow all the normal fighter rules, and have the usual points costs for their specialised types; the basic multirole type has a movement allowance of 24mu (plus 12mu secondary move) and a standard 1-die attack, and Heavy and Interceptor specialised variants all follow the relevant rules.",
+   "book": "FB2",
+   "page": 36
   }
  ]
 }

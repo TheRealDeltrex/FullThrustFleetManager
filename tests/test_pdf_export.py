@@ -201,3 +201,39 @@ def test_a_battle_pack_of_two_rulesets_is_refused_in_the_dialog(client):
     page = client.post("/print", data={"second_fleet": "nope"},
                        follow_redirects=True).get_data(as_text=True)
     assert "second fleet was not found" in page
+
+
+# ---- Phalon pulser configuration on paper (FB2 p.35) ---------------------------------------------
+
+
+def a_phalon_fleet() -> tuple[dict, str]:
+    """A one-ship Phalon fleet whose pulsers are all configured to close range."""
+    fleet, _msg = store.create_fleet("fb", "Grand Fleet", race="phalon", faction="PH")
+    store.add_ship(fleet, "fb:fb2:ph-voth")
+    design = store.get_design("fb:fb2:ph-voth")
+    uid = next(s["uid"] for s in design["systems"] if s["type"] == "pulser")
+    fleet["ships"][0]["loadout"] = {"fighters": [], "magazines": [],
+                                    "pulsers": [{"pulser": uid, "mode": "C"}]}
+    store.save_fleet(fleet)
+    return fleet, uid
+
+
+def test_a_configured_pulser_prints_its_letter():
+    fleet, _uid = a_phalon_fleet()
+    _data, pages = render([fleet], pdf_export.PrintOptions(quickref=False, roster=False))
+    assert "C" in chr(10).join(pages)
+
+
+def test_blank_pulsers_prints_the_icons_empty():
+    """The print dialog's toggle drops the configuration so the player writes it on the sheet,
+    which is how FB2 prints Phalon SSDs."""
+    fleet, _uid = a_phalon_fleet()
+    options = pdf_export.PrintOptions(quickref=False, blank_pulsers=True)
+    design = store.get_design("fb:fb2:ph-voth")
+    assert pdf_export._sheet_loadout(fleet["ships"][0], design, options)["pulsers"] == []
+    # Without the toggle the sheet keeps what the ship recorded.
+    kept = pdf_export._sheet_loadout(fleet["ships"][0], design, pdf_export.PrintOptions())
+    assert len(kept["pulsers"]) == 1
+    # A race with no pulsers is untouched either way.
+    plain = {"uid": "x", "loadout": {"fighters": [], "magazines": [], "pulsers": []}}
+    assert pdf_export._sheet_loadout(plain, {}, options) == plain["loadout"]

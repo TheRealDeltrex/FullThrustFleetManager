@@ -115,7 +115,8 @@ def quickref_entries():
         for race in {r.id for r in ruleset.races()} - {"human"}:
             for entry in ruleset.quickref({"kgun", "mkp", "scattergun", "fire_control", "hangar",
                                            "stinger", "pod_launcher", "spicule", "cortex",
-                                           "screen_node", "drone_womb", "power_generator"},
+                                           "screen_node", "drone_womb", "power_generator",
+                                           "pulser", "plasma_bolt_launcher", "vapour_shroud"},
                                           {}, frozenset({race})):
                 yield ruleset.id, entry
 
