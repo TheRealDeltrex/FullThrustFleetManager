@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+
+import paths
 from i18n import _
 from rulesets import QuickRefEntry, Race, SystemDef, common
 from rulesets.fb import data, rules
@@ -44,7 +47,34 @@ class FBRuleset:
         return set()
 
     def quickref(self, systems_present: set[str], options: dict) -> list[QuickRefEntry]:
-        return []  # M9: original rulebook wording per system
+        always = ("turn_sequence", "arcs", "hull_track", "threshold", "crew", "fire_control")
+        return _quickref("fb", systems_present, always, options)
+
+
+def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:
+    """Entries from data/quickref/<id>.json, built by tools/extract_quickref.py from the books
+    (PLAN 2.5: original wording, never a paraphrase, so this text is data, not source)."""
+    path = paths.bundle_dir() / "data" / "quickref" / f"{ruleset_id}.json"
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [
+        QuickRefEntry(key=e["key"], title=e["title"], text=e["text"], book=e["book"], page=e["page"])
+        for e in doc.get("entries", []) if isinstance(e, dict)
+    ]
+
+
+def _quickref(ruleset_id: str, systems_present: set[str], keys_always: tuple[str, ...],
+              options: dict) -> list[QuickRefEntry]:
+    wanted = set(systems_present) | set(keys_always)
+    if options.get("core_systems"):
+        wanted.add("core_systems")
+    if options.get("rerolls"):
+        wanted.add("rerolls")
+    if options.get("vector_movement"):
+        wanted.add("vector_movement")
+    return [e for e in _load_quickref(ruleset_id) if e.key in wanted]
 
 
 RULESET = FBRuleset()
