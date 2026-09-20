@@ -216,3 +216,35 @@ def test_the_ruleset_badge_is_on_the_design_header(client):
     assert 'badge rs-fb' in client.get(f"/design/{CATALOG}").get_data(as_text=True)
     ft2 = client.get("/design/ft2:ft:courier").get_data(as_text=True)
     assert 'badge rs-ft2' in ft2
+
+
+# ---- Races (FB2 alien tech modules) ------------------------------------------------------------
+
+
+def test_new_design_form_offers_every_race_grouped_by_ruleset(client):
+    body = client.get("/design").get_data(as_text=True)
+    assert 'name="race"' in body
+    assert "Kra&#39;Vak" in body or "Kra'Vak" in body
+
+
+def test_a_new_design_inherits_the_current_fleets_race(client):
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Clan raid", "race": "kravak"},
+                follow_redirects=True)
+    resp = client.post("/design/new", data={"ruleset": "fb", "name": "Test hull"},
+                       follow_redirects=True)
+    assert resp.status_code == 200
+    design = next(d for d in store.list_designs() if d["name"] == "Test hull")
+    assert design["race"] == "kravak"
+
+
+def test_the_add_system_picker_follows_the_designs_race(client):
+    created, _msg = store.new_design("fb", "kravak", "KV", "Hunter")
+    body = client.get(f"/design/{created['id']}").get_data(as_text=True)
+    assert "K-gun" in body and "Scattergun" in body
+    assert "Salvo missile launcher" not in body  # human tech, not offered here
+
+
+def test_a_kravak_catalog_design_is_listed_under_its_race(client):
+    body = client.get("/design").get_data(as_text=True)
+    assert "Lo&#39;Vok" in body or "Lo'Vok" in body
+    assert "FB2" in body

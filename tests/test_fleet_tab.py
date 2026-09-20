@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+import fleet_rules
 import store
 
 FURIOUS = "fb:fb1:nac-furious"
@@ -219,3 +220,25 @@ def test_the_check_of_an_empty_fleet_says_so(client):
     fleet_id = make_fleet(client)
     page = text(client.get(f"/fleet/{fleet_id}/check"))
     assert "no ships yet" in page and "Nothing to report at fleet level." in page
+
+
+def test_new_fleet_form_offers_the_races_of_each_ruleset(client):
+    body = client.get("/fleet").get_data(as_text=True)
+    assert 'name="race"' in body and ("Kra'Vak" in body or "Kra&#39;Vak" in body)
+
+
+def test_a_kravak_fleet_can_be_created_and_is_not_mixed_faction(client):
+    """FB2's races have no factions of their own, so each gets the one its ship pages are
+    headed with; without it every alien fleet would wear the mixed-faction badge."""
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Spear Host", "race": "kravak",
+                                    "faction": "KV"}, follow_redirects=True)
+    fleet = next(f for f in store.list_fleets() if f["name"] == "Spear Host")
+    assert fleet["race"] == "kravak" and fleet["faction"] == "KV"
+    assert "KV" in {f["id"] for f in store.builtin_factions("fb")}
+    designs = store.designs_for_fleet(fleet)
+    assert not fleet_rules.badges(fleet, designs)["mixed_faction"]
+
+
+def test_a_race_a_ruleset_does_not_have_is_refused(client):
+    created, _msg = store.create_fleet("ft2", "Wrong race", "kravak")
+    assert created is None

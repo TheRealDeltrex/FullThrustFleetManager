@@ -52,6 +52,15 @@
         <select class="input" name="ruleset" aria-label="{{ _('Ruleset') }}">
           {% for rs in rulesets %}<option value="{{ rs.id }}">{{ rs.name }}</option>{% endfor %}
         </select>
+        <select class="input" name="race" aria-label="{{ _('Race') }}">
+          {% for rs, races in races_by_ruleset %}
+            <optgroup label="{{ rs.name }}">
+              {% for race in races %}
+                <option value="{{ race.id }}"{% if race.id == 'human' %} selected{% endif %}>{{ race.name }}</option>
+              {% endfor %}
+            </optgroup>
+          {% endfor %}
+        </select>
         <input class="input" type="number" min="0" name="points_limit" placeholder="{{ _('Points limit') }}"
                aria-label="{{ _('Points limit') }}" />
         <label class="check"><input type="checkbox" name="allow_race_mixing" /> {{ _("Allow race mixing") }}</label>
