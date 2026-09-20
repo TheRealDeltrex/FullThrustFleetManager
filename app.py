@@ -203,14 +203,19 @@ def current_fleet() -> dict | None:
 def _inject_current_fleet() -> dict:
     """The top bar carries the fleet selector, the points meter and the ruleset strip."""
     fleet = current_fleet()
+    # The race pickers on both creation forms list every ruleset's races; which races exist is
+    # the ruleset's to say (PLAN 6.1), so the template never hard-codes one.
+    races = [(rs, rs.races()) for rs in RULESETS.values()]
     if not fleet:
-        return {"current_fleet": None, "all_fleets": store.list_fleets(), "fleet_points": 0}
+        return {"current_fleet": None, "all_fleets": store.list_fleets(), "fleet_points": 0,
+                "races_by_ruleset": races}
     designs = store.designs_for_fleet(fleet)
     return {
         "current_fleet": fleet,
         "all_fleets": store.list_fleets(),
         "fleet_points": fleet_rules.fleet_points(fleet, designs),
         "fleet_badges": fleet_rules.badges(fleet, designs),
+        "races_by_ruleset": races,
     }
 
 
@@ -359,6 +364,16 @@ def fleet_check(fleet_id: str) -> str:
 # ---- Design tab (PLAN 9.4) --------------------------------------------------------------------
 
 
+def _catalog_group(design: dict) -> str:
+    book = design["source"].get("book") or design["ruleset"]
+    race = design.get("race") or "human"
+    if race == "human":
+        return book
+    rs = RULESETS.get(design["ruleset"])
+    name = next((r.name for r in rs.races() if r.id == race), race) if rs else race
+    return f"{book} · {name}"
+
+
 def _library(query: str = "") -> dict:
     """The left pane: my designs by ruleset, the catalog by book, both filtered by `query`."""
     def matches(d: dict) -> bool:
@@ -372,9 +387,12 @@ def _library(query: str = "") -> dict:
         if matches(d):
             mine.setdefault(d["ruleset"], []).append(d)
     catalog: dict[str, list[dict]] = {}
-    for d in sorted(store.catalog_designs(), key=lambda d: (d["ruleset"], d["name"].lower())):
+    for d in sorted(store.catalog_designs(),
+                    key=lambda d: (d["ruleset"], d.get("race") or "human", d["name"].lower())):
         if matches(d):
-            catalog.setdefault(d["source"].get("book") or d["ruleset"], []).append(d)
+            # One book may hold several races (FB2 is a book of alien fleets), so the group is
+            # book plus race; human designs keep the plain book heading.
+            catalog.setdefault(_catalog_group(d), []).append(d)
     return {"mine": mine, "catalog": catalog, "query": query}
 
 
@@ -425,8 +443,10 @@ def design_detail(design_id: str) -> str:
 
 @app.route("/design/new", methods=["POST"])
 def design_new() -> Response:
+    fleet = current_fleet()
     created, msg = store.new_design(
-        request.form.get("ruleset", ""), request.form.get("race", "human"),
+        request.form.get("ruleset", ""),
+        request.form.get("race") or (fleet or {}).get("race") or "human",
         request.form.get("faction") or None, request.form.get("name", ""),
     )
     flash(msg, "success" if created else "error")
