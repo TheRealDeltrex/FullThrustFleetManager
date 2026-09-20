@@ -19,6 +19,8 @@ System notation, space separated, `*n` repeats a token:
   PG:<n>            Sa'Vasku power generators (n power points)   ST:arcs  stinger node
   PL:arc            pod launcher node      SP  spicule    CX  cortex node
   SN                screen node            DW  drone womb (one drone group by default)
+  PU:arcs           Phalon pulser battery (1, 3 or 6 arcs)       VS  vapour shroud gland
+  PBL<class>[:arcs] plasma bolt launcher (3 arcs, defaults to FP,F,FS)
 Arcs are comma separated ("F,FS,FP") or "all".
 """
 
@@ -87,6 +89,15 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
             add({"type": "pod_launcher", "arcs": _arcs(rest, ruleset)})
         elif head in ("SP", "CX", "SN"):
             add({"type": {"SP": "spicule", "CX": "cortex", "SN": "screen_node"}[head]})
+        elif head == "PU":
+            add({"type": "pulser", "arcs": _arcs(rest, ruleset)})
+        elif re.fullmatch(r"PBL([1-9])", head):
+            # FB2 p.36: "normally (but not always) mounted to fire through the forward arcs";
+            # the icon carries no arc marks, so the book's norm is the default.
+            add({"type": "plasma_bolt_launcher", "class": int(head[3:]),
+                 "arcs": _arcs(rest, ruleset) if rest else ["FP", "F", "FS"]})
+        elif head == "VS":
+            add({"type": "vapour_shroud"})
         elif head == "DW":
             fighters.append({"hangar": add({"type": "drone_womb"})["uid"], "type": "drone"})
         elif head == "PT":
@@ -161,6 +172,7 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
     for mag in magazines:
         mag["feeds"] = list(launchers)
     loadout = {
+        "pulsers": [],  # FB2 prints blank pulser icons; the player configures them per battle
         "fighters": fighters,
         "magazines": [{"magazine": m["uid"], "salvos": ["std"] * (m["capacity"] // 2)} for m in magazines],
     }
@@ -181,6 +193,7 @@ def design(
     *,
     hull: int = 0,
     armour: int = 0,
+    armour_layers: tuple[int, ...] = (),
     thrust: int = 0,
     ftl: bool = True,
     kind: str = "warship",
@@ -190,7 +203,7 @@ def design(
     ident = f"{ruleset}:{slug(book)}:{slug((faction or '') + ' ' + name)}"
     parsed, loadout = parse_systems(systems, ruleset)
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "id": ident,
         "ruleset": ruleset,
         "race": race,
@@ -201,7 +214,8 @@ def design(
         "hull_kind": kind,
         "tmf": tmf,
         "hull_boxes": hull,
-        "armour": armour,
+        "armour": armour or sum(armour_layers),
+        "armour_layers": list(armour_layers),
         "thrust": thrust,
         "ftl": ftl,
         "streamlining": "none",

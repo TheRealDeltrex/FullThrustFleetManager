@@ -2,7 +2,7 @@
  "schema_version": 1,
  "designs": [
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:courier",
    "ruleset": "ft2",
    "race": "human",
@@ -14,6 +14,7 @@
    "tmf": 2,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -34,6 +35,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -48,7 +50,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:scout-ship",
    "ruleset": "ft2",
    "race": "human",
@@ -60,6 +62,7 @@
    "tmf": 4,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -84,6 +87,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -98,7 +102,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:corvette",
    "ruleset": "ft2",
    "race": "human",
@@ -110,6 +114,7 @@
    "tmf": 6,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -144,6 +149,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -158,7 +164,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:frigate",
    "ruleset": "ft2",
    "race": "human",
@@ -170,6 +176,7 @@
    "tmf": 10,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -208,6 +215,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -222,7 +230,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:destroyer",
    "ruleset": "ft2",
    "race": "human",
@@ -234,6 +242,7 @@
    "tmf": 14,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -282,6 +291,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -296,7 +306,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:light-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -308,6 +318,7 @@
    "tmf": 22,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -365,6 +376,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -379,7 +391,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:escort-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -391,6 +403,7 @@
    "tmf": 26,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -448,6 +461,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -462,7 +476,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:heavy-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -474,6 +488,7 @@
    "tmf": 32,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -541,6 +556,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -555,7 +571,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:battlecruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -567,6 +583,7 @@
    "tmf": 40,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -640,6 +657,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -654,7 +672,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:battleship",
    "ruleset": "ft2",
    "race": "human",
@@ -666,6 +684,7 @@
    "tmf": 48,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -751,6 +770,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -765,7 +785,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:battledreadnought",
    "ruleset": "ft2",
    "race": "human",
@@ -777,6 +797,7 @@
    "tmf": 60,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -866,6 +887,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s11",
@@ -885,7 +907,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:superdreadnought",
    "ruleset": "ft2",
    "race": "human",
@@ -897,6 +919,7 @@
    "tmf": 80,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -990,6 +1013,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s11",
@@ -1013,7 +1037,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:light-carrier",
    "ruleset": "ft2",
    "race": "human",
@@ -1025,6 +1049,7 @@
    "tmf": 70,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -1096,6 +1121,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s7",
@@ -1127,7 +1153,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:fleet-carrier",
    "ruleset": "ft2",
    "race": "human",
@@ -1139,6 +1165,7 @@
    "tmf": 98,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -1218,6 +1245,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s7",
@@ -1257,7 +1285,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:bulk-tanker",
    "ruleset": "ft2",
    "race": "human",
@@ -1269,6 +1297,7 @@
    "tmf": 100,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -1330,6 +1359,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1344,7 +1374,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:heavy-freighter",
    "ruleset": "ft2",
    "race": "human",
@@ -1356,6 +1386,7 @@
    "tmf": 60,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -1389,6 +1420,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -1403,7 +1435,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:ft:survey-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -1415,6 +1447,7 @@
    "tmf": 48,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -1463,6 +1496,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },

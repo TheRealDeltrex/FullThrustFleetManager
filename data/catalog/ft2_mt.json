@@ -2,7 +2,7 @@
  "schema_version": 1,
  "designs": [
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:strikeboat",
    "ruleset": "ft2",
    "race": "human",
@@ -14,6 +14,7 @@
    "tmf": 4,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -35,6 +36,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -49,7 +51,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:lancer",
    "ruleset": "ft2",
    "race": "human",
@@ -61,6 +63,7 @@
    "tmf": 6,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -89,6 +92,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -103,7 +107,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:torpedo-destroyer",
    "ruleset": "ft2",
    "race": "human",
@@ -115,6 +119,7 @@
    "tmf": 14,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -146,6 +151,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -160,7 +166,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:super-destroyer",
    "ruleset": "ft2",
    "race": "human",
@@ -172,6 +178,7 @@
    "tmf": 16,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -220,6 +227,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -234,7 +242,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:privateer",
    "ruleset": "ft2",
    "race": "human",
@@ -246,6 +254,7 @@
    "tmf": 18,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 8,
    "ftl": true,
    "streamlining": "none",
@@ -282,6 +291,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -296,7 +306,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:needle-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -308,6 +318,7 @@
    "tmf": 22,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 6,
    "ftl": true,
    "streamlining": "none",
@@ -362,6 +373,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -376,7 +388,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:strike-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -388,6 +400,7 @@
    "tmf": 28,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -425,6 +438,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -439,7 +453,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:missile-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -451,6 +465,7 @@
    "tmf": 26,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": true,
    "streamlining": "none",
@@ -500,6 +515,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -514,7 +530,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:planetary-bombardment-monitor",
    "ruleset": "ft2",
    "race": "human",
@@ -526,6 +542,7 @@
    "tmf": 32,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -575,6 +592,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -589,7 +607,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:system-defence-cruiser",
    "ruleset": "ft2",
    "race": "human",
@@ -601,6 +619,7 @@
    "tmf": 32,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 4,
    "ftl": false,
    "streamlining": "none",
@@ -682,6 +701,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -696,7 +716,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:escort-patrol-carrier",
    "ruleset": "ft2",
    "race": "human",
@@ -708,6 +728,7 @@
    "tmf": 40,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -777,6 +798,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [
      {
       "hangar": "s4",
@@ -800,7 +822,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:free-trader",
    "ruleset": "ft2",
    "race": "human",
@@ -812,6 +834,7 @@
    "tmf": 10,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -832,6 +855,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -846,7 +870,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:medium-tug",
    "ruleset": "ft2",
    "race": "human",
@@ -858,6 +882,7 @@
    "tmf": 32,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -900,6 +925,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },
@@ -914,7 +940,7 @@
    "notes": ""
   },
   {
-   "schema_version": 1,
+   "schema_version": 2,
    "id": "ft2:mt:armed-merchantman",
    "ruleset": "ft2",
    "race": "human",
@@ -926,6 +952,7 @@
    "tmf": 36,
    "hull_boxes": 0,
    "armour": 0,
+   "armour_layers": [],
    "thrust": 2,
    "ftl": true,
    "streamlining": "none",
@@ -964,6 +991,7 @@
     }
    ],
    "default_loadout": {
+    "pulsers": [],
     "fighters": [],
     "magazines": []
    },

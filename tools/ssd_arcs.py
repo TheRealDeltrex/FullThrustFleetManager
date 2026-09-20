@@ -200,6 +200,46 @@ def arrows(page: pymupdf.Page) -> list[dict]:
     return sorted(found, key=lambda f: (round(f["y"] / 6), f["x"]))
 
 
+def stars(page: pymupdf.Page) -> list[dict]:
+    """[{x, y, arcs}] for every Phalon Pulser Battery (FB2 pp.38-45).
+
+    A pulser is drawn as a small hexagon (the blank the player writes L, M or C into) ringed by
+    six triangles, one per arc: a white triangle is an arc the battery covers, a black one an arc
+    it does not. So a one-arc pulser shows one white point and five black, and an all-arc battery
+    six white ones.
+    """
+    drawings = page.get_drawings()
+    bodies = [
+        d for d in drawings
+        if _is_white(d.get("fill")) and len(d["items"]) == 6
+        and all(it[0] == "l" for it in d["items"]) and 8 < d["rect"].width < 14
+    ]
+    points = [
+        d for d in drawings
+        if d.get("fill") is not None and len(d["items"]) == 3
+        and all(it[0] == "l" for it in d["items"]) and 3 < d["rect"].width < 8
+    ]
+    found = []
+    for body in bodies:
+        r = body["rect"]
+        cx, cy = (r.x0 + r.x1) / 2, (r.y0 + r.y1) / 2
+        arcs = []
+        for arc, degrees in ARC_ANGLES.items():
+            want = (cx + 6.9 * math.cos(math.radians(degrees)),
+                    cy + 6.9 * math.sin(math.radians(degrees)))
+            near = [
+                d for d in points
+                if math.hypot((d["rect"].x0 + d["rect"].x1) / 2 - want[0],
+                              (d["rect"].y0 + d["rect"].y1) / 2 - want[1]) < 3.0
+            ]
+            if near and _is_white(near[0]["fill"]):
+                arcs.append(arc)
+        if arcs:
+            found.append({"x": round(cx, 1), "y": round(cy, 1),
+                          "arcs": [a for a in ARC_ANGLES if a in arcs]})
+    return sorted(found, key=lambda f: (round(f["y"] / 6), f["x"]))
+
+
 def main() -> None:
     doc = pymupdf.open(ROOT / "rulebooks" / sys.argv[1])
     for p in map(int, sys.argv[2:]):
@@ -210,6 +250,9 @@ def main() -> None:
             print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) pie {','.join(f['arcs'])}")
         for f in arrows(doc[p - 1]):
             print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) arrow {f['arc']}")
+        for f in stars(doc[p - 1]):
+            arcs = "all" if len(f["arcs"]) == 6 else ",".join(f["arcs"])
+            print(f"p{p} ({f['x']:6.1f},{f['y']:6.1f}) pulser {arcs}")
 
 
 if __name__ == "__main__":
