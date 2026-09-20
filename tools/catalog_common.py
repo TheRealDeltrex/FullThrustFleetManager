@@ -13,6 +13,9 @@ System notation, space separated, `*n` repeats a token:
   S<level>          screen                 HB   one fighter hangar bay (FB) / fighter group (FT2)
   H:<mass> P:<mass> T:<mass>  cargo / passenger / troop space      TB:<capacity>  tender bay
   NOVA:arc  WAVE:arc  AA:arc  MSL  ORTILLERY  MINELAYER  MINESWEEPER  TUG
+  K<class>[:arcs]   Kra'Vak K-gun (class 1 defaults to all arcs, the rest to F)
+  MKP[:arc]         Kra'Vak MKP pack (defaults to F)      SG   Kra'Vak scattergun
+  S:<mass>          science-lab space
 Arcs are comma separated ("F,FS,FP") or "all".
 """
 
@@ -54,14 +57,25 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
 
     for tok in tokens:
         head, _, rest = tok.partition(":")
-        m = re.fullmatch(r"B([1-6ABC])", head)
-        if m:
-            cls = m.group(1)
+        beam = re.fullmatch(r"B([1-6ABC])", head)
+        kgun = re.fullmatch(r"K([1-9])", head)
+        if beam:
+            cls = beam.group(1)
             if ruleset == "fb":
                 arcs = _arcs(rest, ruleset) if rest else list(FB_ALL)
                 add({"type": "beam", "class": int(cls), "arcs": arcs})
             else:
                 add({"type": "beam", "class": cls, "arcs": _arcs(rest, ruleset)})
+        elif kgun:
+            # FB2 p.9: class 1 is always all-round, every larger class fires through one arc,
+            # which the book's prose (and every SSD) puts forward.
+            k = int(kgun.group(1))
+            add({"type": "kgun", "class": k,
+                 "arcs": _arcs(rest, ruleset) if rest else (list(FB_ALL) if k == 1 else ["F"])})
+        elif head == "MKP":
+            add({"type": "mkp", "arcs": _arcs(rest, ruleset) if rest else ["F"]})
+        elif head == "SG":
+            add({"type": "scattergun"})
         elif head == "PT":
             add({"type": "pulse_torpedo", "arcs": _arcs(rest, ruleset)})
         elif head == "NB":
@@ -110,11 +124,11 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
                 fighters.append({"hangar": add({"type": "hangar", "bays": 1})["uid"], "type": "standard"})
             else:
                 fighters.append({"hangar": add({"type": "fighter_group"})["uid"], "type": "standard"})
-        elif head in ("H", "P", "T"):
+        elif head in ("H", "P", "T", "S"):
             add(
                 {
                     "type": "hold",
-                    "kind": {"H": "cargo", "P": "passenger", "T": "troop"}[head],
+                    "kind": {"H": "cargo", "P": "passenger", "T": "troop", "S": "lab"}[head],
                     "mass": int(rest),
                 }
             )
@@ -157,6 +171,7 @@ def design(
     thrust: int = 0,
     ftl: bool = True,
     kind: str = "warship",
+    race: str = "human",
     notes: str = "",
 ) -> dict:
     ident = f"{ruleset}:{slug(book)}:{slug((faction or '') + ' ' + name)}"
@@ -165,7 +180,7 @@ def design(
         "schema_version": 1,
         "id": ident,
         "ruleset": ruleset,
-        "race": "human",
+        "race": race,
         "faction": faction,
         "name": name,
         "type_label": type_label,

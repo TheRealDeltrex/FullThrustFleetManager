@@ -4,5 +4,11 @@
     "book_value": 276,
     "rules_value": 267,
     "reason": "FT p.31 design example: the totals line prints 276 Points, but its own line items (72+36+72+25+9+26+27) and the text below the table give 267. Table misprint."
+  },
+  {
+    "id": "fb:fb2:kv-do-san",
+    "book_value": 671,
+    "rules_value": 691,
+    "reason": "FB2 p.18 Do'San: the spec panel and SSD agree (hull 54, thrust 4A, FTL, 4 x K-3, 3 x K-1, 7 scatterguns, 3 fire controls, 4 hangar bays) and close the MASS at exactly 180, so the systems fit is not in doubt. Those items cost 691. The three other Kra'Vak classes with hangar bays (Lo'Vok 626, Yu'Kas 883, Ko'San 917) all price a bay at 27 points and match their printed NPV exactly, so the printed 671 is 20 points light: a transcription slip for 691."
   }
 ]
