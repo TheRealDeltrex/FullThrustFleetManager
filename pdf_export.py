@@ -379,6 +379,7 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
     if not ruleset:
         return
     present: set[str] = set()
+    races: set[str] = set()
     options: dict = {}
     for fleet, designs in zip(fleets, designs_by_fleet):
         options.update({k: v for k, v in fleet_rules.fleet_options(fleet).items() if v})
@@ -390,7 +391,11 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add("armour")
             if design and design["streamlining"] != "none":
                 present.add("streamlining")
-    entries = ruleset.quickref(present, options)
+            if design:
+                races.add(design.get("race") or "human")
+    # A race's own entries go on the sheet beside the shared ones (FB2 restates movement, crew
+    # and the weapon summaries per race), so the ruleset needs to know which races are in play.
+    entries = ruleset.quickref(present, options, frozenset(races or {"human"}))
     if not entries:
         return
     pdf.add_page()

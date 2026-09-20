@@ -18,3 +18,8 @@ def test_protocol(rid):
     assert rs.id == rid and rs.short_label and rs.name and rs.accent_color.startswith("--rs-")
     assert rs.arcs and rs.books and rs.races()
     assert rs.system_types("human", {}) and rs.fighter_types({})
+    # Every race the ruleset offers must be a complete tech module, not just a name in a list.
+    for race in rs.races():
+        assert rs.system_types(race.id, {}), race.id
+        assert rs.fighter_types({}, race.id), race.id
+        assert rs.icon_set_for(race.id), race.id

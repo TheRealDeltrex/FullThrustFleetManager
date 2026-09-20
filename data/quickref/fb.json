@@ -147,6 +147,55 @@
    "text": "This is an OPTIONAL rule, but one that we recommend is used - the new design system results in ships that are somewhat larger and may (depending on chosen hull strength) have more damage boxes than FT2 standard classes, and the extra damage potential of the Reroll option goes some way to redressing the balance. Simply, when firing any weapon system that is capable of penetrating damage (as specified for each type of system), any roll of SIX inflicts the usual damage AND allows a \"reroll\" - roll an extra die, and apply any further damage that is indicated by the result. If this reroll is ALSO a six, then apply the damage and roll again.",
    "book": "FB1",
    "page": 5
+  },
+  {
+   "key": "kv_thrust",
+   "title": "Kra'Vak thrust and manoeuvre",
+   "text": "[Note that these rules for Advanced Drives also apply to Sa'vasku ships, but NOT to the Phalons.] Cinematic Movement: When using the Cinematic (\"standard\" FT) movement system, Kra'Vak vessels move and manoeuvre in exactly the same way as other ships, using the normal rules, with one exception: they are permitted to use MORE than half their available thrust for COURSE CHANGES, and may in fact use up to ALL their thrust rating for this.",
+   "book": "FB2",
+   "page": 9
+  },
+  {
+   "key": "kv_kgun",
+   "title": "Kinetic guns (K-guns)",
+   "text": "Range 0 - 6 mu: 2+ to hit Range 6 - 12 mu: 3+ to hit Range 12 - 18 mu: 4+ to hit Range 18 - 24 mu: 5+ to hit Range 24 - 30 mu: 6 to hit If hit scored, roll again; roll GREATER than K-gun class = DP equal to class, roll LESS THAN OR EQUAL to class = DP equal to class x 2. Natural roll of 6 is always class x 1 DP, even for K-6 and larger. First DP of hit taken on armour, remainder penetrates. Class-1 K-guns ONLY can fire in limited point-defence mode: 1 fighter/missile kill is scored on a roll of 5 or 6; no rerolls.",
+   "book": "FB2",
+   "page": 11
+  },
+  {
+   "key": "kv_mkp",
+   "title": "Multiple kinetic penetrator packs",
+   "text": "One-shot system, range 12 mu. 1 die rolled: 1-3 = no hits, 4 or 5 = 1 hit, 6 = 2 hits (no rerolls). Each hit does 4 damage points, one to armour (if any) and remainder on hull.",
+   "book": "FB2",
+   "page": 11
+  },
+  {
+   "key": "kv_scattergun",
+   "title": "Scatterguns",
+   "text": "One shot system, all-arc fire. May fire in point-defence, area-defence or antiship mode. 1 die is rolled in all cases: Against standard fighters or salvo missiles, the shot kills 1D6 elements from the group/salvo (ie: 1-6 fighters/missiles). Against HEAVY fighters, halve the number of kills (round up). No rerolls. Against plasma bolts, 4 or 5 reduces the bolt strength by 1, 6 reduces it by 2. No rerolls. Against ship targets, 4 or 5 = 1 DP, 6 = 2 DP (two separate hits, so both are taken on armour if applicable). No rerolls. In area defence mode, roll of 1 = 1 DP against ship under attack.",
+   "book": "FB2",
+   "page": 11
+  },
+  {
+   "key": "kv_fire_control",
+   "title": "Kra'Vak fire control",
+   "text": "Kra'Vak ships carry fire-control systems that function exactly as their human equivalents; use all standard rules for them. A Kra'Vak FC system requires 1 MASS and costs 4 points. As their scatterguns have an in-built \"area-defence\" capability (ie: they are not only useful against targets attacking their own ship), the Kra'Vak have no need for ADFC systems.",
+   "book": "FB2",
+   "page": 10
+  },
+  {
+   "key": "kv_crew",
+   "title": "Kra'Vak crew factors and damage control",
+   "text": "Kra'Vak ships use the same rules for crew factors and damage-contol parties as human ships; there is one crew factor for each 20 MASS of ship (or part thereof), so for example a MASS 30 Kra'Vak ship has a crew factor of 2, and a MASS 41 ship a factor of 3. There is no cost or mass requirement for crew factors.",
+   "book": "FB2",
+   "page": 10
+  },
+  {
+   "key": "kv_hangar",
+   "title": "Kra'Vak fighters",
+   "text": "Kra'Vak fighters, like human ones, operate in groups of 6 craft. They have 6 Combat Endurance Factors, which may be used up to make attacks and/or to make secondary moves. The standard Kra'Vak fighter is the Ra'San (literally \"Little Sliver of Mother\", UN codename KIP) and the heavy variant is the Va'San (\"Great Sliver of Mother\", UN codename KART). The Ra'San is treated as a regular multirole fighter, and the Va'san gets the defensive bonus for being a \"heavy\" fighter. The costs per group of 6 are 18 points per Ra'San group (3 per fighter) and 30 points per Va'San group (5 per fighter).",
+   "book": "FB2",
+   "page": 10
   }
  ]
 }

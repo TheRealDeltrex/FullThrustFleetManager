@@ -110,6 +110,12 @@ def quickref_entries():
                                       {"core_systems": True, "rerolls": True,
                                        "vector_movement": True}):
             yield ruleset.id, entry
+        # Each race brings its own entries, from its own pages (FB2's Kra'Vak section repeats
+        # FB1's headings, so a wrong page reference here is a real risk).
+        for race in {r.id for r in ruleset.races()} - {"human"}:
+            for entry in ruleset.quickref({"kgun", "mkp", "scattergun", "fire_control", "hangar"},
+                                          {}, frozenset({race})):
+                yield ruleset.id, entry
 
 
 def test_every_quickref_entry_is_readable():
