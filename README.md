@@ -2,14 +2,13 @@
 
 Fleet management tool for the *Full Thrust* starship wargame (Ground Zero Games): design ships,
 build fleets to a points limit, track campaign damage, and print a fleet PDF for the table.
-Supports the FT2 and Fleet Book rulesets first; Cross Dimensions and Project Continuum later.
+Supports the Full Thrust 2nd edition and Fleet Book rulesets; Cross Dimensions and Project
+Continuum later.
 
 ![Full Thrust Fleet Manager](static/logo.jpg)
 
-**Status:** v0.1.0, the first release. Both rulesets, the ship catalog, the design workbench,
-fleets, campaign bookkeeping, the fleet PDF and the rulebook viewer are in. See
-[docs/PLAN.md](docs/PLAN.md) for the full plan. Licensed GPL-3.0; GZG content notice in
-[NOTICE.md](NOTICE.md).
+**Status:** v0.1.0, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
+[NOTICE.md](NOTICE.md), full build plan in [docs/PLAN.md](docs/PLAN.md).
 
 ## What it does
 
@@ -26,9 +25,17 @@ fleets, campaign bookkeeping, the fleet PDF and the rulebook viewer are in. See
 
 Everything runs locally: no account, no server, plain JSON files you can back up and share.
 
+## Getting it
+
+- **Windows:** download the zip from the [latest release](../../releases/latest), unpack it
+  anywhere and run `FullThrustFleetManager.exe`. It needs no installation and works offline;
+  your library lives in `%APPDATA%\FullThrustFleetManager`.
+- **In the browser:** the same app runs on GitHub Pages via Pyodide. Nothing is uploaded; the
+  library is stored in that browser only, so export a backup file to keep it.
+
 ## Running from source
 
-Needs Python 3.11+.
+Needs Python 3.11 or newer.
 
 ```bash
 python -m venv .venv
@@ -36,42 +43,40 @@ python -m venv .venv
 .venv/Scripts/python.exe app.py
 ```
 
-Then open http://127.0.0.1:5000/. Data is kept in `userdata/` next to the checkout (set
-`FTFM_DATA_DIR` to use another folder).
+Then open <http://127.0.0.1:5000/>. Data is kept in `userdata/` next to the checkout; set
+`FTFM_DATA_DIR` to put it elsewhere.
 
 ## Building
 
-- **Windows desktop app:** `pyinstaller fleetmanager.spec` (output in
-  `dist/FullThrustFleetManager/`). Runs fully offline; stores data in
-  `%APPDATA%\FullThrustFleetManager`.
+- **Windows desktop app:** `pyinstaller fleetmanager.spec`, output in `dist/`. Runs fully
+  offline.
 - **Web build:** `python scripts/build_browser_bundle.py` writes `web/bundle.json`; the
   "Deploy Pages" GitHub Action builds and publishes it.
-- **Tests:** `python -m pytest`, lint with `ruff check .`.
+- **Tests and lint:** `python -m pytest`, `ruff check .`.
 
-## Rulebook sources (`rulebooks/`)
+## Rulebooks (`rulebooks/`)
 
-Clean, searchable, bookmarked copies of the four core books, built from the
-originals in `E:\RPG\Tabletop\Full Thurst`:
+The app ships clean, searchable, bookmarked copies of the four core books, prepared from the
+PDFs Ground Zero Games sells, so that every page reference in the app opens the right page.
+Every page renders identically to the original; the work was on the text layer and the
+bookmarks:
 
-| Output | Source | Text layer |
-|---|---|---|
-| `Full Thrust.pdf` | `Full Thrust.pdf` (image-only scan) | Tesseract OCR, invisible layer over the untouched scans |
-| `More Thrust.pdf` | `More Thrust.pdf` | Native text, fake-bold overprints removed from the text layer |
-| `Fleet Book 1.pdf` | `Fleet Book 1Full.pdf` | Native text, overprints removed |
-| `Fleet Book 2.pdf` | `Fleet Book 2Full.pdf` | Native text, overprints removed |
+| Book | Text layer |
+|---|---|
+| `Full Thrust.pdf` | image-only scan, Tesseract OCR added as an invisible layer over the untouched pages |
+| `More Thrust.pdf` | native text, fake-bold overprints hidden |
+| `Fleet Book 1.pdf` | native text, overprints hidden |
+| `Fleet Book 2.pdf` | native text, overprints hidden |
 
-Every page renders identically to the original. Bookmarks follow each book's
-contents page and jump to the heading on the page; the Fleet Books also have one
-bookmark per ship class under each fleet's "Ship Designs" entry.
+Bookmarks follow each book's contents page; the Fleet Books also have one bookmark per ship
+class under each fleet's "Ship Designs" entry.
 
-Rebuild (needs PyMuPDF, pypdf and Tesseract at `C:\Program Files\Tesseract-OCR`):
+The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
+`tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and
+reads the original PDFs from a local folder you set in the script.
 
-```bash
-python tools/build_rulebooks.py
-```
+## Credits
 
-`--only "Fleet Book 1"` rebuilds a single book. The OCR of Full Thrust takes about 5 minutes.
-
-- `tools/build_rulebooks.py`: the pipeline
-- `tools/tocs.py`: bookmark lists (transcribed from the contents pages)
-- `tools/dedup_text.py`: hides the 2-5x overprinted "bold" text copies via empty `/ActualText`
+*Full Thrust*, *More Thrust* and the Fleet Books, their rules text, ship designs and diagrams
+are © Jon Tuffley and Ground Zero Games. This is an unofficial fan project, not affiliated with
+or endorsed by Ground Zero Games. See [NOTICE.md](NOTICE.md).

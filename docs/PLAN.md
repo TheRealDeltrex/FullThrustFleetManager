@@ -10,8 +10,8 @@ do not silently re-decide.
 - **Milestones:** GitHub issues labelled `milestone`, one per section 16 entry
 - **Agent manual:** `CLAUDE.md` at the repo root (keep it current as you build)
 - **Mockups:** `docs/mockups/` (serve the folder over HTTP; the pages load `ssd.js`/`mockup.css`)
-- **Sister project to copy infrastructure from:** `E:\ClaudeCodeFolder\FrostgraveWarbandKeeper`
-  (public repo `TheRealDeltrex/FrostgraveWarbandKeeper`)
+- **Sister project to copy infrastructure from:** a local checkout of the public repo
+  `TheRealDeltrex/FrostgraveWarbandKeeper`
 
 Book abbreviations: **FT** Full Thrust 2nd ed., **MT** More Thrust, **FB1/FB2** Fleet Book 1/2,
 **FTCD** Full Thrust: Cross Dimensions, **FTPC** Full Thrust: Project Continuum. Page numbers
@@ -102,7 +102,7 @@ Two builds of the same code:
 
 ## 4. Repository layout
 
-The existing folder `E:\ClaudeCodeFolder\FullThrustFleetManager` is the repo. It already holds
+The existing checkout is the repo. It already holds
 `tools/` (rulebook build), `rulebooks/` (the four processed PDFs) and `docs/`.
 
 ```
@@ -162,9 +162,8 @@ layers above it. `ssd_layout.py` and `pdf_export.py` are pure consumers of layer
 `idle_watchdog.py`, `run_app.py`, `frostgrave.spec` → `fleetmanager.spec`,
 `scripts/build_browser_bundle.py`, `docs/app/index.html` → `web/index.html`,
 `.github/workflows/deploy-pages.yml`, the `@register_action` dispatch pattern in `app.py`, and
-the release skill at `E:\ClaudeCodeFolder\.claude\skills\shipping-a-release` (make a sibling
-skill for this app there; it lives outside the repo on purpose because it holds code-signing
-setup).
+the release skill kept alongside the sister project (make a sibling skill for this app there;
+it lives outside the repo on purpose because it holds code-signing setup).
 
 ---
 
@@ -441,7 +440,7 @@ text layer is OCR, so verify every number against the page image.
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
 errata of 26 April 2017; text layers present). Both need the rulebook treatment first
 (bookmarks via `tools/tocs.py`, overprint check), and the errata folded into the FTPC ruleset.
-Source folder: `E:\RPG\Tabletop\Full Thurst\`.
+Source folder: the local folder holding the bought PDFs (set in `tools/build_rulebooks.py`).
 
 ---
 
@@ -659,9 +658,8 @@ own. Rules beyond FT's outline may be invented; label them in the UI as "app rul
 
 ## 12. Rulebooks in the app
 
-- `rulebooks/*.pdf` (processed text layer + bookmarks, built by `tools/build_rulebooks.py` from
-  the originals in `E:\RPG\Tabletop\Full Thurst\`) are part of the repo and bundled with the
-  desktop build.
+- `rulebooks/*.pdf` (processed text layer + bookmarks, built by `tools/build_rulebooks.py`
+  from the bought originals) are part of the repo and bundled with the desktop build.
 - Page links ("FB1 p.16") open the bundled PDF at that page. Desktop: an in-app viewer page
   (pdf.js vendored under `static/`, no CDN), with a setting to use the system PDF viewer
   instead. Web: the same viewer page; PDFs are served as static files next to the app on Pages

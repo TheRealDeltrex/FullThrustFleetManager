@@ -26,7 +26,8 @@ from dedup_text import dedup_page
 import tocs
 
 ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_SRC = Path(r"E:\RPG\Tabletop\Full Thurst")
+# Where the bought PDFs live. Override with --src, or the FT_RULEBOOK_SRC env var.
+DEFAULT_SRC = Path(os.environ.get("FT_RULEBOOK_SRC", "rulebook-sources"))
 TESSERACT = Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe")
 OCR_DPI = 300
 
