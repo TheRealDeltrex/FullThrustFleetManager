@@ -17,9 +17,10 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M6 are done: an empty Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the
-96-design catalog behind the NPV gate, the storage layer (library, fleets, import/export) and
-the SSD layout engine. No UI on top of them yet; next is **M7** (Design tab).
+M1-M7 are done: the Layout C shell, the FB and FT2 (+ More Thrust) rules engines, the 96-design
+catalog behind the NPV gate, the storage layer (library, fleets, import/export), the SSD layout
+engine and the Design tab workbench. Next is **M8** (Fleet overview tab); the Fleet, Campaign
+and Settings tabs are still placeholders.
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
@@ -51,6 +52,28 @@ What exists:
 - `fleet_rules.py`, `store.py`, `migrations.py`, `data/factions.json` — see Storage below.
 
 - `ssd_layout.py` — the record sheet; see Ship diagram below.
+- The Design tab (`/design`, `/design/<id>`) — see Design tab below.
+
+## Design tab
+
+- Routes: `GET /design` (library, no selection), `GET /design/<id>` (workbench),
+  `POST /design/new`, `POST /design/<id>` with an `action` field. Catalog ids contain `:` and
+  travel in the path unescaped, which Flask handles.
+- **Edits go to a draft, not the library.** Strict mode refuses to save a violating design, so
+  the workbench has to hold changes that are not saveable yet: `store.save_draft()` /
+  `get_draft()` / `discard_draft()` under `drafts/`, and `working_design(id)` returns
+  `(design, dirty)`. Saving, refitting, saving as a variant and deleting all clear the draft.
+- The whole design posts with every action (`_apply_form`), so an edit is never lost by
+  clicking Add system. Per-system inputs are named `sys-<uid>-<param>`; arcs are checkboxes
+  plus a hidden `sys-<uid>-arcs-present` marker, because an all-unchecked arc set posts nothing.
+  Remove buttons carry the uid in their `formaction` query, so the table needs no script.
+- Actions: `apply` (recalculate), `add_system`, `remove_system`, `save` / `refit` / `variant`
+  (`store.save_design` modes), `discard`, `delete`, `make_variant`. Everything but
+  `make_variant` is refused on a catalog design.
+- The right pane is computed per request in `_design_context()`: breakdown, MASS bar against
+  `derived["mass_limit"]`, NPV against the book value for catalog designs, issue list, and the
+  live SSD as inline SVG (`Markup`, from `ssd_layout`).
+- `tests/test_design_tab.py` uses the `client` fixture with a per-test `FTFM_DATA_DIR`.
 
 `pdf_export.py` (PLAN section 4) arrives with M9.
 

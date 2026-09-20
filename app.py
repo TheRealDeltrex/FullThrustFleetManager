@@ -15,11 +15,16 @@ from collections.abc import Callable
 from logging.handlers import RotatingFileHandler
 
 from flask import Flask, Response, abort, flash, redirect, render_template, request, url_for
+from markupsafe import Markup
 
+import fleet_rules
 import i18n
 import paths
+import ssd_layout
+import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
+from rulesets import RULESETS
 
 logger = logging.getLogger(__name__)
 
@@ -169,9 +174,178 @@ def fleet_overview() -> str:
     return render_template("fleet.html", active_tab="fleet_overview")
 
 
+# ---- Design tab (PLAN 9.4) --------------------------------------------------------------------
+
+
+def _library(query: str = "") -> dict:
+    """The left pane: my designs by ruleset, the catalog by book, both filtered by `query`."""
+    def matches(d: dict) -> bool:
+        if not query:
+            return True
+        haystack = " ".join(str(d.get(k) or "") for k in ("name", "type_label", "type_code", "faction"))
+        return query.lower() in haystack.lower()
+
+    mine: dict[str, list[dict]] = {}
+    for d in store.list_designs():
+        if matches(d):
+            mine.setdefault(d["ruleset"], []).append(d)
+    catalog: dict[str, list[dict]] = {}
+    for d in sorted(store.catalog_designs(), key=lambda d: (d["ruleset"], d["name"].lower())):
+        if matches(d):
+            catalog.setdefault(d["source"].get("book") or d["ruleset"], []).append(d)
+    return {"mine": mine, "catalog": catalog, "query": query}
+
+
+def _design_context(design: dict, dirty: bool) -> dict:
+    """Everything the workbench shows about one design: breakdown, issues, SSD, usage."""
+    rs = RULESETS[design["ruleset"]]
+    options = {k: True for k in fleet_rules.FLEET_OPTION_KEYS}  # the picker offers everything
+    breakdown = rs.design_breakdown(design, {})
+    issues = fleet_rules.design_issues(design, {})
+    violations = [i for i in issues if i.severity == "violation"]
+    used_by = store.ships_using(design["id"])
+    return {
+        "design": design,
+        "dirty": dirty,
+        "ruleset": rs,
+        "read_only": store.is_catalog(design["id"]),
+        "breakdown": breakdown,
+        "mass_limit": breakdown.derived.get("mass_limit") or design["tmf"],
+        "issues": issues,
+        "violations": violations,
+        "can_save": not violations or design["allow_rule_breaking"],
+        "used_by": used_by,
+        "system_types": rs.system_types(design.get("race", "human"), options),
+        "fighter_types": rs.fighter_types(options),
+        "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
+        "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
+    }
+
+
 @app.route("/design")
 def design() -> str:
-    return render_template("design.html", active_tab="design")
+    return render_template(
+        "design.html", active_tab="design", library=_library(request.args.get("q", "")),
+        rulesets=list(RULESETS.values()), selected=None,
+    )
+
+
+@app.route("/design/<design_id>")
+def design_detail(design_id: str) -> str:
+    working, dirty = store.working_design(design_id)
+    if not working:
+        abort(404)
+    return render_template(
+        "design.html", active_tab="design", library=_library(request.args.get("q", "")),
+        rulesets=list(RULESETS.values()), selected=_design_context(working, dirty),
+    )
+
+
+@app.route("/design/new", methods=["POST"])
+def design_new() -> Response:
+    created, msg = store.new_design(
+        request.form.get("ruleset", ""), request.form.get("race", "human"),
+        request.form.get("faction") or None, request.form.get("name", ""),
+    )
+    flash(msg, "success" if created else "error")
+    if not created:
+        return redirect(url_for("design"))
+    return redirect(url_for("design_detail", design_id=created["id"]))
+
+
+def _apply_form(design: dict) -> dict:
+    """The workbench posts the whole design; rules maths stays in the ruleset (PLAN 2.7)."""
+    form = request.form
+    design["name"] = form.get("name", design["name"]).strip()[:80] or design["name"]
+    design["type_label"] = form.get("type_label", "").strip()[:60]
+    design["type_code"] = form.get("type_code", "").strip()[:8]
+    design["hull_kind"] = "merchant" if form.get("hull_kind") == "merchant" else "warship"
+    design["faction"] = form.get("faction") or None
+    for field in ("tmf", "hull_boxes", "armour", "thrust"):
+        if form.get(field) is not None:
+            design[field] = max(0, int(form.get(field) or 0))
+    design["ftl"] = form.get("ftl") == "on"
+    design["streamlining"] = form.get("streamlining", "none")
+    design["allow_rule_breaking"] = form.get("allow_rule_breaking") == "on"
+    design["notes"] = form.get("notes", "")[:4000]
+    for system in design["systems"]:
+        prefix = f"sys-{system['uid']}-"
+        arcs = form.getlist(prefix + "arcs")
+        if arcs or (prefix + "arcs-present") in form:
+            system["arcs"] = arcs
+        for key in list(system):
+            if key in ("uid", "type", "arcs"):
+                continue
+            value = form.get(prefix + key)
+            if value is None:
+                continue
+            system[key] = value if isinstance(system[key], str) and not value.isdigit() else int(value or 0)
+    design["default_loadout"] = _read_loadout(design)
+    return design
+
+
+def _read_loadout(design: dict) -> dict:
+    fighters = [
+        {"hangar": system["uid"], "type": request.form.get(f"loadout-{system['uid']}", "standard")}
+        for system in design["systems"] if system["type"] in ("hangar", "fighter_group")
+    ]
+    magazines = [
+        {"magazine": system["uid"],
+         "salvos": request.form.getlist(f"salvos-{system['uid']}")}
+        for system in design["systems"] if system["type"] == "sm_magazine"
+    ]
+    return {"fighters": [f for f in fighters if f["type"]], "magazines": magazines}
+
+
+@app.route("/design/<design_id>", methods=["POST"])
+def design_update(design_id: str) -> Response:
+    working, _dirty = store.working_design(design_id)
+    if not working:
+        abort(404)
+    action = request.form.get("action", "")
+
+    if store.is_catalog(design_id) and action != "make_variant":
+        flash(_("Catalog designs are read-only; make a variant."), "error")
+        return redirect(url_for("design_detail", design_id=design_id))
+
+    if action == "make_variant":
+        variant, msg = store.make_variant(design_id)
+        flash(msg, "success" if variant else "error")
+        return redirect(url_for("design_detail", design_id=variant["id"] if variant else design_id))
+
+    if action == "discard":
+        ok, msg = store.discard_draft(design_id)
+        flash(msg, "success" if ok else "error")
+        return redirect(url_for("design_detail", design_id=design_id))
+
+    if action == "delete":
+        ok, msg = store.delete_design(design_id)
+        flash(msg, "success" if ok else "error")
+        return redirect(url_for("design_detail", design_id=design_id) if not ok else url_for("design"))
+
+    try:
+        working = _apply_form(working)
+    except ValueError:
+        flash(_("Please enter a valid number."), "error")
+        return redirect(url_for("design_detail", design_id=design_id))
+
+    if action == "add_system":
+        ok, msg = store.add_system(working, request.form.get("system_type", ""))
+        flash(msg, "success" if ok else "error")
+    elif action == "remove_system":
+        ok, msg = store.remove_system(working, request.args.get("uid") or request.form.get("uid", ""))
+        flash(msg, "success" if ok else "error")
+    elif action in ("save", "refit", "variant"):
+        ok, msg, saved_id = store.save_design(working, mode=action)
+        flash(msg, "success" if ok else "error")
+        if ok:
+            return redirect(url_for("design_detail", design_id=saved_id))
+    elif action != "apply":
+        flash(_("Unknown action."), "error")
+        return redirect(url_for("design_detail", design_id=design_id))
+
+    store.save_draft(working)
+    return redirect(url_for("design_detail", design_id=design_id))
 
 
 @app.route("/campaign")
