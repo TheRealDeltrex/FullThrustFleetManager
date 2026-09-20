@@ -111,8 +111,10 @@ What exists:
   figure captions, spec panels and half sentences:  repairs hyphenation and stray page
   numbers, and  in the tool holds entries transcribed from the page image where the
   layout defeats it.  guards both the text and the page numbers. `Ruleset.quickref()` filters it to the systems present plus a few always-on
-  entries, the fleet's optional rules and the races in the fleet. Race entries are key-prefixed
-  (`kv_kgun`), so a mixed fleet still gets the FB1 entry for its human designs. **FB2 repeats
+  entries, the fleet's optional rules and the races in the fleet. Some shared entries are
+  race-dependent: FB1's crew and fire-control entries are dropped unless a crewed race is in the
+  fleet, because a Sa'Vasku construct has neither. Race entries are key-prefixed (`kv_kgun`,
+  `sv_stinger`), so a mixed fleet still gets the FB1 entry for its human designs. **FB2 repeats
   FB1's headings once per race** and `body_after()` keeps the longest body wherever it is, so a
   Kra'Vak key can silently resolve to the Phalon section: pin such an entry to its printed pages
   in the tool's `PAGES` map, and check the page reference against the page image.
@@ -165,10 +167,17 @@ What exists:
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
   a damaged drive; black on paper. `damage=None` is a blank copy.
 - Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race
-  (`icon_set_for(race)` -> `"fb"` / `"ft2"` / `"fb_kravak"`, falling back to the `icon_set`
+  (`icon_set_for(race)` -> `"fb"` / `"ft2"` / `"fb_kravak"` / `"fb_savasku"`, falling back to the `icon_set`
   attribute) rather than drawing itself, because drawing is a consumer's job. A set may also
   supply `"main_drive"` and draw the drive itself, as `fb_kravak` does for the Advanced Grav
   Drive that FB2 p.9 says looks different and is written "4A".
+- **Parts of a sheet that are not systems come from the ruleset's `derived`, never from a branch
+  on the race**: `core_systems` (the B/L/P box; false for Sa'Vasku), `power_generators` (drawn at
+  the damage-track row ends, over the rows the ship actually has, zeros omitted), `thrust_table`
+  and `power` (the thrust table and the empty M/A/D/R box). A ruleset that derives none of them
+  gets none of them, which is why FT2 and the human sheets did not change when they were added.
+  `layout()` calls `design_breakdown()` once and also hands each icon its system's computed MASS,
+  so an icon can print it (the Sa'Vasku screen node shows the power it needs).
   An unknown type falls back to a labelled box, so a new system never breaks a sheet. Boxed
   abbreviations take a callable so the label is translated at draw time.
 - `box_size()` gives the sheet width band (small/medium/large/xlarge) the packed PDF sorts by.
@@ -270,7 +279,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - `rulesets/fb/`: `data.py` (books, `system_defs()` for the picker, fighter points, FB1 p.12
   classes, hull descriptors), `rules.py` (human tech: `SYSTEM_RULES` type -> (mass, points,
   label), breakdown, validation, derived values), `kravak.py` (Kra'Vak tech, FB2 pp.9-11),
-  `tech.py` (the race -> module table), `__init__.py` (`RULESET`).
+  `savasku.py` (Sa'Vasku tech, FB2 pp.21-25), `tech.py` (the race -> module table),
+  `__init__.py` (`RULESET`).
 - Kra'Vak tech (`kravak.py`): hull, damage track, crew factors, thresholds, holds and tender bays
   are the human rules, which FB2 p.9 says outright, so they are imported from `rules.py` rather
   than restated. What differs: the Advanced Grav Drive costs 3 points per MASS (FB2 p.9, and it
@@ -283,6 +293,22 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - **FB2 p.10 prints "9 MASS and costs 18 points" for a Kra'Vak fighter bay and that is wrong**:
   every design in the book (Lo'Vok 626, Yu'Kas 883, Ko'San 917) prices a bay at the human 27, and
   the printed 18 is the Ra'San group's own cost from the same page. Do not "fix" it back.
+- Sa'Vasku tech (`savasku.py`) needed **no new schema**, and that is the point: biomass IS
+  `hull_boxes` (1 MASS, 2 points, four-row track, threshold at each row end), carapace IS
+  `armour`, the FTL node is the ordinary 10% one. The main drive node is always 10% of MASS with
+  no rating, so `thrust` is 0 and a non-zero thrust is a violation; power generation is a system
+  (`power_generator` {capacity}) carrying the total. Nodes: `stinger` {arcs, 3 contiguous},
+  `pod_launcher` {arcs, one}, `spicule`, `cortex`, `screen_node` (5% of MASS, min 3), `drone_womb`.
+  A construct has **no crew factors** (`crew_factors` is 0, no CF stars) and no core systems box.
+- **The M/A/D/R power pools are not in the data model and must not be added.** They are rewritten
+  every turn and explicitly do not carry over (FB2 p.22), so they are play state like movement
+  orders: the sheet prints an empty box to write in. Drones are grown from biomass in play, so a
+  drone group costs 0 points.
+- The Sa'Vasku **thrust table** is derived (`derived["thrust_table"]`), not stored. FB2 p.21 says
+  the power cost is "rounded up" and shows 9.6 -> 10, but it is **round-half-up with a floor of
+  1**: the Sa'Kess'Tha needs 1 PP at thrust 6 (1.32) and 2 at thrust 7 (1.54). Each row is the
+  *highest* thrust its power pair buys. `extract_catalog_fb2_savasku.py` checks the derived table
+  against every table printed in the book; twelve of the fourteen match to the cell.
 - System dicts per type (the design `systems` list; `uid` + `type` always): `beam` {class,
   arcs}, `pulse_torpedo`/`needle_beam`/`sm_launcher`/`nova_cannon`/`wave_gun` {arcs},
   `submunition` {arcs optional}, `sm_magazine` {capacity (MASS), feeds [launcher uids]},
@@ -323,6 +349,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 
 - `data/catalog/fb_fb1.json` (FB1 pp.13-42: 57 NAC/NSL/FSE/ESU warships, 8 merchant and support
   vessels), `fb_fb2_kravak.json` (FB2 pp.12-19, 15 Kra'Vak warships and 1 merchant),
+  `fb_fb2_savasku.json` (FB2 pp.26-32, 14 Sa'Vasku constructs),
   `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
@@ -335,8 +362,12 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   facing, submunitions, merchants, all of FT and MT) from rendered page images. FT2 beam pointers:
   up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
 - `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
-  110 of the 112 match their printed NPV; the two errata entries are the FT p.31 design example
+  124 of the 126 match their printed NPV; the two errata entries are the FT p.31 design example
   and the FB2 p.18 Do'San.
+- **Sa'Vasku arcs come off the vector SSDs**, unlike Kra'Vak's. Stinger nodes are the same
+  six-segment rings human beams use, so `ssd_arcs.rings()` reads them; pod launchers needed
+  `ssd_arcs.arrows()`, which finds the arrowhead beside each cogged disc and turns its direction
+  into the launcher's single arc.
 - **Kra'Vak arcs need no image pass.** `ssd_arcs.py` finds nothing on FB2 pp.12-19: the Kra'Vak
   icon is a plain numbered hexagon with no arc pointer (the key is on FB2 p.11), filled for a
   one-arc gun and outline for an all-arc one. The class already fixes that, and the book's prose
