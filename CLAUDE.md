@@ -455,7 +455,15 @@ text layer is OCR: verify numbers against the page image (`page.get_pixmap(dpi=2
 
 ## Git and GitHub
 
-- Work on `devversion`; `main` is for releases only. Never push to `main` without the owner.
+- Work on `devversion`. **It is the only branch with source.** `main` carries just
+  `README.md`, `LICENSE`, `NOTICE.md`, `.gitignore` and `.github/workflows/`, because GitHub
+  only offers a `workflow_dispatch` workflow that exists on the default branch, and `main`
+  is the default branch. Releases are tagged on `devversion`; nothing is merged into `main`.
+  Never push to `main` without the owner.
+- Because nothing is merged into `main`, a change to a file under `.github/workflows/` has
+  to be copied to `main` deliberately, or the dispatchable copy goes stale. The checkout
+  step takes its `ref` as an input defaulting to `devversion`, so a stale copy runs against
+  good source and simply skips whatever steps it is missing.
 - Commit per coherent step; each milestone issue is closed by the commit/PR that completes it.
 - Commit messages end with the attribution line the harness provides.
 - **Shipping** (version bump, exe, release, Pages deploy) has its own procedure in

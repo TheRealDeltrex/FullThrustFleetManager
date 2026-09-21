@@ -15,10 +15,15 @@ Version is single-sourced from `pyproject.toml` `[project] version`, read at run
 `paths.app_version()` and shown in the top bar. Nothing else stores a version number; the
 landing page's badges are filled in at deploy time, never by hand.
 
-A release is cut by merging `devversion` into `main` and tagging there — `git log origin/main`
-shows the pattern (`Merge v0.1.1` on top of `Version 0.1.1`). `main` carries the full source, so
-after a release it is a real copy of the app, not a stub. Check `gh release list` before picking
-a tag; a tag is never reused.
+**A release is tagged on `devversion`. Nothing is merged into `main`.** `main` carries only
+`README.md`, `LICENSE`, `NOTICE.md`, `.gitignore` and `.github/workflows/`, and the only reason
+it carries those workflow files is that GitHub will not offer a `workflow_dispatch` workflow
+unless it exists on the **default branch**, which `main` is. Everything else lives on
+`devversion`. (v0.1.0 and v0.1.1 predate this and were cut by merging into `main`; their tags
+still point at commits that carry the whole source, which is why the history looks different
+before that point.)
+
+Check `gh release list` before picking a tag; a tag is never reused.
 
 **The order below matters.** The two version badges on the landing page each state the truth
 about their own channel, which is the point of them:
@@ -112,14 +117,20 @@ one, so an exe left running across a few tool calls is simply gone, with a healt
 `/design`, a catalog design's workbench (the SSD), `/fleet`, `/campaign`, a rulebook page (the
 one thing that proves the PDFs got bundled) and a fleet PDF.
 
-## 3. Merge, tag, release
+## 3. Tag and release
 
-Owner's call, every time. Merge `devversion` into `main`, tag `vX.Y.Z` there, push, then create
-the release and attach the zip:
+Owner's call, every time. Tag `vX.Y.Z` on `devversion`, push the tag, then create the release
+and attach the zip:
 
 ```bash
-gh release create vX.Y.Z dist/FullThrustFleetManager-<version>-win64.zip --title "vX.Y.Z" --notes "..."
+git tag vX.Y.Z && git push origin vX.Y.Z
+gh release create vX.Y.Z dist/FullThrustFleetManager-<version>-win64.zip \
+  --target devversion --title "vX.Y.Z" --notes "..."
 ```
+
+`main` is not touched. It only ever changes when the README, the licence or a **workflow file**
+changes — and a workflow file changing on `devversion` is the one case where `main` genuinely
+has to be updated too, or the dispatchable copy goes stale. See step 4 for why that bites.
 
 ## 4. Deploy Pages, last
 
@@ -130,11 +141,19 @@ gh workflow run deploy-pages.yml --ref devversion -f ref=devversion
 **Pass `--ref devversion` as well as `-f ref=devversion`.** They do different jobs and both
 matter: `-f ref=` is an *input* the checkout step consumes, while `--ref` selects **which
 branch's copy of the workflow file runs**. Without it GitHub runs `main`'s copy, because `main`
-is the default branch. That is not academic here — between releases, `main`'s `deploy-pages.yml`
-is whatever the last release shipped, and right now it is a version that publishes the app at
-the site root with **no landing page at all**, because `web/landing.html` and both `scripts/`
-helpers only exist on `devversion`. Running the wrong copy replaces the front door with the app.
-The merge in step 3 is what finally brings them across; until then, always be explicit.
+is the default branch.
+
+That is not academic. Note what the two do together: the checkout step takes `ref` as an
+**input** defaulting to `devversion`, so `main`'s copy of the workflow runs against
+`devversion`'s *source*. The source is therefore never the problem — the **steps** are. A
+`main` copy that is missing a step just silently does not run it, against perfectly good source,
+and the site deploys looking almost right. That is exactly how Frostgrave's landing page sat at
+`vDEV` through several deploys.
+
+Since nothing is merged into `main` any more, **`main`'s copy of a workflow file is only ever
+updated deliberately**. If you change `.github/workflows/deploy-pages.yml` on `devversion`, copy
+it to `main` in the same breath, or the dispatchable version quietly goes stale. Passing
+`--ref devversion` sidesteps the whole question, so do that as well.
 
 Afterwards, open the deployed site and check the badges actually moved. A stamp step that fails
 does not fail the deploy: it warns and leaves the page as it was.
