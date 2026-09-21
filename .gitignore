@@ -12,5 +12,14 @@ dist/
 *.log
 # generated web bundle (built in CI)
 web/bundle.json
+# the Pages site, assembled fresh by deploy-pages.yml; never committed
+_site/
+# code-signing key. The Deltrex .pfx is passwordless, so a stray commit would publish a
+# usable signing key. It belongs in the Windows cert store, not in the repo.
+.codesign/
 # local user data when running from source
 userdata/
+
+# Logo mock-ups and other working artwork. Nothing builds from these: the shipped emblem is
+# static/logo.jpg. They are tens of megabytes of PNG that git would keep in history forever.
+Pictures/

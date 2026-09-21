@@ -1,0 +1,87 @@
+name: Build Linux
+
+# Linux counterpart to the Windows build, which is made locally and signed on the owner's machine.
+# Manually dispatched: Linux releases are occasional rather than one per version. With no tag it
+# just leaves a workflow artifact to download; with a tag it attaches the tarball to that release,
+# which is what the landing page's Linux button links to.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing GitHub Release tag to attach the binary to (blank = artifact only)"
+        required: false
+        default: ""
+      ref:
+        description: "Branch or tag to build from"
+        required: false
+        default: "devversion"
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Read the version
+        id: version
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import tomllib, pathlib
+          data = tomllib.loads(pathlib.Path("pyproject.toml").read_text(encoding="utf-8"))
+          print(f"value={data['project']['version']}")
+          PY
+
+      - name: Build with PyInstaller
+        run: pyinstaller fleetmanager-linux.spec --noconfirm
+
+      - name: Smoke test the binary
+        # The onefile binary re-extracts on every launch and bundles the rulebook PDFs, so give it
+        # room: this catches a spec that forgot a data folder, which is the failure that matters.
+        run: |
+          chmod +x dist/FullThrustFleetManager
+          FTFM_DATA_DIR=/tmp/ftfm-ci PORT=5000 ./dist/FullThrustFleetManager &
+          pid=$!
+          ok=""
+          for _ in $(seq 1 40); do
+            if curl -sf http://127.0.0.1:5000/ > /dev/null; then ok=1; break; fi
+            sleep 0.5
+          done
+          test -n "$ok"
+          curl -sf http://127.0.0.1:5000/design > /dev/null
+          curl -sf http://127.0.0.1:5000/fleet > /dev/null
+          curl -sf http://127.0.0.1:5000/settings > /dev/null
+          curl -sf "http://127.0.0.1:5000/static/favicon.png" > /dev/null
+          kill "$pid"
+
+      - name: Package
+        run: |
+          mkdir -p out
+          tar -C dist -czf \
+            "out/FullThrustFleetManager-${{ steps.version.outputs.value }}-linux-x64.tar.gz" \
+            FullThrustFleetManager
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FullThrustFleetManager-${{ steps.version.outputs.value }}-linux-x64
+          path: out/*.tar.gz
+
+      - name: Attach to release
+        if: ${{ inputs.release_tag != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ inputs.release_tag }}" out/*.tar.gz \
+            --clobber --repo "${{ github.repository }}"

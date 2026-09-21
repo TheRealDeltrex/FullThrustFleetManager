@@ -2,7 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [devversion, main]
+    # `main` carries no source, only the README, the licence and the workflow
+    # files, so there is nothing there to test.
+    branches: [devversion]
   pull_request:
   workflow_dispatch:
 

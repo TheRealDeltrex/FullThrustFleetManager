@@ -1,7 +1,0 @@
--r requirements.txt
-pytest>=8.0.0
-ruff>=0.6.0
-pyinstaller>=6.0.0
-# tools/ only (rulebook build, catalog extraction)
-pymupdf>=1.24.0
-pypdf>=4.0.0
