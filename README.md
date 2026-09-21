@@ -11,8 +11,9 @@ Continuum later.
 to play in your browser or download the Windows build, no code needed. You can also take the
 [latest release](../../releases/latest) directly.
 
-**Status:** v0.1.1, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
-[NOTICE.md](NOTICE.md), full build plan in [docs/PLAN.md](docs/PLAN.md).
+**Status:** v0.2, adding the Fleet Book 2 alien races (Kra'Vak, Sa'Vasku and Phalon).
+Licensed GPL-3.0; Ground Zero Games content notice in [NOTICE.md](NOTICE.md), full build
+plan in [docs/PLAN.md](docs/PLAN.md).
 
 ## What it does
 
