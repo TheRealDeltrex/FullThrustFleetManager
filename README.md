@@ -85,6 +85,12 @@ bookmarks:
 Bookmarks follow each book's contents page; the Fleet Books also have one bookmark per ship
 class under each fleet's "Ship Designs" entry.
 
+Three more books are bundled to read rather than to play from, given the same treatment:
+*Cross Dimensions* and *Project Continuum* with its errata, both free non-commercial
+publications distributed with Ground Zero Games' agreement. No ruleset implements their rules,
+so they are registered as `REFERENCE_BOOKS` rather than against a ruleset, and appear in the
+viewer and the Settings list beside the rest.
+
 The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
 `tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and
 reads the original PDFs from a local folder you set in the script.
