@@ -10,21 +10,15 @@ from __future__ import annotations
 import os
 import webbrowser
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 import i18n
-
-_BG = (16, 24, 38, 255)
-_FG = (79, 155, 232, 255)
+import paths
 
 
 def _icon_image() -> Image.Image:
-    """A simple arrowhead ship silhouette on a dark disc."""
-    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    draw.ellipse((2, 2, 62, 62), fill=_BG, outline=_FG, width=3)
-    draw.polygon([(32, 10), (48, 50), (32, 42), (16, 50)], fill=_FG)
-    return img
+    """The app logo (static/favicon.png), shipped with the build."""
+    return Image.open(paths.bundle_dir() / "static" / "favicon.png").convert("RGBA")
 
 
 def run(url: str) -> None:
