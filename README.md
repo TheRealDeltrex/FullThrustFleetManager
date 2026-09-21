@@ -58,7 +58,8 @@ Then open <http://127.0.0.1:5000/>. Data is kept in `userdata/` next to the chec
 ## Building
 
 - **Windows desktop app:** `pyinstaller fleetmanager.spec`, output in `dist/`. Runs fully
-  offline.
+  offline. Released builds are Authenticode-signed with a self-signed "Deltrex" certificate,
+  which puts a publisher name on the SmartScreen prompt without silencing it.
 - **Linux desktop app:** the "Build Linux" GitHub Action runs `fleetmanager-linux.spec`
   (onefile, no tray icon), smoke-tests the binary and attaches it to a release on request.
 - **Web build:** `python scripts/build_browser_bundle.py` writes `web/bundle.json`; the

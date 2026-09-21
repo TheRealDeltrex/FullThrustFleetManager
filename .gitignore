@@ -14,6 +14,9 @@ dist/
 web/bundle.json
 # the Pages site, assembled fresh by deploy-pages.yml; never committed
 _site/
+# code-signing key. The Deltrex .pfx is passwordless, so a stray commit would publish a
+# usable signing key. It belongs in the Windows cert store, not in the repo.
+.codesign/
 # local user data when running from source
 userdata/
 
