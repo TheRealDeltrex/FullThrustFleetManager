@@ -36,8 +36,12 @@ So a Pages deploy that runs before the zip is attached stamps the Windows badge 
 
 ## 1. Bump the version
 
-On `devversion`, in its own commit: `pyproject.toml`, and the status line in `README.md` if it
-names the version. Then `.venv/Scripts/python.exe -m ruff check .` and the full suite — a
+On `devversion`, in its own commit: `pyproject.toml`, and nothing else. No README on either
+branch names a version — `devversion`'s is a stub pointing at `main`, and `main`'s points at the
+download page, whose badges are stamped from the releases API. That is deliberate: a version
+written into prose on a branch with no tests is a thing that goes stale unnoticed.
+
+Then `.venv/Scripts/python.exe -m ruff check .` and the full suite — a
 release is the one time running everything locally is the right call rather than the targeted
 tests CLAUDE.md asks for day to day.
 
