@@ -98,7 +98,9 @@
     box-shadow: var(--shadow-3), var(--rim-lit);
   }
 
-  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+  /* auto-fit, so a card the stamp script drops for want of a build leaves no gap behind. */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+           gap: 1.25rem; margin-bottom: 1.25rem; }
   @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } }
 
   .card {
@@ -135,6 +137,14 @@
   .btn:hover { background: linear-gradient(180deg, var(--accent-hover) 0%, var(--accent) 100%); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.28), inset 0 -1px 0 rgb(0 0 0 / 0.4), var(--shadow-2); }
   .btn:active { transform: translateY(1px); }
   .btn.wide { width: auto; padding-left: 2.2rem; padding-right: 2.2rem; }
+  .btn.secondary {
+    background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);
+    border-color: var(--border); color: var(--text); font-weight: 600;
+  }
+  .btn.secondary:hover {
+    background: linear-gradient(180deg, var(--border) 0%, var(--surface-2) 100%);
+    border-color: var(--accent); color: var(--text);
+  }
 
   .steps { margin: 0 0 1rem; padding-left: 1.2rem; font-size: 0.88rem; color: var(--muted); }
   .steps li { margin-bottom: 0.35rem; }
@@ -194,32 +204,73 @@
       <a class="btn wide" href="app/">Launch the online app</a>
     </div>
 
+    <div class="cards">
+      <div class="card" data-platform-card="windows">
+        <h2>🪟 Windows <span class="version-badge" data-version-badge="windows">vDEV</span></h2>
+        <p class="sub">No Python install needed. Works fully offline.</p>
+        <ol class="steps" style="margin-top:0">
+          <li>Unzip it anywhere (your Desktop or Documents, for example).</li>
+          <li>Run <code>FullThrustFleetManager.exe</code> inside the unzipped folder.</li>
+          <li>It opens in your browser automatically. A tray icon lets you quit it later.</li>
+        </ol>
+        <p class="note">
+          The exe is not signed with a paid certificate, so SmartScreen may warn the first time.
+          Click “More info”, then “Run anyway”.
+        </p>
+        <a class="btn" style="margin-top:1.2rem" data-download="windows"
+           href="https://github.com/TheRealDeltrex/FullThrustFleetManager/releases/latest">
+          Download for Windows
+        </a>
+      </div>
+
+      <div class="card" data-platform-card="linux">
+        <h2>🐧 Linux <span class="version-badge" data-version-badge="linux">vDEV</span></h2>
+        <p class="sub">No Python install needed. Works fully offline.</p>
+        <ol class="steps" style="margin-top:0">
+          <li>Extract it: <code>tar -xzf FullThrustFleetManager-*-linux-x64.tar.gz</code></li>
+          <li>Make it executable: <code>chmod +x FullThrustFleetManager</code></li>
+          <li>Run it: <code>./FullThrustFleetManager</code>, which opens in your browser.</li>
+        </ol>
+        <p class="note">
+          Or from a file manager: right-click, Properties, allow executing, then double-click.
+        </p>
+        <p class="note">
+          Linux builds are occasional rather than one per release, so this link points at the
+          newest release that has one rather than at the latest release.
+        </p>
+        <a class="btn" style="margin-top:1.2rem" data-download="linux"
+           href="https://github.com/TheRealDeltrex/FullThrustFleetManager/releases">
+          Download for Linux
+        </a>
+      </div>
+    </div>
+
     <div class="section">
-      <h2>
-        🪟 Download for Windows
-        <span class="version-badge" data-version-badge="windows">vDEV</span>
-      </h2>
-      <p class="lead">No Python install needed. Works fully offline.</p>
-      <ol class="steps">
-        <li>Unzip it anywhere (your Desktop or Documents, for example).</li>
-        <li>Run <code>FullThrustFleetManager.exe</code> inside the unzipped folder.</li>
-        <li>It opens in your browser automatically. A tray icon lets you quit it later.</li>
-      </ol>
-      <p class="note">
-        The exe is not signed with a paid certificate, so SmartScreen may warn the first time.
-        Click “More info”, then “Run anyway”.
+      <h2>See it in action</h2>
+      <p class="lead">
+        Static, click-around snapshots of the real screens with sample data. Nothing on them
+        saves; they are the app’s own pages, rendered once and served as plain files.
       </p>
-      <a class="btn wide" data-download="windows"
-         href="https://github.com/TheRealDeltrex/FullThrustFleetManager/releases/latest">
-        Download for Windows
-      </a>
+      <div class="cards" style="margin-bottom:0">
+        <div class="card">
+          <h2>🛠 Design workbench</h2>
+          <p class="sub">A Kra’Vak battleship: systems, arcs, live MASS and NPV, and its record sheet.</p>
+          <a class="btn secondary" href="preview-design.html">Preview a design</a>
+        </div>
+        <div class="card">
+          <h2>📋 Fleet overview</h2>
+          <p class="sub">A task force in squadrons, against its points limit, with the rules check.</p>
+          <a class="btn secondary" href="preview-fleet.html">Preview a fleet</a>
+        </div>
+      </div>
     </div>
 
     <div class="section">
       <h2>What it does</h2>
       <ul class="features">
         <li><strong>Design ships</strong> to the Fleet Book or Full Thrust 2nd edition rules, with live MASS and NPV, an arc picker and a rules check. Break the rules on purpose if you like; the design is then marked non-conforming.</li>
-        <li><strong>Build fleets</strong> to a points limit, in squadrons, from your own designs or the 96 ship classes of the books, with a tournament check that lists every violation.</li>
+        <li><strong>Build fleets</strong> to a points limit, in squadrons, from your own designs or the 141 ship classes of the books, with a tournament check that lists every violation.</li>
+        <li><strong>Field the alien races</strong>: Kra’Vak, Sa’Vasku and Phalon, each with its own systems, record sheet icons, rules check and quick reference, alongside the human fleets.</li>
         <li><strong>Track a campaign</strong>: damage marked by clicking the ship diagram, crew factors, repairs and replenishment, and a fleet log.</li>
         <li><strong>Print</strong> a fleet pack or a two-fleet battle pack: roster, record sheets, orders chart, ordnance tracker and a quick reference.</li>
         <li><strong>Read the rulebooks</strong> in the app, with every page reference in the UI linking straight into them.</li>
