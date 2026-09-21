@@ -152,6 +152,18 @@ def get_ruleset(ruleset_id: str) -> Ruleset:
     return RULESETS[ruleset_id]
 
 
+# Books the app ships to read but whose rules no ruleset implements yet. A ruleset's own `books`
+# are its rules sources: the things a "FB1 p.16" link in the UI points into, and the things the
+# quick reference quotes. These are neither, so they are kept apart rather than hung off a
+# ruleset they do not belong to. The viewer and the Settings list show both (see app.books()).
+REFERENCE_BOOKS: tuple[BookRef, ...] = (
+    BookRef("CD", "Full Thrust: Cross Dimensions", "Full Thrust Cross Dimensions.pdf", 1),
+    BookRef("PC", "Full Thrust: Project Continuum", "Full Thrust - Project Continuum.pdf", 0),
+    BookRef("PCE", "Project Continuum Errata",
+            "Full Thrust - Project Continuum Errata.pdf", 0),
+)
+
+
 # Registration imports come last: the packages import the dataclasses above.
 from rulesets import fb, ft2  # noqa: E402
 

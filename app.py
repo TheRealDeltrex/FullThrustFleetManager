@@ -38,7 +38,7 @@ import ssd_layout
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
-from rulesets import RULESETS
+from rulesets import REFERENCE_BOOKS, RULESETS
 
 logger = logging.getLogger(__name__)
 
@@ -726,8 +726,14 @@ def dice(sides: int) -> Response:
 
 
 def books() -> dict[str, object]:
-    """Every book any ruleset knows, by its code (FB1, FT, ...)."""
-    return {b.code: b for rs in RULESETS.values() for b in rs.books}
+    """Every book the app ships, by its code (FB1, FT, CD, ...).
+
+    The rulesets' own books first, then the reference-only ones whose rules nothing implements
+    yet; a ruleset book wins a code clash, since that is the one page links resolve against.
+    """
+    shipped = {b.code: b for b in REFERENCE_BOOKS}
+    shipped.update({b.code: b for rs in RULESETS.values() for b in rs.books})
+    return shipped
 
 
 def book_url(code: str, page: int | None = None) -> str:

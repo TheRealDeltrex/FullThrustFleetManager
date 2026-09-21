@@ -29,6 +29,57 @@ def test_every_book_a_ruleset_names_is_bundled():
             assert (paths.bundle_dir() / "rulebooks" / book.file).is_file(), book.file
 
 
+# ---- Reference-only books (Cross Dimensions, Project Continuum) ---------------------------------
+#
+# Shipped to read; no ruleset implements their rules, so they hang off REFERENCE_BOOKS rather than
+# off a ruleset whose page links would then resolve into the wrong book.
+
+
+def test_every_reference_book_is_bundled_too():
+    from rulesets import REFERENCE_BOOKS
+
+    assert REFERENCE_BOOKS, "the reference-only books went missing"
+    for book in REFERENCE_BOOKS:
+        assert (paths.bundle_dir() / "rulebooks" / book.file).is_file(), book.file
+
+
+def test_reference_books_are_offered_beside_the_rules_books(client):
+    import app as app_module
+    from rulesets import REFERENCE_BOOKS
+
+    shipped = app_module.books()
+    for book in REFERENCE_BOOKS:
+        assert shipped[book.code] is book
+    assert {"FB1", "FB2", "FT", "MT"} <= set(shipped)          # and the rules books still there
+    assert book.title in text(client.get("/settings"))          # listed where a reader finds them
+
+
+def test_a_reference_book_opens_and_serves_its_file(client):
+    assert "rulebook/CD/file" in text(client.get("/rulebook/CD"))
+    response = client.get("/rulebook/CD/file")
+    assert response.status_code == 200 and response.data[:4] == b"%PDF"
+
+
+def test_the_reference_book_offsets_match_the_printed_folios():
+    """Cross Dimensions prints 9 on its 10th PDF page; Project Continuum's numbering matches."""
+    import fitz  # pymupdf
+
+    from rulesets import REFERENCE_BOOKS
+
+    for book in REFERENCE_BOOKS:
+        if book.code == "PCE":
+            continue                                   # 8-page errata, no printed folios
+        with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:
+            for printed in (20, 30):
+                page = doc[printed + book.page_offset - 1]      # printed -> 0-based PDF index
+                bottom = [s for blk in page.get_text("dict")["blocks"]
+                          for line in blk.get("lines", []) for s in line["spans"]
+                          if s["bbox"][1] > page.rect.height * 0.92]
+                folios = [s["text"].strip() for s in bottom
+                          if re.fullmatch(r"\d{1,3}", s["text"].strip())]
+                assert str(printed) in folios, f"{book.code} p.{printed} landed on {folios}"
+
+
 def test_pdfjs_is_vendored_not_linked():
     assert (PDFJS / "web" / "viewer.html").is_file()
     assert (PDFJS / "build" / "pdf.mjs").is_file()

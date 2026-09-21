@@ -450,8 +450,20 @@ on port 5123. Reach the server as `127.0.0.1`/`localhost`; other Host headers ge
 ## Rules sources
 
 `rulebooks/` holds the processed PDFs. Page numbers in code, data and PLAN are **printed** page
-numbers. PDF page = printed + 1 for `Full Thrust.pdf`, = printed for the others. The FT2 book's
-text layer is OCR: verify numbers against the page image (`page.get_pixmap(dpi=200)`).
+numbers. PDF page = printed + 1 for `Full Thrust.pdf` and `Full Thrust Cross Dimensions.pdf`,
+= printed for the others. The FT2 book's text layer is OCR: verify numbers against the page
+image (`page.get_pixmap(dpi=200)`).
+
+- A ruleset's `books` are its **rules sources**: what a `book_url()` link points into and what
+  the quick reference quotes. Books the app ships only to be read go in `REFERENCE_BOOKS`
+  (`rulesets/__init__.py`) instead, so a code can never resolve a page reference into a book
+  whose rules nothing implements. Cross Dimensions (`CD`) and Project Continuum (`PC`, errata
+  `PCE`) are there; both are free non-commercial publications distributed with GZG's
+  agreement, credited in `NOTICE.md`. `app.books()` merges the two, rulesets winning a clash.
+- A new PDF needs no spec or workflow change: `fleetmanager.spec` and `deploy-pages.yml` both
+  take the whole `rulebooks/` folder. Verify its `page_offset` against a printed folio rather
+  than assuming 0; `tests/test_rulebooks.py` checks the reference books' against pages 20
+  and 30.
 
 ## Git and GitHub
 
