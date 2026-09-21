@@ -35,8 +35,12 @@ Everything runs locally: no account, no server, plain JSON files you can back up
 - **Windows:** download the zip from the [latest release](../../releases/latest), unpack it
   anywhere and run `FullThrustFleetManager.exe`. It needs no installation and works offline;
   your library lives in `%APPDATA%\FullThrustFleetManager`.
-- **In the browser:** the same app (landing page at the site root, the app under `app/`) runs on GitHub Pages via Pyodide. Nothing is uploaded; the
-  library is stored in that browser only, so export a backup file to keep it.
+- **Linux:** download the tarball from the release the download page points at, `chmod +x` it
+  and run it. Linux builds are occasional rather than one per version.
+- **In the browser:** the same app (landing page at the site root, the app under `app/`) runs
+  on GitHub Pages via Pyodide. Nothing is uploaded; the library is stored in that browser only,
+  so export a backup file to keep it. The landing page also carries read-only previews of a
+  design and a fleet, for looking before installing anything.
 
 ## Running from source
 
@@ -55,8 +59,11 @@ Then open <http://127.0.0.1:5000/>. Data is kept in `userdata/` next to the chec
 
 - **Windows desktop app:** `pyinstaller fleetmanager.spec`, output in `dist/`. Runs fully
   offline.
+- **Linux desktop app:** the "Build Linux" GitHub Action runs `fleetmanager-linux.spec`
+  (onefile, no tray icon), smoke-tests the binary and attaches it to a release on request.
 - **Web build:** `python scripts/build_browser_bundle.py` writes `web/bundle.json`; the
-  "Deploy Pages" GitHub Action builds and publishes it.
+  "Deploy Pages" GitHub Action builds the site, renders the preview pages from the real app
+  and publishes the lot.
 - **Tests and lint:** `python -m pytest`, `ruff check .`.
 
 ## Rulebooks (`rulebooks/`)

@@ -33,6 +33,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
       - name: Build web/bundle.json
         run: python scripts/build_browser_bundle.py
 
@@ -47,7 +50,11 @@ jobs:
           cp -r static _site/app/static
           cp -r rulebooks _site/app/rulebooks
 
-      - name: Stamp the landing page's version badges and download link
+      - name: Build the preview pages (_site/preview-*.html)
+        # Rendered from the real app, so they cannot drift from the templates or the rules engine.
+        run: python scripts/build_preview_pages.py _site
+
+      - name: Stamp the landing page's version badges and download links
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/stamp_landing_page_versions.py _site/index.html

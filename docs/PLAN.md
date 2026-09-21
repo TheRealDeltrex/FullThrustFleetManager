@@ -151,7 +151,7 @@ FullThrustFleetManager/
   web/                      Pyodide shell (index.html), deployed to Pages by CI
   tests/
   docs/PLAN.md, docs/mockups/
-  .github/workflows/        tests.yml, deploy-pages.yml (as Frostgrave)
+  .github/workflows/        tests.yml, deploy-pages.yml, build-linux.yml (as Frostgrave)
 ```
 
 **Layering (strict, from Frostgrave):** `rulesets/*` (data + pure rules) → `fleet_rules.py`
