@@ -45,22 +45,64 @@ PyInstaller cannot cross-compile, so this is local and manual:
 ```
 
 That produces a **onedir** build at `dist/FullThrustFleetManager/` (~63 MB; the rulebooks and
-pdf.js are most of it). The published zip holds that folder's **contents** at its root —
-`FullThrustFleetManager.exe` next to `_internal\` — not the folder itself, so the user unzips
-anywhere and runs the exe they can see. Name it exactly `FullThrustFleetManager-<version>-win64.zip`:
-`scripts/stamp_landing_page_versions.py` finds the download by that `-win64.zip` suffix and reads
-the version from the release tag, so a misnamed asset silently leaves the card unstamped.
+pdf.js are most of it).
+
+### Sign it, then package it
+
+In that order: the signature goes on the exe inside `dist\FullThrustFleetManager\`, and signing
+the zip instead would do nothing for the user.
+
+Sign with the same self-signed `CN=Deltrex, O=Deltrex, C=DE` certificate the Frostgrave project
+uses (expires 2036-08-05). There is no Windows SDK / `signtool.exe` on this machine, so use the
+PKI cmdlets.
+
+The key lives in the Windows certificate store, and that is the copy to use — do not copy the
+`.pfx` into this repo. It is passwordless, so a stray commit would publish a working signing
+key; `.gitignore` blocks `.codesign/` as a guard in case one ever lands there anyway.
+
+**Select it by thumbprint.** There are two `Deltrex` certificates in `Cert:\CurrentUser\My`, and
+matching on the subject returns both. The older one (`CN=Deltrex`, no `O`/`C`, expires
+2031-07-29, thumbprint `F76A92DB…`) is the `OLD-lostpw` key and must not be used.
+
+```powershell
+$cert = Get-Item "Cert:\CurrentUser\My\723FEAB2277DA6FB30EB99D5105CAA4ED98057E2"
+Set-AuthenticodeSignature -FilePath "dist\FullThrustFleetManager\FullThrustFleetManager.exe" `
+  -Certificate $cert -HashAlgorithm SHA256 -TimestampServer "http://timestamp.digicert.com"
+```
+
+**`Status` comes back `UnknownError`, and that is the expected result** — it is the
+untrusted-root complaint for a self-signed certificate, not a failure. Confirm the signature
+really landed by checking the subject and that it was timestamped, which is what keeps it valid
+after the certificate expires:
+
+```powershell
+$v = Get-AuthenticodeSignature "dist\FullThrustFleetManager\FullThrustFleetManager.exe"
+$v.SignerCertificate.Subject          # CN=Deltrex, O=Deltrex, C=DE
+$null -ne $v.TimeStamperCertificate   # True
+```
+
+If the store is ever empty (fresh machine), re-import from Frostgrave's
+`.codesign\Deltrex-CodeSigning.pfx` with an empty `SecureString` as the password, or regenerate
+with `New-SelfSignedCertificate -Type CodeSigningCert` and export passwordless.
+
+The certificate exists so Windows shows "Deltrex" rather than "Unknown Publisher". **SmartScreen
+still warns**, because the root is not trusted and the binary has no reputation; the owner has
+accepted that, and `web/landing.html` says so.
+
+Note that **v0.1.1 shipped unsigned** (`Get-AuthenticodeSignature` on the published asset reports
+`NotSigned`), so the first signed release is also the first one whose landing-page note is true.
+
+Only once it is signed, zip it. The published zip holds the build folder's **contents** at its
+root, `FullThrustFleetManager.exe` next to `_internal\`, not the folder itself, so the user
+unzips anywhere and runs the exe they can see. Name it exactly
+`FullThrustFleetManager-<version>-win64.zip`: `scripts/stamp_landing_page_versions.py` finds the
+download by that `-win64.zip` suffix and reads the version from the release tag, so a misnamed
+asset silently leaves the card unstamped.
 
 ```powershell
 Compress-Archive -Path "dist\FullThrustFleetManager\*" `
   -DestinationPath "dist\FullThrustFleetManager-<version>-win64.zip" -Force
 ```
-
-**The exe is not signed.** Checked against the shipped v0.1.1 asset: `Get-AuthenticodeSignature`
-reports `NotSigned`, which is what the landing page's SmartScreen note already says. Frostgrave
-signs with a self-signed `CN=Deltrex` cert under its own `.codesign/`; this project has never
-done that. Do not start signing on your own initiative — if the owner asks for it, the
-SmartScreen wording in `web/landing.html` has to change in the same breath.
 
 Smoke-test the built exe before releasing it. **Do the whole thing in one command**:
 `idle_watchdog` exits the process 180 s after the last browser heartbeat and nothing here sends
