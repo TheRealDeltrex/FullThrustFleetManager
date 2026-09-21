@@ -106,6 +106,32 @@ def test_a_draft_release_is_not_offered_as_a_download():
     assert stamp.latest_asset([shipped], "-linux-x64.tar.gz") is None
 
 
+# ---- The prose, which has no build step to keep it honest ---------------------------------------
+#
+# The badges stamp themselves; the sentences do not. The page sat claiming 96 catalog designs for
+# the whole of the alien-race work, which is what these two tests exist to stop happening again.
+
+
+def test_the_page_states_the_catalog_size_the_app_actually_has(html):
+    import store
+
+    stated = {int(n) for n in re.findall(r"(\d+) ship classes", html)}
+    assert stated == {len(store.catalog_designs())}, (
+        "web/landing.html advertises a catalog size the app no longer has"
+    )
+
+
+def test_the_page_names_every_race_the_rules_engines_offer(html):
+    from rulesets import RULESETS
+
+    # The page sets its apostrophes typographically and the rules engines type them straight,
+    # so compare with both flattened: Kra'Vak and Kra’Vak are the same race.
+    page = html.replace("’", "'")
+    races = {race.name for rs in RULESETS.values() for race in rs.races()} - {"Human"}
+    for name in races:
+        assert name.replace("’", "'") in page, f"web/landing.html never mentions {name}"
+
+
 # ---- The preview pages -------------------------------------------------------------------------
 
 

@@ -458,6 +458,12 @@ text layer is OCR: verify numbers against the page image (`page.get_pixmap(dpi=2
 - Work on `devversion`; `main` is for releases only. Never push to `main` without the owner.
 - Commit per coherent step; each milestone issue is closed by the commit/PR that completes it.
 - Commit messages end with the attribution line the harness provides.
+- **Shipping** (version bump, exe, release, Pages deploy) has its own procedure in
+  `.claude/skills/shipping-a-release/SKILL.md`. Read it when actually shipping and not
+  before. Two things in it are easy to get wrong from memory: deploy Pages **last**, after
+  the zip is attached, or the Windows badge stamps the previous version; and dispatch the
+  workflow with `--ref devversion` as well as `-f ref=devversion`, or GitHub runs `main`'s
+  copy of the workflow file.
 
 ## Testing
 
