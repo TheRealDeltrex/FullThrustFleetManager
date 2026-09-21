@@ -2,8 +2,8 @@
 
 Fleet management tool for the *Full Thrust* starship wargame (Ground Zero Games): design ships,
 build fleets to a points limit, track campaign damage, and print a fleet PDF for the table.
-Supports the Full Thrust 2nd edition and Fleet Book rulesets; Cross Dimensions and Project
-Continuum later.
+Supports the Full Thrust 2nd edition and Fleet Book rulesets, including the Fleet Book 2 alien
+races; Cross Dimensions and Project Continuum later.
 
 [![Full Thrust Fleet Manager](https://raw.githubusercontent.com/TheRealDeltrex/FullThrustFleetManager/devversion/static/logo.jpg)](https://therealdeltrex.github.io/FullThrustFleetManager/)
 
@@ -11,17 +11,20 @@ Continuum later.
 to play in your browser or download the Windows build, no code needed. You can also take the
 [latest release](../../releases/latest) directly.
 
-**Status:** v0.2, adding the Fleet Book 2 alien races (Kra'Vak, Sa'Vasku and Phalon).
-Licensed GPL-3.0; Ground Zero Games content notice in [NOTICE.md](NOTICE.md), full build
-plan in [docs/PLAN.md](https://github.com/TheRealDeltrex/FullThrustFleetManager/blob/devversion/docs/PLAN.md).
+The [download page](https://therealdeltrex.github.io/FullThrustFleetManager/) always states
+the current version of each build. Licensed GPL-3.0; Ground Zero Games content notice in
+[NOTICE.md](NOTICE.md), full build plan in
+[docs/PLAN.md](https://github.com/TheRealDeltrex/FullThrustFleetManager/blob/devversion/docs/PLAN.md).
 
 ## What it does
 
 - **Design ships** to the Fleet Book or Full Thrust 2nd edition rules, with live MASS and NPV,
   an arc picker and a rules check. Break the rules deliberately if you want to; the design is
   then marked non-conforming.
-- **Build fleets** to a points limit, in squadrons, from your own designs or the 96 ship classes
+- **Build fleets** to a points limit, in squadrons, from your own designs or the ship classes
   of the books, with a tournament check that lists every violation.
+- **Field the alien races**: Kra'Vak, Sa'Vasku and Phalon, each with its own systems,
+  record-sheet icons, rules check and quick reference, alongside the human fleets.
 - **Track a campaign**: damage marked by clicking the ship diagram, crew factors, repairs and
   replenishment, a fleet log.
 - **Print** a fleet pack or a two-fleet battle pack: roster, record sheets, orders chart,
