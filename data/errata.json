@@ -1,8 +1,0 @@
-[
-  {
-    "id": "ft2:ft:super-heavy-cruiser-example",
-    "book_value": 276,
-    "rules_value": 267,
-    "reason": "FT p.31 design example: the totals line prints 276 Points, but its own line items (72+36+72+25+9+26+27) and the text below the table give 267. Table misprint."
-  }
-]

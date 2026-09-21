@@ -5,10 +5,15 @@ build fleets to a points limit, track campaign damage, and print a fleet PDF for
 Supports the Full Thrust 2nd edition and Fleet Book rulesets; Cross Dimensions and Project
 Continuum later.
 
-![Full Thrust Fleet Manager](static/logo.jpg)
+[![Full Thrust Fleet Manager](https://raw.githubusercontent.com/TheRealDeltrex/FullThrustFleetManager/devversion/static/logo.jpg)](https://therealdeltrex.github.io/FullThrustFleetManager/)
 
-**Status:** v0.1.1, the first release. Licensed GPL-3.0; Ground Zero Games content notice in
-[NOTICE.md](NOTICE.md), full build plan in [docs/PLAN.md](docs/PLAN.md).
+**Just want to use it? Go to the [download page](https://therealdeltrex.github.io/FullThrustFleetManager/)**
+to play in your browser or download the Windows build, no code needed. You can also take the
+[latest release](../../releases/latest) directly.
+
+**Status:** v0.2, adding the Fleet Book 2 alien races (Kra'Vak, Sa'Vasku and Phalon).
+Licensed GPL-3.0; Ground Zero Games content notice in [NOTICE.md](NOTICE.md), full build
+plan in [docs/PLAN.md](https://github.com/TheRealDeltrex/FullThrustFleetManager/blob/devversion/docs/PLAN.md).
 
 ## What it does
 
@@ -30,10 +35,17 @@ Everything runs locally: no account, no server, plain JSON files you can back up
 - **Windows:** download the zip from the [latest release](../../releases/latest), unpack it
   anywhere and run `FullThrustFleetManager.exe`. It needs no installation and works offline;
   your library lives in `%APPDATA%\FullThrustFleetManager`.
-- **In the browser:** the same app runs on GitHub Pages via Pyodide. Nothing is uploaded; the
-  library is stored in that browser only, so export a backup file to keep it.
+- **In the browser:** the same app (landing page at the site root, the app under `app/`) runs
+  on GitHub Pages via Pyodide. Nothing is uploaded; the library is stored in that browser only,
+  so export a backup file to keep it. The landing page also carries read-only previews of a
+  design and a fleet, for looking before installing anything.
 
 ## Running from source
+
+The code lives on the
+[`devversion`](https://github.com/TheRealDeltrex/FullThrustFleetManager/tree/devversion)
+branch; `main` carries only this README, the licence and the workflow files, which GitHub
+requires on the default branch to make them dispatchable. Clone that branch.
 
 Needs Python 3.11 or newer.
 
@@ -49,9 +61,14 @@ Then open <http://127.0.0.1:5000/>. Data is kept in `userdata/` next to the chec
 ## Building
 
 - **Windows desktop app:** `pyinstaller fleetmanager.spec`, output in `dist/`. Runs fully
-  offline.
+  offline. Released builds are Authenticode-signed with a self-signed "Deltrex" certificate,
+  which puts a publisher name on the SmartScreen prompt without silencing it.
+- **Linux desktop app:** the "Build Linux" GitHub Action runs `fleetmanager-linux.spec`
+  (onefile, no tray icon) and smoke-tests the binary. Nothing has been released for Linux yet;
+  the workflow is there if it is ever wanted.
 - **Web build:** `python scripts/build_browser_bundle.py` writes `web/bundle.json`; the
-  "Deploy Pages" GitHub Action builds and publishes it.
+  "Deploy Pages" GitHub Action builds the site, renders the preview pages from the real app
+  and publishes the lot.
 - **Tests and lint:** `python -m pytest`, `ruff check .`.
 
 ## Rulebooks (`rulebooks/`)
