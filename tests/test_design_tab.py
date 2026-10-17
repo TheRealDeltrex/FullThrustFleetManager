@@ -27,6 +27,7 @@ def fields(design: dict, **changes) -> dict:
         "tmf": design["tmf"], "hull_boxes": design["hull_boxes"], "armour": design["armour"],
         "thrust": design["thrust"], "streamlining": design["streamlining"],
         "hull_kind": design["hull_kind"], "notes": design["notes"],
+        "faction": design["faction"] or "",
     }
     if design["ftl"]:
         data["ftl"] = "on"
@@ -235,6 +236,30 @@ def test_a_new_design_inherits_the_current_fleets_race(client):
     assert resp.status_code == 200
     design = next(d for d in store.list_designs() if d["name"] == "Test hull")
     assert design["race"] == "kravak"
+
+
+def test_a_new_design_defaults_to_the_current_fleets_faction(client):
+    client.post("/fleet/new", data={"ruleset": "ftcd", "name": "Rim patrol", "faction": "NSL"})
+    body = client.get("/design").get_data(as_text=True)
+    assert '<option value="NSL" selected>' in body
+    client.post("/design/new", data={"ruleset": "ftcd", "name": "Picket", "faction": "NSL"})
+    assert next(d for d in store.list_designs() if d["name"] == "Picket")["faction"] == "NSL"
+
+
+def test_the_workbench_sets_the_faction_and_saving_keeps_it(client):
+    design_id = make(client, ruleset="ftcd")
+    assert 'name="faction"' in client.get(f"/design/{design_id}").get_data(as_text=True)
+    client.post(f"/design/{design_id}", data=fields(store.get_design(design_id), action="save",
+                                                    faction="ESU", allow_rule_breaking="on"))
+    assert store.get_design(design_id)["faction"] == "ESU"
+
+
+def test_saving_a_catalog_variant_keeps_the_class_faction(client):
+    """The workbench used to have no faction field, so every save cleared it."""
+    variant, _msg = store.make_variant(CATALOG)
+    client.post(f"/design/{variant['id']}", data=fields(variant, action="save",
+                                                        allow_rule_breaking="on"))
+    assert store.get_design(variant["id"])["faction"] == "NAC"
 
 
 def test_the_add_system_picker_follows_the_designs_race(client):

@@ -65,6 +65,13 @@
             </optgroup>
           {% endfor %}
         </select>
+        {# The current fleet's faction by default, so a design made for it does not mark the fleet mixed. #}
+        <select class="input" name="faction" aria-label="{{ _('Faction') }}">
+          <option value="">{{ _("No faction") }}</option>
+          {% for faction in all_factions %}
+            <option value="{{ faction.id }}"{% if current_fleet and current_fleet.faction == faction.id %} selected{% endif %}>{{ faction.name }}</option>
+          {% endfor %}
+        </select>
         <button class="btn primary" type="submit">{{ _("Create design") }}</button>
       </form>
     </div>
@@ -113,6 +120,14 @@
             <label>{{ _("Name") }}<input class="input" name="name" value="{{ d.name }}" /></label>
             <label>{{ _("Type") }}<input class="input" name="type_label" value="{{ d.type_label }}" /></label>
             <label>{{ _("Type code") }}<input class="input" name="type_code" value="{{ d.type_code }}" /></label>
+            <label>{{ _("Faction") }}
+              <select class="input" name="faction">
+                <option value="">{{ _("None") }}</option>
+                {% for faction in selected.factions %}
+                  <option value="{{ faction.id }}" {% if d.faction == faction.id %}selected{% endif %}>{{ faction.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
             <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
             <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
             {# Cross Dimensions tech levels (CD pp.43-44), each beside the part it upgrades. #}
