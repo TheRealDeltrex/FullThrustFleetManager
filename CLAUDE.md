@@ -18,7 +18,7 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 ## Current state
 
 M1-M11 are done: the whole v1 feature set — the Layout C shell, the FB and FT2 (+ More Thrust)
-rules engines, the 96-design catalog behind the NPV gate, the storage layer, the SSD layout
+rules engines (after v1, a third: FTCD, Cross Dimensions), the 96-design catalog behind the NPV gate, the storage layer, the SSD layout
 engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF and the rulebook
 viewer. What remains is packaging: **M12** (desktop exe), **M13** (web build) and M14 (release,
 the owner's).
@@ -43,7 +43,8 @@ What exists:
 - `scripts/build_browser_bundle.py` → `web/bundle.json` (gitignored), `web/index.html` (the
   Pyodide shell). `scripts/build_preview_pages.py` and
   `scripts/stamp_landing_page_versions.py` finish the Pages site; see Web build below.
-- `rulesets/` — the `Ruleset` protocol, registry, FB and FT2 engines; see Rulesets below.
+- `rulesets/` — the `Ruleset` protocol, registry, FB, FT2 and FTCD engines; see Rulesets and
+  FTCD ruleset below.
 - `data/catalog/` — the read-only catalog; see Catalog below. `data/errata.json` — book values
   that disagree with the rules, with the reason (PLAN 8).
 - `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` and
@@ -259,7 +260,9 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `BreakdownRow`, `Breakdown`, `Issue`, `QuickRefEntry`), the `Ruleset` protocol, `RULESETS`,
   `register()`, `get_ruleset()`. Rulesets register at the bottom of that file (they import the
   dataclasses, so the import has to come last).
-- The protocol is PLAN 6.1 plus: `arcs` (the ruleset's arc names), `loadout_points()` (fleet
+- The protocol is PLAN 6.1 plus: `arcs` (the ruleset's arc names), `option_keys` (the fleet
+  options it offers, in display order; `fleet_rules.option_label()` names them, and the fleet
+  form, chips and PDF show only those), `loadout_points()` (fleet
   totals include loadouts, PLAN 5.4), `fighter_types(options, race)` (loadout editor),
   `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)` and
   `quickref(systems_present, options, races)`. `loadout=None` means the design's default loadout.
@@ -369,6 +372,30 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   rule and validator), `tests/test_rulesets.py` (protocol conformance).
   `docs/mockups/ssd.js` has a JS costing that agrees on 219 and 261; it is not the reference.
 
+## FTCD ruleset (`rulesets/ftcd/`)
+
+- Cross Dimensions chapter 11, human tech. `data.py` (book, picker, CD p.42 classes),
+  `rules.py` (costing, validation), `__init__.py`. It reuses FB's helpers and its missile check
+  (`rulesets.fb.rules`) because CD is the Fleet Book design system gathered into one book; what
+  CD changes is in `rules.py`'s docstring. Golden: the CD p.46 Heavy Cruiser is 294.
+- New design fields `hull_advanced`, `drive_advanced`, `ftl_advanced` (normalised in `store`;
+  other rulesets ignore them). An advanced hull has three rows (thresholds 6, 5) and is a
+  standard hull below four boxes; an advanced drive turns its full thrust and its sheet icon
+  is the "nA" hexagon, the advanced FTL a hexagon. Both come from `derived`, not a ruleset id.
+- Broadside arcs are exactly `FS, AS, AP, FP`; they cost as three arcs (class-1/2 beams as six).
+- Shell armour reuses `armour_layers` but costs 2, 4, 8 per box (doubling), not the Phalon
+  2 x layer. MASS used may be under the total (CD p.42 "a maximum of"): a note, not a violation.
+- **Fleet options drive points, so the Design tab passes none**: the CPV hull cost and paying for
+  advanced FTL apply to fleet totals only, and a system behind an option (`cd_optional_systems`,
+  `cd_multistage`, `cd_super_weapons`) is an `option_needed` note there and an `option_off`
+  violation only where a fleet has that option explicitly off.
+- Quick reference: `CD_ENTRIES` in `tools/extract_quickref.py`. CD's headings are mixed case, so
+  each entry names the next heading and a printed-page window instead; `gap_text()` restores the
+  word spaces the justified text layer drops (glyph gap > 0.1 x font size) and skips the
+  all-italic lines, which are the book's worked examples. That cleanup runs for CD only, so the
+  FB and FT2 output does not move.
+- No catalog: the book prints no designs of its own.
+
 ## Catalog
 
 - `data/catalog/fb_fb1.json` (FB1 pp.13-42: 57 NAC/NSL/FSE/ESU warships, 8 merchant and support
@@ -457,9 +484,10 @@ image (`page.get_pixmap(dpi=200)`).
 - A ruleset's `books` are its **rules sources**: what a `book_url()` link points into and what
   the quick reference quotes. Books the app ships only to be read go in `REFERENCE_BOOKS`
   (`rulesets/__init__.py`) instead, so a code can never resolve a page reference into a book
-  whose rules nothing implements. Cross Dimensions (`CD`) and Project Continuum (`PC`, errata
-  `PCE`) are there; both are free non-commercial publications distributed with GZG's
-  agreement, credited in `NOTICE.md`. `app.books()` merges the two, rulesets winning a clash.
+  whose rules nothing implements. Project Continuum (`PC`, errata `PCE`) is there; Cross
+  Dimensions (`CD`) was too until the FTCD ruleset made it a rules source. Both are free
+  non-commercial publications distributed with GZG's agreement, credited in `NOTICE.md`.
+  `app.books()` merges the two, rulesets winning a clash.
 - A new PDF needs no spec or workflow change: `fleetmanager.spec` and `deploy-pages.yml` both
   take the whole `rulebooks/` folder. Verify its `page_offset` against a printed folio rather
   than assuming 0; `tests/test_rulebooks.py` checks the reference books' against pages 20

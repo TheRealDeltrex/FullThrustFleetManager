@@ -29,10 +29,11 @@ def test_every_book_a_ruleset_names_is_bundled():
             assert (paths.bundle_dir() / "rulebooks" / book.file).is_file(), book.file
 
 
-# ---- Reference-only books (Cross Dimensions, Project Continuum) ---------------------------------
+# ---- Reference-only books (Project Continuum) and Cross Dimensions ------------------------------
 #
-# Shipped to read; no ruleset implements their rules, so they hang off REFERENCE_BOOKS rather than
-# off a ruleset whose page links would then resolve into the wrong book.
+# Project Continuum is shipped to read; no ruleset implements its rules, so it hangs off
+# REFERENCE_BOOKS rather than off a ruleset whose page links would then resolve into the wrong
+# book. Cross Dimensions started there and moved to the FTCD ruleset's own books.
 
 
 def test_every_reference_book_is_bundled_too():
@@ -54,6 +55,13 @@ def test_reference_books_are_offered_beside_the_rules_books(client):
     assert book.title in text(client.get("/settings"))          # listed where a reader finds them
 
 
+def test_cross_dimensions_is_the_ftcd_rules_source_not_a_reference_book():
+    from rulesets import REFERENCE_BOOKS
+
+    assert "CD" not in {b.code for b in REFERENCE_BOOKS}
+    assert [b.code for b in RULESETS["ftcd"].books] == ["CD"]
+
+
 def test_a_reference_book_opens_and_serves_its_file(client):
     assert "rulebook/CD/file" in text(client.get("/rulebook/CD"))
     response = client.get("/rulebook/CD/file")
@@ -66,7 +74,7 @@ def test_the_reference_book_offsets_match_the_printed_folios():
 
     from rulesets import REFERENCE_BOOKS
 
-    for book in REFERENCE_BOOKS:
+    for book in REFERENCE_BOOKS + RULESETS["ftcd"].books:
         if book.code == "PCE":
             continue                                   # 8-page errata, no printed folios
         with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:
@@ -157,7 +165,11 @@ def quickref_entries():
                                        "sm_launcher", "sm_magazine", "pds", "pdaf", "adfc",
                                        "screen", "armour", "hold", "tug_drive", "ortillery",
                                        "cloak", "reflex_field", "mt_missile", "streamlining",
-                                       "ftl", "crew", "hull_track"},
+                                       "ftl", "crew", "hull_track",
+                                       # Cross Dimensions only
+                                       "graser", "advanced_screen", "shell_armour", "scattergun",
+                                       "heavy_missile", "superior_sensors", "weasel_capital",
+                                       "area_ecm", "minelayer", "minesweeper"},
                                       {"core_systems": True, "rerolls": True,
                                        "vector_movement": True}):
             yield ruleset.id, entry

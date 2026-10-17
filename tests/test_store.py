@@ -8,6 +8,7 @@ import pytest
 
 import migrations
 import store
+from rulesets import RULESETS
 
 CATALOG_FB = "fb:fb1:nac-harrison"
 
@@ -401,3 +402,17 @@ def test_settings_defaults_and_validation():
     s = store.load_settings()
     assert s["paper"] == "Letter" and s["pdf_viewer"] == "app"
     assert "nothing_like_this" not in s
+
+
+@pytest.mark.parametrize("ruleset,race,system_type,arcs", [
+    ("fb", "human", "beam", ["F", "FS", "AS", "A", "AP", "FP"]),     # class 1: all six or illegal
+    ("fb", "phalon", "plasma_bolt_launcher", ["FP", "F", "FS"]),       # exactly three adjacent
+    ("ftcd", "human", "heavy_missile", ["FP", "F", "FS"]),             # three arcs or broadside
+])
+def test_an_added_system_takes_the_pickers_default_arcs(ruleset, race, system_type, arcs):
+    design, _msg = store.new_design(ruleset, race=race)
+    ok, _msg = store.add_system(design, system_type)
+    assert ok and design["systems"][-1]["arcs"] == arcs
+    codes = {i.code for i in RULESETS[ruleset].validate_design(design, {})
+             if i.system_uid == design["systems"][-1]["uid"] and i.severity == "violation"}
+    assert not codes

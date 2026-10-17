@@ -96,6 +96,7 @@ class Ruleset(Protocol):
     books: tuple[BookRef, ...]
     arcs: tuple[str, ...]  # fire arcs clockwise from fore: FB six, FT2 four (FT p.8)
     icon_set: Any  # the human icon table in ssd_layout.ICON_SETS; per race, icon_set_for()
+    option_keys: tuple[str, ...]  # the fleet options this ruleset offers, in display order
 
     def races(self) -> list[Race]: ...
 
@@ -157,7 +158,6 @@ def get_ruleset(ruleset_id: str) -> Ruleset:
 # quick reference quotes. These are neither, so they are kept apart rather than hung off a
 # ruleset they do not belong to. The viewer and the Settings list show both (see app.books()).
 REFERENCE_BOOKS: tuple[BookRef, ...] = (
-    BookRef("CD", "Full Thrust: Cross Dimensions", "Full Thrust Cross Dimensions.pdf", 1),
     BookRef("PC", "Full Thrust: Project Continuum", "Full Thrust - Project Continuum.pdf", 0),
     BookRef("PCE", "Project Continuum Errata",
             "Full Thrust - Project Continuum Errata.pdf", 0),
@@ -165,7 +165,8 @@ REFERENCE_BOOKS: tuple[BookRef, ...] = (
 
 
 # Registration imports come last: the packages import the dataclasses above.
-from rulesets import fb, ft2  # noqa: E402
+from rulesets import fb, ft2, ftcd  # noqa: E402
 
 register(fb.RULESET)
 register(ft2.RULESET)
+register(ftcd.RULESET)

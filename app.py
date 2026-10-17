@@ -244,7 +244,9 @@ def _fleet_context(fleet: dict, view: str) -> dict:
         "library": sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
                           key=lambda d: d["name"].lower()),
         "factions": store.builtin_factions(fleet["ruleset"]) + store.custom_factions(),
-        "option_keys": fleet_rules.FLEET_OPTION_KEYS,
+        # Only the options this fleet's ruleset offers, in its order, with readable names.
+        "option_keys": fleet_rules.ruleset_option_keys(fleet["ruleset"]),
+        "option_label": fleet_rules.option_label,
     }
 
 
@@ -290,7 +292,10 @@ def _update_details(fleet: dict) -> tuple[bool, str]:
         faction=form.get("faction") or None,
         points_limit=int(form.get("points_limit") or 0),
         allow_race_mixing=form.get("allow_race_mixing") == "on",
-        options={k: form.get("opt-" + k) == "on" for k in fleet_rules.FLEET_OPTION_KEYS},
+        # Options the ruleset does not offer are not on the form and stay as they were.
+        options={**fleet["options"],
+                 **{k: form.get("opt-" + k) == "on"
+                    for k in fleet_rules.ruleset_option_keys(fleet["ruleset"])}},
         notes=form.get("notes", ""),
     )
 
@@ -474,6 +479,11 @@ def _apply_form(design: dict) -> dict:
             if part.isdigit()
         ]
     design["ftl"] = form.get("ftl") == "on"
+    if "advanced-present" in form:
+        # Only a ruleset with tech levels draws these checkboxes; the marker keeps an unticked
+        # box from reading as "the form did not say".
+        for field in ("hull_advanced", "drive_advanced", "ftl_advanced"):
+            design[field] = form.get(field) == "on"
     design["streamlining"] = form.get("streamlining", "none")
     design["allow_rule_breaking"] = form.get("allow_rule_breaking") == "on"
     design["notes"] = form.get("notes", "")[:4000]

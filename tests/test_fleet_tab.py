@@ -260,3 +260,16 @@ def test_a_phalon_fleet_is_not_mixed_faction(client):
     assert fleet["race"] == "phalon"
     assert "PH" in {f["id"] for f in store.builtin_factions("fb")}
     assert not fleet_rules.badges(fleet, store.designs_for_fleet(fleet))["mixed_faction"]
+
+
+def test_a_fleet_offers_only_its_rulesets_options_by_name(client):
+    fleet_id = make_fleet(client, ruleset="ftcd")
+    page = text(client.get("/fleet"))
+    assert 'badge rs-ftcd' in page and "ruleset-strip rs-ftcd" in page
+    assert "Combat Points Value (CPV) hull cost" in page
+    assert "opt-cd_cpv" in page and "opt-mt_systems" not in page and "opt-rerolls" not in page
+    client.post(f"/fleet/{fleet_id}/action", data={
+        "action": "update_details", "name": "Home Fleet", "points_limit": "1000", "opt-cd_cpv": "on",
+    })
+    options = store.get_fleet(fleet_id)["options"]
+    assert options["cd_cpv"] is True and options["cd_advanced_ftl"] is False

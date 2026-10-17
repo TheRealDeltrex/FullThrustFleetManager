@@ -92,6 +92,7 @@ a { color: var(--accent); }
   background: var(--rs-current); border-radius: 4px; padding: 2px 7px; }
 .badge.rs-fb { background: var(--rs-fb); }
 .badge.rs-ft2 { background: var(--rs-ft2); }
+.badge.rs-ftcd { background: var(--rs-ftcd); }
 .lib .body { padding: 10px 12px; }
 .lib-group { margin-bottom: 8px; }
 .lib-group summary { cursor: pointer; font-size: 12px; font-weight: 600; }
@@ -124,6 +125,7 @@ a { color: var(--accent); }
 /* Fleet overview (PLAN 9.3) */
 .ruleset-strip.rs-fb { background: var(--rs-fb); }
 .ruleset-strip.rs-ft2 { background: var(--rs-ft2); }
+.ruleset-strip.rs-ftcd { background: var(--rs-ftcd); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .views { display: flex; gap: 4px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }

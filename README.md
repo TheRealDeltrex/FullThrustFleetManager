@@ -85,11 +85,12 @@ bookmarks:
 Bookmarks follow each book's contents page; the Fleet Books also have one bookmark per ship
 class under each fleet's "Ship Designs" entry.
 
-Three more books are bundled to read rather than to play from, given the same treatment:
-*Cross Dimensions* and *Project Continuum* with its errata, both free non-commercial
-publications distributed with Ground Zero Games' agreement. No ruleset implements their rules,
-so they are registered as `REFERENCE_BOOKS` rather than against a ruleset, and appear in the
-viewer and the Settings list beside the rest.
+Three more books are bundled, given the same treatment: *Cross Dimensions*, and *Project
+Continuum* with its errata, both free non-commercial publications distributed with Ground Zero
+Games' agreement. Cross Dimensions is the rules source of the FTCD ruleset. Project Continuum
+is there to read: no ruleset implements its rules yet, so it is registered as a
+`REFERENCE_BOOKS` entry rather than against a ruleset, and appears in the viewer and the
+Settings list beside the rest.
 
 The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
 `tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and

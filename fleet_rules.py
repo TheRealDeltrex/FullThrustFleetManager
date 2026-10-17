@@ -19,7 +19,32 @@ DESTROYED = "destroyed"
 FLEET_OPTION_KEYS = (
     "core_systems", "rerolls", "fighter_endurance", "vector_movement",
     "mt_systems", "mt_superships", "mt_fighters",
+    "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_cpv", "cd_advanced_ftl",
 )
+
+
+def option_label(key: str) -> str:
+    """What a fleet option is called on screen and on paper; the key itself is storage."""
+    return {
+        "core_systems": _("Core systems"),
+        "rerolls": _("Beam re-rolls"),
+        "fighter_endurance": _("Fighter endurance"),
+        "vector_movement": _("Vector movement"),
+        "mt_systems": _("More Thrust systems"),
+        "mt_superships": _("More Thrust superships"),
+        "mt_fighters": _("More Thrust fighter types"),
+        "cd_optional_systems": _("Sensors, ECM, mines and ortillery"),
+        "cd_multistage": _("Multi-stage missiles"),
+        "cd_super_weapons": _("Nova cannon, wave gun, reflex field, cloak"),
+        "cd_cpv": _("Combat Points Value (CPV) hull cost"),
+        "cd_advanced_ftl": _("Pay for advanced FTL"),
+    }.get(key, key)
+
+
+def ruleset_option_keys(ruleset_id: str) -> tuple[str, ...]:
+    """The options a fleet of this ruleset can switch, in the ruleset's display order."""
+    rs = RULESETS.get(ruleset_id)
+    return tuple(getattr(rs, "option_keys", FLEET_OPTION_KEYS)) if rs else ()
 
 
 def ruleset_of(fleet: dict):

@@ -63,6 +63,11 @@ class FT2Ruleset:
     books = data.BOOKS
     arcs = data.ARCS
     icon_set = "ft2"  # the icon table in ssd_layout.ICON_SETS
+    # More Thrust content first: it decides what the fleet may field.
+    option_keys = (
+        "mt_systems", "mt_superships", "mt_fighters",
+        "core_systems", "rerolls", "fighter_endurance", "vector_movement",
+    )
 
     @property
     def name(self) -> str:

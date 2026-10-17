@@ -1,0 +1,264 @@
+{
+ "schema_version": 1,
+ "entries": [
+  {
+   "key": "hull_track",
+   "title": "Damage",
+   "text": "When damage is inflicted, these points are marked off the target ship's hull boxes on its SSD, starting at the top left and crossing out one box per damage point inflicted. If the ship has armour, some or all will also be crossed off. Here a ship with 3 armour and 14 hull boxes has taken 4 points of damage, half on the armour. It is normal for a ship to have hull damage but armour boxes remaining, however hull boxes are always crossed off in sequence without gaps. When you reach the end of a row of hull boxes (but not armour), this is a threshold point (section 4.9) and each ship system must make a threshold check.",
+   "book": "CD",
+   "page": 7
+  },
+  {
+   "key": "vector_movement",
+   "title": "Vector movement",
+   "text": "fleet book 1 introduced a vector movement system. This book does not include any vector movement rules, but you can still use the older system.",
+   "book": "CD",
+   "page": 13
+  },
+  {
+   "key": "arcs",
+   "title": "Fire arcs",
+   "text": "The 360 degree space around each ship is divided into six arcs, each of 60 degrees. The arcs are indicated in figure 11, and are designated Fore (F), Fore Starboard (FS), Aft Starboard (AS), Aft (A), Aft Port (AP), and Fore Port (FP). These fire arcs determine which of a ship's weapons may be brought to bear on a particular target, as some will be unable to fire through certain arcs. A given target ship may only be in one fire arc of the firing ship. No ship may fire offensive weaponry through its aft arc due to the interference of the ship's main drive.",
+   "book": "CD",
+   "page": 14
+  },
+  {
+   "key": "fire_control",
+   "title": "Fire control systems",
+   "text": "The fire control systems (FireCons or FCs) of a ship are some of its most important fittings. Each FireCon represents a suite of sensor systems and computer facilities to direct the fire of the ship's offensive weaponry. Without these, ships are unable to locate and track an enemy with the precision required to fire at it. Each FireCon system permits the ship to engage one target during the firing portion of a turn.",
+   "book": "CD",
+   "page": 15
+  },
+  {
+   "key": "beam",
+   "title": "Beam fire",
+   "text": "A beam weapon rolls a number of dice equal to the class, minus 1 die for each range band beyond the closest. For every die rolled, damage is inflicted on an unscreened target ship as follows: • Every 1,2, or 3 rolled = no effect. (Either a miss or insignificant surface damage.) • Every 4 or 5 rolled = 1 damage point to the target. • Every 6 rolled = 2 damage points inflicted. These damage levels can be reduced by the use of screens or armour on the target ship. (Sections 4.6 and 4.7). No single weapon may split its die rolls between targets in any circumstances, eg a beam-3 at close range must roll all three dice against the same target ship.",
+   "book": "CD",
+   "page": 15
+  },
+  {
+   "key": "rerolls",
+   "title": "Re-rolls",
+   "text": "Beam weapons are capable of penetrating damage. Any roll of six inflicts the usual damage and allows a re-roll: roll an extra D6, and apply any further damage that is indicated by the result. The re-rolls ignore any defensive screens or armour and damage is applied directly to the hull. If a re-roll is also a six, then apply the damage and roll again. There is no limit to the number of re-rolls you can make if you keep throwing sixes. Re-rolls are made for a natural (unmodified) 6 only. For example, if the die roll is modified by +1 then a roll of 5 inflicts 2 damage points as if it were a 6, but does not re-roll.",
+   "book": "CD",
+   "page": 15
+  },
+  {
+   "key": "screen",
+   "title": "Defensive screens",
+   "text": "Screens are the primary defence against beam weapons. Screens are force fields or magnetic fields that deflect or defocus beam energy, but also include materials that reflect energy, or stealth systems that interfere with beam targeting. Screens can be burnt through, but quickly rebuild or recharge themselves. The actual degree of protection given depends on the level of screens that the target ship is carrying. Each level is represented on the SSD by a screen generator symbol, so a ship with level-1 screens would have a single screen generator.",
+   "book": "CD",
+   "page": 16
+  },
+  {
+   "key": "armour",
+   "title": "Armour",
+   "text": "Armour is ablative, metal, ceramic, or similar outer layers that absorb weapons fire but are broken or consumed in the process. Armour also includes force fields that can't be recharged in the time frame of a battle, and other time limited defences such as sandcasters. Armour is represented as additional damage boxes that absorb hits, indicated on the ship diagram as a row of circles placed above the top row of hull boxes. (Yes, calling round circles 'boxes' is a little strange, but it's traditional.) As damage is taken, some of the armour boxes are crossed off on the SSD.",
+   "book": "CD",
+   "page": 16
+  },
+  {
+   "key": "threshold",
+   "title": "Threshold points",
+   "text": "As a ship takes damage from incoming fire, there is a chance that some of the ship's specific systems (drives, weapons, etc) will be damaged or destroyed. To avoid having to roll for possible 'critical hits' every time damage is inflicted we instead use the idea of threshold points at which the player will check to see if each system on the ship is still functioning. A threshold point occurs each time the accumulated damage points reach (or pass) the end of one row of hull boxes on the ship's damage track. At this point, the player must roll one D6 for each system on the ship not already destroyed.",
+   "book": "CD",
+   "page": 17
+  },
+  {
+   "key": "graser",
+   "title": "Grasers",
+   "text": "Grasers are more advanced and especially destructive beam weapons. Like beams, grasers have numeric classes, although the increasing cost means that class 3 and above grasers are less common. The symbol for a graser is similar to a beam but with the class rating in white on a black triangle. The range bands for grasers are 18 MU, not 12, so a class 2 graser rolls 2D6 at 0-18 MU, 1D6 at up to 36 MU. Grasers score hits as beam weapons: against unscreened targets rolls of 4 or 5 inflict 1 hit; rolls of 6 inflict 2. Against level-1 screens rolls of 4 do no damage, and against level-2 screens rolls of 5 or 6 inflict only 1 hit. Grasers are not penetrating weapons and do not re-roll on a 6.",
+   "book": "CD",
+   "page": 19
+  },
+  {
+   "key": "pulse_torpedo",
+   "title": "Torpedoes",
+   "text": "Torpedoes (pulse torpedoes) are railguns, unguided rockets, plasma launchers, and similar weapons that fire projectiles as single shots or in very short bursts. As the projectiles are unguided the firing ship must accurately predict the movement of the target, which becomes more difficult at longer ranges and flight times. While not travelling at lightspeed the projectiles are too fast to be shot down, and since they don't need to be focused the damage remains constant at all ranges. Torpedoes have five range bands, each of 6 MU.",
+   "book": "CD",
+   "page": 19
+  },
+  {
+   "key": "submunition",
+   "title": "Submunition packs",
+   "text": "A submunition pack (SMP) is a single use weapon that fires a cloud of small projectiles either all at once or in quick succession against a single target. They are often used to give smaller ships a cost-effective punch against larger vessels. As the range increases the cloud disperses and the chance of significant damage becomes lower. An SMP fires through a single arc only, by default the fore arc. Once fired, cross the symbol off the SSD and it may not be used again. The maximum range of a submunition pack is 18 MU. The number of dice rolled depends on the range: • At a range of 0-6 MU, 3D6 • At 6-12 MU, 2D6 • At 12-18 MU, one D6.",
+   "book": "CD",
+   "page": 19
+  },
+  {
+   "key": "needle_beam",
+   "title": "Needle weapons",
+   "text": "Needles are very accurate beams, precision guided missiles, or similar sneaky weapons that are used for 'sniping' to knock out individual systems on the target vessel. The maximum range of a needle is 12 MU. Within this range the firing player may nominate any one specific system on the target, and attempt to kill it with the needle shot. Once the target is nominated, roll 1D6. On a score of 6, the targeted system is knocked out and 1 damage point is applied to hull boxes. On a score of 5, the target system is unaffected but 1 damage point is still inflicted on the hull. Rolls of 1-4 have no effect. Needles are penetrating weapons: ignore all screens and armour.",
+   "book": "CD",
+   "page": 20
+  },
+  {
+   "key": "advanced_screen",
+   "title": "Advanced screens",
+   "text": "Advanced screens not only protect against beam weapons, but also against torpedoes, missiles, and other weapons that normally ignore screens. Beams, grasers, fighters, and other weapons that are affected by standard screens are affected in the same way when attacking a ship with advanced screens. SMPs and similar weapons that ignore standard screens and roll a combined hit and damage D6 are affected by advanced screens as if they were beams. Against level-1 advanced screens a roll of 5 inflicts 1 damage point, 6 inflicts 2. Against level-2 advanced screens a roll of 5 or 6 inflicts 1 damage point.",
+   "book": "CD",
+   "page": 20
+  },
+  {
+   "key": "shell_armour",
+   "title": "Shell armour",
+   "text": "Shell or layered armour is unusually effective at absorbing damage and is represented by stacked rows of armour boxes on the ship SSD. The bottom or innermost row (the only row for standard armour) is layer 1, the next above that layer 2, and so on. When hit by weapon fire, half the damage (rounded up) can be absorbed by the top layer as usual. Each successive layer can absorb up to half again of the remaining damage until the hull is reached. Penetrating damage is still applied directly to the hull, regardless of shell armour.",
+   "book": "CD",
+   "page": 20
+  },
+  {
+   "key": "pds",
+   "title": "Point defence",
+   "text": "Point defence weapons are designed for shooting down incoming missiles or fighters. See sections 6.2 and 7.5 for details. Point defence fire does not require FireCons. Point defence systems (PDS) include light beams, autocannon, or countermissile launchers with a large number of reloads. The more PDS symbols a ship has, the stronger the point defence. Beam-1 systems are dual purpose and can also be used for point defence. In this role they do not require a FireCon. Point defence weapons can be fired through any arc, including the rear arc even if the ship has used the main drive in this turn.",
+   "book": "CD",
+   "page": 21
+  },
+  {
+   "key": "scattergun",
+   "title": "Scatterguns",
+   "text": "A scattergun is any short range projectile PDS usable for only one turn, such as a one shot canister gun or countermissile launcher with a limited number of reloads. A scattergun can fire through any arc at a target like other point defence systems, but once fired must be crossed off the SSD. A ship cannot be fitted with both PDS and scatterguns, as they represent different technological or tactical methods of point defence. (A ship can carry scatterguns and light beams.) If as an optional rule you do decided to allow ships to be fitted with both types of point defence, only weapons of one type can be fired in a single turn. A scattergun used for point defence rolls as if it were four PDS.",
+   "book": "CD",
+   "page": 21
+  },
+  {
+   "key": "adfc",
+   "title": "Area-defence fire control",
+   "text": "An ADFC is an enhanced anti-fighter/anti-missile fire control system that allows a ship to protect other nearby ships with fire from its own point defence. One ADFC allows the ship's PDS or scatterguns (but not beam-1) to fire at any combination of threats (fighters, salvo missiles, etc) that are directly attacking one other ship that is within 6 MU of the ADFC carrying ship. Ships with multiple ADFCs may divide their fire to protect as many other ships as the number of operational ADFCs, but each weapon may only be fired once per turn. Weapons used in area defence mode roll dice and score kills exactly as normal PDS fire.",
+   "book": "CD",
+   "page": 21
+  },
+  {
+   "key": "sm_launcher",
+   "title": "Launching missiles",
+   "text": "Missile launch occurs in phase 3, after orders are written but before fighter group movement. The firing player announces the launch of a missile or salvo, and places a salvo counter at the intended point of aim. This may be anywhere up to a maximum range of 24 MU from the firing ship, or 36 MU for extended range missiles, but must be within the boundaries of the fire arcs through which the launcher system may bear. (And not obstructed by any asteroids, planets, or similar obstacles as described in section 13.) The marker is left in place while all ships are moved. An operational FireCon is necessary to launch heavy missiles, salvo missile racks, or salvo missile launchers (section 5.5).",
+   "book": "CD",
+   "page": 23
+  },
+  {
+   "key": "missile_damage",
+   "title": "Missile damage",
+   "text": "Each heavy missile inflicts 3D6 of damage on the target. Each missile in a salvo that hits the target ship inflicts 1D6 of damage. (As usual, half rounded up can be taken on armour, the remainder on the hull.) Standard screens have no effect on missiles. Advanced level-1 screens subtract 1 from each damage roll, advanced level-2 screens subtract 2. If using the optional rear arc attack rule (section 4.8), missiles do not do penetrating damage.",
+   "book": "CD",
+   "page": 24
+  },
+  {
+   "key": "sm_magazine",
+   "title": "Mountings and magazines",
+   "text": "Heavy missiles and salvo missile racks (SMR) have individual symbols on the ship SSD. Once fired, it is crossed off and cannot be used again. Each counts as one system for threshold point checks. A salvo missile launcher (SML) may fire one salvo per turn provided ammunition is left in the magazine. The magazine symbol is a box linked by lines to the SML(s) it feeds. Each magazine has a mass rating, which determines the number of salvo loads carried: mass 2 for a standard salvo, mass 3 for ER. Salvo loads are indicated by small arrowhead symbols within the box which are crossed off as they are fired. Magazines and launchers are considered separate systems for threshold point checks.",
+   "book": "CD",
+   "page": 24
+  },
+  {
+   "key": "hangar",
+   "title": "Fighter launch and recovery",
+   "text": "Fighter groups may be launched from a carrier in any turn. A ship that is launching fighters cannot use the main drive to perform any velocity, course, or facing changes, so need only write Launch as the movement order for that turn. Recovery ('landing') of fighters back on their carrier is similar to launching: the carrier must move at a constant course and velocity for that turn. The fighter group moves into contact with the carrier in the fighter movement phase. Launching fighters move before all others in that game turn. The launching group may immediately form a screen for the carrier, attack other fighters or ships, or carry out any other normal action.",
+   "book": "CD",
+   "page": 26
+  },
+  {
+   "key": "core_systems",
+   "title": "Core systems",
+   "text": "Core systems are optional but recommended. While weapons, fire control sensors, and screen emitters are all surface features and thus are very vulnerable to incoming fire, there are certain vital systems that are usually buried deep within the ships hull. These are the core systems and consist of the Command Bridge (which also includes computer systems, electronics, etc), the Power Core, and the Life Support System. These three systems are grouped together on the ship system status display, with a box drawn around them.",
+   "book": "CD",
+   "page": 31
+  },
+  {
+   "key": "crew",
+   "title": "Damage control parties",
+   "text": "The number of damage control parties (DCP) a ship has is proportional to its crew size, which is in turn a function of ship mass. This assumes that a certain percentage of the crew is allocated to form damage control teams during combat. Military ships have one crew factor (CF) for every 20 mass or part thereof, and one DCP per crew factor. Thus a mass 1-20 ship has one CF and hence 1 DCP, a mass 21-40 ship 2 CFs and 2 DCPs, a mass 81-100 ship 5 CFs and 5 DCPs, and so on. For merchant and civilian vessels, which usually have much smaller crews than warships, there will be one CF per 50 mass (or part thereof) of ship size.",
+   "book": "CD",
+   "page": 32
+  },
+  {
+   "key": "hold",
+   "title": "Cargo and passengers",
+   "text": "The holds and passenger space are arranged on the ship SSD as a row of boxes, containing an H or P identifier as appropriate and a number that represents the actual capacity of the space. The larger spaces are the first to be crossed off as damage is taken. One of the holds or passenger areas is automatically lost each time the ship's cumulative damage reaches a threshold point. When a hold or passenger space box is crossed off, any cargo stored in it is assumed lost and any non-evacuated passengers in that area are killed.",
+   "book": "CD",
+   "page": 32
+  },
+  {
+   "key": "tug_drive",
+   "title": "FTL tugs and tenders",
+   "text": "Any ship can be made a tender by having internal bay space allocated to carry other ships (whether the carried craft are FTL-capable or not), at the same rate as for carrying fighters and other small craft: every 1.5 mass used for hangar bay space provides capacity for 1 mass of carried ship(s). Tugs, which are designed to carry other ships by extending their jumpfield around them, require massively overpowered FTL drives. They need a drive equal to 10% of their mass just to provide their own jump capability, plus for every 1 additional FTL drive mass they can tow an additional 5 transfer mass of other ships.",
+   "book": "CD",
+   "page": 34
+  },
+  {
+   "key": "enhanced_sensors",
+   "title": "Advanced sensors",
+   "text": "If not playing an open book game, these optional rules for more advanced sensors can be used for disclosing information about ship capabilities and status to opponents. Advanced sensor suites are classified as enhanced or superior grade. Enhanced sensors require 2 mass, superior 4. The points cost is mass × 4, so 8 for enhanced and 16 for superior. Basic sensors immediately 'illuminate' the ship using them and the scanned ship, so models for both are placed on the table. If enhanced or superior active sensors are used, the scanning player also rolls 1 D6. If the ship is using enhanced active sensors use the die score as rolled; for superior sensors add 2 to the score.",
+   "book": "CD",
+   "page": 37
+  },
+  {
+   "key": "ecm",
+   "title": "Electronic counter measures",
+   "text": "These additional optional rules allow players to use ECM (Electronic Counter Measures) to jam enemy sensors. Ships may be fitted with individual ECM packages (to protect that ship only) at a mass requirement of 4 and a points cost of 16. Alternatively, a ship may be fitted with an area-effect ECM package that can also protect other nearby ships against sensor scans, at a mass of 6 and points cost of 24. It should be noted that, in general, area effect ECM is only fitted to dedicated electronic warfare ships that would then accompany a flotilla of non-ECM equipped vessels.",
+   "book": "CD",
+   "page": 38
+  },
+  {
+   "key": "minelayer",
+   "title": "Minelaying",
+   "text": "Ships equipped with minelaying systems may deposit mine markers on the table during their movement phase. The player must note in the order for that ship that it will deploy mines in that turn by writing Mine in the order box. Individual mines are carried as loads within a magazine. Each minelayer system fitted may deploy one mine per turn, so a ship with two mine systems may drop two markers during its movement, either both at the same spot or at different points. The mines may be placed anywhere along the ship's course during that movement.",
+   "book": "CD",
+   "page": 38
+  },
+  {
+   "key": "minesweeper",
+   "title": "Minesweeping",
+   "text": "Just as certain ships may be equipped to lay mines, so others may be provided with systems to clear enemy mines safely. To attempt to dispose of a mine marker, the minesweeping ship must have its sweeper system activated by noting this in its orders for that turn. It must then pass within 3 MU of the mine during the course of its movement, and at that point 1D6 is rolled. On a score of 1, the mine immediately attacks the minesweeper, detonating and causing damage as normal. On a roll of 2, the mine does not attack, but is also not disabled; it remain in position and can attack other ships as normal.",
+   "book": "CD",
+   "page": 38
+  },
+  {
+   "key": "nova_cannon",
+   "title": "Spinal mount nova cannon",
+   "text": "This is probably the single most deadly system available; however it does have its disadvantages as well – by all means experiment with fitting one to your largest ships, but don't say we didn't warn you! The nova cannon is a massive weapon that can only be mounted in the spinal core of a capital ship, and fires only directly forward – not just through the fore arc, but actually on the centreline of the ship only. In other words, the weapon fires in whatever direction the ship's bow is pointing. Firing a nova cannon draws a massive amount of power from the ship's power plant.",
+   "book": "CD",
+   "page": 55
+  },
+  {
+   "key": "wave_gun",
+   "title": "Wave gun",
+   "text": "The wave gun is a smaller and slightly less over-the-top variant on the nova cannon. The system fires a plasma charge that expands as it travels along its line of flight, causing damage to any vessels in its path. As with the nova cannon, the wave gun may fire only along the main axis of the carrying ship, ie in a straight line bearing directly forward along the ship's current course. The ship may not fire any other weaponry in the turn that it fires the wave gun, and also counts as unscreened through its entire frontal arc while the weapon is being fired. The wave gun needs to be charged prior to firing.",
+   "book": "CD",
+   "page": 55
+  },
+  {
+   "key": "reflex_field",
+   "title": "Reflex field",
+   "text": "The reflex field is a variation on conventional screen technology in that it protects its carrying ship (partially) against attack from energy weapons such as standard beam batteries. The interesting aspect of the reflex field is that it has the capability to actually 'return' some or all of the attacking beam energy back to its source, causing damage to the firing vessel! 'Energy weapon' includes beams, grasers, fighters, and any other weapon affected by standard screens. This nasty little device may be activated in any desired turn, but it must be written in the carrying ship's orders that the field device is to be activated.",
+   "book": "CD",
+   "page": 55
+  },
+  {
+   "key": "cloak",
+   "title": "Cloaking field",
+   "text": "Cloaking fields are systems that render ships totally invisible and undetectable on all forms of sensors and visual scanning. They are thus very useful under certain circumstances, but they have one big disadvantage as well: though the cloaked ship cannot be seen, it also cannot see out. While the cloak is active it is in its own little world, with no interface to outside reality. (A bit like some gamers…) The cloaked ship is thus reduced to navigating inertially, based on the data it had when entering cloaking mode – it has no idea what is going on around it until it decloaks again.",
+   "book": "CD",
+   "page": 56
+  },
+  {
+   "key": "turn_sequence",
+   "title": "Turn sequence",
+   "text": "1. Write orders. 2. Roll for initiative. 3. Launch missiles. 4. Move fighter groups. 5. Move ships. 6. Secondary fighter moves. 7. Allocate missile and fighter attacks. 8. Fighters against fighters or missiles. 9. Missiles and fighters against ships. 10. Ships fire. 11. Damage control.",
+   "book": "CD",
+   "page": 60
+  },
+  {
+   "key": "ortillery",
+   "title": "Ortillery",
+   "text": "This is orbital artillery or a planetary bombardment system used for ground support fire from orbiting starships. It has no function in space combat, and cannot be used as an anti-ship weapon.",
+   "book": "CD",
+   "page": 39
+  },
+  {
+   "key": "weasel_cruiser",
+   "title": "Weasel boats",
+   "text": "'Weasel' boats are an alternative to the drone decoys. These are small manned ships that are equipped with systems designed to emit the signature of a much larger vessel. While the weasel boat is represented by a bogey marker, that bogey is labelled as if it were the classification that the decoy system is emitting. Once it is scanned, the true nature of the ship is revealed.",
+   "book": "CD",
+   "page": 38
+  }
+ ]
+}

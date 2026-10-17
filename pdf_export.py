@@ -240,7 +240,8 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
         f"{_('Points')}: {report.points} / {limit}",
         f"{_('Ships')}: " + ", ".join(f"{k} {v}" for k, v in fleet_rules.ship_counts(fleet).items()),
     ]
-    active = [k for k in fleet_rules.FLEET_OPTION_KEYS if fleet["options"].get(k)]
+    active = [fleet_rules.option_label(k) for k in fleet_rules.ruleset_option_keys(fleet["ruleset"])
+              if fleet["options"].get(k)]
     if active:
         lines.append(f"{_('Options in force')}: " + ", ".join(active))
     marks = [name for name, on in badges.items() if on]
@@ -406,6 +407,8 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add(system["type"])
             if design and design["armour"]:
                 present.add("armour")
+            if design and sum(1 for n in design.get("armour_layers", []) if n) > 1:
+                present.add("shell_armour")  # layered armour has its own entry (CD p.20)
             if design and design["streamlining"] != "none":
                 present.add("streamlining")
             if design:

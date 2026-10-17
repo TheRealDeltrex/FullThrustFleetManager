@@ -550,8 +550,74 @@ _PHALON_ICONS = dict(_SHARED_ICONS) | {
 }
 
 
+# ---- Cross Dimensions icons (CD p.21 figure 14, p.25 figure 17, p.39 figure 25) ------------------
+#
+# A graser is a beam circle with a downward triangle carrying the class; a classed torpedo writes
+# its class under the tube; advanced screens are diamonds; a heavy missile is a missile outline,
+# solid for extended range. The advanced drive is the Kra'Vak hexagon with its "A" rating (CD
+# p.11 and figure 27) and is drawn from derived["advanced_drive"], so it needs no entry here.
+
+
+def _graser(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    return [
+        Circle(x, y, 8.0, fill=WHITE, stroke=1.3),
+        Path(f"M{_fmt(x - 6)} {_fmt(y - 4)} L{_fmt(x + 6)} {_fmt(y - 4)} L{_fmt(x)} {_fmt(y + 6.5)} Z",
+             fill=BLACK, stroke=0),
+        Text(x, y + 1.8, str(system.get("class", 1)), size=7, bold=True, fill=WHITE),
+        *_arc_ring(x, y, 11.5, system.get("arcs", []), arcs),
+    ]
+
+
+def _classed_torpedo(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    out = _torpedo(system, x, y, arcs)
+    cls = system.get("class", 1)
+    if isinstance(cls, int) and cls > 1:
+        out.append(Text(x + 11, y + 12, str(cls), size=7, bold=True))
+    return out
+
+
+def _diamond(cx: float, cy: float, r: float) -> str:
+    return (f"M{_fmt(cx)} {_fmt(cy - r)} L{_fmt(cx + r)} {_fmt(cy)} L{_fmt(cx)} {_fmt(cy + r)} "
+            f"L{_fmt(cx - r)} {_fmt(cy)} Z")
+
+
+def _advanced_screen(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    level = max(1, min(3, int(system.get("level", 1) or 1)))
+    return [Path(_diamond(x + i * 9 - (level - 1) * 4.5, y, 6.5), fill=WHITE, stroke=1.2)
+            for i in range(level)]
+
+
+def _heavy_missile(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+    fill = BLACK if system.get("load") == "er" else WHITE
+    stages = system.get("stages", 1)
+    out: list[Primitive] = [
+        Path(f"M{_fmt(x)} {_fmt(y - 9)} L{_fmt(x + 3)} {_fmt(y - 4)} L{_fmt(x + 3)} {_fmt(y + 5)} "
+             f"L{_fmt(x + 5)} {_fmt(y + 9)} L{_fmt(x - 5)} {_fmt(y + 9)} L{_fmt(x - 3)} {_fmt(y + 5)} "
+             f"L{_fmt(x - 3)} {_fmt(y - 4)} Z", fill=fill, stroke=1.1),
+    ]
+    if isinstance(stages, int) and stages > 1:
+        out.append(Text(x + 9, y + 9, str(stages), size=7, bold=True))
+    return out
+
+
+_CD_ICONS = dict(_SHARED_ICONS) | {
+    "graser": _graser,
+    "pulse_torpedo": _classed_torpedo,
+    "advanced_screen": _advanced_screen,
+    "scattergun": _scattergun,
+    "heavy_missile": _heavy_missile,
+    "enhanced_sensors": _labelled(lambda: _("ENH")),
+    "superior_sensors": _labelled(lambda: _("SUP")),
+    "weasel_cruiser": _labelled(lambda: _("WSL")),
+    "weasel_capital": _labelled(lambda: _("WSL+")),
+    "ecm": _labelled(lambda: _("ECM")),
+    "area_ecm": _labelled(lambda: _("AECM"), wide=True),
+}
+
+
 ICON_SETS: dict[str, dict] = {
     "fb": dict(_SHARED_ICONS),
+    "ftcd": _CD_ICONS,
     "ft2": dict(_SHARED_ICONS),
     "fb_kravak": _KRAVAK_ICONS,
     "fb_savasku": _SAVASKU_ICONS,
@@ -575,7 +641,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
 WEAPONS = {
     "beam", "pulse_torpedo", "needle_beam", "nova_cannon", "wave_gun", "aa_battery",
     "sm_launcher", "sm_rack", "submunition", "kgun", "mkp", "stinger", "pod_launcher",
-    "pulser", "plasma_bolt_launcher",
+    "pulser", "plasma_bolt_launcher", "graser", "heavy_missile",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay"}
 
@@ -794,12 +860,18 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
 
     # Bottom row: FTL, main drive with its thrust, core systems (FB), holds and tugs.
     if design.get("ftl"):
-        prims.append(Rect(16, y, 20, 16, fill=WHITE, stroke=1.2))
+        if derived.get("advanced_ftl"):
+            # CD figure 27: the advanced FTL is a hexagon where the standard one is a box.
+            prims.append(Path(_hexagon(26, y + 8, 10.5), fill=WHITE, stroke=1.2))
+        else:
+            prims.append(Rect(16, y, 20, 16, fill=WHITE, stroke=1.2))
         prims.append(Text(26, y + 11.5, _("FTL"), size=7, bold=True))
     thrust = int(design.get("thrust") or 0)
     # An icon set may draw the main drive itself: FB2 p.9 gives the Kra'Vak Advanced Grav Drive
     # its own icon and writes the rating with an "A".
     draw_drive = ICON_SETS.get(icon_set, {}).get("main_drive")
+    if draw_drive is None and derived.get("advanced_drive"):
+        draw_drive = _kv_drive  # CD p.11: the advanced drive's own icon, rating written "nA"
     if draw_drive:
         prims.extend(draw_drive({"type": "main_drive", "thrust": thrust}, 55, y + 7.5, arcs))
     else:

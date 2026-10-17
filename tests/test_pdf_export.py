@@ -237,3 +237,22 @@ def test_blank_pulsers_prints_the_icons_empty():
     # A race with no pulsers is untouched either way.
     plain = {"uid": "x", "loadout": {"fighters": [], "magazines": [], "pulsers": []}}
     assert pdf_export._sheet_loadout(plain, {}, options) == plain["loadout"]
+
+
+def test_a_cross_dimensions_fleet_prints_its_own_sheets_and_reference():
+    design, _msg = store.new_design("ftcd", name="Lancer")
+    design.update(tmf=40, hull_boxes=10, thrust=6, drive_advanced=True, systems=[
+        {"uid": "g1", "type": "graser", "class": 1, "arcs": ["FP", "F", "FS"]},
+        {"uid": "f1", "type": "fire_control"},
+        {"uid": "s1", "type": "advanced_screen", "level": 1},
+    ])
+    ok, msg, _new_id = store.save_design(design, mode="refit")
+    assert ok, msg
+    fleet = a_fleet(name="Lancers", ruleset="ftcd", ships=[design["id"]])
+    store.update_fleet_details(fleet, options={"cd_cpv": True})
+    store.save_fleet(fleet)
+    text = "\n".join(render([fleet])[1])
+    assert "FTCD · Lancers" in text
+    assert "Combat Points Value (CPV) hull cost" in text      # options by name, not by key
+    assert "Grasers" in text and "Advanced screens" in text   # the quick reference, from CD
+    assert "CD p." in text

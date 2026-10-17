@@ -53,7 +53,8 @@
         <input class="input" type="text" name="name" placeholder="{{ _('Name') }}"
                aria-label="{{ _('Name') }}" />
         <select class="input" name="ruleset" aria-label="{{ _('Ruleset') }}">
-          {% for rs in rulesets %}<option value="{{ rs.id }}">{{ rs.name }}</option>{% endfor %}
+          {# The current fleet's ruleset first in mind: a new design is usually for it. #}
+          {% for rs in rulesets %}<option value="{{ rs.id }}"{% if current_fleet and current_fleet.ruleset == rs.id %} selected{% endif %}>{{ rs.name }}</option>{% endfor %}
         </select>
         <select class="input" name="race" aria-label="{{ _('Race') }}">
           {% for rs, races in races_by_ruleset %}
@@ -114,9 +115,17 @@
             <label>{{ _("Type code") }}<input class="input" name="type_code" value="{{ d.type_code }}" /></label>
             <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
             <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
+            {# Cross Dimensions tech levels (CD pp.43-44), each beside the part it upgrades. #}
+            {% set advanced = selected.breakdown.derived.advanced_tech %}
+            {% if advanced %}
+              <input type="hidden" name="advanced-present" value="1" />
+              <label class="check"><input type="checkbox" name="hull_advanced" {% if d.hull_advanced %}checked{% endif %} />
+                {{ _("Advanced hull (3 rows)") }}</label>
+            {% endif %}
             <label>{{ _("Armour") }}<input class="input" type="number" min="0" name="armour" value="{{ d.armour }}" /></label>
             {% if selected.breakdown.derived.shell_layers is defined %}
-              {# A Phalon shell stacks in layers whose cost rises with the layer (FB2 p.35). #}
+              {# A Phalon shell (FB2 p.35) or CD shell armour (CD p.20) stacks in layers whose
+                 cost rises with the layer. #}
               <label>{{ _("Shell layers (inner first)") }}
                 <input class="input" type="text" name="armour_layers"
                        placeholder="{{ _('e.g. 8, 4, 4') }}"
@@ -132,6 +141,10 @@
             {% else %}
               <label>{{ _("Thrust") }}<input class="input" type="number" min="0" name="thrust" value="{{ d.thrust }}" /></label>
             {% endif %}
+            {% if advanced %}
+              <label class="check"><input type="checkbox" name="drive_advanced" {% if d.drive_advanced %}checked{% endif %} />
+                {{ _("Advanced drive") }}</label>
+            {% endif %}
             <label>{{ _("Streamlining") }}
               <select class="input" name="streamlining">
                 {% for value, text in (("none", _("None")), ("partial", _("Partial")), ("full", _("Full"))) %}
@@ -146,6 +159,10 @@
               </select>
             </label>
             <label class="check"><input type="checkbox" name="ftl" {% if d.ftl %}checked{% endif %} /> {{ _("FTL drive") }}</label>
+            {% if advanced %}
+              <label class="check"><input type="checkbox" name="ftl_advanced" {% if d.ftl_advanced %}checked{% endif %} />
+                {{ _("Advanced FTL") }}</label>
+            {% endif %}
           </div>
         </div>
 

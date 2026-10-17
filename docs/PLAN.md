@@ -75,7 +75,7 @@ Two builds of the same code:
 | 3 | v1 races | Human only in v1. Tech-module structure in place so each alien race is additive; after v1 the FB ruleset gained Kra'Vak this way (`rulesets/fb/tech.py`) |
 | 4 | Rulesets | Selectable **FT2, FB, FTCD, FTPC** |
 | 5 | Ruleset scope | Per fleet, fixed at creation; designs belong to one ruleset; very visible everywhere |
-| 6 | v1 rulesets | **FB + FT2**. FTCD and FTPC after v1 works |
+| 6 | v1 rulesets | **FB + FT2**. FTCD and FTPC after v1 works; FTCD (human tech) is done |
 | 7 | Stack | New repo; copy and adapt Frostgrave infrastructure; Frostgrave's 4-layer architecture |
 | 8 | Design storage | Global library per ruleset; fleets reference designs; catalog designs read-only (editing makes a variant); editing a used design asks "refit all N ships" or "save as variant" |
 | 9 | Campaign | v1 = fleet-level bookkeeping; data shaped to grow into a full optional campaign module (map, invented rules allowed, random campaign generator) |
@@ -438,6 +438,15 @@ text layer is OCR, so verify every number against the page image.
 
 ### 6.4 Later rulesets (not in v1)
 
+**FTCD is built** (`rulesets/ftcd/`, human tech): the CD chapter 11 design system, its
+optional systems behind fleet options, the CD quick reference and the Cross Dimensions icon
+set. Golden test: the CD p.46 Heavy Cruiser, MASS 86 = **294 points**. The book prints no ship
+designs of its own (its introductory ships are FB1's), so there is no FTCD catalog. Judgment
+calls, recorded in `rulesets/ftcd/rules.py`: a two-arc class-1 graser costs the three-arc 3
+MASS; the tug drive rounds its transfer MASS up; advanced FTL is paid at the standard rate
+unless the fleet option says the players pay for it (CD p.33); a system behind a fleet option
+is a note in the Design tab and a violation only in a fleet that has the option off.
+
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
 errata of 26 April 2017; text layers present). Both need the rulebook treatment first
@@ -735,7 +744,10 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 
 ## 17. After v1 (roadmap, rough order)
 
-1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs)
+1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs) -
+   **done** for human tech (6.4). Not yet: FTL and kinetic fighters (+6 points each, CD p.30),
+   swing-role fighters, light vessels in hangars, multi-stage salvo loads in magazines, jump
+   gates, and the FB2 races under CD's changes (CD p.21).
 2. FTPC ruleset (incl. the 2017 errata)
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37

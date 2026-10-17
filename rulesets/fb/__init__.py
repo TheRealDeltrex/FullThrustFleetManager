@@ -21,6 +21,7 @@ class FBRuleset:
     books = data.BOOKS
     arcs = common.ARCS
     icon_set = "fb"  # human default; per race, use icon_set_for()
+    option_keys = ("core_systems", "rerolls", "fighter_endurance", "vector_movement")
 
     @property
     def name(self) -> str:

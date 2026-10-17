@@ -7,8 +7,8 @@ import pytest
 from rulesets import RULESETS, Ruleset
 
 
-def test_v1_rulesets_registered():
-    assert set(RULESETS) == {"fb", "ft2"}
+def test_rulesets_registered():
+    assert set(RULESETS) == {"fb", "ft2", "ftcd"}
 
 
 @pytest.mark.parametrize("rid", sorted(RULESETS))
@@ -23,3 +23,13 @@ def test_protocol(rid):
         assert rs.system_types(race.id, {}), race.id
         assert rs.fighter_types({}, race.id), race.id
         assert rs.icon_set_for(race.id), race.id
+
+
+@pytest.mark.parametrize("rid", sorted(RULESETS))
+def test_option_keys_are_known_and_labelled(rid):
+    import fleet_rules
+
+    keys = RULESETS[rid].option_keys
+    assert keys and len(set(keys)) == len(keys)
+    assert set(keys) <= set(fleet_rules.FLEET_OPTION_KEYS)
+    assert all(fleet_rules.option_label(k) != k for k in keys)
