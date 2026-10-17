@@ -221,9 +221,25 @@
         <h3>{{ _("Add ship") }}</h3>
         {# A ruleset with no published ships (Cross Dimensions) starts with an empty list:
            say where designs come from instead of offering a picker with nothing in it. #}
-        {% if not selected.library %}
+        {% if not selected.library_total %}
         <p class="body muted">{{ _("No ship designs for {ruleset} yet.", ruleset=selected.ruleset.name) }}
           <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab first.") }}</a></p>
+        {% else %}
+        {# A faction narrows the list to its own ships; the toggle shows every design again. #}
+        {% if f.faction %}
+        <form method="get" action="{{ url_for('fleet_overview') }}" class="body row">
+          <input type="hidden" name="view" value="{{ selected.view }}" />
+          <input type="hidden" name="all_ships" value="0" />
+          <label class="check"><input type="checkbox" name="all_ships" value="1"
+            {% if selected.show_all_ships %}checked{% endif %} onchange="this.form.submit()" />
+            {{ _("Show all ships") }}</label>
+          <noscript><button class="btn sm" type="submit">{{ _("Apply") }}</button></noscript>
+        </form>
+        {% endif %}
+        {% if not selected.library %}
+        <p class="body muted">{{ _("No {faction} ship designs yet.", faction=selected.faction_name) }}
+          <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab,") }}</a>
+          {{ _("or tick Show all ships to pick from every faction.") }}</p>
         {% else %}
         <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body row">
           <select class="input grow" name="design_id" aria-label="{{ _('Design') }}">
@@ -239,6 +255,7 @@
           </select>
           <button class="btn primary" type="submit" name="action" value="add_ship">{{ _("Add ship") }}</button>
         </form>
+        {% endif %}
         {% endif %}
       </div>
 
