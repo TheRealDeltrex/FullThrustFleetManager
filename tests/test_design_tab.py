@@ -131,6 +131,30 @@ def test_arcs_are_edited_as_checkboxes(client):
     assert store.get_draft(design_id)["systems"][0]["arcs"] == ["F", "FS"]
 
 
+@pytest.mark.parametrize("ruleset, system_type, value", [
+    ("ftcd", "beam", "3"), ("ftcd", "graser", "2"), ("fb", "beam", "2"), ("ft2", "beam", "C"),
+])
+def test_a_weapons_class_is_edited_beside_its_arcs(client, ruleset, system_type, value):
+    design_id = make(client, ruleset=ruleset)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type=system_type))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="sys-{uid}-class"' in page and f'name="sys-{uid}-arcs"' in page
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-class": value}))
+    assert str(store.get_draft(design_id)["systems"][0]["class"]) == value
+
+
+def test_a_racks_load_and_stages_show_beside_its_arcs(client):
+    design_id = make(client, ruleset="ftcd")
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="sm_rack"))
+    uid = store.get_draft(design_id)["systems"][0]["uid"]
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="sys-{uid}-load"' in page and f'name="sys-{uid}-stages"' in page
+
+
 def test_a_bad_number_is_reported_not_raised(client):
     design_id = make(client)
     page = client.post(f"/design/{design_id}",
