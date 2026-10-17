@@ -132,6 +132,17 @@ def test_the_page_names_every_race_the_rules_engines_offer(html):
         assert name.replace("’", "'") in page, f"web/landing.html never mentions {name}"
 
 
+def test_the_page_names_every_ruleset_you_can_design_to(html):
+    from rulesets import RULESETS
+
+    # How the page's prose names each ruleset; a new ruleset fails here until the page says so.
+    prose = {"fb": "Fleet Book", "ft2": "Full Thrust 2nd edition", "ftcd": "Cross Dimensions"}
+    assert set(prose) == set(RULESETS), "a ruleset the landing page does not describe"
+    design_line = next(line for line in html.splitlines() if "<strong>Design ships</strong>" in line)
+    for name in prose.values():
+        assert name in design_line, f"web/landing.html does not offer designing to {name}"
+
+
 # ---- The preview pages -------------------------------------------------------------------------
 
 
