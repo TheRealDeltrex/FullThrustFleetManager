@@ -141,7 +141,8 @@ def test_a_weapons_class_is_edited_beside_its_arcs(client, ruleset, system_type,
     draft = store.get_draft(design_id)
     uid = draft["systems"][0]["uid"]
     page = client.get(f"/design/{design_id}").get_data(as_text=True)
-    assert f'name="sys-{uid}-class"' in page and f'name="sys-{uid}-arcs"' in page
+    assert f'<select class="input sm" name="sys-{uid}-class">' in page   # always a dropdown
+    assert f'name="sys-{uid}-arcs"' in page
     client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-class": value}))
     assert str(store.get_draft(design_id)["systems"][0]["class"]) == value
 
@@ -152,7 +153,19 @@ def test_a_racks_load_and_stages_show_beside_its_arcs(client):
                 data=fields(store.get_design(design_id), action="add_system", system_type="sm_rack"))
     uid = store.get_draft(design_id)["systems"][0]["uid"]
     page = client.get(f"/design/{design_id}").get_data(as_text=True)
-    assert f'name="sys-{uid}-load"' in page and f'name="sys-{uid}-stages"' in page
+    assert f'name="sys-{uid}-load"' in page
+    assert f'<select class="input sm" name="sys-{uid}-stages">' in page
+
+
+def test_a_class_outside_the_list_stays_selected(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="beam"))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-class": "8"}))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert '<option value="8" selected>8</option>' in page
 
 
 def test_a_bad_number_is_reported_not_raised(client):
