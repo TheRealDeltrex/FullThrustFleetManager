@@ -39,6 +39,7 @@ import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
 from rulesets import REFERENCE_BOOKS, RULESETS, common
+from rulesets.fb import data as fb_data
 
 logger = logging.getLogger(__name__)
 
@@ -374,11 +375,37 @@ def fleet_check(fleet_id: str) -> str:
 def _catalog_group(design: dict) -> str:
     book = design["source"].get("book") or design["ruleset"]
     race = design.get("race") or "human"
-    if race == "human":
-        return book
     rs = RULESETS.get(design["ruleset"])
-    name = next((r.name for r in rs.races() if r.id == race), race) if rs else race
-    return f"{book} · {name}"
+    group = book
+    if race != "human":
+        name = next((r.name for r in rs.races() if r.id == race), race) if rs else race
+        group = f"{book} · {name}"
+    # A ruleset may adopt another's book (Cross Dimensions takes the Fleet Book ships), so the
+    # adopted copies get their own group, named for the ruleset they are costed under.
+    if rs and book not in {b.code for b in rs.books}:
+        group = f"{group} ({rs.short_label})"
+    return group
+
+
+# The catalog lists hulls smallest to largest: the FB1 p.12 size bands (SC up to SDN), with CD's
+# CA beside CH, then carriers and merchants, which are roles rather than sizes.
+_WARSHIP_ORDER = tuple(code for _, code, _, _ in fb_data.SHIP_CLASSES)
+_AFTER_CH = _WARSHIP_ORDER.index("CH") + 1
+_CLASS_ORDER = {code: i for i, code in enumerate(
+    _WARSHIP_ORDER[:_AFTER_CH] + ("CA",) + _WARSHIP_ORDER[_AFTER_CH:]
+    + ("CVE", "CVL", "CV", "CVH", "CVA", "M"))}
+
+
+def _class_rank(design: dict) -> int:
+    """Where a design's class sits in the catalog; an unknown code goes last."""
+    return _CLASS_ORDER.get(design.get("type_code") or "", len(_CLASS_ORDER))
+
+
+def _catalog_key(design: dict) -> tuple:
+    """Book and race (the group), then faction (factionless last), class size, mass and name."""
+    faction = design.get("faction") or ""
+    return (design["ruleset"], design.get("race") or "human", not faction, faction,
+            _class_rank(design), design.get("tmf", 0), design["name"].lower())
 
 
 def _library(query: str = "") -> dict:
@@ -394,9 +421,9 @@ def _library(query: str = "") -> dict:
         if matches(d):
             mine.setdefault(d["ruleset"], []).append(d)
     catalog: dict[str, list[dict]] = {}
-    for d in sorted(store.catalog_designs(),
-                    key=lambda d: (d["ruleset"], d.get("race") or "human", d["name"].lower())):
+    for d in sorted(store.catalog_designs(), key=_catalog_key):
         if matches(d):
+            d["points"] = fleet_rules.design_points(d, {})
             # One book may hold several races (FB2 is a book of alien fleets), so the group is
             # book plus race; human designs keep the plain book heading.
             catalog.setdefault(_catalog_group(d), []).append(d)
@@ -509,6 +536,9 @@ def _apply_form(design: dict) -> dict:
                     system[key] = form.getlist(prefix + key)
                 continue
             value = form.get(prefix + key)
+            if value == "more":
+                # An open-ended setting's dropdown ends in "More" and a field to type the number.
+                value = form.get(prefix + key + "-more", "").strip() or None
             if value is None:
                 continue
             system[key] = value if isinstance(system[key], str) and not value.isdigit() else int(value or 0)

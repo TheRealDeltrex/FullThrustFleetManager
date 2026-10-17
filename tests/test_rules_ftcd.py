@@ -407,3 +407,94 @@ def test_ruleset_identity():
     assert CD.arcs == ("F", "FS", "AS", "A", "AP", "FP")
     assert [b.code for b in CD.books] == ["CD"]
     assert "cd_cpv" in CD.option_keys and "mt_systems" not in CD.option_keys
+
+
+# ---- The Fleet Book ships under Cross Dimensions (CD pp.3, 21) ----------------------------------
+
+
+def _catalog() -> list[dict]:
+    import store
+
+    return store.catalog_designs("ftcd")
+
+
+def test_every_fleet_book_design_is_adopted():
+    import store
+
+    fb_ids = {d["id"].split(":", 1)[1] for d in store.catalog_designs("fb")}
+    assert {d["id"].split(":", 1)[1] for d in _catalog()} == fb_ids
+    assert all(d["id"].startswith("ftcd:") and d["ruleset"] == "ftcd" for d in _catalog())
+
+
+@pytest.mark.parametrize("d", _catalog(), ids=lambda d: d["id"])
+def test_adopted_designs_are_legal_under_cross_dimensions(d):
+    opts = {o: True for o in CD.required_options(d, None)}
+    assert [i.code for i in CD.validate_design(d, opts) if i.severity == "violation"] == []
+
+
+def test_fleet_book_1_ships_cost_what_the_book_prints():
+    # CD p.3: "All of the ships in fleet book 1 can be used unchanged with cross dimensions."
+    fb1 = [d for d in _catalog() if d["source"]["book"] == "FB1"]
+    assert len(fb1) == 65
+    for d in fb1:
+        assert CD.design_breakdown(d, {}).points == d["source"]["npv_book"], d["id"]
+        assert "Cross Dimensions" not in d["notes"]
+
+
+def _adopted(name: str) -> dict:
+    return next(d for d in _catalog() if d["name"] == name)
+
+
+def test_kravak_scatterguns_cost_4_points():
+    # CD p.21; the Vo'Bok (FB2 p.14, NPV 238) has four, so it costs 4 less.
+    vobok = _adopted("Vo'Bok")
+    assert CD.design_breakdown(vobok, {}).points == 234
+    assert vobok["source"]["npv_book"] == 0  # the printed NPV no longer holds
+    assert "prints NPV 238" in vobok["notes"]
+
+
+def test_the_si_tek_trades_a_k1_gun_for_an_adfc():
+    # CD p.21: Kra'Vak scatterguns lose area defence, so the Si'Tek takes an ADFC instead of a K-1.
+    sitek = _adopted("Si'Tek")
+    types = [s["type"] for s in sitek["systems"]]
+    assert types.count("adfc") == 1
+    assert sum(1 for s in sitek["systems"] if s["type"] == "kgun" and s.get("class") == 1) == 1
+    b = CD.design_breakdown(sitek, {})
+    assert b.mass_used == sitek["tmf"] == 70
+    assert b.points == 278 - 5  # the swap is points-neutral (2 MASS each at 4); 5 scatterguns
+    assert "adfc" in {s.type for s in CD.system_types("kravak", {})}
+
+
+def test_kravak_fighters_pay_for_kinetic_weapons():
+    # CD p.21 and p.47: +6 a group on the FB2 Ra'San price of 18.
+    assert CD.loadout_points(_adopted("Lo'Vok"), None, {}) == 24
+    assert CD.loadout_points(_adopted("Ko'San"), None, {}) == 6 * 24
+
+
+def test_phalon_and_savasku_designs_keep_their_fleet_book_cost():
+    for d in _catalog():
+        if d["race"] in ("phalon", "savasku"):
+            assert CD.design_breakdown(d, {}).points == d["source"]["npv_book"], d["id"]
+
+
+def test_cpv_reaches_alien_hulls():
+    # CD p.58: the CPV hull cost is MASS squared / 100, for every hull.
+    kotek = _adopted("Ko'Tek")
+    plain = CD.design_breakdown(kotek, {}).points
+    assert CD.design_breakdown(kotek, {"cd_cpv": True}).points == plain - 70 + 49
+
+
+def test_alien_races_are_offered():
+    assert [r.id for r in CD.races()] == ["human", "kravak", "savasku", "phalon"]
+    assert CD.icon_set_for("kravak") == "fb_kravak" and CD.icon_set_for("human") == "ftcd"
+    assert CD.fighter_types({}, "kravak") == ["standard", "heavy"]
+    assert CD.required_options(_adopted("Lo'Vok"), None) == set()
+
+
+def test_quick_reference_for_an_alien_fleet():
+    keys = {e.key for e in CD.quickref({"kgun", "scattergun"}, {}, frozenset({"kravak"}))}
+    assert {"cd_kravak", "kv_kgun", "kv_thrust", "scattergun"} <= keys
+    assert "kv_scattergun" not in keys  # CD's scattergun rules replace FB2's (CD p.21)
+    savasku = {e.key for e in CD.quickref({"stinger"}, {}, frozenset({"savasku"}))}
+    assert {"cd_savasku", "sv_stinger", "sv_power"} <= savasku and "crew" not in savasku
+    assert "cd_kravak" not in {e.key for e in CD.quickref(set(), {})}

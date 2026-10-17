@@ -114,9 +114,14 @@ def test_a_draft_release_is_not_offered_as_a_download():
 
 def test_the_page_states_the_catalog_size_the_app_actually_has(html):
     import store
+    from rulesets import RULESETS
 
+    # A class Cross Dimensions adopts from the Fleet Books is the same class, so only the designs
+    # costed under their own book's ruleset count.
+    classes = [d for d in store.catalog_designs()
+               if d["source"]["book"] in {b.code for b in RULESETS[d["ruleset"]].books}]
     stated = {int(n) for n in re.findall(r"(\d+) ship classes", html)}
-    assert stated == {len(store.catalog_designs())}, (
+    assert stated == {len(classes)}, (
         "web/landing.html advertises a catalog size the app no longer has"
     )
 

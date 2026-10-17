@@ -36,11 +36,16 @@
       {% for book, designs in library.catalog.items() %}
         <details class="lib-group" {% if library.query %}open{% endif %}>
           <summary>{{ book|upper }} <span class="muted">({{ designs|length }})</span></summary>
+          {# A faction heading only where the book mixes factions (FB1); designs come sorted. #}
+          {% set mixed = designs|map(attribute='faction')|unique|list|length > 1 %}
           <ul class="lib-list">
             {% for d in designs %}
+              {% if mixed and (loop.first or d.faction != loop.previtem.faction) %}
+                <li class="lib-faction muted">{{ d.faction or _("Civilian") }}</li>
+              {% endif %}
               <li><a href="{{ url_for('design_detail', design_id=d.id) }}"
                      class="{% if selected and selected.design.id == d.id %}on{% endif %}">{{ d.name }}</a>
-                <span class="muted">{{ d.type_code }}</span></li>
+                <span class="muted">{% if d.type_code %}{{ d.type_code }} · {% endif %}{{ d.points }} {{ _("pts") }}</span></li>
             {% endfor %}
           </ul>
         </details>
@@ -185,7 +190,7 @@
           <h3>{{ _("Systems") }}</h3>
           <table class="tbl">
             <thead>
-              <tr><th>{{ _("System") }}</th><th>{{ _("Arcs") }}</th><th class="num">{{ _("MASS") }}</th>
+              <tr><th>{{ _("System") }}</th><th>{{ _("Settings") }}</th><th class="num">{{ _("MASS") }}</th>
                   <th class="num">{{ _("Points") }}</th><th></th></tr>
             </thead>
             <tbody>
@@ -194,15 +199,11 @@
                 <tr>
                   <td>{{ row.label }}</td>
                   <td class="arcs">
-                    {% if system and 'arcs' in system %}
-                      <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
-                      {% for arc in selected.ruleset.arcs %}
-                        <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
-                          {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
-                      {% endfor %}
-                    {% elif system %}
+                    {% if system %}
+                      {# Settings (a beam's class, a rack's load) first, then the arcs: a weapon
+                         has both, so neither may hide the other. #}
                       {% set defs = selected.param_defs.get(system.type, {}) %}
-                      {% for key, value in system.items() if key not in ('uid', 'type') %}
+                      {% for key, value in system.items() if key not in ('uid', 'type', 'arcs') %}
                         {% set param = defs.get(key) %}
                         {% set name = param.label if param else key %}
                         {% if key == 'feeds' %}
@@ -220,11 +221,40 @@
                                 <option value="{{ choice }}" {% if value == choice %}selected{% endif %}>{{ text }}</option>
                               {% endfor %}
                             </select></label>
+                        {% elif param and param.kind == 'int' and param.min is not none %}
+                          {# Numbers are picked from a list. A capped one (a weapon's class, missile
+                             stages) lists its whole range, and a value outside it (bookkeeping mode)
+                             stays selectable. An open-ended one lists up to 11, then "More", which
+                             shows a field to type the number in (style.css, no script needed). #}
+                          {% set capped = param.max is not none %}
+                          {% set options = range(param.min, (param.max if capped else 11) + 1) | list %}
+                          {% set more = not capped and value not in options %}
+                          <label class="param">{{ name }}
+                            <select class="input sm" name="sys-{{ system.uid }}-{{ key }}">
+                              {% if capped and value not in options %}<option value="{{ value }}" selected>{{ value }}</option>{% endif %}
+                              {% for option in options %}
+                                <option value="{{ option }}" {% if value == option %}selected{% endif %}>{{ option }}</option>
+                              {% endfor %}
+                              {% if not capped %}<option value="more" {% if more %}selected{% endif %}>{{ _("More") }}</option>{% endif %}
+                            </select>
+                            {% if not capped %}
+                              <input class="input sm more" type="number" min="{{ param.min }}"
+                                name="sys-{{ system.uid }}-{{ key }}-more" value="{{ value if more else '' }}" />
+                            {% endif %}</label>
                         {% else %}
                           <label class="param">{{ name }}
-                            <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
+                            <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}"
+                              {% if param and param.kind == 'int' %}type="number"
+                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}{% endif %} /></label>
                         {% endif %}
                       {% endfor %}
+                      {% if 'arcs' in system %}
+                        <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
+                        {% for arc in selected.ruleset.arcs %}
+                          <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
+                            {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
+                        {% endfor %}
+                      {% endif %}
                     {% endif %}
                   </td>
                   <td class="num">{{ row.mass }}</td>
@@ -267,7 +297,7 @@
                   {% set craft = (d.default_loadout.craft or []) | selectattr('hangar', 'equalto', system.uid) | sum(attribute='mass') %}
                   <fieldset class="loadout-group">
                     <legend>{{ _("Hangar {uid}", uid=system.uid) }}
-                      <span class="muted">{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays or 1) }}</span></legend>
+                      <span class="muted">{% if (system.bays or 1) == 1 %}{{ _("6 fighters or 6 MASS of craft") }}{% else %}{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays) }}{% endif %}</span></legend>
                     {% for index in range(system.bays or 1) %}
                       {% set group = groups[index] if index < groups|length else None %}
                       {% set prefix = "fighter-" ~ system.uid ~ "-" ~ index ~ "-" %}

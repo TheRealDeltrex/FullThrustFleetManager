@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "Built-in factions per ruleset. Names from the FB1 fleet chapters (pp.13, 20, 27, 34); FB1 prints 'Federal Stats Europa', a typo for States. FB2's alien races have no factions of their own, so each race gets the one its ship pages are headed with (FB2 pp.12-19). Cross Dimensions (CD p.58) names the same four powers, so ftcd repeats FB1's human factions.",
+  "note": "Built-in factions per ruleset. Names from the FB1 fleet chapters (pp.13, 20, 27, 34); FB1 prints 'Federal Stats Europa', a typo for States. FB2's alien races have no factions of their own, so each race gets the one its ship pages are headed with (FB2 pp.12-19). Cross Dimensions (CD p.58) names the same four powers, so ftcd repeats FB1's human factions, and FB2's alien ones since CD p.21 takes the FB2 races over.",
   "factions": {
     "fb": [
       {
@@ -66,6 +66,18 @@
       {
         "id": "ESU",
         "name": "Eurasian Solar Union"
+      },
+      {
+        "id": "KV",
+        "name": "Kra'Vak Dominion Star Forces"
+      },
+      {
+        "id": "SV",
+        "name": "Sa'Vasku Space Combat Constructs"
+      },
+      {
+        "id": "PH",
+        "name": "Phalon Conglomerate Grand Fleet"
       }
     ]
   }

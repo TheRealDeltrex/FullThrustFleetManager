@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+import app as app_module
 import store
 
 CATALOG = "fb:fb1:nac-furious"
@@ -49,6 +50,24 @@ def test_the_tab_opens_with_the_catalog_and_no_selection(client):
 def test_search_filters_the_library(client):
     page = client.get("/design?q=furious").get_data(as_text=True)
     assert "Furious" in page and "Vandenburg" not in page
+
+
+def test_the_catalog_lists_by_faction_then_class_size_with_points(client):
+    fb1 = app_module._library()["catalog"]["FB1"]
+    factions = [d.get("faction") or "~" for d in fb1]
+    assert factions == sorted(factions)  # factionless freighters last
+    nac = [d["type_code"] for d in fb1 if d.get("faction") == "NAC"]
+    assert nac.index("SC") < nac.index("DD") < nac.index("CH") < nac.index("BB") < nac.index("SDN")
+    page = client.get("/design").get_data(as_text=True)
+    furious = next(d for d in fb1 if d["id"] == CATALOG)
+    assert f"{furious['type_code']} · {furious['points']} pts" in page
+    assert "NAC" in page and "Civilian" in page
+
+
+def test_every_catalog_design_has_a_class_code():
+    """The FB2 hulls the book leaves unclassified take the class their MASS suggests, so the
+    catalog can sort them by size."""
+    assert all(d["type_code"] for d in store.catalog_designs())
 
 
 def test_a_missing_design_is_a_404(client):
@@ -111,6 +130,82 @@ def test_arcs_are_edited_as_checkboxes(client):
     data[f"sys-{uid}-arcs"] = ["F", "FS"]
     client.post(f"/design/{design_id}", data=data)
     assert store.get_draft(design_id)["systems"][0]["arcs"] == ["F", "FS"]
+
+
+@pytest.mark.parametrize("ruleset, system_type, value", [
+    ("ftcd", "beam", "3"), ("ftcd", "graser", "2"), ("fb", "beam", "2"), ("ft2", "beam", "C"),
+])
+def test_a_weapons_class_is_edited_beside_its_arcs(client, ruleset, system_type, value):
+    design_id = make(client, ruleset=ruleset)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type=system_type))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'<select class="input sm" name="sys-{uid}-class">' in page   # always a dropdown
+    assert f'name="sys-{uid}-arcs"' in page
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-class": value}))
+    assert str(store.get_draft(design_id)["systems"][0]["class"]) == value
+
+
+def test_a_racks_load_and_stages_show_beside_its_arcs(client):
+    design_id = make(client, ruleset="ftcd")
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="sm_rack"))
+    uid = store.get_draft(design_id)["systems"][0]["uid"]
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="sys-{uid}-load"' in page
+    assert f'<select class="input sm" name="sys-{uid}-stages">' in page
+
+
+def test_a_class_outside_the_list_stays_selected(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="beam"))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-class": "8"}))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert '<option value="8" selected>8</option>' in page
+
+
+def test_an_open_ended_setting_lists_up_to_11_then_more(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="sm_magazine"))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    key = f"sys-{uid}-capacity"
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'<select class="input sm" name="{key}">' in page
+    assert '<option value="11" >11</option>' in page and '<option value="12"' not in page
+    assert '<option value="more" >More</option>' in page and f'name="{key}-more" value=""' in page
+
+    client.post(f"/design/{design_id}", data=fields(
+        draft, action="apply", **{key: "more", f"{key}-more": "14"}))
+    assert store.get_draft(design_id)["systems"][0]["capacity"] == 14
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert '<option value="more" selected>More</option>' in page
+    assert f'name="{key}-more" value="14"' in page
+
+    client.post(f"/design/{design_id}",
+                data=fields(draft, action="apply", **{key: "more", f"{key}-more": ""}))
+    assert store.get_draft(design_id)["systems"][0]["capacity"] == 14   # an empty field changes nothing
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{key: "4"}))
+    assert store.get_draft(design_id)["systems"][0]["capacity"] == 4
+
+
+@pytest.mark.parametrize("ruleset", ["fb", "ftcd"])
+def test_a_hangar_bay_holds_one_fighter_group(client, ruleset):
+    """FB1 p.10, CD p.46: 9 MASS of bay per group of six, so a second group is a second bay."""
+    design_id = make(client, ruleset=ruleset)
+    for _ in range(2):
+        design = store.get_draft(design_id) or store.get_design(design_id)
+        client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type="hangar"))
+    hangars = store.get_draft(design_id)["systems"]
+    assert [s["type"] for s in hangars] == ["hangar", "hangar"] and not any("bays" in s for s in hangars)
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert page.count("Hangar bay (1 fighter group)") == 2 and f"sys-{hangars[0]['uid']}-bays" not in page
 
 
 def test_a_bad_number_is_reported_not_raised(client):
@@ -359,7 +454,6 @@ def test_cross_dimensions_loadout_editor(client):
     assert f'name="stages-{magazine}"' in page and "Long range" in page
 
     client.post(f"/design/{design_id}", data=fields(design, action="apply", **{
-        f"sys-{hangar}-bays": "2",
         f"fighter-{hangar}-0-type": "attack", f"fighter-{hangar}-0-ftl": "on",
         f"fighter-{hangar}-0-swing": ["standard", "interceptor"],
         f"fighter-{hangar}-1-type": "", f"craft-{hangar}": "4",
@@ -372,7 +466,7 @@ def test_cross_dimensions_loadout_editor(client):
     assert loadout["magazines"] == [{"magazine": magazine, "salvos": ["std"] * 3, "stages": 2}]
 
     page = client.get(f"/design/{design_id}").get_data(as_text=True)
-    assert f'name="fighter-{hangar}-1-type"' in page                 # a row per bay
+    assert f'name="fighter-{hangar}-1-type"' not in page             # one bay, one group
     assert "Loadout: 56 points" in page                              # 24 + 9 + 9 + 6, shuttles 8
 
 
@@ -415,6 +509,6 @@ def test_fighter_types_and_system_fields_carry_names_not_keys(client):
         client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type=system_type))
     page = client.get(f"/design/{design_id}").get_data(as_text=True)
     assert ">Long range</option>" in page and ">long_range<" not in page
-    assert "Fighter groups" in page and ">bays" not in page
+    assert ">bays" not in page
     hold = next(s["uid"] for s in store.get_draft(design_id)["systems"] if s["type"] == "hold")
     assert f'<select class="input sm" name="sys-{hold}-kind"' in page and ">Cargo (H)</option>" in page

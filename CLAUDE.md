@@ -340,7 +340,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - System dicts per type (the design `systems` list; `uid` + `type` always): `beam` {class,
   arcs}, `pulse_torpedo`/`needle_beam`/`sm_launcher`/`nova_cannon`/`wave_gun` {arcs},
   `submunition` {arcs optional}, `sm_magazine` {capacity (MASS), feeds [launcher uids]},
-  `sm_rack` {load std|er, arcs}, `screen` {level; >2 = backup generators}, `hangar` {bays},
+  `sm_rack` {load std|er, arcs}, `screen` {level; >2 = backup generators}, `hangar` (one bay = one fighter group, FB1 p.10; the
+  picker offers no count, an older design's `bays` > 1 still costs 9 MASS a bay),
   `tender_bay` {capacity = MASS carried}, `minelayer` {mines}, `tug_drive` {tow_mass}, `hold`
   {kind cargo|passenger|troop|lab, mass}; no params: `pds`, `fire_control`, `adfc`,
   `mt_missile`, `ortillery`, `minesweeper`, `reflex_field`, `cloak`.
@@ -405,7 +406,19 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `_validate_missiles` takes FTCD's `salvo_space` for the bigger loads.
 - A magazine's `feeds` list is edited as launcher checkboxes with a `-feeds-present` marker,
   like arcs; any list-valued system field is skipped by `_apply_form`'s int parsing.
-- No catalog: the book prints no designs of its own.
+- The FB2 races (`aliens.py`, CD p.21 section 5.12): each race's FB2 tech module with CD's
+  design changes on top. Kra'Vak scatterguns cost 4 (not 5), Kra'Vak may mount an ADFC (2 MASS,
+  8), Kra'Vak fighter groups pay +6 for kinetic weapons; the CPV option reaches every hull.
+  Sa'Vasku and Phalon cost as in FB2. The rest of p.21 is play (screens, penetration) and is in
+  the quick reference as `cd_kravak`, `cd_savasku`, `cd_phalon` beside the race's FB2 entries;
+  `kv_scattergun` is left out because CD's scattergun rules replace it.
+- Catalog: CD prints no designs ("all of the ships in fleet book 1 can be used unchanged", p.3),
+  so it adopts the FB catalog at load time: `catalog_sources = ("fb",)` and `adopt_design()`
+  (Ruleset protocol; FB and FT2 adopt nothing). `store._catalog()` calls it once per FB design:
+  id `ftcd:<rest of the fb id>`. Every FB1 design costs its printed NPV unchanged. A design whose
+  cost moves (the Kra'Vak, for their scatterguns) loses `npv_book` and says why in `notes`; the
+  Si'Tek swaps one K-1 gun for an ADFC as p.21 says. The Design tab groups the copies as
+  "FB1 (FTCD)" etc., and the landing page's class count leaves them out.
 
 ## Catalog
 

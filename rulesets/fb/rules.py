@@ -24,6 +24,14 @@ from rulesets.fb import data
 STREAMLINING_PERCENT = {"none": 0, "partial": 10, "full": 20}
 
 
+def _hangar_label(bays: int) -> str:
+    """FB1 p.10, CD p.46: a bay holds one fighter group. A row normally is one bay; designs saved
+    before the picker stopped offering a group count may still hold several."""
+    if bays == 1:
+        return _("Hangar bay (1 fighter group)")
+    return _("Hangar bay ({n} fighter groups)", n=bays)
+
+
 def _int(value: object, default: int = 0) -> int:
     """Stored designs are semi-untrusted (imports), so a bad number counts as default instead of
     raising; validation reports what matters."""
@@ -110,7 +118,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "hangar": (
         lambda s, t: data.FIGHTER_BAY_MASS * max(1, _int(s.get("bays"), 1)),
         lambda s, m: 3 * m,
-        lambda s: _("Hangar bay ({n} fighter groups)", n=max(1, _int(s.get("bays"), 1))),
+        lambda s: _hangar_label(max(1, _int(s.get("bays"), 1))),
     ),
     "tender_bay": (
         lambda s, t: max(1, round_half_up(3 * max(1, _int(s.get("capacity"), 1)), 2)),

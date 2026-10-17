@@ -169,7 +169,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "hangar": (
         lambda s, t: 9 * max(1, _int(s.get("bays"), 1)),
         lambda s, m: 3 * m,
-        lambda s: _("Hangar bay ({n} fighter groups)", n=max(1, _int(s.get("bays"), 1))),
+        lambda s: fb_rules._hangar_label(max(1, _int(s.get("bays"), 1))),
     ),
     "tender_bay": (
         lambda s, t: max(1, round_half_up(3 * max(1, _int(s.get("capacity"), 1)), 2)),

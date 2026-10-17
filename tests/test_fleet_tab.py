@@ -97,14 +97,26 @@ def test_a_ship_of_another_ruleset_is_refused(client):
     assert "another ruleset" in text(add_ship(client, fleet_id, design_id=COURIER))
 
 
-def test_a_ruleset_with_no_designs_points_to_the_design_tab(client):
-    # Cross Dimensions ships no catalogue: an empty picker whose button says "Design not found."
-    # left people stuck, so the panel says where designs come from instead.
+def test_a_ruleset_with_no_designs_points_to_the_design_tab(client, monkeypatch):
+    # An empty picker whose button says "Design not found." left people stuck, so the panel says
+    # where designs come from instead. Every ruleset has catalog designs now, so take them away.
+    real = store.catalog_designs
+    monkeypatch.setattr(store, "catalog_designs",
+                        lambda ruleset=None: [] if ruleset == "ftcd" else real(ruleset))
     make_fleet(client, "Explorers", ruleset="ftcd")
     page = text(client.get("/fleet"))
     assert "No ship designs for" in page and 'href="/design"' in page
     assert 'value="add_ship"' not in page
     assert 'value="add_ship"' in text(client.get(f"/fleet/{make_fleet(client)}", follow_redirects=True))
+
+def test_a_cross_dimensions_fleet_fields_the_fleet_book_ships(client):
+    # CD p.3: the Fleet Book designs serve Cross Dimensions, costed by its rules.
+    fleet_id = make_fleet(client, "Explorers", ruleset="ftcd")
+    add_ship(client, fleet_id, "ftcd:fb1:nac-furious")
+    fleet = store.get_fleet(fleet_id)
+    assert [s["design_id"] for s in fleet["ships"]] == ["ftcd:fb1:nac-furious"]
+    assert '"fb:fb1:nac-furious"' not in text(client.get(f"/fleet/{fleet_id}"))
+
 
 def test_ship_status_and_squadron_are_edited_from_the_card(client):
     fleet_id = make_fleet(client)
