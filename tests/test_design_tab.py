@@ -512,3 +512,81 @@ def test_fighter_types_and_system_fields_carry_names_not_keys(client):
     assert ">bays" not in page
     hold = next(s["uid"] for s in store.get_draft(design_id)["systems"] if s["type"] == "hold")
     assert f'<select class="input sm" name="sys-{hold}-kind"' in page and ">Cargo (H)</option>" in page
+
+
+# ---- Class presets ------------------------------------------------------------------------------
+
+
+def _preset_index(ruleset: str, code: str) -> str:
+    from rulesets import presets
+    return presets.preset_key(ruleset, next(i for i, p in enumerate(presets.class_presets(ruleset))
+                                            if p.code == code))
+
+
+def _new(client, ruleset: str, code: str, race: str = "human") -> dict:
+    client.post("/design/new", data={"ruleset": ruleset, "race": race, "name": code,
+                                     "class_preset": _preset_index(ruleset, code)})
+    return next(d for d in store.list_designs() if d["name"] == code)
+
+
+def _count(design: dict, system_type: str) -> int:
+    return sum(1 for s in design["systems"] if s["type"] == system_type)
+
+
+def test_a_class_preset_fills_the_hull_from_the_class(client):
+    cl = _new(client, "ftcd", "CL")  # CD p.42: 40-60
+    assert (cl["type_code"], cl["tmf"], cl["hull_boxes"], cl["armour"], cl["thrust"]) == ("CL", 50, 15, 3, 4)
+    assert cl["ftl"] and _count(cl, "fire_control") == 2 and _count(cl, "hangar") == 0
+
+
+@pytest.mark.parametrize("code, fcs", [("FF", 1), ("CE", 2), ("CA", 2), ("BC", 3), ("BB", 3),
+                                       ("BDN", 4), ("DN", 4), ("SDN", 4), ("CVL", 2)])
+def test_fire_controls_grow_with_the_class(client, code, fcs):
+    assert _count(_new(client, "ftcd", code), "fire_control") == fcs
+
+
+def test_carriers_start_with_two_hangar_bays_and_merchants_with_no_fire_control(client):
+    cvh = _new(client, "fb", "CVH")
+    assert _count(cvh, "hangar") == 2 and _count(cvh, "fire_control") == 2
+    merchant = _new(client, "fb", "M")
+    assert merchant["hull_kind"] == "merchant" and _count(merchant, "fire_control") == 0
+    assert _count(_new(client, "ft2", "CVL"), "fighter_group") == 2
+
+
+def test_races_without_fire_control_get_none(client):
+    assert _new(client, "ftcd", "BB", race="savasku")["systems"] == []
+
+
+def test_no_preset_starts_blank_as_before(client):
+    design = store.get_design(make(client))
+    assert design["systems"] == [] and design["type_code"] == ""
+
+
+def test_leaving_the_class_band_reclasses_without_touching_the_rest(client):
+    cl = _new(client, "ftcd", "CL")
+    client.post(f"/design/{cl['id']}", data=fields(cl, tmf=58, action="apply"))
+    assert store.get_draft(cl["id"])["type_code"] == "CL"  # still inside 40-60
+    client.post(f"/design/{cl['id']}", data=fields(cl, tmf=85, action="apply"))
+    draft = store.get_draft(cl["id"])
+    assert draft["type_code"] == "CA" and draft["hull_boxes"] == cl["hull_boxes"]
+    assert _count(draft, "fire_control") == 2
+
+
+def test_a_carrier_stays_a_carrier_and_a_typed_code_wins(client):
+    cve = _new(client, "fb", "CVE")
+    client.post(f"/design/{cve['id']}", data=fields(cve, tmf=145, action="apply"))
+    assert store.get_draft(cve["id"])["type_code"] == "CVL"
+    cl = _new(client, "fb", "CL")
+    client.post(f"/design/{cl['id']}", data=fields(cl, tmf=120, type_code="XX", action="apply"))
+    assert store.get_draft(cl["id"])["type_code"] == "XX"
+
+
+def test_the_form_offers_the_class_picker(client):
+    page = client.get("/design").get_data(as_text=True)
+    assert 'name="class_preset"' in page and "CL · Light Cruiser · MASS 50" in page
+
+
+def test_a_class_of_another_ruleset_is_ignored(client):
+    client.post("/design/new", data={"ruleset": "fb", "name": "Odd",
+                                     "class_preset": _preset_index("ftcd", "CA")})
+    assert next(d for d in store.list_designs() if d["name"] == "Odd")["type_code"] == ""

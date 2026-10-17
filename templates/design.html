@@ -57,7 +57,7 @@
       <form method="post" action="{{ url_for('design_new') }}" class="stack">
         <input class="input" type="text" name="name" placeholder="{{ _('Name') }}"
                aria-label="{{ _('Name') }}" />
-        <select class="input" name="ruleset" aria-label="{{ _('Ruleset') }}">
+        <select class="input" name="ruleset" id="new-design-ruleset" aria-label="{{ _('Ruleset') }}">
           {# The current fleet's ruleset first in mind: a new design is usually for it. #}
           {% for rs in rulesets %}<option value="{{ rs.id }}"{% if current_fleet and current_fleet.ruleset == rs.id %} selected{% endif %}>{{ rs.name }}</option>{% endfor %}
         </select>
@@ -77,8 +77,37 @@
             <option value="{{ faction.id }}"{% if current_fleet and current_fleet.faction == faction.id %} selected{% endif %}>{{ faction.name }}</option>
           {% endfor %}
         </select>
+        {# A one-time head start: the class fills MASS, hull, armour, thrust and fire control,
+           all editable afterwards. Only the chosen ruleset's classes are shown. #}
+        <select class="input" name="class_preset" id="class-preset" aria-label="{{ _('Class') }}">
+          <option value="">{{ _("Class: start blank") }}</option>
+          {% for rs, choices in class_presets %}
+            <optgroup label="{{ rs.name }}" data-ruleset="{{ rs.id }}">
+              {% for key, p in choices %}
+                <option value="{{ key }}">{{ p.code }} · {{ p.label }} · {{ _("MASS {n}", n=p.tmf) }}</option>
+              {% endfor %}
+            </optgroup>
+          {% endfor %}
+        </select>
         <button class="btn primary" type="submit">{{ _("Create design") }}</button>
       </form>
+      <script>
+        (function () {
+          // Offer only the chosen ruleset's classes; a class of another ruleset is cleared.
+          var rs = document.getElementById("new-design-ruleset");
+          var cls = document.getElementById("class-preset");
+          function sync() {
+            cls.querySelectorAll("optgroup").forEach(function (g) {
+              var on = g.dataset.ruleset === rs.value;
+              g.hidden = !on;
+              g.disabled = !on;
+              if (!on && cls.selectedOptions[0] && cls.selectedOptions[0].parentNode === g) cls.value = "";
+            });
+          }
+          rs.addEventListener("change", sync);
+          sync();
+        })();
+      </script>
     </div>
   </aside>
 

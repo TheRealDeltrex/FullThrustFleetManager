@@ -38,7 +38,7 @@ import ssd_layout
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
-from rulesets import REFERENCE_BOOKS, RULESETS, common
+from rulesets import REFERENCE_BOOKS, RULESETS, common, presets
 from rulesets.fb import data as fb_data
 
 logger = logging.getLogger(__name__)
@@ -463,11 +463,17 @@ def _design_context(design: dict, dirty: bool) -> dict:
     }
 
 
+def _class_presets() -> list[tuple]:
+    """The New design form's class picker: each ruleset's presets with their form values."""
+    return [(rs, [(presets.preset_key(rs.id, i), p) for i, p in enumerate(presets.class_presets(rs.id))])
+            for rs in RULESETS.values()]
+
+
 @app.route("/design")
 def design() -> str:
     return render_template(
         "design.html", active_tab="design", library=_library(request.args.get("q", "")),
-        rulesets=list(RULESETS.values()), selected=None,
+        rulesets=list(RULESETS.values()), selected=None, class_presets=_class_presets(),
     )
 
 
@@ -479,6 +485,7 @@ def design_detail(design_id: str) -> str:
     return render_template(
         "design.html", active_tab="design", library=_library(request.args.get("q", "")),
         rulesets=list(RULESETS.values()), selected=_design_context(working, dirty),
+        class_presets=_class_presets(),
     )
 
 
@@ -489,6 +496,7 @@ def design_new() -> Response:
         request.form.get("ruleset", ""),
         request.form.get("race") or (fleet or {}).get("race") or "human",
         request.form.get("faction") or None, request.form.get("name", ""),
+        request.form.get("class_preset", ""),
     )
     flash(msg, "success" if created else "error")
     if not created:
@@ -499,6 +507,7 @@ def design_new() -> Response:
 def _apply_form(design: dict) -> dict:
     """The workbench posts the whole design; rules maths stays in the ruleset (PLAN 2.7)."""
     form = request.form
+    old_tmf, old_code = design["tmf"], design["type_code"]
     design["name"] = form.get("name", design["name"]).strip()[:80] or design["name"]
     design["type_label"] = form.get("type_label", "").strip()[:60]
     design["type_code"] = form.get("type_code", "").strip()[:8]
@@ -507,6 +516,11 @@ def _apply_form(design: dict) -> dict:
     for field in ("tmf", "hull_boxes", "armour", "thrust"):
         if form.get(field) is not None:
             design[field] = max(0, int(form.get(field) or 0))
+    if design["tmf"] != old_tmf and design["type_code"] == old_code:
+        # MASS moved out of the class's band: the class follows, nothing else is re-preset.
+        new_type = presets.reclass(design)
+        if new_type:
+            design["type_label"], design["type_code"] = new_type
     if form.get("armour_layers") is not None:
         # The Phalon shell, inner layer first, as "8, 4, 4" (FB2 p.35). Blank means one layer.
         design["armour_layers"] = [
