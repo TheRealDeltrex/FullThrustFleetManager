@@ -39,6 +39,7 @@ import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
 from rulesets import REFERENCE_BOOKS, RULESETS, common
+from rulesets.fb import data as fb_data
 
 logger = logging.getLogger(__name__)
 
@@ -380,6 +381,31 @@ def _catalog_group(design: dict) -> str:
     return f"{book} · {name}"
 
 
+# The catalog lists hulls smallest to largest: the FB1 p.12 size bands (SC up to SDN), with CD's
+# CA beside CH, then carriers and merchants, which are roles rather than sizes.
+_WARSHIP_ORDER = tuple(code for _, code, _, _ in fb_data.SHIP_CLASSES)
+_AFTER_CH = _WARSHIP_ORDER.index("CH") + 1
+_CLASS_ORDER = {code: i for i, code in enumerate(
+    _WARSHIP_ORDER[:_AFTER_CH] + ("CA",) + _WARSHIP_ORDER[_AFTER_CH:]
+    + ("CVE", "CVL", "CV", "CVH", "CVA", "M"))}
+
+
+def _class_rank(design: dict) -> float:
+    """Where a design's class sits in the catalog; a hull with no class code goes by its mass."""
+    code = design.get("type_code") or ""
+    if code in _CLASS_ORDER:
+        return _CLASS_ORDER[code]
+    bands = [code for _, code, low, _ in fb_data.SHIP_CLASSES if design.get("tmf", 0) >= low]
+    return _CLASS_ORDER[bands[-1]] + 0.5 if bands else -1
+
+
+def _catalog_key(design: dict) -> tuple:
+    """Book and race (the group), then faction (factionless last), class size, mass and name."""
+    faction = design.get("faction") or ""
+    return (design["ruleset"], design.get("race") or "human", not faction, faction,
+            _class_rank(design), design.get("tmf", 0), design["name"].lower())
+
+
 def _library(query: str = "") -> dict:
     """The left pane: my designs by ruleset, the catalog by book, both filtered by `query`."""
     def matches(d: dict) -> bool:
@@ -393,9 +419,9 @@ def _library(query: str = "") -> dict:
         if matches(d):
             mine.setdefault(d["ruleset"], []).append(d)
     catalog: dict[str, list[dict]] = {}
-    for d in sorted(store.catalog_designs(),
-                    key=lambda d: (d["ruleset"], d.get("race") or "human", d["name"].lower())):
+    for d in sorted(store.catalog_designs(), key=_catalog_key):
         if matches(d):
+            d["points"] = fleet_rules.design_points(d, {})
             # One book may hold several races (FB2 is a book of alien fleets), so the group is
             # book plus race; human designs keep the plain book heading.
             catalog.setdefault(_catalog_group(d), []).append(d)

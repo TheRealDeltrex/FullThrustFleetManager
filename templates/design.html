@@ -36,11 +36,16 @@
       {% for book, designs in library.catalog.items() %}
         <details class="lib-group" {% if library.query %}open{% endif %}>
           <summary>{{ book|upper }} <span class="muted">({{ designs|length }})</span></summary>
+          {# A faction heading only where the book mixes factions (FB1); designs come sorted. #}
+          {% set mixed = designs|map(attribute='faction')|unique|list|length > 1 %}
           <ul class="lib-list">
             {% for d in designs %}
+              {% if mixed and (loop.first or d.faction != loop.previtem.faction) %}
+                <li class="lib-faction muted">{{ d.faction or _("Civilian") }}</li>
+              {% endif %}
               <li><a href="{{ url_for('design_detail', design_id=d.id) }}"
                      class="{% if selected and selected.design.id == d.id %}on{% endif %}">{{ d.name }}</a>
-                <span class="muted">{{ d.type_code }}</span></li>
+                <span class="muted">{% if d.type_code %}{{ d.type_code }} · {% endif %}{{ d.points }} {{ _("pts") }}</span></li>
             {% endfor %}
           </ul>
         </details>
