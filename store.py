@@ -733,6 +733,12 @@ def remove_squadron(fleet: dict, squadron_id: str) -> tuple[bool, str]:
     return True, _("Squadron removed; its ships moved to {name}.", name=fleet["squadrons"][0]["name"])
 
 
+def _table_id_taken(fleet: dict, table_id: str, except_uid: str = "") -> bool:
+    """Table IDs name ships on the table, so they are unique within a fleet (case-insensitive)."""
+    key = table_id.strip()[:16].lower()
+    return any(s["table_id"].lower() == key for s in fleet["ships"] if s["uid"] != except_uid)
+
+
 def suggest_table_id(fleet: dict, type_code: str) -> str:
     """CE-1, CE-2, ... from the design's type code (PLAN 9.3)."""
     code = type_code or "S"
@@ -750,6 +756,8 @@ def add_ship(fleet: dict, design_id: str, name: str = "", table_id: str = "", sq
         return False, _("Design not found.")
     if design["ruleset"] != fleet["ruleset"]:
         return False, _("That design belongs to another ruleset.")
+    if table_id.strip() and _table_id_taken(fleet, table_id):
+        return False, _("Another ship in this fleet already has the ID {id}.", id=table_id.strip()[:16])
     sq_ids = [q["id"] for q in fleet["squadrons"]]
     uids = {s["uid"] for s in fleet["ships"]}
     n = len(uids) + 1
@@ -785,6 +793,8 @@ def update_ship(fleet: dict, uid: str, *, name: str | None = None, table_id: str
     ship = _ship(fleet, uid)
     if not ship:
         return False, _("Ship not found.")
+    if table_id is not None and table_id.strip() and _table_id_taken(fleet, table_id, uid):
+        return False, _("Another ship in this fleet already has the ID {id}.", id=table_id.strip()[:16])
     if status is not None:
         if status not in STATUSES:
             return False, _("Unknown status.")

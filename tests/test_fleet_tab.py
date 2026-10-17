@@ -126,6 +126,14 @@ def test_ship_status_and_squadron_are_edited_from_the_card(client):
                 data={"action": "update_ship", "uid": uid, "status": "damaged", "squadron": "sq1"})
     assert store.get_fleet(fleet_id)["ships"][0]["status"] == "damaged"
 
+    client.post(f"/fleet/{fleet_id}/action",
+                data={"action": "update_ship", "uid": uid, "name": "Lionheart", "table_id": "LH-1",
+                      "status": "damaged", "squadron": "sq1"})
+    ship = store.get_fleet(fleet_id)["ships"][0]
+    assert (ship["name"], ship["table_id"]) == ("Lionheart", "LH-1")
+    page = text(client.get(f"/fleet/{fleet_id}", follow_redirects=True))
+    assert 'name="table_id" value="LH-1"' in page and 'value="Lionheart"' in page
+
     page = text(client.post(f"/fleet/{fleet_id}/action", data={"action": "remove_ship", "uid": uid},
                             follow_redirects=True))
     assert "Ship removed." in page

@@ -193,6 +193,10 @@
                   </footer>
                   <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="row">
                     <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                    <input class="input sm" name="table_id" value="{{ ship.table_id }}" maxlength="16" required
+                           aria-label="{{ _('Ship ID') }}" title="{{ _('Ship ID') }}" />
+                    <input class="input sm name" name="name" value="{{ ship.name }}" maxlength="80" required
+                           aria-label="{{ _('Ship name') }}" title="{{ _('Ship name') }}" />
                     <select class="input sm" name="status" aria-label="{{ _('Status') }}">
                       {% for status in ("ready", "damaged", "docked", "hulk", "destroyed") %}
                         <option value="{{ status }}" {% if ship.status == status %}selected{% endif %}>{{ status }}</option>
