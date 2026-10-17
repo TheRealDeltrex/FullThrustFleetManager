@@ -118,22 +118,46 @@ def _norm_loadout(v: object) -> dict | None:
     if not isinstance(v, dict):
         return None
     fighters = [
-        {"hangar": f["hangar"], "type": f["type"]}
+        {"hangar": f["hangar"], "type": f["type"], **_fighter_extras(f)}
         for f in v.get("fighters", []) if isinstance(v.get("fighters"), list)
         if isinstance(f, dict) and isinstance(f.get("hangar"), str) and isinstance(f.get("type"), str)
     ] if isinstance(v.get("fighters"), list) else []
     magazines = [
-        {"magazine": m["magazine"], "salvos": _as_str_list(m.get("salvos"))}
+        {"magazine": m["magazine"], "salvos": _as_str_list(m.get("salvos")),
+         # Cross Dimensions multi-stage loads (CD p.25); a regular magazine carries no key.
+         **({"stages": _as_int(m["stages"], 1, 1, 9)}
+            if isinstance(m.get("stages"), int) and m["stages"] > 1 else {})}
         for m in v.get("magazines", [])
         if isinstance(m, dict) and isinstance(m.get("magazine"), str)
     ] if isinstance(v.get("magazines"), list) else []
+    # Cross Dimensions light vessels in hangars (CD p.47), MASS of craft per entry.
+    craft = [
+        {"hangar": c["hangar"], "mass": _as_int(c["mass"], 1, 1, 1000)}
+        for c in v.get("craft", [])
+        if isinstance(c, dict) and isinstance(c.get("hangar"), str)
+        and isinstance(c.get("mass"), int) and c["mass"] > 0
+    ] if isinstance(v.get("craft"), list) else []
     pulsers = [
         {"pulser": x["pulser"], "mode": x["mode"][:1].upper()}
         for x in v.get("pulsers", [])
         if isinstance(x, dict) and isinstance(x.get("pulser"), str)
         and isinstance(x.get("mode"), str) and x["mode"][:1].upper() in ("L", "M", "C")
     ] if isinstance(v.get("pulsers"), list) else []
-    return {"fighters": fighters, "magazines": magazines, "pulsers": pulsers}
+    out = {"fighters": fighters, "magazines": magazines, "pulsers": pulsers}
+    if craft:
+        out["craft"] = craft
+    return out
+
+
+def _fighter_extras(f: dict) -> dict:
+    """Cross Dimensions FTL/kinetic capability and swing roles (CD p.30); absent when unused, so
+    the rulesets that have neither keep their entries as they were."""
+    out = {}
+    for key in ("extras", "swing"):
+        values = [x[:20] for x in _as_str_list(f.get(key))]
+        if values:
+            out[key] = values
+    return out
 
 
 def normalize_design(doc: object) -> dict | None:

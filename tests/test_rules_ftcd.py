@@ -312,6 +312,91 @@ def test_fighter_loadout_points():
     assert system_row(d, "h").points == 54
 
 
+def carrier(*fighters, craft=(), bays=1) -> dict:
+    return design(tmf=60, hull_boxes=6, systems=[sys_("h", "hangar", bays=bays)],
+                  default_loadout={"fighters": [{"hangar": "h", **f} for f in fighters],
+                                   "magazines": [], "craft": [{"hangar": "h", "mass": m} for m in craft]})
+
+
+@pytest.mark.parametrize("group,points", [
+    ({"type": "attack"}, 24),
+    ({"type": "attack", "extras": ["ftl"]}, 30),                         # CD p.47: +6 a group
+    ({"type": "heavy", "extras": ["ftl", "kinetic"]}, 42),
+    ({"type": "attack", "swing": ["standard", "interceptor"]}, 42),      # the CD p.30 example
+    ({"type": "standard", "swing": ["attack", "interceptor"]}, 42),      # dearest type in full
+    ({"type": "attack", "swing": ["standard", "interceptor"], "extras": ["ftl"]}, 48),
+    ({"type": "torpedo", "swing": ["torpedo"]}, 36),                     # a repeat adds nothing
+])
+def test_fighter_extras_and_swing_role(group, points):
+    d = carrier(group)
+    assert CD.loadout_points(d, None, {}) == points
+    assert not codes(d)
+
+
+def test_kinetic_is_allowed_but_no_use_to_interceptors_and_torpedo_fighters():
+    # CD p.30: "can be bought for all types of fighter, but has no benefit" for those two.
+    assert "kinetic_no_benefit" in infos(carrier({"type": "interceptor", "extras": ["kinetic"]}))
+    assert "kinetic_no_benefit" in infos(carrier({"type": "torpedo", "swing": ["interceptor"],
+                                                  "extras": ["kinetic"]}))
+    assert "kinetic_no_benefit" not in infos(carrier({"type": "torpedo", "swing": ["attack"],
+                                                      "extras": ["kinetic"]}))
+
+
+def test_unknown_fighter_extras_and_swing_types_are_violations():
+    assert "unknown_fighter_type" in codes(carrier({"type": "attack", "swing": ["dragon"]}))
+    assert "unknown_fighter_type" in codes(carrier({"type": "attack", "extras": ["cloaked"]}))
+
+
+def test_light_vessels_in_hangars():
+    # CD p.47: 2 points per MASS of craft, 1.5 hangar MASS per craft MASS (a 9-MASS bay holds 6).
+    shuttles = carrier(craft=[6])
+    assert CD.loadout_points(shuttles, None, {}) == 12
+    assert not codes(shuttles)
+    assert "hangar_overfull" in codes(carrier(craft=[7]))
+    assert "hangar_overfull" in codes(carrier({"type": "standard"}, craft=[1]))
+    mixed = carrier({"type": "standard"}, craft=[2, 4], bays=2)
+    assert CD.loadout_points(mixed, None, {}) == 18 + 12
+    assert not codes(mixed)
+    assert "craft_without_hangar" in codes(design(default_loadout={
+        "fighters": [], "magazines": [], "craft": [{"hangar": "nope", "mass": 2}]}))
+
+
+def magazine_ship(capacity: int, salvos: list[str], stages: int = 1) -> dict:
+    return design(tmf=40, hull_boxes=4, systems=[
+        sys_("l", "sm_launcher", arcs=FRONT3), sys_("m", "sm_magazine", capacity=capacity, feeds=["l"])],
+        default_loadout={"fighters": [], "magazines": [
+            {"magazine": "m", "salvos": salvos, **({"stages": stages} if stages > 1 else {})}]})
+
+
+def test_multistage_salvo_loads_in_magazines():
+    # CD p.25: an extra stage adds 2 MASS and doubles the points. A standard load is 2 MASS of
+    # magazine at 3 points (6); two stages are 4 MASS and 12 points, which the magazine space
+    # already pays; three stages are 6 MASS and 24 points, 6 more than the space.
+    two = magazine_ship(8, ["std", "std"], stages=2)
+    assert not codes(two)
+    assert CD.loadout_points(two, None, {}) == 0
+    assert CD.loadout_points(magazine_ship(6, ["std"], stages=3), None, {}) == 6
+    assert CD.loadout_points(magazine_ship(12, ["std", "std"], stages=3), None, {}) == 12
+    assert "magazine_overloaded" in codes(magazine_ship(8, ["std"] * 3, stages=2))
+    assert not codes(magazine_ship(8, ["std"] * 4))                # regular loads are unchanged
+    assert CD.loadout_points(magazine_ship(8, ["std"] * 4), None, {}) == 0
+
+
+def test_a_multistage_magazine_carries_standard_missiles_only():
+    # CD p.25: only standard missiles may be multi-stage, and no mixing in one magazine.
+    assert "multistage_er" in codes(magazine_ship(10, ["std", "er"], stages=2))
+    assert "multistage_er" not in codes(magazine_ship(10, ["std", "std", "er"]))
+
+
+def test_multistage_loads_need_the_fleet_option():
+    d = magazine_ship(8, ["std", "std"], stages=2)
+    assert CD.required_options(d, None) == {"cd_multistage"}
+    assert CD.required_options(d, {"magazines": [{"magazine": "m", "salvos": ["std"]}]}) == set()
+    assert "option_needed" in infos(d)
+    assert "option_off" in codes(d, {"cd_multistage": False})
+    assert CD.required_options(magazine_ship(8, ["std"] * 4), None) == set()
+
+
 def test_type_suggestion():
     assert CD.suggest_type(design(tmf=72))[1] == "CA"            # CD p.42 calls it CA, not CH
     assert CD.suggest_type(design(tmf=200))[1] == "SDN"

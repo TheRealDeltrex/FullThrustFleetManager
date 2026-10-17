@@ -12,7 +12,7 @@ from rulesets import BookRef, ParamDef, SystemDef
 
 BOOKS = (BookRef("CD", "Full Thrust: Cross Dimensions", "Full Thrust Cross Dimensions.pdf", 1),)
 
-# CD p.47: group of 6. FTL and kinetic fighters (+6 each, CD p.30) are not offered yet.
+# CD p.47: group of 6, in the order of the book's table there.
 FIGHTER_POINTS = {
     "standard": 18,
     "interceptor": 18,
@@ -22,6 +22,28 @@ FIGHTER_POINTS = {
     "heavy": 30,
     "torpedo": 36,
 }
+# CD p.30 and the p.47 table: +1 a fighter, +6 a group, each, on top of the type. Kinetic can be
+# bought for every type but is of no benefit to interceptors and torpedo fighters.
+FIGHTER_EXTRAS = {"ftl": 6, "kinetic": 6}
+NO_KINETIC_BENEFIT = frozenset({"interceptor", "torpedo"})
+
+# CD p.47: 1.5 MASS of hangar per fighter or per MASS of light vessel, so a 9-MASS bay holds a
+# group of 6 or 6 MASS of craft. Light vessels (interface craft, shuttles) cost 2 a MASS.
+BAY_CRAFT_MASS = 6
+CRAFT_POINTS_PER_MASS = 2
+
+# CD p.47: magazine space per salvo (2, ER 3) at 3 points per MASS; CD p.25: each extra stage
+# adds 2 MASS and doubles the points, standard missiles only.
+SALVO_SPACE = {"std": 2, "er": 3}
+MAX_STAGES = 3
+
+
+def fighter_label(fighter_type: str) -> str:
+    return {
+        "standard": _("Standard"), "interceptor": _("Interceptor"), "fast": _("Fast"),
+        "attack": _("Attack"), "long_range": _("Long range"), "heavy": _("Heavy"),
+        "torpedo": _("Torpedo"),
+    }.get(fighter_type, fighter_type)
 
 # CD p.42: escorts up to MASS 44, cruisers up to 90, anything bigger is a capital; 300 at most.
 ESCORT_MAX, CRUISER_MAX, MAX_MASS = 44, 90, 300

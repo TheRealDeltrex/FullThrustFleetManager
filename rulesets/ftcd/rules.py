@@ -327,6 +327,9 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "core_systems": True,  # CD p.31: optional but drawn; the fleet option decides use
         "shell_layers": layers,
         "advanced_tech": True,  # the Design tab offers the advanced hull/drive/FTL choices
+        # ...and the loadout editor a row per fighter group with its extras and swing roles,
+        # light vessels per hangar and a stage count per magazine (CD pp.25, 30, 47).
+        "rich_loadout": True,
         "advanced_drive": advanced_drive,
         "advanced_ftl": advanced_ftl,
     }
@@ -373,11 +376,66 @@ def threshold_numbers(design: dict) -> list[int]:
 # ---- Loadout, options ---------------------------------------------------------------------------
 
 
+def _entries(loadout: object, key: str) -> list[dict]:
+    return fb_rules._loadout_entries(loadout, key)
+
+
+def _magazine_stages(entry: dict) -> int:
+    return max(1, _int(entry.get("stages"), 1))
+
+
+def _group_types(entry: dict) -> list[str]:
+    """The types a group may launch as: its own, then its swing roles (CD p.30), no repeats."""
+    swing = entry.get("swing") if isinstance(entry.get("swing"), list) else []
+    out: list[str] = []
+    for t in [entry.get("type"), *swing]:
+        if isinstance(t, str) and t not in out:
+            out.append(t)
+    return out
+
+
+def _group_extras(entry: dict) -> list[str]:
+    extras = entry.get("extras") if isinstance(entry.get("extras"), list) else []
+    return list(dict.fromkeys(x for x in extras if isinstance(x, str)))
+
+
+def fighter_group_points(entry: dict) -> int:
+    """CD p.30: a swing-role group pays its dearest type in full and half of each other type;
+    FTL and kinetic capability are +6 a group each (CD p.47)."""
+    costs = sorted((data.FIGHTER_POINTS[t] for t in _group_types(entry) if t in data.FIGHTER_POINTS),
+                   reverse=True)
+    if not costs:
+        return 0
+    return (costs[0] + sum(c // 2 for c in costs[1:])
+            + sum(data.FIGHTER_EXTRAS.get(x, 0) for x in _group_extras(entry)))
+
+
+def salvo_space(entry: dict, salvo: str) -> int | None:
+    """Magazine MASS one salvo of this load takes: an extra stage adds 2 (CD p.25)."""
+    if salvo not in data.SALVO_SPACE:
+        return None
+    return data.SALVO_SPACE[salvo] + (2 * (_magazine_stages(entry) - 1) if salvo == "std" else 0)
+
+
+def _salvo_surcharge(entry: dict) -> int:
+    """Points a multi-stage load costs beyond the magazine space it fills. Each stage doubles
+    the points of a standard load (2 MASS at 3 = 6, CD pp.25, 47) while the space it takes is
+    already priced at 3 a MASS in the magazine, so two stages cost nothing more and three 6."""
+    stages = _magazine_stages(entry)
+    if stages == 1:
+        return 0
+    salvos = entry.get("salvos") if isinstance(entry.get("salvos"), list) else []
+    per_load = 6 * 2 ** (stages - 1) - 3 * salvo_space(entry, "std")
+    return per_load * sum(1 for x in salvos if x == "std")
+
+
 def loadout_points(design: dict, loadout: dict | None, options: dict) -> int:
     if loadout is None:
         loadout = design.get("default_loadout")
-    return sum(data.FIGHTER_POINTS.get(f.get("type"), 0)
-               for f in fb_rules._loadout_entries(loadout, "fighters"))
+    craft_mass = sum(max(0, _int(c.get("mass"))) for c in _entries(loadout, "craft"))
+    return (sum(fighter_group_points(f) for f in _entries(loadout, "fighters"))
+            + data.CRAFT_POINTS_PER_MASS * craft_mass
+            + sum(_salvo_surcharge(m) for m in _entries(loadout, "magazines")))
 
 
 def _option_for(system: dict) -> str | None:
@@ -392,7 +450,12 @@ def _option_for(system: dict) -> str | None:
 
 
 def required_options(design: dict, loadout: dict | None) -> set[str]:
-    return {key for key in (_option_for(s) for s in _systems(design)) if key}
+    keys = {key for key in (_option_for(s) for s in _systems(design)) if key}
+    if loadout is None:
+        loadout = design.get("default_loadout")
+    if any(_magazine_stages(m) > 1 for m in _entries(loadout, "magazines")):
+        keys.add("cd_multistage")
+    return keys
 
 
 # The same wording as fleet_rules.option_label(), which this layer may not import.
@@ -484,11 +547,8 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
             continue
         _validate_arcs(s, uid, violation)
         key = _option_for(s)
-        if key and options.get(key) is False:
-            violation("option_off", _("This system needs the fleet option: {name}.",
-                                      name=OPTION_NAMES[key]()), uid)
-        elif key and key not in options:
-            info("option_needed", _("A fleet must switch on: {name}.", name=OPTION_NAMES[key]()), uid)
+        if key:
+            _option_issue(key, options, uid, violation, info)
         if stype == "nova_cannon" and not capital:
             violation("capital_only", _("Only capital ships may mount this system."), uid)
         if stype in ("sm_rack", "heavy_missile") and _stages(s) > 1 and s.get("load") == "er":
@@ -500,8 +560,9 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     if {"pds", "scattergun"} <= types:
         violation("mixed_point_defence", _("A ship cannot have both PDS and scatterguns."))
 
-    fb_rules._validate_missiles(design, systems, by_uid, violation)
-    _validate_fighters(design, by_uid, violation)
+    fb_rules._validate_missiles(design, systems, by_uid, violation, salvo_space)
+    _validate_magazine_loads(design, by_uid, options, violation, info)
+    _validate_hangars(design, by_uid, violation, info)
 
     if not any(s.get("type") == "fire_control" for s in systems):
         info("no_fire_control", _("No fire control: weapons that need one cannot fire."))
@@ -558,19 +619,57 @@ def _validate_arcs(s: dict, uid: str | None, violation) -> None:
         violation("single_arc", _("This weapon fires straight ahead only."), uid)
 
 
-def _validate_fighters(design: dict, by_uid: dict, violation) -> None:
-    per_hangar: dict[str, int] = {}
-    for entry in fb_rules._loadout_entries(design.get("default_loadout"), "fighters"):
+def _option_issue(key: str, options: dict, uid: str | None, violation, info) -> None:
+    if options.get(key) is False:
+        violation("option_off", _("This system needs the fleet option: {name}.",
+                                  name=OPTION_NAMES[key]()), uid)
+    elif key not in options:
+        info("option_needed", _("A fleet must switch on: {name}.", name=OPTION_NAMES[key]()), uid)
+
+
+def _validate_magazine_loads(design: dict, by_uid: dict, options: dict, violation, info) -> None:
+    """CD p.25: a magazine carries regular or multi-stage loads, never a mix, and only standard
+    missiles take extra stages. The stage count is the magazine's, so the only possible mix is an
+    ER salvo in a multi-stage magazine."""
+    for entry in _entries(design.get("default_loadout"), "magazines"):
+        mag = by_uid.get(entry.get("magazine"))
+        if _magazine_stages(entry) == 1 or not mag or mag.get("type") != "sm_magazine":
+            continue
+        _option_issue("cd_multistage", options, mag["uid"], violation, info)
+        salvos = entry.get("salvos") if isinstance(entry.get("salvos"), list) else []
+        if "er" in salvos:
+            violation("multistage_er", _("Only standard missiles may have extra stages."), mag["uid"])
+
+
+def _validate_hangars(design: dict, by_uid: dict, violation, info) -> None:
+    """Fighter groups and light vessels share the hangar: 6 craft MASS a bay (CD p.47)."""
+    loadout = design.get("default_loadout")
+    used: dict[str, int] = {}
+    for entry in _entries(loadout, "fighters"):
         hangar = by_uid.get(entry.get("hangar"))
         if not hangar or hangar.get("type") != "hangar":
             violation("fighters_without_hangar",
                       _("Fighter group assigned to a hangar this design does not have."))
             continue
-        if entry.get("type") not in data.FIGHTER_POINTS:
+        types = _group_types(entry)
+        if (any(t not in data.FIGHTER_POINTS for t in types)
+                or any(x not in data.FIGHTER_EXTRAS for x in _group_extras(entry))):
             violation("unknown_fighter_type", _("Unknown fighter type."), hangar["uid"])
-        per_hangar[hangar["uid"]] = per_hangar.get(hangar["uid"], 0) + 1
-    for uid, groups in per_hangar.items():
+        if "kinetic" in _group_extras(entry) and set(types) <= data.NO_KINETIC_BENEFIT:
+            info("kinetic_no_benefit",
+                 _("Kinetic weapons are of no benefit to interceptors or torpedo fighters."),
+                 hangar["uid"])
+        used[hangar["uid"]] = used.get(hangar["uid"], 0) + data.BAY_CRAFT_MASS
+    for entry in _entries(loadout, "craft"):
+        hangar = by_uid.get(entry.get("hangar"))
+        if not hangar or hangar.get("type") != "hangar":
+            violation("craft_without_hangar",
+                      _("Light vessels assigned to a hangar this design does not have."))
+            continue
+        used[hangar["uid"]] = used.get(hangar["uid"], 0) + max(0, _int(entry.get("mass")))
+    for uid, craft_mass in used.items():
         bays = max(1, _int(by_uid[uid].get("bays"), 1))
-        if groups > bays:
-            violation("hangar_overfull", _("{groups} fighter groups in a hangar with {bays} bays.",
-                                           groups=groups, bays=bays), uid)
+        if craft_mass > bays * data.BAY_CRAFT_MASS:
+            violation("hangar_overfull",
+                      _("The hangar holds {cap} MASS of fighters and light vessels; {n} are loaded.",
+                        cap=bays * data.BAY_CRAFT_MASS, n=craft_mass), uid)

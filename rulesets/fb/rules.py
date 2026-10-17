@@ -389,7 +389,13 @@ def _validate_arcs(s: dict, uid: str | None, violation) -> None:
         )
 
 
-def _validate_missiles(design: dict, systems: list[dict], by_uid: dict, violation) -> None:
+def _validate_missiles(design: dict, systems: list[dict], by_uid: dict, violation,
+                       salvo_space=None) -> None:
+    """Magazine feeds and salvo loads. `salvo_space(entry, salvo)` is the magazine MASS one salvo
+    of a load takes, or None for an unknown salvo; FTCD passes its own for multi-stage loads."""
+    if salvo_space is None:
+        def salvo_space(entry: dict, salvo: str) -> int | None:
+            return data.SALVO_SPACE.get(salvo)
     fed_by: dict[str, list[str]] = {}
     for s in systems:
         if s.get("type") != "sm_magazine":
@@ -418,10 +424,11 @@ def _validate_missiles(design: dict, systems: list[dict], by_uid: dict, violatio
             violation("salvos_without_magazine", _("Salvo load for a magazine this design does not have."))
             continue
         salvos = entry.get("salvos") if isinstance(entry.get("salvos"), list) else []
-        if any(x not in data.SALVO_SPACE for x in salvos):
+        spaces = [salvo_space(entry, x) for x in salvos]
+        if any(space is None for space in spaces):
             violation("unknown_salvo_type", _("Unknown salvo type."), mag.get("uid"))
             continue
-        used = sum(data.SALVO_SPACE[x] for x in salvos)
+        used = sum(spaces)
         capacity = _int(mag.get("capacity"))
         if used > capacity:
             violation(

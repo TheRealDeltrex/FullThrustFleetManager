@@ -281,7 +281,10 @@ rack. A ship's `loadout` overrides it wholesale (the UI copies the default when 
 editing). **Design NPV excludes loadout costs** (matches FB2 p.6 and the NPV gate); **ship and
 fleet totals include them**. In FT2 the fighter group cost is part of the design (20 points incl.
 bay, FT p.31); the loadout choice there is only the MT specialised fighter type (extra cost, MT
-toggle).
+toggle). FTCD adds to the same shape: a fighter entry may carry `extras` (`ftl`, `kinetic`) and
+`swing` (the other types it may launch as), a magazine entry `stages` (multi-stage loads), and
+`craft` lists light vessels per hangar by MASS. The keys are absent when unused, so the FB and
+FT2 entries are unchanged.
 
 ### 5.5 Custom factions
 
@@ -446,6 +449,14 @@ calls, recorded in `rulesets/ftcd/rules.py`: a two-arc class-1 graser costs the 
 MASS; the tug drive rounds its transfer MASS up; advanced FTL is paid at the standard rate
 unless the fleet option says the players pay for it (CD p.33); a system behind a fleet option
 is a note in the Design tab and a violation only in a fleet that has the option off.
+Loadouts (CD pp.25, 30, 47): FTL and kinetic are +6 a group each, kinetic allowed on
+interceptors and torpedo fighters but noted as no use to them; a swing-role group pays its
+dearest type in full and half of each other type; light vessels are 2 points per MASS and take
+1.5 hangar MASS per craft MASS, sharing the bay with fighter groups (6 craft MASS a bay); a
+magazine has one stage count for all its loads, so regular and multi-stage never mix, and
+only standard salvos may have extra stages. Each extra stage adds 2 MASS and doubles the
+points, so a load pays only what that doubling exceeds the magazine space it fills: nothing
+for two stages, 6 a salvo for three.
 
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
@@ -746,9 +757,9 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 ## 17. After v1 (roadmap, rough order)
 
 1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs) -
-   **done** for human tech (6.4). Not yet: FTL and kinetic fighters (+6 points each, CD p.30),
-   swing-role fighters, light vessels in hangars, multi-stage salvo loads in magazines, jump
-   gates, and the FB2 races under CD's changes (CD p.21).
+   **done** for human tech (6.4), including the loadout extras (FTL and kinetic fighters,
+   swing roles, light vessels in hangars, multi-stage salvo loads). Not yet: jump gates, and
+   the FB2 races under CD's changes (CD p.21).
 2. FTPC ruleset (incl. the 2017 errata)
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37
