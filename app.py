@@ -462,8 +462,9 @@ def _design_context(design: dict, dirty: bool) -> dict:
 
 
 def _class_presets() -> list[tuple]:
-    """The New design form's class picker: each ruleset's presets, by index (see presets)."""
-    return [(rs, list(enumerate(presets.class_presets(rs.id)))) for rs in RULESETS.values()]
+    """The New design form's class picker: each ruleset's presets with their form values."""
+    return [(rs, [(presets.preset_key(rs.id, i), p) for i, p in enumerate(presets.class_presets(rs.id))])
+            for rs in RULESETS.values()]
 
 
 @app.route("/design")
