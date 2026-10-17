@@ -9,8 +9,8 @@ launcher nodes are a cogged disc with an arrow beside it pointing along the laun
 arc, which ssd_arcs.py arrows() reads; all but the Vas'Sa'Rosh's three (F, FP, FS) bear fore.
 
 Type codes are the FB1 p.12 class whose name the panel's "Human Class Equivalent" gives exactly;
-the two ships the book calls only "Cruiser" carry no code, because inventing one would put a
-classification in the catalog that no book prints.
+the two ships the book calls only "Cruiser" take the FB1 p.12 class their MASS suggests (CE
+and CH), as the app's own type suggestion would pick, so every catalog design sorts by class.
 
     python tools/extract_catalog_fb2_savasku.py
 """
@@ -42,9 +42,9 @@ SHIPS = [
      f"PG:9 ST:{PORT} ST:{STBD} PL:F SP CX"),
     (28, "Var'Arr'Sha",  'Light Cruiser',                    'CL',  52, 169, 16,  3,
      f"PG:12 ST:{PORT} ST:{STBD} PL:F SP*2 CX*2"),
-    (29, "Var'Kiir'Sha", 'Cruiser',                          '',    64, 208, 18,  4,
+    (29, "Var'Kiir'Sha", 'Cruiser',                          'CE',  64, 208, 18,  4,
      f"PG:16 ST:{PORT} ST:{FORE} ST:{STBD} PL:F SP*3 CX*2"),
-    (29, "Var'Thee'Sha", 'Cruiser',                          '',    70, 226, 20,  6,
+    (29, "Var'Thee'Sha", 'Cruiser',                          'CH',  70, 226, 20,  6,
      f"PG:16 ST:{PORT} ST:{FORE} ST:{STBD} PL:F SP*3 CX*2"),
     (30, "Thy'Sa'Teth",  'Escort Carrier',                   'CVE', 94, 302, 36,  6,
      f"PG:16 ST:{FORE} SN SP*3 CX*2 DW*2"),

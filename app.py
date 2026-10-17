@@ -390,13 +390,9 @@ _CLASS_ORDER = {code: i for i, code in enumerate(
     + ("CVE", "CVL", "CV", "CVH", "CVA", "M"))}
 
 
-def _class_rank(design: dict) -> float:
-    """Where a design's class sits in the catalog; a hull with no class code goes by its mass."""
-    code = design.get("type_code") or ""
-    if code in _CLASS_ORDER:
-        return _CLASS_ORDER[code]
-    bands = [code for _, code, low, _ in fb_data.SHIP_CLASSES if design.get("tmf", 0) >= low]
-    return _CLASS_ORDER[bands[-1]] + 0.5 if bands else -1
+def _class_rank(design: dict) -> int:
+    """Where a design's class sits in the catalog; an unknown code goes last."""
+    return _CLASS_ORDER.get(design.get("type_code") or "", len(_CLASS_ORDER))
 
 
 def _catalog_key(design: dict) -> tuple:
