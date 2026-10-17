@@ -64,6 +64,8 @@ a { color: var(--accent); }
 .chip.warn { background: var(--warn-soft); border-color: #f0d6a8; color: var(--warn); }
 .chip.bad { background: var(--bad-soft); border-color: #f1c3be; color: var(--bad); }
 .chip.info { background: var(--accent-soft); border-color: #c4d8f1; color: var(--accent); }
+a.chip { text-decoration: none; }
+a.chip:hover { text-decoration: underline; }
 .muted { color: var(--muted); }
 
 /* ---- Flash messages ---- */

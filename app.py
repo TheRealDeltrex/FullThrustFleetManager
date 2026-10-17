@@ -210,7 +210,7 @@ def _inject_current_fleet() -> dict:
     races = [(rs, rs.races()) for rs in RULESETS.values()]
     if not fleet:
         return {"current_fleet": None, "all_fleets": store.list_fleets(), "fleet_points": 0,
-                "races_by_ruleset": races}
+                "races_by_ruleset": races, "all_factions": store.faction_choices()}
     designs = store.designs_for_fleet(fleet)
     return {
         "current_fleet": fleet,
@@ -218,6 +218,7 @@ def _inject_current_fleet() -> dict:
         "fleet_points": fleet_rules.fleet_points(fleet, designs),
         "fleet_badges": fleet_rules.badges(fleet, designs),
         "races_by_ruleset": races,
+        "all_factions": store.faction_choices(),
     }
 
 
@@ -244,7 +245,7 @@ def _fleet_context(fleet: dict, view: str) -> dict:
         "hull_damage": sum(s["damage"]["hull"] for s in fleet["ships"]),
         "library": sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
                           key=lambda d: d["name"].lower()),
-        "factions": store.builtin_factions(fleet["ruleset"]) + store.custom_factions(),
+        "factions": store.faction_choices(fleet["ruleset"], keep=fleet["faction"]),
         # Only the options this fleet's ruleset offers, in its order, with readable names.
         "option_keys": fleet_rules.ruleset_option_keys(fleet["ruleset"]),
         "option_label": fleet_rules.option_label,
@@ -448,6 +449,7 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "violations": violations,
         "can_save": not violations or design["allow_rule_breaking"],
         "used_by": used_by,
+        "factions": store.faction_choices(design["ruleset"], keep=design["faction"]),
         "system_types": rs.system_types(design.get("race", "human"), options),
         "fighter_types": rs.fighter_types(options),
         "fighter_label": common.fighter_label,

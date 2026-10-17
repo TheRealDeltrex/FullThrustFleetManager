@@ -569,6 +569,20 @@ def add_custom_faction(name: str, faction_id: str | None = None) -> tuple[bool, 
     return True, _("Faction added."), fid
 
 
+def faction_choices(ruleset: str | None = None, keep: str | None = None) -> list[dict]:
+    """What a faction picker offers: the ruleset's built-in factions (every ruleset's, once each,
+    when none is named), then the custom ones. ``keep`` is the value already chosen; it stays on
+    the list even when it is not offered any more, so saving a form does not drop it."""
+    rulesets = [ruleset] if ruleset else list(_builtin_factions())
+    choices: list[dict] = []
+    for f in [f for r in rulesets for f in builtin_factions(r)] + custom_factions():
+        if not any(c["id"] == f["id"] for c in choices):
+            choices.append(f)
+    if keep and not any(c["id"] == keep for c in choices):
+        choices.append({"id": keep, "name": faction_name(keep)})
+    return choices
+
+
 def faction_name(faction_id: str | None, ruleset: str | None = None) -> str:
     if not faction_id:
         return ""
