@@ -128,6 +128,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .loadout-row .swing .row { margin-top: 4px; }
 .arc, .param { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 3px; }
 .input.sm { padding: 2px 5px; width: 62px; font-size: 12px; }
+.input.sm.name { width: 140px; }
 /* An open-ended setting's write-in field, shown once its dropdown says "More". */
 .param .more { display: none; }
 .param:has(option[value="more"]:checked) .more { display: inline-block; }
