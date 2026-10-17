@@ -94,6 +94,9 @@ What exists:
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
   record sheets (docked, hulk and destroyed ships are listed but not drawn, PLAN 10.2) and the
   roster table. All three use the same `ssd_layout` diagrams the PDF will.
+- Add ship lists only the fleet's faction's designs when it has one; the "Show all ships" toggle
+  is a GET form (`all_ships`, a hidden 0 before the checkbox's 1) remembered in
+  `session["all_ships"]`, so it survives the redirect after adding a ship.
 - `tests/test_fleet_tab.py` covers the routes, the views, every badge row and the check page.
 
 ## Fleet PDF (`pdf_export.py`)

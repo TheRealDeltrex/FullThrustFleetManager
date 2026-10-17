@@ -242,6 +242,32 @@ def test_the_no_faction_badge_leads_to_the_faction_picker(client):
     assert 'href="#fleet-details"' in page and 'id="fleet-details"' in page
 
 
+def test_a_factions_fleet_is_offered_only_its_own_ships_until_show_all(client):
+    fleet_id = make_fleet(client, faction="NSL")
+    page = text(client.get("/fleet"))
+    assert "Show all ships" in page
+    assert 'value="fb:fb1:nsl-' in page and f'value="{FURIOUS}"' not in page   # Furious is NAC
+    page = text(client.get("/fleet?all_ships=0&all_ships=1"))
+    assert f'value="{FURIOUS}"' in page
+    add_ship(client, fleet_id)                                   # the choice survives a redirect
+    assert f'value="{FURIOUS}"' in text(client.get("/fleet"))
+    assert f'value="{FURIOUS}"' not in text(client.get("/fleet?all_ships=0"))
+
+
+def test_a_fleet_without_a_faction_lists_everything_and_no_toggle(client):
+    make_fleet(client)
+    page = text(client.get("/fleet"))
+    assert "Show all ships" not in page and f'value="{FURIOUS}"' in page
+
+
+def test_a_faction_with_no_designs_points_to_the_design_tab_and_the_toggle(client):
+    _ok, _m, fid = store.add_custom_faction("Free Traders")
+    make_fleet(client, faction=fid)
+    page = text(client.get("/fleet"))
+    assert "No Free Traders ship designs yet." in page and "Design one in the Design tab" in page
+    assert "Show all ships" in page and 'name="design_id"' not in page
+
+
 def test_a_variant_shows_the_custom_ships_badge(client):
     fleet_id = make_fleet(client)
     variant, _msg = store.make_variant(FURIOUS)
