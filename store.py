@@ -305,6 +305,14 @@ def _catalog() -> dict[str, dict]:
             clean = normalize_design(d)
             if clean:
                 out[clean["id"]] = clean
+    # A ruleset with no designs of its own may adopt another's (Cross Dimensions takes the Fleet
+    # Book ships, CD p.3), converted by the ruleset rather than kept as a second file.
+    for rs in RULESETS.values():
+        for source in rs.catalog_sources:
+            for d in [d for d in out.values() if d["ruleset"] == source]:
+                clean = normalize_design(rs.adopt_design(json.loads(json.dumps(d))))
+                if clean and clean["ruleset"] == rs.id and clean["id"] not in out:
+                    out[clean["id"]] = clean
     return out
 
 
