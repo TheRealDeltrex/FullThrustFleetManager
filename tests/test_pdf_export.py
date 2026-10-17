@@ -256,3 +256,9 @@ def test_a_cross_dimensions_fleet_prints_its_own_sheets_and_reference():
     assert "Combat Points Value (CPV) hull cost" in text      # options by name, not by key
     assert "Grasers" in text and "Advanced screens" in text   # the quick reference, from CD
     assert "CD p." in text
+
+
+def test_the_tracker_names_one_shot_systems():
+    pages = render([a_fleet(ships=["fb:fb1:fse-athena"])])[1]
+    tracker = next(p for p in pages if "Fighters and ordnance" in p)
+    assert "Submunition" in tracker and "submunition" not in tracker

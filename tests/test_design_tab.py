@@ -381,3 +381,15 @@ def test_a_magazine_feeds_its_launchers_from_checkboxes(client):
     client.post(f"/design/{design_id}", data=fields(design, action="apply",
                                                      **{f"sys-{magazine}-feeds-present": "1"}))
     assert feeds() == []
+
+
+def test_fighter_types_and_system_fields_carry_names_not_keys(client):
+    design_id = make(client, "Named carrier")
+    for system_type in ("hangar", "hold"):
+        design = store.get_draft(design_id) or store.get_design(design_id)
+        client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type=system_type))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert ">Long range</option>" in page and ">long_range<" not in page
+    assert "Fighter groups" in page and ">bays" not in page
+    hold = next(s["uid"] for s in store.get_draft(design_id)["systems"] if s["type"] == "hold")
+    assert f'<select class="input sm" name="sys-{hold}-kind"' in page and ">Cargo (H)</option>" in page

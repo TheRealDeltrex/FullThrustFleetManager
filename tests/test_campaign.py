@@ -226,3 +226,9 @@ def test_unknown_fleet_and_action(client):
     fleet, _uid = a_fleet()
     assert client.post("/campaign/nope/action", data={"action": "replenish"}).status_code == 404
     assert "Unknown action." in text(post(client, fleet, action="dance"))
+
+
+def test_systems_knocked_out_are_listed_by_name(client):
+    a_fleet()
+    page = text(client.get("/campaign"))
+    assert "Fire control" in page and "fire_control</label>" not in page

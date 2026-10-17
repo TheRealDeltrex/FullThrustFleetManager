@@ -56,6 +56,16 @@ def fleet_options(fleet: dict) -> dict:
     return {k: bool(opts.get(k)) for k in FLEET_OPTION_KEYS} if isinstance(opts, dict) else {}
 
 
+def system_labels(design: dict | None) -> dict[str, str]:
+    """uid -> the system's name as the ruleset labels it (the breakdown rows), for lists that
+    name systems outside the Design tab: knocked-out systems, the PDF tracker."""
+    rs = RULESETS.get((design or {}).get("ruleset"))
+    if not rs:
+        return {}
+    return {row.system_uid: row.label
+            for row in rs.design_breakdown(design, {}).rows if row.system_uid}
+
+
 def design_points(design: dict, options: dict) -> int:
     rs = RULESETS.get(design.get("ruleset"))
     return rs.design_breakdown(design, options).points if rs else 0

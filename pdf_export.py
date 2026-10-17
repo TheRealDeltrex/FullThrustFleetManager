@@ -365,6 +365,7 @@ def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         design = designs.get(ship["design_id"])
         if not design or ship["status"] in ("destroyed", "hulk"):
             continue
+        labels = fleet_rules.system_labels(design)
         for system in design["systems"]:
             if system["type"] in ("hangar", "fighter_group", "drone_womb"):
                 rows.append((f"{ship['table_id']} {ship['name']}", _("Fighter group"), 6, "fighters"))
@@ -372,7 +373,9 @@ def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
                 salvos = max(1, int(system.get("capacity", 2) or 2) // 2)
                 rows.append((f"{ship['table_id']} {ship['name']}", _("Salvos"), salvos, "salvos"))
             elif system["type"] in ("submunition", "nova_cannon", "wave_gun", "mt_missile"):
-                rows.append((f"{ship['table_id']} {ship['name']}", system["type"], 1, "one_shot"))
+                name = labels.get(system["uid"], system["type"])
+                rows.append((f"{ship['table_id']} {ship['name']}", name, 1,
+                             "one_shot"))
     if not rows:
         return
     pdf.add_page()
