@@ -24,7 +24,7 @@ import fleet_rules
 import migrations
 import paths
 from i18n import _
-from rulesets import RULESETS
+from rulesets import RULESETS, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
@@ -355,7 +355,9 @@ def _write_design(design: dict) -> None:
 
 
 def new_design(ruleset: str, race: str = "human", faction: str | None = None,
-               name: str = "") -> tuple[dict | None, str]:
+               name: str = "", class_preset: str = "") -> tuple[dict | None, str]:
+    """A fresh design; `class_preset` (an index into presets.class_presets) gives it a head
+    start of that class's MASS, hull, armour, thrust and fire controls."""
     rs = RULESETS.get(ruleset)
     if not rs:
         return None, _("Unknown ruleset.")
@@ -367,6 +369,11 @@ def new_design(ruleset: str, race: str = "human", faction: str | None = None,
         "hull_boxes": 15 if ruleset in ("fb", "ftcd") else 0, "thrust": 4, "ftl": True,
         "source": {"kind": "custom"},
     })
+    preset = presets.find_preset(ruleset, class_preset)
+    if preset:
+        presets.apply_preset(design, preset)
+        for system_type in presets.preset_systems(ruleset, race, preset):
+            add_system(design, system_type)
     _write_design(design)
     return design, _("Design created.")
 
