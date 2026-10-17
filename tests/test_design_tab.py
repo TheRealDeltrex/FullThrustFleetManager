@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+import app as app_module
 import store
 
 CATALOG = "fb:fb1:nac-furious"
@@ -48,6 +49,24 @@ def test_the_tab_opens_with_the_catalog_and_no_selection(client):
 def test_search_filters_the_library(client):
     page = client.get("/design?q=furious").get_data(as_text=True)
     assert "Furious" in page and "Vandenburg" not in page
+
+
+def test_the_catalog_lists_by_faction_then_class_size_with_points(client):
+    fb1 = app_module._library()["catalog"]["FB1"]
+    factions = [d.get("faction") or "~" for d in fb1]
+    assert factions == sorted(factions)  # factionless freighters last
+    nac = [d["type_code"] for d in fb1 if d.get("faction") == "NAC"]
+    assert nac.index("SC") < nac.index("DD") < nac.index("CH") < nac.index("BB") < nac.index("SDN")
+    page = client.get("/design").get_data(as_text=True)
+    furious = next(d for d in fb1 if d["id"] == CATALOG)
+    assert f"{furious['type_code']} · {furious['points']} pts" in page
+    assert "NAC" in page and "Civilian" in page
+
+
+def test_every_catalog_design_has_a_class_code():
+    """The FB2 hulls the book leaves unclassified take the class their MASS suggests, so the
+    catalog can sort them by size."""
+    assert all(d["type_code"] for d in store.catalog_designs())
 
 
 def test_a_missing_design_is_a_404(client):

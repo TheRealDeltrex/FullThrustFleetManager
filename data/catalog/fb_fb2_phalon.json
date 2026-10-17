@@ -458,7 +458,7 @@
    "faction": "PH",
    "name": "Huulth",
    "type_label": "Medium Cruiser",
-   "type_code": "",
+   "type_code": "CH",
    "hull_kind": "warship",
    "tmf": 70,
    "hull_boxes": 12,
