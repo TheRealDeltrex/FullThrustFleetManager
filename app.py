@@ -547,6 +547,9 @@ def _apply_form(design: dict) -> dict:
                     system[key] = form.getlist(prefix + key)
                 continue
             value = form.get(prefix + key)
+            if value == "more":
+                # An open-ended setting's dropdown ends in "More" and a field to type the number.
+                value = form.get(prefix + key + "-more", "").strip() or None
             if value is None:
                 continue
             system[key] = value if isinstance(system[key], str) and not value.isdigit() else int(value or 0)

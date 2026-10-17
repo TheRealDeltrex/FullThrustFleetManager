@@ -235,12 +235,31 @@
                                 <option value="{{ choice }}" {% if value == choice %}selected{% endif %}>{{ text }}</option>
                               {% endfor %}
                             </select></label>
+                        {% elif param and param.kind == 'int' and param.min is not none %}
+                          {# Numbers are picked from a list. A capped one (a weapon's class, missile
+                             stages) lists its whole range, and a value outside it (bookkeeping mode)
+                             stays selectable. An open-ended one lists up to 11, then "More", which
+                             shows a field to type the number in (style.css, no script needed). #}
+                          {% set capped = param.max is not none %}
+                          {% set options = range(param.min, (param.max if capped else 11) + 1) | list %}
+                          {% set more = not capped and value not in options %}
+                          <label class="param">{{ name }}
+                            <select class="input sm" name="sys-{{ system.uid }}-{{ key }}">
+                              {% if capped and value not in options %}<option value="{{ value }}" selected>{{ value }}</option>{% endif %}
+                              {% for option in options %}
+                                <option value="{{ option }}" {% if value == option %}selected{% endif %}>{{ option }}</option>
+                              {% endfor %}
+                              {% if not capped %}<option value="more" {% if more %}selected{% endif %}>{{ _("More") }}</option>{% endif %}
+                            </select>
+                            {% if not capped %}
+                              <input class="input sm more" type="number" min="{{ param.min }}"
+                                name="sys-{{ system.uid }}-{{ key }}-more" value="{{ value if more else '' }}" />
+                            {% endif %}</label>
                         {% else %}
                           <label class="param">{{ name }}
                             <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}"
                               {% if param and param.kind == 'int' %}type="number"
-                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}
-                                {% if param.max is not none %}max="{{ param.max }}"{% endif %}{% endif %} /></label>
+                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}{% endif %} /></label>
                         {% endif %}
                       {% endfor %}
                       {% if 'arcs' in system %}
@@ -292,7 +311,7 @@
                   {% set craft = (d.default_loadout.craft or []) | selectattr('hangar', 'equalto', system.uid) | sum(attribute='mass') %}
                   <fieldset class="loadout-group">
                     <legend>{{ _("Hangar {uid}", uid=system.uid) }}
-                      <span class="muted">{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays or 1) }}</span></legend>
+                      <span class="muted">{% if (system.bays or 1) == 1 %}{{ _("6 fighters or 6 MASS of craft") }}{% else %}{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays) }}{% endif %}</span></legend>
                     {% for index in range(system.bays or 1) %}
                       {% set group = groups[index] if index < groups|length else None %}
                       {% set prefix = "fighter-" ~ system.uid ~ "-" ~ index ~ "-" %}
