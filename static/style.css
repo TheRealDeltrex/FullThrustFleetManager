@@ -26,7 +26,11 @@ body { background: var(--bg); color: var(--ink);
 a { color: var(--accent); }
 
 /* ---- Top bar ---- */
-.topbar { background: var(--chrome); color: var(--chrome-ink); }
+/* Sticky, not fixed: it keeps its place in the flow, so nothing below starts hidden under it.
+   The z-index keeps it above SSD and record-sheet SVGs as they scroll past. */
+.topbar { background: var(--chrome); color: var(--chrome-ink); position: sticky; top: 0; z-index: 10; }
+/* On a short window the bar (which wraps onto several rows when narrow) would eat the page. */
+@media (max-height: 520px), print { .topbar { position: static; } }
 .ruleset-strip { height: 3px; background: var(--rs-current); }
 .topbar-row { display: flex; align-items: center; gap: 18px; padding: 10px 16px; flex-wrap: wrap; }
 .brand { font-weight: 700; letter-spacing: .3px; white-space: nowrap; color: var(--chrome-ink); text-decoration: none; }
