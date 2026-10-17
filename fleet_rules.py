@@ -168,16 +168,28 @@ def design_is_custom(design: dict | None) -> bool:
 
 
 def badges(fleet: dict, designs: dict) -> dict[str, bool]:
-    """PLAN 7: non_conforming, mixed_faction, custom_ships (the ruleset badge is always shown)."""
+    """PLAN 7: non_conforming, no_faction, mixed_faction, custom_ships (the ruleset badge is
+    always shown). A fleet without a faction says so rather than calling itself mixed: there is
+    nothing for its ships to be mixed against."""
     ships = fleet.get("ships", [])
     faction = fleet.get("faction")
     ship_designs = [designs.get(s.get("design_id")) for s in ships]
-    mixed = faction is None or any(d is None or d.get("faction") != faction for d in ship_designs)
+    mixed = faction is not None and any(d is None or d.get("faction") != faction for d in ship_designs)
     return {
         "non_conforming": not fleet_conforming(fleet, designs),
+        "no_faction": faction is None,
         "mixed_faction": mixed,
         "custom_ships": any(design_is_custom(d) for d in ship_designs),
     }
+
+
+def badge_label(key: str) -> str:
+    return {
+        "non_conforming": _("Non-conforming"),
+        "no_faction": _("No faction"),
+        "mixed_faction": _("Mixed faction"),
+        "custom_ships": _("Custom ships"),
+    }.get(key, key)
 
 
 # ---- Campaign maths (PLAN 11.1; the repair rules are FT p.35) ----------------------------------

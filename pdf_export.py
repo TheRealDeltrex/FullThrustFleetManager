@@ -244,7 +244,7 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
               if fleet["options"].get(k)]
     if active:
         lines.append(f"{_('Options in force')}: " + ", ".join(active))
-    marks = [name for name, on in badges.items() if on]
+    marks = [fleet_rules.badge_label(name) for name, on in badges.items() if on]
     if marks:
         lines.append(f"{_('Badges')}: " + ", ".join(marks))
     for line in lines:
