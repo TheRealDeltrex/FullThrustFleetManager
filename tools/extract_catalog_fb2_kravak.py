@@ -43,7 +43,7 @@ WARSHIPS = [
     (17, "Yu'Kas",  'Superdreadnought',         'SDN',220, 883, 72, 3, "K6*4 K1*5 SG*13 FC*5 HB"),
     (18, "Do'San",  'Tactical (Light) Carrier', 'CVL',180, 671, 54, 4, "K3*4 K1*3 SG*7 FC*3 HB*4"),
     (18, "Ko'San",  'Heavy Carrier',            'CVH',240, 917, 72, 4, "K3*4 K1*4 SG*11 FC*3 HB*6"),
-    (19, "To'Rok",  'Explorer or Recon Ship',   '',    60, 196, 18, 4, "K2 K1 SG*2 FC S:10 TB:4"),
+    (19, "To'Rok",  'Explorer or Recon Ship',   'CE',  60, 196, 18, 4, "K2 K1 SG*2 FC S:10 TB:4"),
 ]
 # The Sha'Ken is the one Kra'Vak merchant hull: crew factor 1 at MASS 40 ("[Crew Factor: 1
 # (Merchant)]", FB2 p.19), so it is costed with the merchant crew rule.

@@ -1658,7 +1658,7 @@
    "faction": "KV",
    "name": "To'Rok",
    "type_label": "Explorer or Recon Ship",
-   "type_code": "",
+   "type_code": "CE",
    "hull_kind": "warship",
    "tmf": 60,
    "hull_boxes": 18,
