@@ -69,6 +69,12 @@
             {% endfor %}
           </select>
         </label>
+        <label class="field">{{ _("Faction") }}
+          <select class="input" name="faction">
+            <option value="">{{ _("None") }}</option>
+            {% for faction in all_factions %}<option value="{{ faction.id }}">{{ faction.name }}</option>{% endfor %}
+          </select>
+        </label>
         <label class="field">{{ _("Points limit") }}
           <input class="input" type="number" min="0" name="points_limit" placeholder="{{ _('Points limit') }}" />
         </label>
@@ -88,9 +94,10 @@
         <span class="badge rs-{{ f.ruleset }}">{{ selected.ruleset.short_label }}</span>
         <h2>{{ f.name }}</h2>
         {% if f.admiral %}<span class="muted">{{ f.admiral }}</span>{% endif %}
-        {% if f.faction %}<span class="chip">{{ f.faction }}</span>{% endif %}
+        {% if f.faction %}<a class="chip" href="#fleet-details">{{ f.faction }}</a>{% endif %}
         {% if selected.badges.non_conforming %}<span class="chip bad">{{ _("Non-conforming") }}</span>{% endif %}
-        {% if selected.badges.no_faction %}<span class="chip warn">{{ _("No faction") }}</span>{% endif %}
+        {% if selected.badges.no_faction %}<a class="chip warn" href="#fleet-details"
+           title="{{ _('Choose one under Fleet details') }}">{{ _("No faction") }}</a>{% endif %}
         {% if selected.badges.mixed_faction %}<span class="chip warn">{{ _("Mixed faction") }}</span>{% endif %}
         {% if selected.badges.custom_ships %}<span class="chip info">{{ _("Custom ships") }}</span>{% endif %}
         {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ selected.option_label(key) }}</span>{% endfor %}
@@ -236,7 +243,7 @@
       </div>
 
       {# ---- Fleet details ---- #}
-      <div class="panel">
+      <div class="panel" id="fleet-details">
         <h3>{{ _("Fleet details") }}</h3>
         <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body stack">
           <div class="grid-fields">

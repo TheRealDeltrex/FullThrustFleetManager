@@ -229,6 +229,19 @@ def test_badges_follow_the_fleet(client):
     assert "Non-conforming" in text(client.get("/fleet"))
 
 
+def test_the_faction_is_picked_when_the_fleet_is_created(client):
+    page = text(client.get("/fleet"))
+    assert 'name="faction"' in page and "Eurasian Solar Union" in page
+    fleet_id = make_fleet(client, ruleset="ftcd", faction="ESU")
+    assert store.get_fleet(fleet_id)["faction"] == "ESU"
+
+
+def test_the_no_faction_badge_leads_to_the_faction_picker(client):
+    make_fleet(client)
+    page = text(client.get("/fleet"))
+    assert 'href="#fleet-details"' in page and 'id="fleet-details"' in page
+
+
 def test_a_variant_shows_the_custom_ships_badge(client):
     fleet_id = make_fleet(client)
     variant, _msg = store.make_variant(FURIOUS)
