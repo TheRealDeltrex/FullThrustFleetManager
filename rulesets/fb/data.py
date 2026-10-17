@@ -165,7 +165,6 @@ def system_defs() -> list[SystemDef]:
             "hangar",
             _("Fighter hangar bay"),
             craft,
-            (ParamDef("bays", "int", _("Fighter groups"), 1, 1, None),),
             **fb1,
         ),
         SystemDef(
