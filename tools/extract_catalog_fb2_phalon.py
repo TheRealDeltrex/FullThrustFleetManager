@@ -11,7 +11,8 @@ its class number in it, so they take the book's stated norm, "normally (but not 
 to fire through the forward arcs of the ship (FP/F/FS)" (FB2 p.36).
 
 Type codes are the FB1 p.12 class nearest the panel's "Human Class Equivalent"; the Huulth,
-which the book calls only a "Medium Cruiser", carries none, because no book prints that class.
+which the book calls only a "Medium Cruiser", takes the FB1 p.12 class its MASS suggests (CH),
+as the app's own type suggestion would pick, so every catalog design sorts by class.
 
     python tools/extract_catalog_fb2_phalon.py
 """
@@ -45,7 +46,7 @@ SHIPS = [
      f"PU:{ALL} PU:F PBL1 VS FC"),
     (41, "Tsaara",  'Light Cruiser',    'CL',   58,  225, 10, (3, 2),          4,
      f"PU:F PU:{ALL}*2 PBL2 VS FC*2"),
-    (41, "Huulth",  'Medium Cruiser',   '',     70,  276, 12, (4, 3),          4,
+    (41, "Huulth",  'Medium Cruiser',   'CH',   70,  276, 12, (4, 3),          4,
      f"PU:{PORT} PU:{ALL}*2 PU:{STBD} PBL2 VS FC*2"),
     (42, "Tuuloth", 'Heavy Cruiser',    'CH',   80,  299, 16, (6, 3),          4,
      f"PU:{PORT} PU:{ALL} PU:{STBD} PBL3 VS FC*2"),

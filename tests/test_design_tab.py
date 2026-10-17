@@ -63,6 +63,12 @@ def test_the_catalog_lists_by_faction_then_class_size_with_points(client):
     assert "NAC" in page and "Civilian" in page
 
 
+def test_every_catalog_design_has_a_class_code():
+    """The FB2 hulls the book leaves unclassified take the class their MASS suggests, so the
+    catalog can sort them by size."""
+    assert all(d["type_code"] for d in store.catalog_designs())
+
+
 def test_a_missing_design_is_a_404(client):
     assert client.get("/design/nope").status_code == 404
 
