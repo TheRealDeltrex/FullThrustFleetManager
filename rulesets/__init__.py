@@ -167,6 +167,9 @@ REFERENCE_BOOKS: tuple[BookRef, ...] = (
 # Registration imports come last: the packages import the dataclasses above.
 from rulesets import fb, ft2, ftcd  # noqa: E402
 
-register(fb.RULESET)
+# In publication order: FT2 with More Thrust (1992/1994), the Fleet Books (1998/2000), Cross
+# Dimensions (2006), then Project Continuum once it exists. Pickers list rulesets in this order
+# and the New fleet form numbers them from it, so core Full Thrust is 1.
 register(ft2.RULESET)
+register(fb.RULESET)
 register(ftcd.RULESET)
