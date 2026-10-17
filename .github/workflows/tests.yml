@@ -23,7 +23,8 @@ jobs:
 
       - name: Install dependencies
         # The app and test deps only; pyinstaller and the tools/ PDF libraries aren't needed here.
-        run: pip install -r requirements.txt pytest ruff
+        # pymupdf reads the exported PDFs back in tests/test_pdf_export.py.
+        run: pip install -r requirements.txt pytest ruff pymupdf
 
       - name: Ruff
         run: ruff check .
