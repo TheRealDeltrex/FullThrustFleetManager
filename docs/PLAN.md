@@ -88,7 +88,7 @@ Two builds of the same code:
 | 16 | Enforcement | Strict mode default, per-design bookkeeping checkbox, tournament check, non-conforming badge on printouts |
 | 17 | Non-conformance | Per design and per fleet; computed from violations only |
 | 18 | Race/faction | Fleet picks a race at creation; race mixing needs a per-fleet checkbox. Faction is a label; catalog filters are the player's choice |
-| 19 | Badges | `mixed-faction`, `custom-ships`, `non-conforming` (section 7) |
+| 19 | Badges | `no-faction`, `mixed-faction`, `custom-ships`, `non-conforming` (section 7) |
 | 20 | Rulebooks | Processed PDFs bundled; page links open them locally (web: served as static files) |
 | 21 | Offline | Desktop fully offline; web as close as reasonable |
 | 22 | Handoff | PLAN.md + starter CLAUDE.md + milestone issues |
@@ -479,7 +479,8 @@ pack):
 |---|---|
 | **ruleset** (always) | e.g. `FB · Fleet Books` or `FT2 · Full Thrust 2nd ed.`, in the ruleset accent colour |
 | **non-conforming** | the fleet is non-conforming. PDF: top-right corner of **every page** of that fleet: "⚠ Contains non-conforming ships, see roster"; offending ships marked on the roster |
-| **mixed-faction** | the fleet has **no faction**, **or** any ship's design faction differs from the fleet faction (a custom design without a faction counts as different) |
+| **no-faction** | the fleet has no faction (owner decision after v1: it replaced "no faction counts as mixed") |
+| **mixed-faction** | the fleet has a faction and any ship's design faction differs from it (a custom design without a faction counts as different) |
 | **custom-ships** | any ship uses a custom design or a variant of a catalog design |
 
 Variants inherit the faction of the catalog class they came from. A custom-faction fleet built

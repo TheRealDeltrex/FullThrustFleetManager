@@ -183,13 +183,14 @@ def test_badges_follow_the_fleet(client):
     fleet_id = make_fleet(client)
     add_ship(client, fleet_id)
     page = text(client.get("/fleet"))
-    assert "Mixed faction" in page          # the fleet has no faction yet
+    assert "No faction" in page and "Mixed faction" not in page    # no faction chosen yet
     assert "Non-conforming" not in page and "Custom ships" not in page
 
     client.post(f"/fleet/{fleet_id}/action",
                 data={"action": "update_details", "name": "Home Fleet", "faction": "NAC",
                       "points_limit": "1000"})
-    assert "Mixed faction" not in text(client.get("/fleet"))
+    page = text(client.get("/fleet"))
+    assert "Mixed faction" not in page and "No faction" not in page
 
     client.post(f"/fleet/{fleet_id}/action",
                 data={"action": "update_details", "name": "Home Fleet", "faction": "NAC",

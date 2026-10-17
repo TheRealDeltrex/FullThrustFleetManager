@@ -197,7 +197,8 @@ What exists:
 - `fleet_rules.py` (pure): `fleet_options()`, `design_points()` / `ship_points()` (NPV plus the
   ship's loadout, its own or the design default) / `fleet_points()` (skips destroyed ships),
   `design_issues()`, `fleet_report()` (the tournament check: fleet issues + a `ShipReport` each),
-  `badges()` (`non_conforming`, `mixed_faction`, `custom_ships`), `ship_counts()`. Conformance is
+  `badges()` (`non_conforming`, `no_faction`, `mixed_faction`, `custom_ships`; names from
+  `badge_label()`), `ship_counts()`. Conformance is
   "no violation": campaign damage, ship status and `allow_rule_breaking` never enter into it. A
   ship also violates on `missing_design`, `wrong_ruleset`, `race_mixing`, `mt_toggle_off`; a
   fleet on `over_points` (a limit of 0 means no limit).

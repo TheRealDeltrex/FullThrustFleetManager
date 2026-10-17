@@ -147,13 +147,19 @@ def badges(f, d):
 
 
 @pytest.mark.parametrize(
-    "fleet_faction,design_faction,mixed",
-    [("NAC", "NAC", False), ("NAC", "NSL", True), ("NAC", None, True),
-     (None, "NAC", True), (None, None, True)],
+    "fleet_faction,design_faction,mixed,no_faction",
+    [("NAC", "NAC", False, False), ("NAC", "NSL", True, False), ("NAC", None, True, False),
+     (None, "NAC", False, True), (None, None, False, True)],
 )
-def test_badge_mixed_faction(fleet_faction, design_faction, mixed):
+def test_badge_mixed_or_no_faction(fleet_faction, design_faction, mixed, no_faction):
     designs = {"d1": design(faction=design_faction)}
-    assert badges(fleet(faction=fleet_faction, ships=[ship()]), designs)["mixed_faction"] is mixed
+    b = badges(fleet(faction=fleet_faction, ships=[ship()]), designs)
+    assert (b["mixed_faction"], b["no_faction"]) == (mixed, no_faction)
+
+
+def test_badges_have_names():
+    for key in badges(fleet(ships=[ship()]), DESIGNS):
+        assert fleet_rules.badge_label(key) != key
 
 
 def test_badge_custom_ships_and_variants():

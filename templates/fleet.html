@@ -81,6 +81,7 @@
         {% if f.admiral %}<span class="muted">{{ f.admiral }}</span>{% endif %}
         {% if f.faction %}<span class="chip">{{ f.faction }}</span>{% endif %}
         {% if selected.badges.non_conforming %}<span class="chip bad">{{ _("Non-conforming") }}</span>{% endif %}
+        {% if selected.badges.no_faction %}<span class="chip warn">{{ _("No faction") }}</span>{% endif %}
         {% if selected.badges.mixed_faction %}<span class="chip warn">{{ _("Mixed faction") }}</span>{% endif %}
         {% if selected.badges.custom_ships %}<span class="chip info">{{ _("Custom ships") }}</span>{% endif %}
         {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ selected.option_label(key) }}</span>{% endfor %}
