@@ -206,12 +206,22 @@
                                 <option value="{{ choice }}" {% if value == choice %}selected{% endif %}>{{ text }}</option>
                               {% endfor %}
                             </select></label>
+                        {% elif param and param.kind == 'int' and param.min is not none and param.max is not none %}
+                          {# A capped number (a weapon's class, missile stages) is a short list: a
+                             dropdown. A value outside it (bookkeeping mode) stays selectable. #}
+                          {% set options = range(param.min, param.max + 1) | list %}
+                          <label class="param">{{ name }}
+                            <select class="input sm" name="sys-{{ system.uid }}-{{ key }}">
+                              {% if value not in options %}<option value="{{ value }}" selected>{{ value }}</option>{% endif %}
+                              {% for option in options %}
+                                <option value="{{ option }}" {% if value == option %}selected{% endif %}>{{ option }}</option>
+                              {% endfor %}
+                            </select></label>
                         {% else %}
                           <label class="param">{{ name }}
                             <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}"
                               {% if param and param.kind == 'int' %}type="number"
-                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}
-                                {% if param.max is not none %}max="{{ param.max }}"{% endif %}{% endif %} /></label>
+                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}{% endif %} /></label>
                         {% endif %}
                       {% endfor %}
                       {% if 'arcs' in system %}
