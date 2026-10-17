@@ -22,6 +22,7 @@ class FBRuleset:
     arcs = common.ARCS
     icon_set = "fb"  # human default; per race, use icon_set_for()
     option_keys = ("core_systems", "rerolls", "fighter_endurance", "vector_movement")
+    catalog_sources: tuple[str, ...] = ()
 
     @property
     def name(self) -> str:
@@ -69,6 +70,9 @@ class FBRuleset:
 
     def required_options(self, design: dict, loadout: dict | None) -> set[str]:
         return set()
+
+    def adopt_design(self, design: dict) -> dict | None:
+        return None
 
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
