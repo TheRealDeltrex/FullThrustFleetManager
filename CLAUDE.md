@@ -17,20 +17,23 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 
 ## Current state
 
-M1-M11 are done: the whole v1 feature set — the Layout C shell, the FB and FT2 (+ More Thrust)
-rules engines (after v1, a third: FTCD, Cross Dimensions), the 96-design catalog behind the NPV gate, the storage layer, the SSD layout
-engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF and the rulebook
-viewer. What remains is packaging: **M12** (desktop exe), **M13** (web build) and M14 (release,
-the owner's).
+M1-M14 are done and released (versions are tagged on `devversion`). The app has the Layout C shell,
+three rules engines (FB with the FB2 races, FT2 + More Thrust, and FTCD, Cross Dimensions, which
+also fields every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
+layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
+rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
+Next on the roadmap: Project Continuum (FTPC). Releases follow
+`.claude/skills/shipping-a-release/SKILL.md`.
 
 What exists:
 - `app.py` — Flask app: tabs `/fleet` (home, `/` redirects), `/design`, `/campaign`,
   `/settings`; `/heartbeat` routes; `_reject_cross_site()` guard; `register_action` /
-  `dispatch_action` (no update routes use them yet, they arrive with the store in M5); `main()`
-  runs Werkzeug in dev, waitress + tray + idle watchdog when frozen.
+  `dispatch_action` carry the Fleet tab's state-changing forms; `main()` runs Werkzeug in dev,
+  waitress + tray + idle watchdog when frozen.
 - `templates/base.html` — Layout C top bar (brand, fleet selector, tabs, points meter, Print
-  button, ruleset colour strip), flashes, `<main class="work cols-N">` grid. One template per
-  tab plus `error.html`; tab bodies are placeholders.
+  button, ruleset colour strip; sticky except below 520 px tall and in print), flashes,
+  `<main class="work cols-N">` grid. One template per tab plus `error.html`, `print.html`,
+  `rulebook.html` and `tournament_check.html`.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
   variables, panes stack below 1100 px.
 - `static/fonts/` — IBM Plex Sans (owner's choice) Regular, Italic, SemiBold, Bold as TTF from the
@@ -77,6 +80,9 @@ What exists:
 - The right pane is computed per request in `_design_context()`: breakdown, MASS bar against
   `derived["mass_limit"]`, NPV against the book value for catalog designs, issue list, and the
   live SSD as inline SVG (`Markup`, from `ssd_layout`).
+- New designs start from a class preset (`rulesets/presets.py`, built from each ruleset's
+  class tables; applied by `store.new_design(class_preset=...)`). A later MASS change that
+  leaves the class band only re-classes the design (`presets.reclass` in `_apply_form`).
 - `tests/test_design_tab.py` uses the `client` fixture with a per-test `FTFM_DATA_DIR`.
 
 ## Fleet overview tab
@@ -94,6 +100,8 @@ What exists:
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
   record sheets (docked, hulk and destroyed ships are listed but not drawn, PLAN 10.2) and the
   roster table. All three use the same `ssd_layout` diagrams the PDF will.
+- A ship's name and table ID are editable on its card; table IDs are unique per fleet,
+  case-insensitive (`store._table_id_taken`, checked on add and on edit).
 - Add ship lists only the fleet's faction's designs when it has one; the "Show all ships" toggle
   is a GET form (`all_ships`, a hidden 0 before the checkbox's 1) remembered in
   `session["all_ships"]`, so it survives the redirect after adding a ship.
@@ -242,13 +250,13 @@ Full list in PLAN section 2. The ones most likely to be broken by accident:
 - **Every user-facing string goes through `_()`** (UI and PDF), even though only English exists.
 - **Catalog designs are read-only.** Editing one creates a variant.
 
-## Architecture (PLAN section 4; layer 1 exists, layers 2-3 arrive with M5-M8)
+## Architecture (PLAN section 4)
 
 Four layers, strictly ordered — each may import only from layers above it:
 
 1. **`rulesets/<id>/`** — per-ruleset data and pure rules (costing, validation, damage track,
    icon set, quick reference) behind the `Ruleset` protocol in `rulesets/__init__.py`.
-   v1: `fb` and `ft2` (+ `ft2/mt.py` for the More Thrust toggles).
+   `fb`, `ft2` (+ `ft2/mt.py` for the More Thrust toggles) and `ftcd`.
 2. **`fleet_rules.py`** — pure fleet logic: totals incl. loadouts, conformance, badges,
    tournament check, campaign maths. Never branches on a ruleset id; calls the protocol.
 3. **`store.py`** — persistence and every mutation, returning `(ok: bool, msg: str)`.
