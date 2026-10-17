@@ -68,6 +68,7 @@ class FT2Ruleset:
         "mt_systems", "mt_superships", "mt_fighters",
         "core_systems", "rerolls", "fighter_endurance", "vector_movement",
     )
+    catalog_sources: tuple[str, ...] = ()
 
     @property
     def name(self) -> str:
@@ -98,6 +99,9 @@ class FT2Ruleset:
 
     def icon_set_for(self, race: str) -> str:
         return self.icon_set  # FT2 has human tech only
+
+    def adopt_design(self, design: dict) -> dict | None:
+        return None
 
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
