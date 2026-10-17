@@ -224,6 +224,11 @@ def _inject_current_fleet() -> dict:
 
 def _fleet_context(fleet: dict, view: str) -> dict:
     designs = store.designs_for_fleet(fleet)
+    every_design = sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
+                          key=lambda d: d["name"].lower())
+    # A fleet with a faction is offered that faction's ships unless the player asks for all.
+    show_all = not fleet["faction"] or session.get("all_ships", False)
+    library = every_design if show_all else [d for d in every_design if d["faction"] == fleet["faction"]]
     report = fleet_rules.fleet_report(fleet, designs)
     sheets = {
         s["uid"]: Markup(ssd_layout.to_svg(ssd_layout.layout(
@@ -243,8 +248,10 @@ def _fleet_context(fleet: dict, view: str) -> dict:
                                                           fleet_rules.fleet_options(fleet))
                         for s in fleet["ships"]},
         "hull_damage": sum(s["damage"]["hull"] for s in fleet["ships"]),
-        "library": sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
-                          key=lambda d: d["name"].lower()),
+        "library": library,
+        "library_total": len(every_design),
+        "show_all_ships": show_all,
+        "faction_name": store.faction_name(fleet["faction"], fleet["ruleset"]),
         "factions": store.faction_choices(fleet["ruleset"], keep=fleet["faction"]),
         # Only the options this fleet's ruleset offers, in its order, with readable names.
         "option_keys": fleet_rules.ruleset_option_keys(fleet["ruleset"]),
@@ -258,6 +265,9 @@ def fleet_overview() -> str:
     if not fleet:
         return render_template("fleet.html", active_tab="fleet_overview", selected=None,
                                rulesets=list(RULESETS.values()))
+    if "all_ships" in request.args:
+        # The toggle posts a hidden 0 before the checkbox's 1, so the last value is the box.
+        session["all_ships"] = request.args.getlist("all_ships")[-1] == "1"
     return render_template("fleet.html", active_tab="fleet_overview",
                            selected=_fleet_context(fleet, request.args.get("view", "cards")),
                            rulesets=list(RULESETS.values()))
