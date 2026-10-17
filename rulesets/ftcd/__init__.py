@@ -18,6 +18,7 @@ class FTCDRuleset:
     books = data.BOOKS
     arcs = common.ARCS
     icon_set = "ftcd"
+    max_stages = data.MAX_STAGES  # the loadout editor's stage choice per magazine (CD p.25)
     # In the order a player reads them: what the fleet may field, then how points are counted,
     # then play rules the quick reference adds. Re-rolls are standard in CD (p.14), so no toggle.
     option_keys = (
@@ -54,6 +55,9 @@ class FTCDRuleset:
 
     def fighter_types(self, options: dict, race: str = "human") -> list[str]:
         return list(data.FIGHTER_POINTS)
+
+    def fighter_label(self, fighter_type: str) -> str:
+        return data.fighter_label(fighter_type)
 
     def required_options(self, design: dict, loadout: dict | None) -> set[str]:
         return rules.required_options(design, loadout)

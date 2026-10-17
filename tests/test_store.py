@@ -416,3 +416,20 @@ def test_an_added_system_takes_the_pickers_default_arcs(ruleset, race, system_ty
     codes = {i.code for i in RULESETS[ruleset].validate_design(design, {})
              if i.system_uid == design["systems"][-1]["uid"] and i.severity == "violation"}
     assert not codes
+
+
+def test_normalize_keeps_the_cross_dimensions_loadout_fields():
+    d = store.normalize_design({"id": "x", "ruleset": "ftcd", "default_loadout": {
+        "fighters": [{"hangar": "h", "type": "attack", "extras": ["ftl", 3], "swing": ["standard"]},
+                     {"hangar": "h", "type": "heavy", "extras": "no"}],
+        "magazines": [{"magazine": "m", "salvos": ["std"], "stages": 2},
+                      {"magazine": "n", "salvos": ["er"], "stages": "lots"}],
+        "craft": [{"hangar": "h", "mass": 4}, {"hangar": "h", "mass": -2}, {"mass": 3}, "nope"],
+    }})
+    loadout = d["default_loadout"]
+    assert loadout["fighters"] == [
+        {"hangar": "h", "type": "attack", "extras": ["ftl"], "swing": ["standard"]},
+        {"hangar": "h", "type": "heavy"}]
+    assert loadout["magazines"] == [{"magazine": "m", "salvos": ["std"], "stages": 2},
+                                    {"magazine": "n", "salvos": ["er"]}]
+    assert loadout["craft"] == [{"hangar": "h", "mass": 4}]

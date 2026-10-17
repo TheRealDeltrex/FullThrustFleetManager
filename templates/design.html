@@ -187,8 +187,18 @@
                       {% endfor %}
                     {% elif system %}
                       {% for key, value in system.items() if key not in ('uid', 'type') %}
+                        {% if key == 'feeds' %}
+                          {# The launchers a magazine feeds; checkboxes plus a marker, like arcs. #}
+                          <input type="hidden" name="sys-{{ system.uid }}-feeds-present" value="1" />
+                          <span class="param">{{ key }}</span>
+                          {% for launcher in d.systems if launcher.type == 'sm_launcher' %}
+                            <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-feeds" value="{{ launcher.uid }}"
+                              {% if launcher.uid in value %}checked{% endif %} /> {{ launcher.uid }}</label>
+                          {% endfor %}
+                        {% else %}
                         <label class="param">{{ key }}
                           <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
+                        {% endif %}
                       {% endfor %}
                     {% endif %}
                   </td>
@@ -223,6 +233,76 @@
           <div class="panel">
             <h3>{{ _("Default loadout") }}</h3>
             <div class="body stack">
+              {% if selected.breakdown.derived.rich_loadout %}
+                {# Cross Dimensions: a row per fighter group (CD p.30 extras and swing roles), light
+                   vessels per hangar (CD p.47), salvo counts and stages per magazine (CD p.25). #}
+                {% set label = selected.fighter_label %}
+                {% for system in carriers %}
+                  {% set groups = d.default_loadout.fighters | selectattr('hangar', 'equalto', system.uid) | list %}
+                  {% set craft = (d.default_loadout.craft or []) | selectattr('hangar', 'equalto', system.uid) | sum(attribute='mass') %}
+                  <fieldset class="loadout-group">
+                    <legend>{{ _("Hangar {uid}", uid=system.uid) }}
+                      <span class="muted">{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays or 1) }}</span></legend>
+                    {% for index in range(system.bays or 1) %}
+                      {% set group = groups[index] if index < groups|length else None %}
+                      {% set prefix = "fighter-" ~ system.uid ~ "-" ~ index ~ "-" %}
+                      {% set swing = group.swing if group and group.swing else [] %}
+                      <div class="loadout-row">
+                        <label>{{ _("Group {n}", n=index + 1) }}
+                          <select class="input" name="{{ prefix }}type">
+                            <option value="">{{ _("Empty") }}</option>
+                            {% for fighter in selected.fighter_types %}
+                              <option value="{{ fighter }}" {% if group and group.type == fighter %}selected{% endif %}>{{ label(fighter) }}</option>
+                            {% endfor %}
+                          </select>
+                        </label>
+                        <label class="check"><input type="checkbox" name="{{ prefix }}ftl"
+                          {% if group and 'ftl' in (group.extras or []) %}checked{% endif %} /> {{ _("FTL") }}</label>
+                        <label class="check"><input type="checkbox" name="{{ prefix }}kinetic"
+                          {% if group and 'kinetic' in (group.extras or []) %}checked{% endif %} /> {{ _("Kinetic") }}</label>
+                        <details class="swing">
+                          <summary>{{ _("Swing role") }}:
+                            {% for t in swing %}{{ label(t) }}{% if not loop.last %}, {% endif %}{% else %}{{ _("none") }}{% endfor %}</summary>
+                          <div class="row">
+                            {% for fighter in selected.fighter_types %}
+                              <label class="check"><input type="checkbox" name="{{ prefix }}swing" value="{{ fighter }}"
+                                {% if fighter in swing %}checked{% endif %} /> {{ label(fighter) }}</label>
+                            {% endfor %}
+                          </div>
+                        </details>
+                      </div>
+                    {% endfor %}
+                    <label class="loadout-row">{{ _("Light vessels (MASS of craft)") }}
+                      <input class="input sm" type="number" min="0" name="craft-{{ system.uid }}" value="{{ craft }}" /></label>
+                  </fieldset>
+                {% endfor %}
+                {% for system in magazines %}
+                  {% set entry = (d.default_loadout.magazines | selectattr('magazine', 'equalto', system.uid) | list | first) %}
+                  {% set salvos = entry.salvos if entry and entry.salvos else ['std'] * ((system.capacity or 0) // 2) %}
+                  {% set stages = entry.stages if entry and entry.stages else 1 %}
+                  <fieldset class="loadout-group">
+                    <legend>{{ _("Magazine {uid}", uid=system.uid) }}
+                      <span class="muted">{{ _("capacity {n} MASS", n=system.capacity) }}</span></legend>
+                    <div class="loadout-row">
+                      <label>{{ _("Stages") }}
+                        <select class="input" name="stages-{{ system.uid }}">
+                          <option value="1">{{ _("Regular") }}</option>
+                          {% for n in range(2, selected.max_stages + 1) %}
+                            <option value="{{ n }}" {% if stages == n %}selected{% endif %}>{{ _("{n} stages", n=n) }}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                      <label>{{ _("Standard salvos") }}
+                        <input class="input sm" type="number" min="0" name="salvos-{{ system.uid }}-std"
+                               value="{{ salvos | select('equalto', 'std') | list | length }}" /></label>
+                      <label>{{ _("ER salvos") }}
+                        <input class="input sm" type="number" min="0" name="salvos-{{ system.uid }}-er"
+                               value="{{ salvos | select('equalto', 'er') | list | length }}" /></label>
+                    </div>
+                  </fieldset>
+                {% endfor %}
+                <p class="muted">{{ _("Loadout: {n} points", n=selected.loadout_points) }}</p>
+              {% else %}
               {% for system in carriers %}
                 {% set chosen = (d.default_loadout.fighters | selectattr('hangar', 'equalto', system.uid) | list | first) %}
                 <label>{{ _("Fighters in bay {uid}", uid=system.uid) }}
@@ -236,6 +316,7 @@
               {% for system in magazines %}
                 <p class="muted">{{ _("Magazine {uid}: standard salvos", uid=system.uid) }}</p>
               {% endfor %}
+              {% endif %}
               {% for system in pulsers %}
                 {# FB2 p.35: chosen before each battle, never changed during one. #}
                 {% set chosen = (d.default_loadout.pulsers | selectattr('pulser', 'equalto', system.uid) | list | first) %}

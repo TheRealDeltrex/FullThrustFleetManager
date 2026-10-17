@@ -423,6 +423,9 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "used_by": used_by,
         "system_types": rs.system_types(design.get("race", "human"), options),
         "fighter_types": rs.fighter_types(options),
+        "fighter_label": getattr(rs, "fighter_label", str),
+        "loadout_points": rs.loadout_points(design, None, {}),
+        "max_stages": getattr(rs, "max_stages", 1),
         "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
         "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
     }
@@ -495,6 +498,11 @@ def _apply_form(design: dict) -> dict:
         for key in list(system):
             if key in ("uid", "type", "arcs"):
                 continue
+            if isinstance(system[key], list):
+                # A magazine's feeds: checkboxes, so an all-unchecked set needs the marker too.
+                if (prefix + key + "-present") in form:
+                    system[key] = form.getlist(prefix + key)
+                continue
             value = form.get(prefix + key)
             if value is None:
                 continue
@@ -504,26 +512,72 @@ def _apply_form(design: dict) -> dict:
 
 
 def _read_loadout(design: dict) -> dict:
-    fighters = [
-        {"hangar": system["uid"], "type": request.form.get(f"loadout-{system['uid']}", "standard")}
-        for system in design["systems"] if system["type"] in ("hangar", "fighter_group", "drone_womb")
-    ]
-    magazines = [
-        {"magazine": system["uid"],
-         "salvos": request.form.getlist(f"salvos-{system['uid']}")}
-        for system in design["systems"] if system["type"] == "sm_magazine"
-    ]
+    form = request.form
+    fighters: list[dict] = []
+    craft: list[dict] = []
+    magazines: list[dict] = []
+    for system in design["systems"]:
+        uid = system["uid"]
+        if system["type"] in ("hangar", "fighter_group", "drone_womb"):
+            if f"fighter-{uid}-0-type" in form:
+                fighters += _read_fighter_groups(system)
+                mass = _form_count(f"craft-{uid}")
+                if mass:
+                    craft.append({"hangar": uid, "mass": mass})
+            else:
+                fighters.append({"hangar": uid, "type": form.get(f"loadout-{uid}", "standard")})
+        elif system["type"] == "sm_magazine":
+            if f"salvos-{uid}-std" in form:
+                # Counts and a stage count per magazine (CD p.25: never a mix of regular and
+                # multi-stage loads in one magazine).
+                entry = {"magazine": uid, "salvos": ["std"] * _form_count(f"salvos-{uid}-std")
+                         + ["er"] * _form_count(f"salvos-{uid}-er")}
+                stages = _form_count(f"stages-{uid}")
+                if stages > 1:
+                    entry["stages"] = stages
+                magazines.append(entry)
+            else:
+                magazines.append({"magazine": uid, "salvos": form.getlist(f"salvos-{uid}")})
     # FB2 p.35: a Phalon pulser is configured L, M or C before a battle. "" leaves it blank,
     # which is what the book's own sheets print.
     pulsers = [
-        {"pulser": system["uid"], "mode": request.form.get(f"pulser-{system['uid']}", "")}
+        {"pulser": system["uid"], "mode": form.get(f"pulser-{system['uid']}", "")}
         for system in design["systems"] if system["type"] == "pulser"
     ]
-    return {
+    loadout = {
         "fighters": [f for f in fighters if f["type"]],
         "magazines": magazines,
         "pulsers": [x for x in pulsers if x["mode"] in ("L", "M", "C")],
     }
+    if craft:
+        loadout["craft"] = craft
+    return loadout
+
+
+def _form_count(name: str) -> int:
+    value = request.form.get(name, "")
+    return min(999, int(value)) if value.isdigit() else 0
+
+
+def _read_fighter_groups(hangar: dict) -> list[dict]:
+    """One row per bay: the type ("" leaves the bay empty), FTL and kinetic capability, and the
+    swing roles it may also launch as (Cross Dimensions, CD p.30)."""
+    groups = []
+    bays = hangar.get("bays") if isinstance(hangar.get("bays"), int) else 1
+    for index in range(max(1, min(bays, 99))):
+        prefix = f"fighter-{hangar['uid']}-{index}-"
+        fighter_type = request.form.get(prefix + "type", "")
+        if not fighter_type:
+            continue
+        entry = {"hangar": hangar["uid"], "type": fighter_type}
+        extras = [x for x in ("ftl", "kinetic") if request.form.get(prefix + x) == "on"]
+        swing = [t for t in request.form.getlist(prefix + "swing") if t != fighter_type]
+        if extras:
+            entry["extras"] = extras
+        if swing:
+            entry["swing"] = swing
+        groups.append(entry)
+    return groups
 
 
 @app.route("/design/<design_id>", methods=["POST"])

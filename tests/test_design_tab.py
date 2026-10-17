@@ -316,3 +316,68 @@ def test_cross_dimensions_tech_levels_are_edited_on_the_workbench(client):
     assert working["ftl_advanced"] is False
     plain = client.get(f"/design/{make(client, 'Plain')}").get_data(as_text=True)
     assert 'name="drive_advanced"' not in plain                    # FB has no tech levels
+
+
+def test_cross_dimensions_loadout_editor(client):
+    """CD pp.25, 30, 47: one row per fighter group with its extras and swing roles, light vessels
+    per hangar, and salvo counts with a stage count per magazine."""
+    design_id = make(client, "Ark", ruleset="ftcd")
+    for system_type in ("hangar", "sm_magazine"):
+        design = store.get_draft(design_id) or store.get_design(design_id)
+        client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type=system_type))
+    design = store.get_draft(design_id)
+    hangar = next(s["uid"] for s in design["systems"] if s["type"] == "hangar")
+    magazine = next(s["uid"] for s in design["systems"] if s["type"] == "sm_magazine")
+
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="fighter-{hangar}-0-type"' in page and f'name="craft-{hangar}"' in page
+    assert f'name="stages-{magazine}"' in page and "Long range" in page
+
+    client.post(f"/design/{design_id}", data=fields(design, action="apply", **{
+        f"sys-{hangar}-bays": "2",
+        f"fighter-{hangar}-0-type": "attack", f"fighter-{hangar}-0-ftl": "on",
+        f"fighter-{hangar}-0-swing": ["standard", "interceptor"],
+        f"fighter-{hangar}-1-type": "", f"craft-{hangar}": "4",
+        f"salvos-{magazine}-std": "3", f"salvos-{magazine}-er": "0", f"stages-{magazine}": "2",
+    }))
+    loadout = store.get_draft(design_id)["default_loadout"]
+    assert loadout["fighters"] == [{"hangar": hangar, "type": "attack", "extras": ["ftl"],
+                                    "swing": ["standard", "interceptor"]}]
+    assert loadout["craft"] == [{"hangar": hangar, "mass": 4}]
+    assert loadout["magazines"] == [{"magazine": magazine, "salvos": ["std"] * 3, "stages": 2}]
+
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="fighter-{hangar}-1-type"' in page                 # a row per bay
+    assert "Loadout: 56 points" in page                              # 24 + 9 + 9 + 6, shuttles 8
+
+
+def test_fb_keeps_its_one_select_per_hangar(client):
+    design_id = make(client, "Plain carrier")
+    design = store.get_draft(design_id) or store.get_design(design_id)
+    client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type="hangar"))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    hangar = next(s["uid"] for s in store.get_draft(design_id)["systems"] if s["type"] == "hangar")
+    assert f'name="loadout-{hangar}"' in page and "-0-type" not in page
+
+
+def test_a_magazine_feeds_its_launchers_from_checkboxes(client):
+    """The feeds list used to post as the text "[]", and every recalculation then failed."""
+    design_id = make(client, "Feeder", ruleset="ftcd")
+    for system_type in ("sm_launcher", "sm_magazine"):
+        design = store.get_draft(design_id) or store.get_design(design_id)
+        client.post(f"/design/{design_id}", data=fields(design, action="add_system", system_type=system_type))
+    design = store.get_draft(design_id)
+    launcher = next(s["uid"] for s in design["systems"] if s["type"] == "sm_launcher")
+    magazine = next(s["uid"] for s in design["systems"] if s["type"] == "sm_magazine")
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="sys-{magazine}-feeds" value="{launcher}"' in page
+
+    client.post(f"/design/{design_id}", data=fields(design, action="apply", **{
+        f"sys-{magazine}-feeds-present": "1", f"sys-{magazine}-feeds": launcher}))
+    def feeds() -> list:
+        return next(s for s in store.get_draft(design_id)["systems"] if s["uid"] == magazine)["feeds"]
+
+    assert feeds() == [launcher]
+    client.post(f"/design/{design_id}", data=fields(design, action="apply",
+                                                     **{f"sys-{magazine}-feeds-present": "1"}))
+    assert feeds() == []

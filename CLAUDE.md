@@ -395,6 +395,16 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   word spaces the justified text layer drops (glyph gap > 0.1 x font size) and skips the
   all-italic lines, which are the book's worked examples. That cleanup runs for CD only, so the
   FB and FT2 output does not move.
+- Loadout extras (CD pp.25, 30, 47) live in the loadout, not the design, under optional keys
+  `store._norm_loadout` keeps only when used: fighter `extras` / `swing`, magazine `stages`,
+  top-level `craft` ({hangar, mass}). `derived["rich_loadout"]` makes the Design tab draw one
+  row per bay (`fighter-<uid>-<i>-type|ftl|kinetic|swing`), `craft-<uid>`, and per magazine
+  `stages-<uid>` with `salvos-<uid>-std|er` counts; `_read_loadout` falls back to the single
+  `loadout-<uid>` select for the other rulesets. Multi-stage loads are paid in `loadout_points`
+  beyond the magazine space (two stages cost nothing extra, three 6 a salvo); FB's
+  `_validate_missiles` takes FTCD's `salvo_space` for the bigger loads.
+- A magazine's `feeds` list is edited as launcher checkboxes with a `-feeds-present` marker,
+  like arcs; any list-valued system field is skipped by `_apply_form`'s int parsing.
 - No catalog: the book prints no designs of its own.
 
 ## Catalog

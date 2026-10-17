@@ -108,6 +108,16 @@ a { color: var(--accent); }
 .tbl th { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
 .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
 .arcs { display: flex; gap: 6px; flex-wrap: wrap; }
+/* Cross Dimensions loadout: one fieldset per hangar or magazine, one row per fighter group. */
+.loadout-group { border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px 8px; margin: 0;
+  display: flex; flex-direction: column; gap: 6px; }
+.loadout-group legend { font-size: 12px; font-weight: 600; padding: 0 4px; }
+.loadout-group legend .muted { font-weight: 400; margin-left: 6px; }
+.loadout-row { display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+.loadout-row > label:not(.check) { display: flex; align-items: center; gap: 6px; }
+.loadout-row .swing summary { cursor: pointer; color: var(--muted); }
+.loadout-row .swing[open] { flex-basis: 100%; }
+.loadout-row .swing .row { margin-top: 4px; }
 .arc, .param { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 3px; }
 .input.sm { padding: 2px 5px; width: 62px; font-size: 12px; }
 .input.wide { width: 100%; }
