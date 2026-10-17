@@ -97,6 +97,15 @@ def test_a_ship_of_another_ruleset_is_refused(client):
     assert "another ruleset" in text(add_ship(client, fleet_id, design_id=COURIER))
 
 
+def test_a_ruleset_with_no_designs_points_to_the_design_tab(client):
+    # Cross Dimensions ships no catalogue: an empty picker whose button says "Design not found."
+    # left people stuck, so the panel says where designs come from instead.
+    make_fleet(client, "Explorers", ruleset="ftcd")
+    page = text(client.get("/fleet"))
+    assert "No ship designs for" in page and 'href="/design"' in page
+    assert 'value="add_ship"' not in page
+    assert 'value="add_ship"' in text(client.get(f"/fleet/{make_fleet(client)}", follow_redirects=True))
+
 def test_ship_status_and_squadron_are_edited_from_the_card(client):
     fleet_id = make_fleet(client)
     add_ship(client, fleet_id)
