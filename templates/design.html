@@ -175,7 +175,7 @@
           <h3>{{ _("Systems") }}</h3>
           <table class="tbl">
             <thead>
-              <tr><th>{{ _("System") }}</th><th>{{ _("Arcs") }}</th><th class="num">{{ _("MASS") }}</th>
+              <tr><th>{{ _("System") }}</th><th>{{ _("Settings") }}</th><th class="num">{{ _("MASS") }}</th>
                   <th class="num">{{ _("Points") }}</th><th></th></tr>
             </thead>
             <tbody>
@@ -184,15 +184,11 @@
                 <tr>
                   <td>{{ row.label }}</td>
                   <td class="arcs">
-                    {% if system and 'arcs' in system %}
-                      <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
-                      {% for arc in selected.ruleset.arcs %}
-                        <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
-                          {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
-                      {% endfor %}
-                    {% elif system %}
+                    {% if system %}
+                      {# Settings (a beam's class, a rack's load) first, then the arcs: a weapon
+                         has both, so neither may hide the other. #}
                       {% set defs = selected.param_defs.get(system.type, {}) %}
-                      {% for key, value in system.items() if key not in ('uid', 'type') %}
+                      {% for key, value in system.items() if key not in ('uid', 'type', 'arcs') %}
                         {% set param = defs.get(key) %}
                         {% set name = param.label if param else key %}
                         {% if key == 'feeds' %}
@@ -212,9 +208,19 @@
                             </select></label>
                         {% else %}
                           <label class="param">{{ name }}
-                            <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
+                            <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}"
+                              {% if param and param.kind == 'int' %}type="number"
+                                {% if param.min is not none %}min="{{ param.min }}"{% endif %}
+                                {% if param.max is not none %}max="{{ param.max }}"{% endif %}{% endif %} /></label>
                         {% endif %}
                       {% endfor %}
+                      {% if 'arcs' in system %}
+                        <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
+                        {% for arc in selected.ruleset.arcs %}
+                          <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
+                            {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
+                        {% endfor %}
+                      {% endif %}
                     {% endif %}
                   </td>
                   <td class="num">{{ row.mass }}</td>
