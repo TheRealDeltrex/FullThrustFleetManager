@@ -356,7 +356,7 @@ def _write_design(design: dict) -> None:
 
 def new_design(ruleset: str, race: str = "human", faction: str | None = None,
                name: str = "", class_preset: str = "") -> tuple[dict | None, str]:
-    """A fresh design; `class_preset` (an index into presets.class_presets) gives it a head
+    """A fresh design; `class_preset` (a presets.preset_key value) gives it a head
     start of that class's MASS, hull, armour, thrust and fire controls."""
     rs = RULESETS.get(ruleset)
     if not rs:

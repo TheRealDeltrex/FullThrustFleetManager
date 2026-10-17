@@ -76,8 +76,8 @@
           <option value="">{{ _("Class: start blank") }}</option>
           {% for rs, choices in class_presets %}
             <optgroup label="{{ rs.name }}" data-ruleset="{{ rs.id }}">
-              {% for i, p in choices %}
-                <option value="{{ i }}">{{ p.code }} · {{ p.label }} · {{ _("MASS {n}", n=p.tmf) }}</option>
+              {% for key, p in choices %}
+                <option value="{{ key }}">{{ p.code }} · {{ p.label }} · {{ _("MASS {n}", n=p.tmf) }}</option>
               {% endfor %}
             </optgroup>
           {% endfor %}

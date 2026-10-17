@@ -12,7 +12,7 @@ ships of that class carry, so a player builds up rather than strips down:
 
 Fire controls follow the owner's rule of thumb rather than a book: 1 for escorts, 2 from the
 light cruiser up, 3 for battlecruisers and battleships, 4 for the dreadnoughts (BDN, DN, SDN),
-2 for carriers and none for merchants; carriers also start with one hangar. Every preset is
+2 for carriers and none for merchants; carriers also start with two hangar bays. Every preset is
 FTL-capable. Races without fire control or hangars (Sa'Vasku) get neither.
 Everything is a starting point only; the workbench edits every value afterwards.
 """
@@ -45,6 +45,7 @@ ARMOUR = {
     "BC": 5, "BB": 5, "BDN": 7, "DN": 7, "SDN": 7, "CVE": 6, "CVL": 9, "CV": 9, "CVH": 12,
 }
 SLOW = {"SDN", "CVH", "CV"}
+CARRIER_BAYS = 2  # hangar bays a carrier preset starts with, one fighter group each
 # A band with no top ("160+", FB1 p.12) is treated as this wide, so its middle stays sensible.
 OPEN_BAND_WIDTH = 80
 
@@ -107,19 +108,27 @@ def class_presets(ruleset_id: str) -> list[ClassPreset]:
     return []
 
 
+def preset_key(ruleset_id: str, index: int) -> str:
+    """The form value for a preset: ruleset and index in `class_presets` (FT2 repeats codes)."""
+    return f"{ruleset_id}:{index}"
+
+
 def find_preset(ruleset_id: str, key: str) -> ClassPreset | None:
-    """The preset a form value names: its index in `class_presets` (FT2 repeats codes)."""
+    """The preset a form value names, or None (blank, or a class of another ruleset)."""
+    rid, _sep, index = key.partition(":")
     presets = class_presets(ruleset_id)
-    return presets[int(key)] if key.isdigit() and int(key) < len(presets) else None
+    if rid != ruleset_id or not index.isdigit() or int(index) >= len(presets):
+        return None
+    return presets[int(index)]
 
 
 def preset_systems(ruleset_id: str, race: str, preset: ClassPreset) -> list[str]:
-    """System types the preset starts with: its fire controls and, for a carrier, one hangar;
-    only those the race can mount (Sa'Vasku have neither)."""
+    """System types the preset starts with: its fire controls and, for a carrier, two hangar bays
+    of one fighter group each (FT2: two fighter groups); only those the race can mount."""
     types = {s.type for s in RULESETS[ruleset_id].system_types(race, {})}
     wanted = ["fire_control"] * preset.fire_controls
     if preset.code.startswith("CV"):
-        wanted.append("fighter_group" if ruleset_id == "ft2" else "hangar")
+        wanted += [("fighter_group" if ruleset_id == "ft2" else "hangar")] * CARRIER_BAYS
     return [t for t in wanted if t in types]
 
 

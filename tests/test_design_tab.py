@@ -494,7 +494,8 @@ def test_fighter_types_and_system_fields_carry_names_not_keys(client):
 
 def _preset_index(ruleset: str, code: str) -> str:
     from rulesets import presets
-    return str(next(i for i, p in enumerate(presets.class_presets(ruleset)) if p.code == code))
+    return presets.preset_key(ruleset, next(i for i, p in enumerate(presets.class_presets(ruleset))
+                                            if p.code == code))
 
 
 def _new(client, ruleset: str, code: str, race: str = "human") -> dict:
@@ -519,12 +520,12 @@ def test_fire_controls_grow_with_the_class(client, code, fcs):
     assert _count(_new(client, "ftcd", code), "fire_control") == fcs
 
 
-def test_carriers_start_with_one_hangar_and_merchants_with_no_fire_control(client):
+def test_carriers_start_with_two_hangar_bays_and_merchants_with_no_fire_control(client):
     cvh = _new(client, "fb", "CVH")
-    assert _count(cvh, "hangar") == 1 and _count(cvh, "fire_control") == 2
+    assert _count(cvh, "hangar") == 2 and _count(cvh, "fire_control") == 2
     merchant = _new(client, "fb", "M")
     assert merchant["hull_kind"] == "merchant" and _count(merchant, "fire_control") == 0
-    assert _count(_new(client, "ft2", "CVL"), "fighter_group") == 1
+    assert _count(_new(client, "ft2", "CVL"), "fighter_group") == 2
 
 
 def test_races_without_fire_control_get_none(client):
@@ -558,3 +559,9 @@ def test_a_carrier_stays_a_carrier_and_a_typed_code_wins(client):
 def test_the_form_offers_the_class_picker(client):
     page = client.get("/design").get_data(as_text=True)
     assert 'name="class_preset"' in page and "CL · Light Cruiser · MASS 50" in page
+
+
+def test_a_class_of_another_ruleset_is_ignored(client):
+    client.post("/design/new", data={"ruleset": "fb", "name": "Odd",
+                                     "class_preset": _preset_index("ftcd", "CA")})
+    assert next(d for d in store.list_designs() if d["name"] == "Odd")["type_code"] == ""
