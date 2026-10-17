@@ -340,7 +340,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - System dicts per type (the design `systems` list; `uid` + `type` always): `beam` {class,
   arcs}, `pulse_torpedo`/`needle_beam`/`sm_launcher`/`nova_cannon`/`wave_gun` {arcs},
   `submunition` {arcs optional}, `sm_magazine` {capacity (MASS), feeds [launcher uids]},
-  `sm_rack` {load std|er, arcs}, `screen` {level; >2 = backup generators}, `hangar` {bays},
+  `sm_rack` {load std|er, arcs}, `screen` {level; >2 = backup generators}, `hangar` (one bay = one fighter group, FB1 p.10; the
+  picker offers no count, an older design's `bays` > 1 still costs 9 MASS a bay),
   `tender_bay` {capacity = MASS carried}, `minelayer` {mines}, `tug_drive` {tow_mass}, `hold`
   {kind cargo|passenger|troop|lab, mass}; no params: `pds`, `fire_control`, `adfc`,
   `mt_missile`, `ortillery`, `minesweeper`, `reflex_field`, `cloak`.

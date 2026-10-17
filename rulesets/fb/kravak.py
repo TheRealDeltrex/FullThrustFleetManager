@@ -24,6 +24,7 @@ from rulesets.common import ARCS, arcs_contiguous, arcs_valid, pct_mass, split_r
 from rulesets.fb import data
 from rulesets.fb.rules import (
     _arcs,
+    _hangar_label,
     _int,
     _systems,
     cf_positions,
@@ -84,7 +85,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "hangar": (
         lambda s, t: data.FIGHTER_BAY_MASS * max(1, _int(s.get("bays"), 1)),
         lambda s, m: 3 * m,
-        lambda s: _("Hangar bay ({n} fighter groups)", n=max(1, _int(s.get("bays"), 1))),
+        lambda s: _hangar_label(max(1, _int(s.get("bays"), 1))),
     ),
     "tender_bay": (
         lambda s, t: max(1, common.round_half_up(3 * max(1, _int(s.get("capacity"), 1)), 2)),
@@ -140,7 +141,6 @@ def system_defs() -> list[SystemDef]:
             "hangar",
             _("Fighter hangar bay"),
             craft,
-            (ParamDef("bays", "int", _("Fighter groups"), 1, 1, None),),
             book="FB2",
             page=10,
         ),
