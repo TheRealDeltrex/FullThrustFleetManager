@@ -56,9 +56,6 @@ class FTCDRuleset:
     def fighter_types(self, options: dict, race: str = "human") -> list[str]:
         return list(data.FIGHTER_POINTS)
 
-    def fighter_label(self, fighter_type: str) -> str:
-        return data.fighter_label(fighter_type)
-
     def required_options(self, design: dict, loadout: dict | None) -> set[str]:
         return rules.required_options(design, loadout)
 

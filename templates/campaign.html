@@ -54,7 +54,7 @@
                     {% for system in row.design.systems %}
                       <label class="check"><input type="checkbox" name="systems_out" value="{{ system.uid }}"
                         {% if system.uid in ship.damage.systems_out %}checked{% endif %} />
-                        {{ system.type }}</label>
+                        {{ row.system_labels.get(system.uid, system.type) }}</label>
                     {% endfor %}
                   </fieldset>
                 {% endif %}

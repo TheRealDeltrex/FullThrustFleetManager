@@ -186,18 +186,28 @@
                           {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
                       {% endfor %}
                     {% elif system %}
+                      {% set defs = selected.param_defs.get(system.type, {}) %}
                       {% for key, value in system.items() if key not in ('uid', 'type') %}
+                        {% set param = defs.get(key) %}
+                        {% set name = param.label if param else key %}
                         {% if key == 'feeds' %}
                           {# The launchers a magazine feeds; checkboxes plus a marker, like arcs. #}
                           <input type="hidden" name="sys-{{ system.uid }}-feeds-present" value="1" />
-                          <span class="param">{{ key }}</span>
+                          <span class="param">{{ name }}</span>
                           {% for launcher in d.systems if launcher.type == 'sm_launcher' %}
                             <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-feeds" value="{{ launcher.uid }}"
                               {% if launcher.uid in value %}checked{% endif %} /> {{ launcher.uid }}</label>
                           {% endfor %}
+                        {% elif param and param.kind == 'choice' %}
+                          <label class="param">{{ name }}
+                            <select class="input sm" name="sys-{{ system.uid }}-{{ key }}">
+                              {% for choice, text in param.choices %}
+                                <option value="{{ choice }}" {% if value == choice %}selected{% endif %}>{{ text }}</option>
+                              {% endfor %}
+                            </select></label>
                         {% else %}
-                        <label class="param">{{ key }}
-                          <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
+                          <label class="param">{{ name }}
+                            <input class="input sm" name="sys-{{ system.uid }}-{{ key }}" value="{{ value }}" /></label>
                         {% endif %}
                       {% endfor %}
                     {% endif %}
@@ -308,7 +318,7 @@
                 <label>{{ _("Fighters in bay {uid}", uid=system.uid) }}
                   <select class="input" name="loadout-{{ system.uid }}">
                     {% for fighter in selected.fighter_types %}
-                      <option value="{{ fighter }}" {% if chosen and chosen.type == fighter %}selected{% endif %}>{{ fighter }}</option>
+                      <option value="{{ fighter }}" {% if chosen and chosen.type == fighter %}selected{% endif %}>{{ selected.fighter_label(fighter) }}</option>
                     {% endfor %}
                   </select>
                 </label>

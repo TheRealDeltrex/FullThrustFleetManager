@@ -38,7 +38,7 @@ import ssd_layout
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
-from rulesets import REFERENCE_BOOKS, RULESETS
+from rulesets import REFERENCE_BOOKS, RULESETS, common
 
 logger = logging.getLogger(__name__)
 
@@ -423,7 +423,10 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "used_by": used_by,
         "system_types": rs.system_types(design.get("race", "human"), options),
         "fighter_types": rs.fighter_types(options),
-        "fighter_label": getattr(rs, "fighter_label", str),
+        "fighter_label": common.fighter_label,
+        # Field names and choices for each system type's parameters, from the picker.
+        "param_defs": {d.type: {p.name: p for p in d.params}
+                       for d in rs.system_types(design.get("race", "human"), options)},
         "loadout_points": rs.loadout_points(design, None, {}),
         "max_stages": getattr(rs, "max_stages", 1),
         "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
@@ -704,6 +707,7 @@ def campaign() -> str:
             "crew_factors_total": total,
             "crippled": fleet_rules.ship_is_crippled(design, ship["damage"]),
             "systems_out": fleet_rules.repairable_systems(design, ship["damage"]),
+            "system_labels": fleet_rules.system_labels(design),
         })
     return render_template("campaign.html", active_tab="campaign", statuses=store.STATUSES,
                            selected={"fleet": fleet, "ships": ships,

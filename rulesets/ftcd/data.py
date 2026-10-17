@@ -38,13 +38,6 @@ SALVO_SPACE = {"std": 2, "er": 3}
 MAX_STAGES = 3
 
 
-def fighter_label(fighter_type: str) -> str:
-    return {
-        "standard": _("Standard"), "interceptor": _("Interceptor"), "fast": _("Fast"),
-        "attack": _("Attack"), "long_range": _("Long range"), "heavy": _("Heavy"),
-        "torpedo": _("Torpedo"),
-    }.get(fighter_type, fighter_type)
-
 # CD p.42: escorts up to MASS 44, cruisers up to 90, anything bigger is a capital; 300 at most.
 ESCORT_MAX, CRUISER_MAX, MAX_MASS = 44, 90, 300
 
