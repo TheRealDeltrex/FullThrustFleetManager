@@ -149,6 +149,11 @@ CD_ENTRIES = [
     ("ftcd", "wave_gun", "Wave gun", "Wave gun", "Reflex field", 55, 55),
     ("ftcd", "reflex_field", "Reflex field", "Reflex field", "Cloaking field", 55, 56),
     ("ftcd", "cloak", "Cloaking field", "Cloaking field", "Mass and points cost", 56, 56),
+    # CD p.21 section 5.12: what changes for the Fleet Book 2 races. Keys are prefixed cd_ so a
+    # sheet with an alien ship gets its race's paragraph beside the FB2 entries for its systems.
+    ("ftcd", "cd_kravak", "Kra'Vak under Cross Dimensions", "Kra’Vak", "Sa’Vasku", 21, 22),
+    ("ftcd", "cd_savasku", "Sa'Vasku under Cross Dimensions", "Sa’Vasku", "Phalons", 22, 22),
+    ("ftcd", "cd_phalon", "Phalons under Cross Dimensions", "Phalons", "PDS", 22, 22),
 ]
 # fmt: on
 
@@ -242,6 +247,21 @@ OVERRIDES = {
         "One-shot system, range 12 mu. 1 die rolled: 1-3 = no hits, 4 or 5 = 1 hit, 6 = 2 hits "
         "(no rerolls). Each hit does 4 damage points, one to armour (if any) and remainder on "
         "hull.",
+    # CD pp.21-22: the Kra'Vak paragraphs run past the length limit, and the trim would drop the
+    # scatterguns' area defence and the fighters' kinetic cost, which change how the ships play.
+    # The worked example (italic in the book) is left out as usual.
+    ("ftcd", "cd_kravak"):
+        "Advanced drives are already included in cross dimensions and do not change. Kinetic "
+        "guns (K-guns) are affected by advanced screens. When rolling to see if damage is "
+        "doubled, deduct the advanced screen level from the class of the K-gun to give the final "
+        "number for the die roll. MKPs are affected by advanced screens as if they were beams. "
+        "Against level-1 advanced screens a 4 is a miss. Against level-2 advanced screen a 4 is a "
+        "miss, and a 6 inflicts only 1 hit. Kra'Vak scatterguns use the rules in cross "
+        "dimensions, rolling 4 PDS dice for effect and costing only 4 points. They cannot "
+        "automatically be used for area defence of other ships, so the Si'Tek escort cruiser or "
+        "similar ships should exchange one K-1 gun for an ADFC. Kra'Vak scatterguns no longer "
+        "risk damaging friendly ships when used for area defence. Kra'Vak fighters pay the extra "
+        "points for being armed with kinetic weapons (section 7.10).",
     # CD p.60's quick-reference panel: the eleven phases without the detail of section 2.6.
     ("ftcd", "turn_sequence"):
         "1. Write orders. 2. Roll for initiative. 3. Launch missiles. 4. Move fighter groups. "

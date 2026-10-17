@@ -240,6 +240,27 @@
    "page": 56
   },
   {
+   "key": "cd_kravak",
+   "title": "Kra'Vak under Cross Dimensions",
+   "text": "Advanced drives are already included in cross dimensions and do not change. Kinetic guns (K-guns) are affected by advanced screens. When rolling to see if damage is doubled, deduct the advanced screen level from the class of the K-gun to give the final number for the die roll. MKPs are affected by advanced screens as if they were beams. Against level-1 advanced screens a 4 is a miss. Against level-2 advanced screen a 4 is a miss, and a 6 inflicts only 1 hit. Kra'Vak scatterguns use the rules in cross dimensions, rolling 4 PDS dice for effect and costing only 4 points. They cannot automatically be used for area defence of other ships, so the Si'Tek escort cruiser or similar ships should exchange one K-1 gun for an ADFC. Kra'Vak scatterguns no longer risk damaging friendly ships when used for area defence. Kra'Vak fighters pay the extra points for being armed with kinetic weapons (section 7.10).",
+   "book": "CD",
+   "page": 21
+  },
+  {
+   "key": "cd_savasku",
+   "title": "Sa'Vasku under Cross Dimensions",
+   "text": "Advanced drives do not change. Lance pods are affected by advanced screens as if they were torpedoes or missiles: subtract 1 from the damage per level of advanced screen. Leech pods are not affected by advanced screens. They continue to be non-penetrating against armour. Interceptor pods roll 4 PDS dice as if they were cross dimensions scatterguns. (And may be used against heavy missiles.) Stingers are equivalent to beam weapons, so now do penetrating damage.",
+   "book": "CD",
+   "page": 22
+  },
+  {
+   "key": "cd_phalon",
+   "title": "Phalons under Cross Dimensions",
+   "text": "Shell armour does not change. As beam weapons, pulsers inflict penetrating damage against armour. Kra'Vak scatterguns and Sa'Vasku interceptor pods, like other scatterguns, roll 4 PDS dice against plasma bolts. All screens, standard or advanced, affect plasma bolts. Subtract the screen level from the damage dice instead of negating rolls of 5 or 6. A roll of 2 therefore inflicts no damage against a level-2 screen, while a roll of 6 inflicts 5 points against level-1.",
+   "book": "CD",
+   "page": 22
+  },
+  {
    "key": "turn_sequence",
    "title": "Turn sequence",
    "text": "1. Write orders. 2. Roll for initiative. 3. Launch missiles. 4. Move fighter groups. 5. Move ships. 6. Secondary fighter moves. 7. Allocate missile and fighter attacks. 8. Fighters against fighters or missiles. 9. Missiles and fighters against ships. 10. Ships fire. 11. Damage control.",

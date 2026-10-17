@@ -374,11 +374,16 @@ def fleet_check(fleet_id: str) -> str:
 def _catalog_group(design: dict) -> str:
     book = design["source"].get("book") or design["ruleset"]
     race = design.get("race") or "human"
-    if race == "human":
-        return book
     rs = RULESETS.get(design["ruleset"])
-    name = next((r.name for r in rs.races() if r.id == race), race) if rs else race
-    return f"{book} · {name}"
+    group = book
+    if race != "human":
+        name = next((r.name for r in rs.races() if r.id == race), race) if rs else race
+        group = f"{book} · {name}"
+    # A ruleset may adopt another's book (Cross Dimensions takes the Fleet Book ships), so the
+    # adopted copies get their own group, named for the ruleset they are costed under.
+    if rs and book not in {b.code for b in rs.books}:
+        group = f"{group} ({rs.short_label})"
+    return group
 
 
 # The catalog lists hulls smallest to largest: the FB1 p.12 size bands (SC up to SDN), with CD's
