@@ -209,6 +209,7 @@ def test_update_ship_and_loadout():
     assert not store.update_ship(f, uid, status="vaporised")[0]
     assert not store.update_ship(f, uid, squadron="nope")[0]
     assert not store.update_ship(f, "nope", name="x")[0]
+    assert store.update_ship(f, uid, table_id="LION-1")[0] and f["ships"][0]["table_id"] == "LION-1"
     assert store.set_ship_loadout(f, uid, {"fighters": [{"hangar": "h", "type": "heavy"}]})[0]
     assert f["ships"][0]["loadout"]["fighters"] == [{"hangar": "h", "type": "heavy"}]
     assert store.set_ship_loadout(f, uid, None)[0]
@@ -433,3 +434,16 @@ def test_normalize_keeps_the_cross_dimensions_loadout_fields():
     assert loadout["magazines"] == [{"magazine": "m", "salvos": ["std"], "stages": 2},
                                     {"magazine": "n", "salvos": ["er"]}]
     assert loadout["craft"] == [{"hangar": "h", "mass": 4}]
+
+
+def test_table_ids_stay_unique_within_a_fleet():
+    d = a_design()
+    f = a_fleet()
+    store.add_ship(f, d["id"])
+    store.add_ship(f, d["id"])
+    a, b = f["ships"]
+    ok, msg = store.update_ship(f, b["uid"], table_id=a["table_id"].lower(), name="Renamed")
+    assert not ok and "already has the ID" in msg
+    assert b["name"] != "Renamed"  # nothing applied when the ID clashes
+    assert store.update_ship(f, a["uid"], table_id=a["table_id"])[0]  # keeping its own ID is fine
+    assert not store.add_ship(f, d["id"], table_id=a["table_id"])[0]
