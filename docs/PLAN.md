@@ -444,7 +444,8 @@ text layer is OCR, so verify every number against the page image.
 **FTCD is built** (`rulesets/ftcd/`, human tech): the CD chapter 11 design system, its
 optional systems behind fleet options, the CD quick reference and the Cross Dimensions icon
 set. Golden test: the CD p.46 Heavy Cruiser, MASS 86 = **294 points**. The book prints no ship
-designs of its own (its introductory ships are FB1's), so there is no FTCD catalog. Judgment
+designs of its own (its introductory ships are FB1's), so the FTCD catalog is the FB one adopted
+at load time (CD p.3: FB1 unchanged; the FB2 races with the p.21 changes, R3b). Judgment
 calls, recorded in `rulesets/ftcd/rules.py`: a two-arc class-1 graser costs the three-arc 3
 MASS; the tug drive rounds its transfer MASS up; advanced FTL is paid at the standard rate
 unless the fleet option says the players pay for it (CD p.33); a system behind a fleet option
