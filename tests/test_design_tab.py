@@ -168,6 +168,31 @@ def test_a_class_outside_the_list_stays_selected(client):
     assert '<option value="8" selected>8</option>' in page
 
 
+def test_an_open_ended_setting_lists_up_to_11_then_more(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="hangar"))
+    draft = store.get_draft(design_id)
+    uid = draft["systems"][0]["uid"]
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'<select class="input sm" name="sys-{uid}-bays">' in page
+    assert '<option value="11" >11</option>' in page and '<option value="12"' not in page
+    assert '<option value="more" >More</option>' in page and f'name="sys-{uid}-bays-more" value=""' in page
+
+    client.post(f"/design/{design_id}", data=fields(
+        draft, action="apply", **{f"sys-{uid}-bays": "more", f"sys-{uid}-bays-more": "14"}))
+    assert store.get_draft(design_id)["systems"][0]["bays"] == 14
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert '<option value="more" selected>More</option>' in page
+    assert f'name="sys-{uid}-bays-more" value="14"' in page
+
+    client.post(f"/design/{design_id}", data=fields(
+        draft, action="apply", **{f"sys-{uid}-bays": "more", f"sys-{uid}-bays-more": ""}))
+    assert store.get_draft(design_id)["systems"][0]["bays"] == 14   # an empty field changes nothing
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{f"sys-{uid}-bays": "3"}))
+    assert store.get_draft(design_id)["systems"][0]["bays"] == 3
+
+
 def test_a_bad_number_is_reported_not_raised(client):
     design_id = make(client)
     page = client.post(f"/design/{design_id}",
