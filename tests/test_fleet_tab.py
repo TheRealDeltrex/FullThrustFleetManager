@@ -43,6 +43,16 @@ def test_the_tab_invites_a_first_fleet(client):
     assert "No fleet yet" in page  # the top-bar selector
 
 
+def test_the_new_fleet_form_labels_its_dropdowns_and_numbers_rulesets_by_publication(client):
+    page = text(client.get("/fleet"))
+    form = page[page.index('name="ruleset"') - 200:page.index("Create fleet")]
+    assert '<label class="field">Ruleset' in form and '<label class="field">Race' in form
+    assert form.index("1. Full Thrust 2nd ed.") < form.index("2. Fleet Books") \
+        < form.index("3. Cross Dimensions")
+    assert 'value="fb" selected>2. Fleet Books' in form    # still the default pick
+    assert '<optgroup label="1. Full Thrust 2nd ed.">' in form
+
+
 def test_creating_a_fleet_selects_it_and_fills_the_top_bar(client):
     page = text(client.post("/fleet/new", data={"ruleset": "fb", "name": "Home Fleet",
                                                 "points_limit": "1000"}, follow_redirects=True))
