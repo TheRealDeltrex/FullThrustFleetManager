@@ -83,7 +83,7 @@
         {% if selected.badges.non_conforming %}<span class="chip bad">{{ _("Non-conforming") }}</span>{% endif %}
         {% if selected.badges.mixed_faction %}<span class="chip warn">{{ _("Mixed faction") }}</span>{% endif %}
         {% if selected.badges.custom_ships %}<span class="chip info">{{ _("Custom ships") }}</span>{% endif %}
-        {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ key }}</span>{% endfor %}
+        {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ selected.option_label(key) }}</span>{% endfor %}
         <div class="spacer"></div>
         <nav class="views" aria-label="{{ _('View') }}">
           {% for value, label in (("cards", _("Cards")), ("sheet", _("Record sheet")), ("roster", _("Roster"))) %}
@@ -242,7 +242,7 @@
             <legend>{{ _("Options in force") }}</legend>
             {% for key in selected.option_keys %}
               <label class="check"><input type="checkbox" name="opt-{{ key }}"
-                {% if f.options[key] %}checked{% endif %} /> {{ key }}</label>
+                {% if f.options[key] %}checked{% endif %} /> {{ selected.option_label(key) }}</label>
             {% endfor %}
           </fieldset>
           <textarea class="input wide" name="notes" rows="2" aria-label="{{ _('Notes') }}">{{ f.notes }}</textarea>

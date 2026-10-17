@@ -177,6 +177,10 @@ def normalize_design(doc: object) -> dict | None:
         if isinstance(doc.get("armour_layers"), list) else [],
         "thrust": _as_int(doc.get("thrust"), 0, 0, 20),
         "ftl": doc.get("ftl") is True,
+        # Cross Dimensions tech levels (CD pp.43-44); rulesets without them ignore the flags.
+        "hull_advanced": doc.get("hull_advanced") is True,
+        "drive_advanced": doc.get("drive_advanced") is True,
+        "ftl_advanced": doc.get("ftl_advanced") is True,
         "streamlining": streamlining,
         "systems": systems,
         "default_loadout": _norm_loadout(doc.get("default_loadout"))
@@ -327,8 +331,8 @@ def new_design(ruleset: str, race: str = "human", faction: str | None = None,
         return None, _("Unknown race for this ruleset.")
     design = normalize_design({
         "id": new_id(), "ruleset": ruleset, "race": race, "faction": faction or None,
-        "name": name.strip() or _("New design"), "tmf": 50 if ruleset == "fb" else 20,
-        "hull_boxes": 15 if ruleset == "fb" else 0, "thrust": 4, "ftl": True,
+        "name": name.strip() or _("New design"), "tmf": 50 if ruleset in ("fb", "ftcd") else 20,
+        "hull_boxes": 15 if ruleset in ("fb", "ftcd") else 0, "thrust": 4, "ftl": True,
         "source": {"kind": "custom"},
     })
     _write_design(design)
@@ -419,7 +423,11 @@ def add_system(design: dict, system_type: str) -> tuple[bool, str]:
     system = {"uid": f"s{n}", "type": system_type}
     for param in definition.params:
         if param.kind == "arcs":
-            system[param.name] = [rs.arcs[0]] * max(1, param.min or 1)
+            # The picker's own default (a class-1 beam's six arcs, a launcher's front three),
+            # so a freshly added system is legal; fore alone when it declares none.
+            default = param.default
+            valid = isinstance(default, list) and default and all(a in rs.arcs for a in default)
+            system[param.name] = list(default) if valid else [rs.arcs[0]]
         elif param.default is not None:
             system[param.name] = param.default
     design["systems"].append(system)

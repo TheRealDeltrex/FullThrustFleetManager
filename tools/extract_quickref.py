@@ -25,6 +25,7 @@ BOOKS = {
     "MT": ("More Thrust.pdf", 0, 2),
     "FB1": ("Fleet Book 1.pdf", 0, 1),
     "FB2": ("Fleet Book 2.pdf", 0, 1),
+    "CD": ("Full Thrust Cross Dimensions.pdf", 1, 3),
 }
 
 # (ruleset, key, title, book, heading). `key` is the system type, or a rule the sheet needs.
@@ -104,6 +105,50 @@ ENTRIES = [
     ("ft2", "cloak", "Cloaking field", "MT", "FIELD:"),
     ("ft2", "mt_missile", "Missiles", "MT", "MISSILE ATTACKS:"),
     ("ft2", "streamlining", "Atmospheric streamlining", "MT", "ATMOSPHERIC STREAMLINING:"),
+]
+
+# Cross Dimensions sets its headings in mixed case, so they cannot be told from body text the
+# way the older books' capitals can. Each entry names the heading that follows it instead, and
+# the printed pages it spans: (ruleset, key, title, heading, next heading or None for the end
+# of the window, first printed page, last printed page).
+CD_ENTRIES = [
+    ("ftcd", "hull_track", "Damage", "Damage", "Game turns", 7, 7),
+    ("ftcd", "vector_movement", "Vector movement", "Vector movement", None, 13, 13),
+    ("ftcd", "arcs", "Fire arcs", "Fire Arcs", "Aft arc", 14, 14),
+    ("ftcd", "fire_control", "Fire control systems", "Fire control systems", "Beam fire", 15, 15),
+    ("ftcd", "beam", "Beam fire", "Beam fire", "Re-rolls", 15, 15),
+    ("ftcd", "rerolls", "Re-rolls", "Re-rolls", "Defensive screens", 15, 16),
+    ("ftcd", "screen", "Defensive screens", "Defensive screens", "Armour", 16, 16),
+    ("ftcd", "armour", "Armour", "Armour", "Optional rule: rear arc attacks", 16, 16),
+    ("ftcd", "threshold", "Threshold points", "Threshold points", "Rolling dice", 17, 17),
+    ("ftcd", "graser", "Grasers", "Grasers", "Torpedoes", 19, 19),
+    ("ftcd", "pulse_torpedo", "Torpedoes", "Torpedoes", "Torpedo classes", 19, 19),
+    ("ftcd", "submunition", "Submunition packs", "Submunition packs", "Needle weapons", 19, 20),
+    ("ftcd", "needle_beam", "Needle weapons", "Needle weapons", "Aiming weapons?", 20, 20),
+    ("ftcd", "advanced_screen", "Advanced screens", "Advanced screens", "Shell armour", 20, 20),
+    ("ftcd", "shell_armour", "Shell armour", "Shell armour", "Stealth", 20, 21),
+    ("ftcd", "pds", "Point defence", "Point defence", "Scatterguns", 21, 21),
+    ("ftcd", "scattergun", "Scatterguns", "Scatterguns", "Against ships", 21, 21),
+    ("ftcd", "adfc", "Area-defence fire control", "Area-defence fire control", "Alien technologies", 21, 21),
+    ("ftcd", "sm_launcher", "Launching missiles", "Launching missiles", "Point defence", 23, 23),
+    ("ftcd", "missile_damage", "Missile damage", "Damage", "Mountings and magazines", 24, 24),
+    ("ftcd", "sm_magazine", "Mountings and magazines", "Mountings and magazines",
+     "Magazine capacity", 24, 24),
+    ("ftcd", "hangar", "Fighter launch and recovery", "Launch and recovery", "Movement", 26, 26),
+    ("ftcd", "core_systems", "Core systems", "Core systems", "Command bridge", 31, 31),
+    ("ftcd", "crew", "Damage control parties", "Damage control parties", "Crew casualties", 32, 32),
+    ("ftcd", "hold", "Cargo and passengers", "Cargo and passengers", None, 32, 32),
+    ("ftcd", "tug_drive", "FTL tugs and tenders", "FTL tugs and tenders",
+     "Battle riders and motherships", 34, 34),
+    ("ftcd", "enhanced_sensors", "Advanced sensors", "Advanced sensors",
+     "Dummy bogeys and weasel boats", 37, 37),
+    ("ftcd", "ecm", "Electronic counter measures", "Electronic counter measures", "Mines", 38, 38),
+    ("ftcd", "minelayer", "Minelaying", "Minelaying", "Minesweeping", 38, 38),
+    ("ftcd", "minesweeper", "Minesweeping", "Minesweeping", "Ortillery", 38, 39),
+    ("ftcd", "nova_cannon", "Spinal mount nova cannon", "Spinal mount nova cannon", "Wave gun", 55, 55),
+    ("ftcd", "wave_gun", "Wave gun", "Wave gun", "Reflex field", 55, 55),
+    ("ftcd", "reflex_field", "Reflex field", "Reflex field", "Cloaking field", 55, 56),
+    ("ftcd", "cloak", "Cloaking field", "Cloaking field", "Mass and points cost", 56, 56),
 ]
 # fmt: on
 
@@ -197,6 +242,49 @@ OVERRIDES = {
         "One-shot system, range 12 mu. 1 die rolled: 1-3 = no hits, 4 or 5 = 1 hit, 6 = 2 hits "
         "(no rerolls). Each hit does 4 damage points, one to armour (if any) and remainder on "
         "hull.",
+    # CD p.60's quick-reference panel: the eleven phases without the detail of section 2.6.
+    ("ftcd", "turn_sequence"):
+        "1. Write orders. 2. Roll for initiative. 3. Launch missiles. 4. Move fighter groups. "
+        "5. Move ships. 6. Secondary fighter moves. 7. Allocate missile and fighter attacks. "
+        "8. Fighters against fighters or missiles. 9. Missiles and fighters against ships. "
+        "10. Ships fire. 11. Damage control.",
+    # CD p.14: figure 11's arc labels sit in the middle of the second paragraph's last sentence.
+    ("ftcd", "arcs"):
+        "The 360 degree space around each ship is divided into six arcs, each of 60 degrees. The "
+        "arcs are indicated in figure 11, and are designated Fore (F), Fore Starboard (FS), Aft "
+        "Starboard (AS), Aft (A), Aft Port (AP), and Fore Port (FP). These fire arcs determine "
+        "which of a ship's weapons may be brought to bear on a particular target, as some will be "
+        "unable to fire through certain arcs. A given target ship may only be in one fire arc of "
+        "the firing ship. No ship may fire offensive weaponry through its aft arc due to the "
+        "interference of the ship's main drive.",
+    # CD p.34: the rule itself comes after a paragraph of background the limit would keep instead.
+    ("ftcd", "tug_drive"):
+        "Any ship can be made a tender by having internal bay space allocated to carry other ships "
+        "(whether the carried craft are FTL-capable or not), at the same rate as for carrying "
+        "fighters and other small craft: every 1.5 mass used for hangar bay space provides "
+        "capacity for 1 mass of carried ship(s). Tugs, which are designed to carry other ships by "
+        "extending their jumpfield around them, require massively overpowered FTL drives. They "
+        "need a drive equal to 10% of their mass just to provide their own jump capability, plus "
+        "for every 1 additional FTL drive mass they can tow an additional 5 transfer mass of other "
+        "ships.",
+    # CD p.39: two sentences, followed on the page by the labels of the figure 25 symbols.
+    ("ftcd", "ortillery"):
+        "This is orbital artillery or a planetary bombardment system used for ground support "
+        "fire from orbiting starships. It has no function in space combat, and cannot be used as "
+        "an anti-ship weapon.",
+    # CD pp.37-38: the weasel paragraphs, without the dummy bogey rules before them.
+    ("ftcd", "weasel_cruiser"):
+        "'Weasel' boats are an alternative to the drone decoys. These are small manned ships that "
+        "are equipped with systems designed to emit the signature of a much larger vessel. While "
+        "the weasel boat is represented by a bogey marker, that bogey is labelled as if it were "
+        "the classification that the decoy system is emitting. Once it is scanned, the true nature "
+        "of the ship is revealed.",
+}
+# Where an override's text sits, for the entries that have no extracted body at all.
+OVERRIDE_PAGES = {
+    ("ftcd", "turn_sequence"): ("CD", "Turn sequence", 60),
+    ("ftcd", "ortillery"): ("CD", "Ortillery", 39),
+    ("ftcd", "weasel_cruiser"): ("CD", "Weasel boats", 38),
 }
 # fmt: on
 
@@ -302,9 +390,69 @@ def _matches(pages: list[str], heading: str):
             yield clean("\n".join(body)), index
 
 
+def gap_text(page) -> str:
+    """A page's text with the word spaces restored. Cross Dimensions is typeset justified and
+    its text layer drops some spaces outright ("Thepointscostof..."); the glyphs are still a
+    space's width apart (about 1.3pt against kerning under 0.2pt), so a gap wider than a tenth
+    of the font size is a space.
+
+    The book sets its worked examples in italics; they are the "needlessly wordy" part a quick
+    reference trims (PLAN 2.5), so an all-italic line is left out."""
+    lines = []
+    for block in page.get_text("rawdict")["blocks"]:
+        for line in block.get("lines", []):
+            spans = [sp for sp in line["spans"] if "".join(c["c"] for c in sp["chars"]).strip()]
+            if spans and all(sp["flags"] & 2 for sp in spans):
+                continue
+            text, prev = "", None
+            for span in line["spans"]:
+                for char in span["chars"]:
+                    if (prev is not None and char["c"] != " " and not text.endswith(" ")
+                            and char["bbox"][0] - prev > span["size"] * 0.1):
+                        text += " "
+                    text += char["c"]
+                    prev = char["bbox"][2]
+            lines.append(text)
+    return "\n".join(lines)
+
+
+def _norm(line: str) -> str:
+    return line.replace("\ufb01", "fi").replace("\ufb02", "fl").strip().rstrip(":").lower()
+
+
+NOISE = re.compile(r"^(\d+(\.\d+)*|Figure \d+:.*)$")
+
+
+def body_between(pages: list[str], heading: str, end: str | None,
+                 window: tuple[int, int]) -> tuple[str, int] | None:
+    """The text from `heading` up to `end` (or the end of the window), across the window's
+    pages. A later page loses its running header; section numbers, page numbers and figure
+    captions are dropped wherever they fall."""
+    lines: list[tuple[str, int]] = []
+    for index in range(window[0], window[1] + 1):
+        page_lines = pages[index].splitlines()
+        lines += [(line, index) for line in (page_lines[1:] if index > window[0] else page_lines)]
+    start = next((i for i, (line, _page) in enumerate(lines) if _norm(line) == _norm(heading)), None)
+    if start is None:
+        return None
+    body: list[str] = []
+    for line, _page in lines[start + 1:]:
+        if end and _norm(line) == _norm(end):
+            break
+        if not NOISE.fullmatch(line.strip()):
+            body.append(line)
+    text = clean("\n".join(body).replace("\ufb01", "fi").replace("\ufb02", "fl"))
+    # A line break inside "12-24" or "level-1", and the space the text layer leaves before a
+    # closing bracket. Only this book's reader does this, so the older books' output is as was.
+    text = re.sub(r"(?<=[0-9a-z])-\s+(?=[0-9])", "-", text)
+    text = re.sub(r"\s+\)", ")", text)
+    return text, lines[start][1]
+
+
 def main() -> int:
     texts = {
-        code: ([page.get_text() for page in fitz.open(ROOT / "rulebooks" / file)], offset, first)
+        code: ([gap_text(page) if code == "CD" else page.get_text()
+                for page in fitz.open(ROOT / "rulebooks" / file)], offset, first)
         for code, (file, offset, first) in BOOKS.items()
     }
     out: dict[str, list[dict]] = {}
@@ -324,6 +472,21 @@ def main() -> int:
         # is that minus the book's offset (FT prints 1 on its second PDF page).
         out.setdefault(ruleset, []).append({
             "key": key, "title": title, "text": text, "book": book, "page": index + 1 - offset,
+        })
+    pages, offset, _first = texts["CD"]
+    for ruleset, key, title, heading, end, first_page, last_page in CD_ENTRIES:
+        found = body_between(pages, heading, end, (first_page + offset - 1, last_page + offset - 1))
+        if not found or len(found[0]) < 60:
+            missing.append(f"{ruleset}/{key} (CD: {heading})")
+            continue
+        body, index = found
+        out.setdefault(ruleset, []).append({
+            "key": key, "title": title, "text": OVERRIDES.get((ruleset, key)) or trim(body),
+            "book": "CD", "page": index + 1 - offset,
+        })
+    for (ruleset, key), (book, title, page) in OVERRIDE_PAGES.items():
+        out.setdefault(ruleset, []).append({
+            "key": key, "title": title, "text": OVERRIDES[(ruleset, key)], "book": book, "page": page,
         })
     target = ROOT / "data" / "quickref"
     target.mkdir(parents=True, exist_ok=True)

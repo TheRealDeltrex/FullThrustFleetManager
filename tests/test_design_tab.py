@@ -302,3 +302,17 @@ def test_the_shell_layer_field_is_only_shown_to_races_that_stack_armour(client):
     human = client.get("/design/fb:fb1:nac-furious").get_data(as_text=True)
     assert 'name="armour_layers"' in phalon and "16, 10, 8, 6" in phalon
     assert 'name="armour_layers"' not in human
+
+
+def test_cross_dimensions_tech_levels_are_edited_on_the_workbench(client):
+    design_id = make(client, "Lancer", ruleset="ftcd")
+    design = store.get_draft(design_id) or store.get_design(design_id)
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert 'name="drive_advanced"' in page
+    client.post(f"/design/{design_id}", data=fields(
+        design, action="apply", **{"advanced-present": "1", "drive_advanced": "on", "hull_advanced": "on"}))
+    working = store.get_draft(design_id)
+    assert working["drive_advanced"] is True and working["hull_advanced"] is True
+    assert working["ftl_advanced"] is False
+    plain = client.get(f"/design/{make(client, 'Plain')}").get_data(as_text=True)
+    assert 'name="drive_advanced"' not in plain                    # FB has no tech levels
