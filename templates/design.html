@@ -305,7 +305,8 @@
           <div class="body row">
             <select class="input grow" name="system_type" aria-label="{{ _('System to add') }}">
               {% for definition in selected.system_types %}
-                <option value="{{ definition.type }}">{{ definition.group }} · {{ definition.label }}</option>
+                <option value="{{ definition.type }}"
+                  {% if definition.type == last_system_type %}selected{% endif %}>{{ definition.group }} · {{ definition.label }}</option>
               {% endfor %}
             </select>
             <button class="btn" type="submit" name="action" value="add_system">{{ _("Add system") }}</button>
