@@ -250,6 +250,7 @@ def _fleet_context(fleet: dict, view: str) -> dict:
                         for s in fleet["ships"]},
         "hull_damage": sum(s["damage"]["hull"] for s in fleet["ships"]),
         "dummy_bogeys": fleet_rules.dummy_bogeys(fleet),
+        "morale": fleet_rules.morale(fleet, designs),
         "dummy_bogey_points": fleet_rules.dummy_bogey_points(fleet),
         "library": library,
         "library_total": len(every_design),

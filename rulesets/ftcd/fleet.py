@@ -52,9 +52,45 @@ def _fits(riders: list[int], bins: list[int]) -> bool:
     return False
 
 
-def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict) -> list[Issue]:
+def _composition(live: list[tuple[dict, dict]], options: dict, ship_points) -> list[Issue]:
+    """CD p.57's fleet composition limits, each a fleet option: a patrol battle has no capitals
+    and at most half its points on cruisers; a larger battle at most half on capitals, "including
+    their fighters", so a ship's points are its loadout's too."""
+    if not (options.get("cd_patrol_battle") or options.get("cd_capital_limit")):
+        return []
+    by_class: dict[str, int] = {}
+    for s, d in live:
+        cls = cd_rules.ship_class(_int(d.get("tmf")))
+        by_class[cls] = by_class.get(cls, 0) + ship_points(s, d)
+    total = sum(by_class.values())
+    issues = []
+    if options.get("cd_patrol_battle"):
+        if by_class.get("capital"):
+            issues.append(Issue("patrol_capital", "violation",
+                                _("A patrol battle fleet has no capital ships.")))
+        if 2 * by_class.get("cruiser", 0) > total:
+            issues.append(Issue("patrol_cruisers", "violation", _(
+                "A patrol battle fleet spends at most half its points on cruisers "
+                "({n} of {m}).", n=by_class.get("cruiser", 0), m=total)))
+    if options.get("cd_capital_limit") and 2 * by_class.get("capital", 0) > total:
+        issues.append(Issue("capital_limit", "violation", _(
+            "At most half the fleet's points on capital ships, fighters included ({n} of {m}).",
+            n=by_class.get("capital", 0), m=total)))
+    return issues
+
+
+def morale_mass(ships: list[tuple[dict, dict]]) -> tuple[int, int]:
+    """(MASS destroyed, MASS at which the fleet withdraws): half the fleet's MASS (CD p.40)."""
+    total = sum(max(0, _int(d.get("tmf"))) for _, d in ships)
+    lost = sum(max(0, _int(d.get("tmf"))) for s, d in ships if s.get("status") == "destroyed")
+    return lost, (total + 1) // 2
+
+
+def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict,
+                 ship_points=lambda ship, design: 0) -> list[Issue]:
     issues: list[Issue] = []
     live = [(s, d) for s, d in ships if s.get("status") != "destroyed"]
+    issues += _composition(live, options, ship_points)
 
     dummies = max(0, _int(fleet.get("dummy_bogeys"), 0))
     if dummies:

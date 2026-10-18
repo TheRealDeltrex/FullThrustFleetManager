@@ -146,6 +146,11 @@ class Ruleset(Protocol):
         its design (ships whose design is missing are left out)."""
         ...
 
+    def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
+        """(MASS destroyed, MASS lost at which the fleet withdraws) for a ruleset with a fleet
+        morale rule, else None."""
+        ...
+
     def adopt_design(self, design: dict) -> dict | None:
         """A catalog design of a `catalog_sources` ruleset as this ruleset's own: a new id and
         this ruleset id, changed where this ruleset's book says the design must change. The

@@ -105,6 +105,9 @@ class FT2Ruleset:
     def fleet_issues(self, fleet: dict, ships: list, options: dict) -> list[Issue]:
         return []
 
+    def morale_mass(self, ships: list) -> tuple[int, int] | None:
+        return None
+
     def adopt_design(self, design: dict) -> dict | None:
         return None
 

@@ -208,3 +208,46 @@ def test_gate_draws_its_transfer_mass():
 
     svg = ssd_layout.to_svg(ssd_layout.layout(gate(60)))
     assert "GATE 60" in svg
+
+
+# ---- Tournament composition (CD p.57) and fleet morale (CD p.40) -----------------------------
+
+
+def sized(tmf: int) -> dict:
+    return design(tmf=tmf, hull_boxes=tmf // 3, ftl=True)
+
+
+def test_patrol_battle_has_no_capitals_and_half_points_on_cruisers():
+    f, designs = cd_fleet((sized(100), "ready"), (sized(20), "ready"),
+                          options={"cd_patrol_battle": True})
+    assert "patrol_capital" in fleet_codes(f, designs)
+    f, designs = cd_fleet((sized(60), "ready"), (sized(20), "ready"),
+                          options={"cd_patrol_battle": True})
+    assert fleet_codes(f, designs) == {"patrol_cruisers": "violation"}
+    f, designs = cd_fleet((sized(60), "ready"), (sized(40), "ready"), (sized(40), "ready"),
+                          options={"cd_patrol_battle": True})
+    assert fleet_codes(f, designs) == {}
+
+
+def test_capital_limit_counts_fighters_with_their_carrier():
+    # Carrier hull 187 points, its torpedo fighters 36 more; three escorts 66 each = 198.
+    bare = design(tmf=100, hull_boxes=30, ftl=True, systems=[sys_("h", "hangar")])
+    loaded = {**bare, "default_loadout": {"fighters": [{"hangar": "h", "type": "torpedo"}],
+                                          "magazines": []}}
+    escorts = [(sized(40), "ready")] * 3
+    f, designs = cd_fleet((bare, "ready"), *escorts, options={"cd_capital_limit": True})
+    assert fleet_codes(f, designs) == {}
+    f, designs = cd_fleet((loaded, "ready"), *escorts, options={"cd_capital_limit": True})
+    assert fleet_codes(f, designs) == {"capital_limit": "violation"}
+
+
+def test_destroyed_ships_do_not_count_toward_composition():
+    f, designs = cd_fleet((sized(100), "destroyed"), (sized(20), "ready"),
+                          options={"cd_patrol_battle": True})
+    assert fleet_codes(f, designs) == {}
+
+
+def test_fleet_morale_withdraws_at_half_its_mass():
+    f, designs = cd_fleet((sized(60), "destroyed"), (sized(40), "ready"), (sized(21), "ready"))
+    assert fleet_rules.morale(f, designs) == (60, 61)
+    assert fleet_rules.morale(fleet(), {}) is None

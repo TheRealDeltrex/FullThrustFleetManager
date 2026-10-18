@@ -127,6 +127,14 @@
         <div class="tile">
           <span class="muted">{{ _("Hull damage") }}</span><b>{{ selected.hull_damage }}</b>
         </div>
+        {% if selected.morale %}
+          {# CD p.40: a fleet withdraws once half its MASS is destroyed. #}
+          <div class="tile">
+            <span class="muted">{{ _("MASS lost") }}</span>
+            <b>{{ selected.morale[0] }} / {{ selected.morale[1] }}</b>
+            <span class="muted">{% if selected.morale[0] >= selected.morale[1] %}{{ _("The fleet withdraws.") }}{% else %}{{ _("Withdraws at half its MASS") }}{% endif %}</span>
+          </div>
+        {% endif %}
       </div>
 
       {# ---- Views ---- #}

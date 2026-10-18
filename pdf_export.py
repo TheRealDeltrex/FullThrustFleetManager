@@ -242,6 +242,10 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
              p=fleet_rules.dummy_bogey_points(fleet))] if fleet_rules.dummy_bogeys(fleet) else []),
         f"{_('Ships')}: " + ", ".join(f"{k} {v}" for k, v in fleet_rules.ship_counts(fleet).items()),
     ]
+    morale = fleet_rules.morale(fleet, designs)
+    if morale:
+        lines.append(_("Fleet morale: withdraws when {n} MASS is destroyed (half its MASS).",
+                       n=morale[1]))
     active = [fleet_rules.option_label(k) for k in fleet_rules.ruleset_option_keys(fleet["ruleset"])
               if fleet["options"].get(k)]
     if active:

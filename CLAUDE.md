@@ -438,6 +438,11 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   lifts the mothership check (CD p.35). Dummy bogeys (`fleet["dummy_bogeys"]`, CD p.37) cost 20,
   at most one per live ship, and need `cd_optional_systems`; the Fleet details form offers them
   as a dropdown.
+- CD p.57's composition limits are fleet options: `cd_patrol_battle` (no capitals, at most half
+  the points on cruisers) and `cd_capital_limit` (at most half on capitals); a ship's points
+  include its loadout ("including their fighters"). Classes come from `rules.ship_class`.
+- Fleet morale (CD p.40) is the protocol's `morale_mass()`: (MASS destroyed, half the fleet's
+  MASS rounded up), shown as a Fleet tab tile and a PDF roster line; None in FB and FT2.
 - Gates and starbases (CD pp.35, 51) need no new design field. A gate is a design carrying a
   `jump_gate` or `portal` system {transfer_mass}: the drive is 1 MASS per 10 transfer (a portal
   1 per 1), paid as FTL at 2 a MASS; hull boxes at least 10% of the transfer MASS; one kind per
