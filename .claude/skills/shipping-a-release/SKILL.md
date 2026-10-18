@@ -24,10 +24,16 @@ Learned the hard way on v0.4.0 and v0.4.1. Split the work by what each place can
   `E:\ClaudeCodeFolder` (the checkout is `E:\ClaudeCodeFolder\FullThrustFleetManager`;
   `E:\ClaudeOnlineFolder` is empty): steps 2 to 4. PyInstaller and the signing key only exist
   there.
-- **The PC's permission check blocks `git push` of a tag and `gh release create`** ("creating a
-  public surface") unless the owner's explicit OK for *this* version is in the session's
-  instructions. On v0.4.0 that cost a full round trip. Get the OK first (the owner's own "ship
-  it" message, or a decision card), then quote it in the Remote Control instructions up front.
+- **The PC's permission check blocks `gh release create`** (and a tag push) as "Create Public
+  Surface" unless **the owner's own message** saying to ship this version has reached the PC
+  session. A Claude brief that quotes the owner's OK word for word does not count: on v0.5.0 the
+  brief carried it and the command was still denied, then went through unchanged once the
+  owner's own message arrived in the session. Messages the owner writes in the release thread
+  reach the Remote Control session, so: start the session on the owner's "ship it" message (it
+  is handed over as the task), and if the release step is still denied, ask the owner in the
+  thread (a decision card) and retry once their answer is in. Build, sign, smoke-test and zip
+  need no OK and can run meanwhile. Never work around the denial by another route.
+
 - If the cloud container's `pip install` fails with `Cannot uninstall blinker ... RECORD file not
   found` (a Debian-installed package), use `pip install --ignore-installed blinker -r ...`.
 
