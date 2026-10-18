@@ -134,6 +134,7 @@
       }
     }
     if (url && url !== location.href) history.replaceState(null, "", url);
+    document.dispatchEvent(new Event("ft:swapped"));
   }
 
   function autosaveForm(el) {
