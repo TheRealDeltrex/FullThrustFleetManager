@@ -62,6 +62,17 @@ def test_creating_a_fleet_selects_it_and_fills_the_top_bar(client):
     assert 'badge rs-fb' in page
 
 
+def test_the_left_pane_sections_fold_on_fleet_and_design(client):
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Home Fleet"})
+    fleet = text(client.get("/fleet", follow_redirects=True))
+    for key in ("fleet-fleets", "fleet-squadrons", "fleet-new"):
+        assert f'data-fold="{key}"' in fleet
+    design = text(client.get("/design"))
+    for key in ("design-library", "design-mine", "design-catalog", "design-new"):
+        assert f'data-fold="{key}"' in design
+    assert "collapse.js" in fleet and "collapse.js" in design
+
+
 def test_fleets_are_listed_with_their_ruleset_and_can_be_switched(client):
     fb = make_fleet(client, "Home Fleet")
     ft2 = make_fleet(client, "Task Force", ruleset="ft2")

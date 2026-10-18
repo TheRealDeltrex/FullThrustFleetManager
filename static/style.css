@@ -97,6 +97,13 @@ a.chip:hover { text-decoration: underline; }
 .panel h3 { margin: 0; padding: 10px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .6px;
   color: var(--muted); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
 .panel h3.sep { border-top: 1px solid var(--line); }
+/* Foldable left-pane sections (static/collapse.js) */
+.panel h3.fold { cursor: pointer; user-select: none; }
+.panel h3.fold::after { content: "\25BE"; font-size: 11px; }
+.panel h3.fold:hover, .panel h3.fold:focus-visible { color: var(--ink); }
+.panel h3.fold[aria-expanded="false"] { border-bottom: 0; }
+.panel h3.fold[aria-expanded="false"]::after { content: "\25B8"; }
+.panel h3.fold[aria-expanded="false"] + .body { display: none; }
 .panel .body, .panel.body { padding: 12px 14px; }
 .panel.head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; }
 .panel.head h2 { margin: 0; font-size: 19px; }
