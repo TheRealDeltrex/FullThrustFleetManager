@@ -195,3 +195,110 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 /* A field the rules compute rather than the player setting it (a Sa'Vasku thrust rating, which
    is bought with power each turn): reads like an input, but is not one. */
 .input.static { display: block; background: var(--panel-2, #f3f4f6); color: var(--muted, #555); }
+
+/* ---- Appearance (Settings): Classic is the rules above. Dark, Bridge and Admiralty (the
+   default, store.DEFAULT_SETTINGS) restyle colours, type and borders only, keyed on
+   <html data-theme>. Ship diagrams stay black ink on a light ground in every theme, and the
+   ruleset and status colours keep their meaning. ---- */
+
+/* Bridge: a dark tactical console. */
+:root[data-theme="bridge"] { --bg: #0b111b; --panel: #121b29; --panel-2: #0f1724; --ink: #dce6f2; --muted: #8597ad; --line: #22324a; --accent: #4fb3ff; --accent-soft: #10263d; --ok: #4fd18b; --ok-soft: #0f2a1f; --warn: #ffb547; --warn-soft: #2e2210; --bad: #ff6b5e; --bad-soft: #321614; --chrome: #070b12; --chrome-ink: #e8f1fb; --chrome-muted: #7f93ab; --st-ready: #4fd18b; --st-damaged: #ffb547; --st-docked: #4fb3ff; --st-lost: #5d6b7c; --rs-ft2: #ffb547; --rs-fb: #4fb3ff; --rs-ftcd: #4fd18b; --rs-ftpc: #b48cff; --rs-current: #2a3a55; }
+[data-theme="bridge"] body { background: radial-gradient(1200px 600px at 70% -10%, #13233b 0%, transparent 60%), var(--bg); background-attachment: fixed; }
+[data-theme="bridge"] .topbar { background: linear-gradient(180deg, #0c1420, #070b12); border-bottom: 1px solid #1d2b40; box-shadow: 0 4px 18px rgba(0,0,0,.45); }
+[data-theme="bridge"] .ruleset-strip { height: 2px; }
+[data-theme="bridge"] .ruleset-strip.rs-fb { box-shadow: 0 0 12px var(--rs-fb); }
+[data-theme="bridge"] .ruleset-strip.rs-ft2 { box-shadow: 0 0 12px var(--rs-ft2); }
+[data-theme="bridge"] .ruleset-strip.rs-ftcd { box-shadow: 0 0 12px var(--rs-ftcd); }
+[data-theme="bridge"] .brand { text-transform: uppercase; letter-spacing: 2.5px; font-size: 13px; }
+[data-theme="bridge"] .brand small { color: var(--accent); letter-spacing: 1px; }
+[data-theme="bridge"] .fleet-select { background: #0e1726; border-color: #22324a; }
+[data-theme="bridge"] .tabs a { text-transform: uppercase; letter-spacing: 1.2px; font-size: 12px; font-weight: 600; border-radius: 3px; }
+[data-theme="bridge"] .tabs a.on { background: transparent; color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+[data-theme="bridge"] .bar { background: #16233a; border-radius: 1px; }
+[data-theme="bridge"] .bar > i { background: linear-gradient(90deg, #2a7fd4, #4fb3ff); box-shadow: 0 0 8px rgba(79,179,255,.7); }
+[data-theme="bridge"] .panel, [data-theme="bridge"] .tile { border-radius: 4px; border-color: var(--line); box-shadow: inset 0 1px 0 rgba(255,255,255,.03); }
+[data-theme="bridge"] .panel h3 { color: var(--accent); letter-spacing: 1.6px; font-size: 11px; background: linear-gradient(90deg, rgba(79,179,255,.08), transparent 60%); }
+[data-theme="bridge"] .panel.head { border-left: 3px solid var(--accent); }
+[data-theme="bridge"] .tile b { color: #fff; font-variant-numeric: tabular-nums; }
+[data-theme="bridge"] .btn { background: #16223a; border-color: #2a3c58; color: var(--ink); border-radius: 3px; }
+[data-theme="bridge"] .btn:hover { border-color: var(--accent); }
+[data-theme="bridge"] .btn.primary { background: var(--accent); border-color: var(--accent); color: #04121f; box-shadow: 0 0 14px rgba(79,179,255,.35); text-transform: uppercase; letter-spacing: .8px; font-size: 12.5px; }
+[data-theme="bridge"] .input, [data-theme="bridge"] select.input { background: #0a1220; color: var(--ink); border-color: #263852; border-radius: 3px; }
+[data-theme="bridge"] .input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+[data-theme="bridge"] .input.static { background: #0f1724; }
+[data-theme="bridge"] .chip { border-radius: 2px; text-transform: uppercase; letter-spacing: .6px; font-size: 10.5px; }
+[data-theme="bridge"] .chip.ok, [data-theme="bridge"] .chip.st-ready { background: var(--ok-soft); border-color: #1d5a3c; color: var(--ok); }
+[data-theme="bridge"] .chip.warn, [data-theme="bridge"] .chip.st-damaged { background: var(--warn-soft); border-color: #6a4a12; color: var(--warn); }
+[data-theme="bridge"] .chip.bad { background: var(--bad-soft); border-color: #6b2620; color: var(--bad); }
+[data-theme="bridge"] .chip.info, [data-theme="bridge"] .chip.st-docked { background: var(--accent-soft); border-color: #1f4a72; color: var(--accent); }
+[data-theme="bridge"] .badge { border-radius: 2px; color: #04121f; }
+[data-theme="bridge"] .card { background: var(--panel-2); border-radius: 4px; }
+[data-theme="bridge"] .card header b, [data-theme="bridge"] .card header strong { color: #fff; }
+[data-theme="bridge"] .card .mini svg, [data-theme="bridge"] .ssd-wrap svg, [data-theme="bridge"] .sheet svg { background: #e9f1fa; border-radius: 3px; box-shadow: 0 0 0 1px #2a3c58, 0 0 18px rgba(79,179,255,.12); }
+[data-theme="bridge"] .tbl th { color: var(--accent); }
+[data-theme="bridge"] .tbl td { border-color: #1b2940; }
+[data-theme="bridge"] .tbl tr:hover td { background: rgba(79,179,255,.04); }
+[data-theme="bridge"] a { color: var(--accent); }
+[data-theme="bridge"] .lib-list a { color: var(--ink); }
+[data-theme="bridge"] .notice { background: var(--warn-soft); border-color: #6a4a12; }
+[data-theme="bridge"] .flash.success { border-color: #1d5a3c; }
+[data-theme="bridge"] .flash.error { border-color: #6b2620; }
+[data-theme="bridge"] input[type=checkbox] { accent-color: var(--accent); }
+
+/* Admiralty: a warm printed-wargame look, oxblood and brass. Georgia is a system serif; the
+   stack falls back to Times and then any serif, so nothing is fetched. */
+:root[data-theme="admiralty"] { --bg: #ece5d6; --panel: #fbf8f1; --panel-2: #f4eee2; --ink: #221c17; --muted: #75695b; --line: #d8ccb6; --accent: #8c2320; --accent-soft: #f4e2dc; --ok: #3d6b33; --ok-soft: #e5eedb; --warn: #9a6512; --warn-soft: #f7ead0; --bad: #a32a1f; --bad-soft: #f6dfda; --chrome: #231b17; --chrome-ink: #f3e9d6; --chrome-muted: #b9a585; --st-ready: #3d6b33; --st-damaged: #c48a1f; --st-docked: #2f4f7a; --st-lost: #a79c8c; --rs-ft2: #c48a1f; --rs-fb: #2f4f7a; --rs-ftcd: #3d6b33; --rs-ftpc: #6b3f7a; --rs-current: #4a3d33; --brass: #c9a25a; }
+[data-theme="admiralty"] body { background: var(--bg); }
+[data-theme="admiralty"] h2, [data-theme="admiralty"] .panel.head h2, [data-theme="admiralty"] .tile b { font-family: Georgia, "Times New Roman", serif; }
+[data-theme="admiralty"] .topbar { background: linear-gradient(180deg, #2b211c, #1d1613); border-bottom: 2px solid var(--brass); }
+[data-theme="admiralty"] .ruleset-strip { height: 4px; }
+[data-theme="admiralty"] .brand { font-family: Georgia, serif; font-size: 17px; letter-spacing: .5px; color: #f3e9d6; }
+[data-theme="admiralty"] .brand small { color: var(--brass); font-family: "IBM Plex Sans", sans-serif; }
+[data-theme="admiralty"] .fleet-select { background: #31261f; border-color: #4a3b30; }
+[data-theme="admiralty"] .tabs a { color: var(--chrome-muted); }
+[data-theme="admiralty"] .tabs a.on { background: var(--brass); color: #231b17; border-radius: 3px; }
+[data-theme="admiralty"] .tabs a:hover { color: #fff3dc; }
+[data-theme="admiralty"] .bar { background: #3a2d25; }
+[data-theme="admiralty"] .bar > i { background: var(--brass); }
+[data-theme="admiralty"] .btn { border-radius: 3px; background: var(--panel); border-color: #cbbb9f; }
+[data-theme="admiralty"] .btn.primary { background: var(--accent); border-color: #6e1714; color: #fff6ea; box-shadow: inset 0 -2px 0 rgba(0,0,0,.2); }
+[data-theme="admiralty"] .topbar .btn.primary { background: var(--brass); border-color: var(--brass); color: #231b17; }
+[data-theme="admiralty"] .panel, [data-theme="admiralty"] .tile { border-radius: 2px; border-color: var(--line); box-shadow: 0 1px 0 rgba(60,40,20,.08); }
+[data-theme="admiralty"] .panel h3 { color: var(--accent); border-bottom: 2px solid var(--accent); font-weight: 700; letter-spacing: 1.4px; }
+[data-theme="admiralty"] .panel.head { border-top: 4px double var(--accent); }
+[data-theme="admiralty"] .panel.head h2 { font-size: 22px; }
+[data-theme="admiralty"] .tile { border-top: 3px solid var(--brass); }
+[data-theme="admiralty"] .tile b { font-size: 24px; }
+[data-theme="admiralty"] .input { background: #fffdf8; border-color: #cbbb9f; border-radius: 2px; }
+[data-theme="admiralty"] .input:focus { outline: 2px solid rgba(140,35,32,.25); border-color: var(--accent); }
+[data-theme="admiralty"] .chip { border-radius: 2px; letter-spacing: .3px; }
+[data-theme="admiralty"] .chip.ok, [data-theme="admiralty"] .chip.st-ready { border-color: #bdd1b0; }
+[data-theme="admiralty"] .chip.warn, [data-theme="admiralty"] .chip.st-damaged { border-color: #e6cc99; }
+[data-theme="admiralty"] .chip.info, [data-theme="admiralty"] .chip.st-docked { background: #e3e9f1; border-color: #bccbe0; color: #2f4f7a; }
+[data-theme="admiralty"] .badge { border-radius: 2px; }
+[data-theme="admiralty"] .card { background: var(--panel); border-color: var(--line); border-radius: 2px; box-shadow: 2px 2px 0 rgba(60,40,20,.08); }
+[data-theme="admiralty"] .card .mini svg, [data-theme="admiralty"] .ssd-wrap svg, [data-theme="admiralty"] .sheet svg { background: #fffdf8; border: 1px solid #e3d8c3; }
+[data-theme="admiralty"] .tbl th { color: var(--accent); }
+[data-theme="admiralty"] .tbl tr:nth-child(even) td { background: rgba(201,162,90,.07); }
+[data-theme="admiralty"] .lib-list a.on { color: var(--accent); }
+[data-theme="admiralty"] input[type=checkbox] { accent-color: var(--accent); }
+
+/* Dark: the plain neutral-grey dark mode most sites offer; Classic's shapes, dark colours. */
+:root[data-theme="dark"] { --bg: #181a1d; --panel: #222429; --panel-2: #1c1e22; --ink: #e4e6ea; --muted: #9ba1ab; --line: #34373e; --accent: #6ea8fe; --accent-soft: #1e2a3d; --ok: #5cc78a; --ok-soft: #1a2c22; --warn: #e5a442; --warn-soft: #30261a; --bad: #f2766b; --bad-soft: #352020; --chrome: #111214; --chrome-ink: #e9eaee; --chrome-muted: #8e939c; --st-ready: #5cc78a; --st-damaged: #e5a442; --st-docked: #6ea8fe; --st-lost: #6b7079; --rs-ft2: #d99a3a; --rs-fb: #4f8fe0; --rs-ftcd: #45a872; --rs-ftpc: #9a74d0; --rs-current: #3a3d44; color-scheme: dark; }
+[data-theme="dark"] .topbar { border-bottom: 1px solid #2a2c31; }
+[data-theme="dark"] .fleet-select { background: #1d1f23; border-color: #33363c; }
+[data-theme="dark"] .tabs a.on { background: #2b2e34; }
+[data-theme="dark"] .bar { background: #2b2e34; }
+[data-theme="dark"] .bar > i { background: var(--accent); }
+[data-theme="dark"] .btn { background: #2b2e34; border-color: #3b3f46; color: var(--ink); }
+[data-theme="dark"] .btn:hover { background: #33363d; }
+[data-theme="dark"] .btn.primary { background: var(--accent); border-color: var(--accent); color: #0d1626; }
+[data-theme="dark"] .input { background: #1a1c20; color: var(--ink); border-color: #3b3f46; }
+[data-theme="dark"] .input:focus { outline: 2px solid rgba(110,168,254,.35); border-color: var(--accent); }
+[data-theme="dark"] .chip.ok, [data-theme="dark"] .chip.st-ready { border-color: #2c5a3e; }
+[data-theme="dark"] .chip.warn, [data-theme="dark"] .chip.st-damaged { border-color: #5e4620; }
+[data-theme="dark"] .chip.bad { border-color: #63302c; }
+[data-theme="dark"] .chip.info, [data-theme="dark"] .chip.st-docked { border-color: #2f4a72; }
+[data-theme="dark"] .notice { border-color: #5e4620; }
+[data-theme="dark"] .card .mini svg, [data-theme="dark"] .ssd-wrap svg, [data-theme="dark"] .sheet svg { background: #eceef1; border-radius: 4px; }
+[data-theme="dark"] input[type=checkbox] { accent-color: var(--accent); }
