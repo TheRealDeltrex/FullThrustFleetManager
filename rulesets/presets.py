@@ -179,6 +179,23 @@ def reclass(design: dict) -> tuple[str, str] | None:
     return None
 
 
+def class_for_code(ruleset_id: str, code: str, tmf: int = 0) -> tuple[str, str] | None:
+    """(label, code) of the ruleset's class with this code, any case, or None. FT2 repeats SC
+    (courier boat, scoutship), so there the one nearest the MASS wins."""
+    code = code.strip().upper()
+    if ruleset_id == "ft2":
+        matches = [c for table in ft2_data.BASIC_CLASSES.values() for c in table if c[1] == code]
+        if not matches:
+            return None
+        label, found, _m = min(matches, key=lambda c: (abs(c[2] - tmf), c[2]))
+        return ft2_data.class_label(label), found
+    for table in _tables(ruleset_id):
+        band = next((c for c in table if c[1] == code), None)
+        if band:
+            return fb_data.translated_class_label(band[0]), band[1]
+    return None
+
+
 def _nearest_band(tmf: int, table: tuple) -> tuple[str, str]:
     """The band holding tmf whose centre is nearest (ties to the smaller), as the type
     suggestion picks; past either end of the table, the end class."""
