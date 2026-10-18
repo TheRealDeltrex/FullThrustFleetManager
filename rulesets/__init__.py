@@ -99,6 +99,7 @@ class Ruleset(Protocol):
     option_keys: tuple[str, ...]  # the fleet options this ruleset offers, in display order
     catalog_sources: tuple[str, ...]  # rulesets whose catalog designs this one adopts
     dummy_bogey_points: int  # points per dummy bogey a fleet may buy; 0 offers none
+    hull_kinds: tuple[str, ...]  # what the Design tab's "Hull kind" offers, warship first
 
     def races(self) -> list[Race]: ...
 

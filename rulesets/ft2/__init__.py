@@ -70,6 +70,7 @@ class FT2Ruleset:
     )
     catalog_sources: tuple[str, ...] = ()
     dummy_bogey_points = 0
+    hull_kinds = ("warship", "merchant")
 
     @property
     def name(self) -> str:

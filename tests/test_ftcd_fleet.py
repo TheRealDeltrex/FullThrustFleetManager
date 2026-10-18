@@ -132,3 +132,79 @@ def test_fleet_details_form_saves_dummy_bogeys(client, tmp_path, monkeypatch):
     assert saved["dummy_bogeys"] == 1 and saved["options"]["cd_optional_systems"]
     page = client.get("/fleet").get_data(as_text=True)
     assert "incl. 1 dummy bogeys (20)" in page
+
+
+# ---- Jump gates, portals and starbase sections (CD pp.35, 51) ---------------------------------
+
+
+def gate(transfer: int, kind: str = "jump_gate", **kw) -> dict:
+    return design(**{"tmf": 20, "hull_boxes": 6, "ftl": False,
+                     "systems": [sys_("g", kind, transfer_mass=transfer)], **kw})
+
+
+def test_jump_gate_drive_moves_10_transfer_mass_per_mass():
+    from test_rules_ftcd import CD, system_row
+
+    row = system_row(gate(60), "g")
+    assert (row.mass, row.points) == (6, 12)  # CD p.35, paid as FTL at 2 a MASS
+    assert system_row(gate(64), "g").mass == 6 and system_row(gate(65), "g").mass == 7
+    assert system_row(gate(4), "g").mass == 1  # never 0 MASS (CD p.42)
+    assert CD.design_breakdown(gate(60), {}).derived["transfer_mass"] == 60
+
+
+def test_portal_drive_is_as_big_as_its_transfer_mass():
+    from test_rules_ftcd import system_row
+
+    row = system_row(gate(12, "portal", tmf=20, hull_boxes=2), "g")
+    assert (row.mass, row.points) == (12, 24)
+
+
+def test_gate_needs_hull_of_10_percent_of_transfer_mass_and_no_thrust():
+    from test_rules_ftcd import codes
+
+    assert "gate_hull" in codes(gate(70, hull_boxes=6))
+    assert "gate_hull" not in codes(gate(60, hull_boxes=6))
+    assert "stationary_thrust" in codes(gate(60, thrust=2))
+    assert "no_ftl" not in codes(gate(60))
+
+
+def test_gate_is_jump_gate_or_portal_not_both():
+    from test_rules_ftcd import codes
+
+    both = gate(20, systems=[sys_("a", "jump_gate", transfer_mass=20),
+                             sys_("b", "portal", transfer_mass=2)])
+    assert "gate_and_portal" in codes(both)
+
+
+def test_starbase_section_is_stationary():
+    from test_rules_ftcd import CD, codes
+
+    section = design(hull_kind="starbase", tmf=100, hull_boxes=30, thrust=0, ftl=False)
+    assert "stationary_thrust" not in codes(section) and "no_ftl" not in codes(section)
+    assert "stationary_thrust" in codes({**section, "thrust": 1})
+    assert CD.suggest_type(section)[1] == "SB"
+    assert CD.suggest_type(gate(60))[1] == "JG"
+    assert CD.suggest_type(gate(6, "portal"))[1] == "PT"
+
+
+def test_starbases_and_gates_are_not_battle_riders():
+    section = design(hull_kind="starbase", tmf=200, hull_boxes=60, ftl=False)
+    f, designs = cd_fleet((section, "ready"), (gate(60), "ready"))
+    assert fleet_codes(f, designs) == {}
+
+
+def test_design_tab_offers_starbase_only_for_cross_dimensions(client, tmp_path, monkeypatch):
+    import store
+
+    monkeypatch.setenv("FTFM_DATA_DIR", str(tmp_path))
+    cd, _ = store.new_design("ftcd", "human", None, "Station", "")
+    fb, _ = store.new_design("fb", "human", None, "Ship", "")
+    assert 'value="starbase"' in client.get(f"/design/{cd['id']}").get_data(as_text=True)
+    assert 'value="starbase"' not in client.get(f"/design/{fb['id']}").get_data(as_text=True)
+
+
+def test_gate_draws_its_transfer_mass():
+    import ssd_layout
+
+    svg = ssd_layout.to_svg(ssd_layout.layout(gate(60)))
+    assert "GATE 60" in svg

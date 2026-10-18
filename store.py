@@ -194,7 +194,8 @@ def normalize_design(doc: object) -> dict | None:
         "name": _as_str(doc.get("name"), _("Unnamed design"), 80),
         "type_label": _as_str(doc.get("type_label"), limit=60),
         "type_code": _as_str(doc.get("type_code"), limit=8),
-        "hull_kind": "merchant" if doc.get("hull_kind") == "merchant" else "warship",
+        # A ruleset that knows no starbases reads one as a warship (only FTCD offers it).
+        "hull_kind": doc["hull_kind"] if doc.get("hull_kind") in ("merchant", "starbase") else "warship",
         "tmf": _as_int(doc.get("tmf"), 10, 0, 10000),
         "hull_boxes": _as_int(doc.get("hull_boxes"), 0, 0, 10000),
         "armour": _as_int(doc.get("armour"), 0, 0, 10000),

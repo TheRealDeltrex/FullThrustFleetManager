@@ -43,6 +43,14 @@ MAX_STAGES = 3
 RIDER_MAX_MASS = 60
 DUMMY_BOGEY_POINTS = 20
 
+# CD p.35: an artificial jump gate's FTL drive moves 10 transfer MASS per MASS of drive; a
+# portal's drive is as big as its transfer MASS. Either needs hull boxes of 10% of it.
+GATE_TRANSFER_PER_MASS = 10
+GATE_TYPES = frozenset({"jump_gate", "portal"})
+
+# The Design tab's hull kinds. A starbase section is always thrust 0 (CD p.51).
+HULL_KINDS = ("warship", "merchant", "starbase")
+
 # CD p.42: escorts up to MASS 44, cruisers up to 90, anything bigger is a capital; 300 at most.
 ESCORT_MAX, CRUISER_MAX, MAX_MASS = 44, 90, 300
 
@@ -84,11 +92,12 @@ SUPER_WEAPONS = {"nova_cannon", "wave_gun", "reflex_field", "cloak"}
 
 def system_defs() -> list[SystemDef]:
     """The Add-system picker, grouped and in the book's order within each group."""
-    weapons, missiles, defence, craft, sensors, special, other = (
+    weapons, missiles, defence, craft, gates, sensors, special, other = (
         _("Weapons"),
         _("Missiles"),
         _("Defences"),
         _("Hangars and bays"),
+        _("Jump gates and portals"),
         _("Sensors and ECM"),
         _("Special systems"),
         _("Holds"),
@@ -133,6 +142,10 @@ def system_defs() -> list[SystemDef]:
                   (ParamDef("capacity", "int", _("Craft MASS carried"), 10, 1, None),), **ref(34)),
         SystemDef("tug_drive", _("Tug jump drive"), craft,
                   (ParamDef("tow_mass", "int", _("Towable MASS"), 50, 1, None),), **ref(34)),
+        SystemDef("jump_gate", _("Jump gate drive"), gates,
+                  (ParamDef("transfer_mass", "int", _("Transfer MASS"), 60, 1, None),), **ref(35)),
+        SystemDef("portal", _("Portal drive"), gates,
+                  (ParamDef("transfer_mass", "int", _("Transfer MASS"), 20, 1, None),), **ref(35)),
         SystemDef("enhanced_sensors", _("Enhanced sensors"), sensors, **ref(37)),
         SystemDef("superior_sensors", _("Superior sensors"), sensors, **ref(37)),
         SystemDef("weasel_cruiser", _("Weasel emitter (cruiser)"), sensors, **ref(38)),

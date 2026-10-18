@@ -284,7 +284,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)`,
   `quickref(systems_present, options, races)`, `fleet_issues(fleet, [(ship, design)], options)`
   (rules that judge the whole fleet; `fleet_report` adds them to `fleet_issues`) and
-  `dummy_bogey_points` (0 offers none; `fleet_rules.fleet_points` adds the fleet's
+  `hull_kinds` (the Design tab's "Hull kind" choices) and `dummy_bogey_points` (0 offers none; `fleet_rules.fleet_points` adds the fleet's
   `dummy_bogeys` at that price). `loadout=None` means the design's default loadout.
 - **Races are additive modules inside a ruleset, never new rulesets** (PLAN 3 decision 3). A tech
   module is a plain module exposing the per-design half of the protocol (`system_defs()`,
@@ -438,6 +438,12 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   lifts the mothership check (CD p.35). Dummy bogeys (`fleet["dummy_bogeys"]`, CD p.37) cost 20,
   at most one per live ship, and need `cd_optional_systems`; the Fleet details form offers them
   as a dropdown.
+- Gates and starbases (CD pp.35, 51) need no new design field. A gate is a design carrying a
+  `jump_gate` or `portal` system {transfer_mass}: the drive is 1 MASS per 10 transfer (a portal
+  1 per 1), paid as FTL at 2 a MASS; hull boxes at least 10% of the transfer MASS; one kind per
+  gate. A starbase section is `hull_kind` "starbase" (FTCD's `hull_kinds` alone offers it; other
+  rulesets read it as a warship). Both are `rules.stationary()`: thrust must be 0, no "no FTL"
+  note, and the fleet's battle-rider check skips them. The sheet draws "GATE n" / "PORT n".
 - Catalog: CD prints no designs ("all of the ships in fleet book 1 can be used unchanged", p.3),
   so it adopts the FB catalog at load time: `catalog_sources = ("fb",)` and `adopt_design()`
   (Ruleset protocol; FB and FT2 adopt nothing). `store._catalog()` calls it once per FB design:

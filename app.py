@@ -525,7 +525,8 @@ def _apply_form(design: dict) -> dict:
     design["name"] = form.get("name", design["name"]).strip()[:80] or design["name"]
     design["type_label"] = form.get("type_label", "").strip()[:60]
     design["type_code"] = form.get("type_code", "").strip()[:8]
-    design["hull_kind"] = "merchant" if form.get("hull_kind") == "merchant" else "warship"
+    kinds = getattr(RULESETS.get(design["ruleset"]), "hull_kinds", ("warship",))
+    design["hull_kind"] = form.get("hull_kind") if form.get("hull_kind") in kinds else "warship"
     design["faction"] = form.get("faction") or None
     for field in ("tmf", "hull_boxes", "armour", "thrust"):
         if form.get(field) is not None:
