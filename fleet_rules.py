@@ -20,7 +20,7 @@ FLEET_OPTION_KEYS = (
     "core_systems", "rerolls", "fighter_endurance", "vector_movement",
     "mt_systems", "mt_superships", "mt_fighters",
     "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence", "cd_cpv",
-    "cd_advanced_ftl",
+    "cd_advanced_ftl", "cd_patrol_battle", "cd_capital_limit",
 )
 
 
@@ -38,6 +38,8 @@ def option_label(key: str) -> str:
         "cd_multistage": _("Multi-stage missiles"),
         "cd_super_weapons": _("Nova cannon, wave gun, reflex field, cloak"),
         "cd_system_defence": _("System defence ships (non-FTL)"),
+        "cd_patrol_battle": _("Patrol battle: no capitals, at most half the points on cruisers"),
+        "cd_capital_limit": _("At most half the points on capital ships"),
         "cd_cpv": _("Combat Points Value (CPV) hull cost"),
         "cd_advanced_ftl": _("Pay for advanced FTL"),
     }.get(key, key)
@@ -93,6 +95,15 @@ def dummy_bogeys(fleet: dict) -> int:
 def dummy_bogey_points(fleet: dict) -> int:
     rs = ruleset_of(fleet)
     return dummy_bogeys(fleet) * rs.dummy_bogey_points if rs else 0
+
+
+def morale(fleet: dict, designs: dict) -> tuple[int, int] | None:
+    """(MASS destroyed, MASS at which the fleet withdraws), where the ruleset has a fleet morale
+    rule (CD p.40). Ships whose design is missing count for nothing."""
+    rs = ruleset_of(fleet)
+    ships = [(s, designs[s.get("design_id")]) for s in fleet.get("ships", [])
+             if s.get("design_id") in designs]
+    return rs.morale_mass(ships) if rs and ships else None
 
 
 def fleet_points(fleet: dict, designs: dict) -> int:
