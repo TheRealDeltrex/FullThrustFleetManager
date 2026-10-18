@@ -397,3 +397,20 @@ def test_a_fleet_offers_only_its_rulesets_options_by_name(client):
     })
     options = store.get_fleet(fleet_id)["options"]
     assert options["cd_cpv"] is True and options["cd_advanced_ftl"] is False
+
+
+def test_card_and_details_edits_save_as_made_without_a_message(client):
+    fleet_id = make_fleet(client)
+    add_ship(client, fleet_id)
+    uid = store.get_fleet(fleet_id)["ships"][0]["uid"]
+    page = text(client.post(f"/fleet/{fleet_id}/action", data={
+        "action": "update_ship", "autosave": "1", "uid": uid, "status": "damaged", "squadron": "sq1",
+    }, follow_redirects=True))
+    assert store.get_fleet(fleet_id)["ships"][0]["status"] == "damaged"
+    assert 'class="flash success"' not in page
+    assert 'data-autosave="update_ship"' in page and 'data-autosave="update_details"' in page
+    page = text(client.post(f"/fleet/{fleet_id}/action", data={
+        "action": "update_details", "autosave": "1", "name": "Task Force",
+    }, follow_redirects=True))
+    assert store.get_fleet(fleet_id)["name"] == "Task Force"
+    assert "Fleet updated." not in page

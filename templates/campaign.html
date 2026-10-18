@@ -32,7 +32,8 @@
             </form>
 
             <div class="stack">
-              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="stack">
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="stack"
+                    data-autosave="set_damage">
                 <input type="hidden" name="uid" value="{{ ship.uid }}" />
                 <div class="grid-fields">
                   <label>{{ _("Hull damage") }}
@@ -58,12 +59,13 @@
                     {% endfor %}
                   </fieldset>
                 {% endif %}
-                <div class="row">
+                <noscript><div class="row">
                   <button class="btn primary" type="submit" name="action" value="set_damage">{{ _("Record damage") }}</button>
-                </div>
+                </div></noscript>
               </form>
 
-              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row"
+                    data-autosave="update_ship">
                 <input type="hidden" name="uid" value="{{ ship.uid }}" />
                 <select class="input" name="status" aria-label="{{ _('Status') }}">
                   {% for status in statuses %}
@@ -72,7 +74,7 @@
                 </select>
                 <input class="input" name="location" value="{{ ship.location }}"
                        placeholder="{{ _('Location') }}" aria-label="{{ _('Location') }}" />
-                <button class="btn" type="submit" name="action" value="update_ship">{{ _("Apply") }}</button>
+                <noscript><button class="btn" type="submit" name="action" value="update_ship">{{ _("Apply") }}</button></noscript>
               </form>
 
               {# Repairs and replenishment at a base: FT p.35. Dice are optional; type a result. #}

@@ -660,3 +660,52 @@ def test_the_faction_toggles_are_saved_settings(client):
     assert settings["show_other_race_factions"] is True and settings["show_custom_factions"] is False
     body = client.get("/design").get_data(as_text=True)
     assert re.search(r'data-toggle="show_other_race_factions"\s+checked', body)
+
+
+# ---- Edits save as they are made (static/autosave.js) ----------------------------------------------
+
+
+def test_an_autosaved_edit_goes_straight_to_the_library_without_a_message(client):
+    design_id = make(client)
+    data = fields(store.get_design(design_id), thrust=6, allow_rule_breaking="on",
+                  action="autosave", autosave="1")
+    page = client.post(f"/design/{design_id}", data=data, follow_redirects=True).get_data(as_text=True)
+    assert store.get_design(design_id)["thrust"] == 6
+    assert store.get_draft(design_id) is None
+    assert "Design saved." not in page and "Unsaved changes" not in page
+    assert 'data-autosave="autosave"' in page
+
+
+def test_an_autosaved_system_added_is_saved_too(client):
+    design_id = make(client)
+    data = fields(store.get_design(design_id), allow_rule_breaking="on",
+                  action="add_system", system_type="beam", autosave="1")
+    page = client.post(f"/design/{design_id}", data=data, follow_redirects=True).get_data(as_text=True)
+    assert [s["type"] for s in store.get_design(design_id)["systems"]] == ["beam"]
+    assert "System added" not in page
+
+
+def test_an_autosaved_edit_to_a_design_ships_use_waits_for_refit_or_variant(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="save", allow_rule_breaking="on"))
+    fleet, _msg = store.create_fleet("fb", "Home Fleet")
+    store.add_ship(fleet, design_id)
+    store.save_fleet(fleet)
+    saved = store.get_design(design_id)
+    page = client.post(f"/design/{design_id}", data=fields(saved, thrust=6, allow_rule_breaking="on",
+                                                          action="autosave", autosave="1"),
+                       follow_redirects=True).get_data(as_text=True)
+    assert store.get_design(design_id)["thrust"] == saved["thrust"]
+    assert store.get_draft(design_id)["thrust"] == 6
+    assert "Unsaved changes" in page and "Refit all 1 ships" in page
+
+
+def test_six_arcs_read_fore_then_aft_with_a_gap(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="beam"))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    arcs = re.findall(r'name="sys-[^"]+-arcs" value="(\w+)"', page)
+    assert arcs == ["F", "FP", "FS", "A", "AP", "AS"]
+    assert re.search(r'<label class="arc aft"><input type="checkbox" name="sys-[^"]+-arcs" value="A"', page)
