@@ -6,6 +6,8 @@ on:
     # files, so there is nothing there to test.
     branches: [devversion]
   pull_request:
+    # A pull request into `main` only touches those files too.
+    branches-ignore: [main]
   workflow_dispatch:
 
 permissions:
