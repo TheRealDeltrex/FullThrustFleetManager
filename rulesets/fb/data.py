@@ -7,7 +7,7 @@ hull box count), FB2 p.4 (fighter types). Page numbers are printed pages.
 from __future__ import annotations
 
 from i18n import _
-from rulesets import BookRef, ParamDef, SystemDef
+from rulesets import BookRef, ParamDef, SystemDef, common
 
 BOOKS = (
     BookRef("FB1", "Full Thrust Fleet Book 1", "Fleet Book 1.pdf", 0),
@@ -58,36 +58,9 @@ CARRIER_MIN_BAYS = 2
 HULL_DESCRIPTORS = ((45, "Super"), (35, "Strong"), (25, "Average"), (15, "Weak"), (0, "Fragile"))
 
 
-def translated_class_label(label: str) -> str:
-    return {
-        "Scout or Courier": _("Scout or Courier"),
-        "Corvette": _("Corvette"),
-        "Frigate": _("Frigate"),
-        "Destroyer": _("Destroyer"),
-        "Heavy Destroyer": _("Heavy Destroyer"),
-        "Light Cruiser": _("Light Cruiser"),
-        "Patrol or Escort Cruiser": _("Patrol or Escort Cruiser"),
-        "Heavy Cruiser": _("Heavy Cruiser"),
-        "Battlecruiser": _("Battlecruiser"),
-        "Battleship": _("Battleship"),
-        "Heavy Battleship": _("Heavy Battleship"),
-        "Dreadnought": _("Dreadnought"),
-        "Superdreadnought": _("Superdreadnought"),
-        "Escort Carrier": _("Escort Carrier"),
-        "Light Carrier": _("Light Carrier"),
-        "Heavy Carrier": _("Heavy Carrier"),
-        "Merchant": _("Merchant"),
-    }[label]
-
-
-def translated_hull_descriptor(label: str) -> str:
-    return {
-        "Fragile": _("Fragile"),
-        "Weak": _("Weak"),
-        "Average": _("Average"),
-        "Strong": _("Strong"),
-        "Super": _("Super"),
-    }[label]
+# Shared with the other Fleet Book family rulesets (rulesets/common.py).
+translated_class_label = common.class_label
+translated_hull_descriptor = common.hull_descriptor_label
 
 
 def fighter_type_label(ftype: str) -> str:
