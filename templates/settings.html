@@ -34,6 +34,22 @@
     </div>
 
     <div class="panel">
+      <h3>{{ _("Appearance") }}</h3>
+      <div class="body">
+        <form method="post" action="{{ url_for('settings_save') }}" class="row">
+          <label>{{ _("Look") }}
+            <select class="input" name="theme">
+              {% for value, label in (("classic", _("Classic")), ("dark", _("Dark")), ("bridge", _("Bridge: dark console")), ("admiralty", _("Admiralty: warm rulebook"))) %}
+                <option value="{{ value }}" {% if settings.theme == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <button class="btn primary" type="submit">{{ _("Save settings") }}</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel">
       <h3>{{ _("Language") }}</h3>
       <div class="body">
         <select class="input" disabled>

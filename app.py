@@ -81,6 +81,7 @@ def _inject_globals() -> dict:
         "IS_FROZEN": paths.is_frozen(),
         "APP_VERSION": APP_VERSION,
         "LANG": i18n.get_language(),
+        "THEME": store.load_settings()["theme"],
     }
 
 
@@ -903,8 +904,9 @@ def settings() -> str:
 
 @app.route("/settings", methods=["POST"])
 def settings_save() -> Response:
-    ok, msg = store.save_settings(paper=request.form.get("paper", "A4"),
-                                  pdf_viewer=request.form.get("pdf_viewer", "app"))
+    # Each Settings panel posts its own fields; a field a form leaves out keeps its value.
+    fields = ("paper", "pdf_viewer", "theme")
+    ok, msg = store.save_settings(**{k: request.form[k] for k in fields if k in request.form})
     flash(msg, "success" if ok else "error")
     return redirect(url_for("settings"))
 

@@ -28,7 +28,10 @@ from rulesets import RULESETS, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
-DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "language": "en", "last_backup": None}
+DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "language": "en",
+                    "last_backup": None}
+# Appearance choices, keyed on <html data-theme> in static/style.css.
+THEMES = ("classic", "dark", "bridge", "admiralty")
 
 
 def new_id() -> str:
@@ -907,6 +910,8 @@ def load_settings() -> dict:
         out["paper"] = doc["paper"]
     if doc.get("pdf_viewer") in ("app", "system"):
         out["pdf_viewer"] = doc["pdf_viewer"]
+    if doc.get("theme") in THEMES:
+        out["theme"] = doc["theme"]
     if isinstance(doc.get("language"), str):
         out["language"] = doc["language"]
     if isinstance(doc.get("last_backup"), str):
