@@ -29,7 +29,7 @@ class FTCDRuleset:
     # then play rules the quick reference adds. Re-rolls are standard in CD (p.14), so no toggle.
     option_keys = (
         "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence",
-        "cd_cpv", "cd_advanced_ftl",
+        "cd_cpv", "cd_advanced_ftl", "cd_patrol_battle", "cd_capital_limit",
         "core_systems", "fighter_endurance", "vector_movement",
     )
 
@@ -47,8 +47,16 @@ class FTCDRuleset:
 
     def fleet_issues(self, fleet_doc: dict, ships: list[tuple[dict, dict]],
                      options: dict) -> list[Issue]:
-        """Battle riders and motherships, system defence ships, dummy bogeys (CD pp.34-37)."""
-        return fleet.fleet_issues(fleet_doc, ships, options)
+        """Battle riders and motherships, system defence ships, dummy bogeys and the
+        composition limits (CD pp.34-37, 57)."""
+        def points(ship: dict, design: dict) -> int:
+            return (self.design_breakdown(design, options).points
+                    + self.loadout_points(design, ship.get("loadout"), options))
+        return fleet.fleet_issues(fleet_doc, ships, options, points)
+
+    def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
+        """(MASS lost, MASS at which the fleet withdraws), CD p.40; None where no rule."""
+        return fleet.morale_mass(ships)
 
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *aliens.races()]
