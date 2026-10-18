@@ -76,12 +76,14 @@ APP_VERSION = paths.app_version()
 
 @app.context_processor
 def _inject_globals() -> dict:
+    settings = store.load_settings()
     return {
         "BROWSER_MODE": BROWSER_MODE,
         "IS_FROZEN": paths.is_frozen(),
         "APP_VERSION": APP_VERSION,
         "LANG": i18n.get_language(),
-        "THEME": store.load_settings()["theme"],
+        "THEME": settings["theme"],
+        "SETTINGS": settings,
     }
 
 
@@ -504,13 +506,29 @@ def design_detail(design_id: str) -> str:
     )
 
 
+NEW_FACTION = "__new__"
+
+
+def _chosen_faction(form, race: str) -> tuple[str | None, str]:
+    """A faction picker's value. "New faction" names one in the box beside it, made on the spot
+    for the design's race; with the box empty the choice stays NEW_FACTION and the caller says so."""
+    faction = form.get("faction") or None
+    if faction != NEW_FACTION:
+        return faction, ""
+    fid, msg = store.faction_for_name(form.get("new_faction", ""), race)
+    return (fid, msg) if fid else (NEW_FACTION, msg)
+
+
 @app.route("/design/new", methods=["POST"])
 def design_new() -> Response:
     fleet = current_fleet()
+    race = request.form.get("race") or (fleet or {}).get("race") or "human"
+    faction, msg = _chosen_faction(request.form, race)
+    if faction == NEW_FACTION:
+        flash(msg, "error")
+        return redirect(url_for("design"))
     created, msg = store.new_design(
-        request.form.get("ruleset", ""),
-        request.form.get("race") or (fleet or {}).get("race") or "human",
-        request.form.get("faction") or None, request.form.get("name", ""),
+        request.form.get("ruleset", ""), race, faction, request.form.get("name", ""),
         request.form.get("class_preset", ""),
     )
     flash(msg, "success" if created else "error")
@@ -528,7 +546,9 @@ def _apply_form(design: dict) -> dict:
     design["type_code"] = form.get("type_code", "").strip()[:8]
     kinds = getattr(RULESETS.get(design["ruleset"]), "hull_kinds", ("warship",))
     design["hull_kind"] = form.get("hull_kind") if form.get("hull_kind") in kinds else "warship"
-    design["faction"] = form.get("faction") or None
+    faction, _msg = _chosen_faction(form, design.get("race") or "human")
+    if faction != NEW_FACTION:  # "New faction" with no name keeps the faction it had
+        design["faction"] = faction
     for field in ("tmf", "hull_boxes", "armour", "thrust"):
         if form.get(field) is not None:
             design[field] = max(0, int(form.get(field) or 0))
@@ -924,6 +944,14 @@ def settings_save() -> Response:
         return redirect(nxt)
     flash(msg, "success" if ok else "error")
     return redirect(url_for("settings"))
+
+
+@app.route("/settings/factions", methods=["POST"])
+def settings_factions() -> tuple[str, int]:
+    """The faction pickers' show/hide toggles, posted in the background as they are ticked."""
+    keys = ("show_custom_factions", "show_other_race_factions")
+    store.save_settings(**{k: request.form[k] == "1" for k in keys if k in request.form})
+    return "", 204
 
 
 @app.route("/heartbeat", methods=["POST"])
