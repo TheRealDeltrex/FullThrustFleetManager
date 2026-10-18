@@ -222,3 +222,16 @@ def test_the_viewer_may_be_framed_by_its_own_page(client):
     headers = client.get("/rulebook/FB1").headers
     assert headers["X-Frame-Options"] == "SAMEORIGIN"
     assert "frame-ancestors 'self'" in headers["Content-Security-Policy"]
+
+
+def test_books_are_listed_in_publication_order(client):
+    import app as app_module
+
+    order = ["FT", "MT", "FB1", "FB2", "CD", "PC", "PCE"]
+    assert [b.code for b in app_module.books_in_order()] == order
+    page = text(client.get("/rulebook/FT"))
+    assert [page.index(f">{code}</a>") for code in order] == sorted(
+        page.index(f">{code}</a>") for code in order)
+    settings = text(client.get("/settings"))
+    titles = [app_module.books()[code].title for code in order]
+    assert [settings.index(t) for t in titles] == sorted(settings.index(t) for t in titles)
