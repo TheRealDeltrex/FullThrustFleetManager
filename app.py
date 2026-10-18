@@ -38,7 +38,7 @@ import ssd_layout
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
-from rulesets import REFERENCE_BOOKS, RULESETS, common, presets
+from rulesets import REFERENCE_BOOKS, RULESETS, book_sort_key, common, presets
 from rulesets.fb import data as fb_data
 
 logger = logging.getLogger(__name__)
@@ -971,6 +971,11 @@ def books() -> dict[str, object]:
     return shipped
 
 
+def books_in_order() -> list:
+    """The shipped books in publication order (FT, MT, FB1, FB2, CD, PC, PCE)."""
+    return sorted(books().values(), key=lambda b: book_sort_key(b.code))
+
+
 def book_url(code: str, page: int | None = None) -> str:
     """The link behind every "FB1 p.16" in the UI."""
     return url_for("rulebook", code=code, page=page or 0)
@@ -991,7 +996,7 @@ def rulebook(code: str) -> str | Response:
         # the OS open it (desktop only; the web build has nowhere to hand it to).
         return redirect(url_for("rulebook_file", code=code) + f"#page={pdf_page}")
     return render_template("rulebook.html", active_tab="settings", book=book, page=page,
-                           pdf_page=pdf_page, books=sorted(books().values(), key=lambda b: b.code))
+                           pdf_page=pdf_page, books=books_in_order())
 
 
 @app.route("/rulebook/<code>/file")
@@ -1009,7 +1014,7 @@ def rulebook_file(code: str) -> Response:
 def settings() -> str:
     return render_template("settings.html", active_tab="settings", languages=i18n.LANGUAGES,
                            settings=store.load_settings(),
-                           books=sorted(books().values(), key=lambda b: b.code))
+                           books=books_in_order())
 
 
 @app.route("/settings", methods=["POST"])
