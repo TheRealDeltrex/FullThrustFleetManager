@@ -225,13 +225,79 @@ def _inject_current_fleet() -> dict:
     }
 
 
+# The Add ship list shows the fleet's own faction, every faction, or the factions the player
+# ticks; the choice is kept per fleet. Designs without a faction tick as this pseudo-faction.
+NO_FACTION = "-"
+SHIP_LIST_MODES = ("own", "all", "pick")
+
+
+def _ship_list(fleet: dict) -> dict:
+    """The fleet's Add ship filter: {"mode", "factions"}. A fleet without a faction has no
+    "own" list, so it starts on all."""
+    saved = (session.get("ship_lists") or {}).get(fleet["id"]) or {}
+    mode = saved.get("mode")
+    if mode not in SHIP_LIST_MODES or (mode == "own" and not fleet["faction"]):
+        mode = "own" if fleet["faction"] else "all"
+    if mode == "own":
+        return {"mode": mode, "factions": [fleet["faction"]]}
+    picked = saved.get("factions")
+    if not isinstance(picked, list):
+        picked = [fleet["faction"]] if fleet["faction"] else []
+    return {"mode": mode, "factions": [f for f in picked if isinstance(f, str)]}
+
+
+def _remember_ship_list(fleet: dict) -> None:
+    args = request.args
+    if "ships" in args:
+        mode = args.get("ships")
+    else:
+        # The old Show all ships toggle: a hidden 0 before the checkbox's 1.
+        mode = "all" if args.getlist("all_ships")[-1] == "1" else "own"
+    if mode not in SHIP_LIST_MODES:
+        return
+    saved = dict((session.get("ship_lists") or {}).get(fleet["id"]) or {})
+    saved["mode"] = mode
+    if mode == "pick" and "factions_sent" in args:
+        saved["factions"] = args.getlist("faction")[:100]
+    lists = dict(session.get("ship_lists") or {})
+    lists[fleet["id"]] = saved
+    session["ship_lists"] = lists
+
+
+def _faction_groups(designs: list[dict], factions: list[dict], keep: str | None = None) -> list[dict]:
+    """Designs grouped by faction in the faction pickers' order (built-in, then custom), any
+    other faction after them and factionless designs last; inside a group smallest class
+    first, then points (the catalog order). ``keep`` adds that faction even with no designs."""
+    order = {f["id"]: i for i, f in enumerate(factions)}
+    by_faction: dict[str, list[dict]] = {}
+    if keep:
+        by_faction[keep] = []
+    for d in designs:
+        by_faction.setdefault(d["faction"] or NO_FACTION, []).append(d)
+
+    def rank(fid: str) -> tuple:
+        return (fid == NO_FACTION, order.get(fid, len(order)), fid)
+
+    return [
+        {"id": fid,
+         "name": _("No faction") if fid == NO_FACTION else store.faction_name(fid),
+         "designs": sorted(by_faction[fid], key=lambda d: (
+             _class_rank(d), d.get("points", 0), d["name"].lower()))}
+        for fid in sorted(by_faction, key=rank)
+    ]
+
+
 def _fleet_context(fleet: dict, view: str) -> dict:
     designs = store.designs_for_fleet(fleet)
-    every_design = sorted(store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"]),
-                          key=lambda d: d["name"].lower())
-    # A fleet with a faction is offered that faction's ships unless the player asks for all.
-    show_all = not fleet["faction"] or session.get("all_ships", False)
-    library = every_design if show_all else [d for d in every_design if d["faction"] == fleet["faction"]]
+    options = fleet_rules.fleet_options(fleet)
+    every_design = store.list_designs(fleet["ruleset"]) + store.catalog_designs(fleet["ruleset"])
+    for d in every_design:
+        d["points"] = fleet_rules.design_points(d, options)
+    factions = store.faction_choices(fleet["ruleset"], keep=fleet["faction"])
+    ship_list = _ship_list(fleet)
+    library = [d for d in every_design if ship_list["mode"] == "all"
+               or (d["faction"] or NO_FACTION) in ship_list["factions"]]
+    groups = _faction_groups(library, factions)
     report = fleet_rules.fleet_report(fleet, designs)
     sheets = {
         s["uid"]: Markup(ssd_layout.to_svg(ssd_layout.layout(
@@ -255,10 +321,13 @@ def _fleet_context(fleet: dict, view: str) -> dict:
         "morale": fleet_rules.morale(fleet, designs),
         "dummy_bogey_points": fleet_rules.dummy_bogey_points(fleet),
         "library": library,
+        "library_groups": groups,
         "library_total": len(every_design),
-        "show_all_ships": show_all,
+        "ship_list": ship_list,
+        # The factions the Pick list offers: those with a design in this ruleset, plus the fleet's.
+        "library_factions": _faction_groups(every_design, factions, keep=fleet["faction"]),
         "faction_name": store.faction_name(fleet["faction"], fleet["ruleset"]),
-        "factions": store.faction_choices(fleet["ruleset"], keep=fleet["faction"]),
+        "factions": factions,
         # Only the options this fleet's ruleset offers, in its order, with readable names.
         "option_keys": fleet_rules.ruleset_option_keys(fleet["ruleset"]),
         "option_label": fleet_rules.option_label,
@@ -271,9 +340,8 @@ def fleet_overview() -> str:
     if not fleet:
         return render_template("fleet.html", active_tab="fleet_overview", selected=None,
                                rulesets=list(RULESETS.values()))
-    if "all_ships" in request.args:
-        # The toggle posts a hidden 0 before the checkbox's 1, so the last value is the box.
-        session["all_ships"] = request.args.getlist("all_ships")[-1] == "1"
+    if "ships" in request.args or "all_ships" in request.args:
+        _remember_ship_list(fleet)
     return render_template("fleet.html", active_tab="fleet_overview",
                            selected=_fleet_context(fleet, request.args.get("view", "cards")),
                            rulesets=list(RULESETS.values()))
