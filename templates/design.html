@@ -143,8 +143,9 @@
         <div class="panel body muted">{{ _("This is a catalog design and cannot be edited.") }}</div>
       {% endif %}
 
+      {# Every change saves itself (static/autosave.js); the buttons in <noscript> are the fallback. #}
       <form method="post" action="{{ url_for('design_update', design_id=d.id) }}" class="workbench"
-            {% if selected.read_only %}inert{% endif %}>
+            data-autosave="autosave" {% if selected.read_only %}inert{% endif %}>
         <div class="panel">
           <h3>{{ _("Hull and drives") }}</h3>
           <div class="body grid-fields">
@@ -274,8 +275,11 @@
                       {% endfor %}
                       {% if 'arcs' in system %}
                         <input type="hidden" name="sys-{{ system.uid }}-arcs-present" value="1" />
-                        {% for arc in selected.ruleset.arcs %}
-                          <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
+                        {# Six arcs read fore then aft, port before starboard, with a gap between
+                           the two halves; other rulesets keep their own order. #}
+                        {% set six = ("F", "FP", "FS", "A", "AP", "AS") %}
+                        {% for arc in (six if selected.ruleset.arcs|sort == six|sort else selected.ruleset.arcs) %}
+                          <label class="arc{% if arc == 'A' and selected.ruleset.arcs|length == 6 %} aft{% endif %}"><input type="checkbox" name="sys-{{ system.uid }}-arcs" value="{{ arc }}"
                             {% if arc in system.arcs %}checked{% endif %} /> {{ arc }}</label>
                         {% endfor %}
                       {% endif %}
@@ -287,7 +291,7 @@
                     {% if system %}
                       {# The uid rides on the button's formaction, so removing needs no script. #}
                       <button class="btn sm ghost" type="submit" name="action" value="remove_system"
-                              formnovalidate title="{{ _('Remove') }}"
+                              formnovalidate data-autosave-click title="{{ _('Remove') }}"
                               formaction="{{ url_for('design_update', design_id=d.id, uid=system.uid) }}">&times;</button>
                     {% endif %}
                   </td>
@@ -296,13 +300,13 @@
             </tbody>
           </table>
           <div class="body row">
-            <select class="input grow" name="system_type" aria-label="{{ _('System to add') }}">
+            <select class="input grow" name="system_type" aria-label="{{ _('System to add') }}" data-no-autosave>
               {% for definition in selected.system_types %}
                 <option value="{{ definition.type }}"
                   {% if definition.type == last_system_type %}selected{% endif %}>{{ definition.group }} · {{ definition.label }}</option>
               {% endfor %}
             </select>
-            <button class="btn" type="submit" name="action" value="add_system">{{ _("Add system") }}</button>
+            <button class="btn" type="submit" name="action" value="add_system" data-autosave-click>{{ _("Add system") }}</button>
           </div>
         </div>
 
@@ -425,7 +429,7 @@
             {% if d.allow_rule_breaking %}checked{% endif %} />
             {{ _("Allow rule-breaking (calculation-only bookkeeping)") }}</label>
           <div class="spacer"></div>
-          <button class="btn" type="submit" name="action" value="apply">{{ _("Recalculate") }}</button>
+          <noscript><button class="btn" type="submit" name="action" value="apply">{{ _("Recalculate") }}</button></noscript>
           {% if selected.dirty %}
             <button class="btn ghost" type="submit" name="action" value="discard" formnovalidate>{{ _("Discard changes") }}</button>
           {% endif %}
@@ -435,8 +439,8 @@
             <button class="btn primary" type="submit" name="action" value="refit"
                     {% if not selected.can_save %}disabled{% endif %}>{{ _("Refit all {n} ships", n=selected.used_by|length) }}</button>
           {% else %}
-            <button class="btn primary" type="submit" name="action" value="save"
-                    {% if not selected.can_save %}disabled{% endif %}>{{ _("Save") }}</button>
+            <noscript><button class="btn primary" type="submit" name="action" value="save"
+                    {% if not selected.can_save %}disabled{% endif %}>{{ _("Save") }}</button></noscript>
           {% endif %}
         </div>
         {% if d.allow_rule_breaking and selected.violations %}

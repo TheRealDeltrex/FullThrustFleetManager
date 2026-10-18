@@ -151,6 +151,8 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
   max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 10px;
   background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
 .arc, .param { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 3px; }
+/* The aft arcs start a little apart from the fore ones. */
+.arc.aft { margin-left: 8px; }
 .input.sm { padding: 2px 5px; width: 62px; font-size: 12px; }
 .input.sm.name { width: 140px; }
 /* An open-ended setting's write-in field, shown once its dropdown says "More". */
