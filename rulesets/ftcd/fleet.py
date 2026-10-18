@@ -8,12 +8,11 @@ destroyed take no part, as in the fleet's points.
 from __future__ import annotations
 
 from i18n import _
-from rulesets import Issue
-from rulesets.fb import rules as fb_rules
+from rulesets import Issue, common
 from rulesets.ftcd import rules as cd_rules
 from rulesets.ftcd.data import RIDER_MAX_MASS
 
-_int = fb_rules._int
+_int = common.as_int
 
 
 def _carriers(design: dict) -> list[tuple[int, bool]]:
@@ -23,7 +22,7 @@ def _carriers(design: dict) -> list[tuple[int, bool]]:
     if design.get("ftl") is not True:
         return []
     out = []
-    for s in fb_rules._systems(design):
+    for s in common.systems_of(design):
         if s.get("type") == "tender_bay":
             out.append((max(1, _int(s.get("capacity"), 1)), False))
         elif s.get("type") == "tug_drive":
