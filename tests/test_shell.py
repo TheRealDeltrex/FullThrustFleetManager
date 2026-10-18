@@ -102,6 +102,8 @@ def test_the_top_bar_look_picker_shares_the_setting(client):
     bar = page.split('id="theme-select"', 1)[1].split("</select>", 1)[0]
     assert all(f'value="{t}"' in bar for t in store.THEMES)    # every look, short names
     assert ">Night Sky<" in bar
+    names = [o.split(">", 1)[1].split("<", 1)[0].strip() for o in bar.split("<option")[1:]]
+    assert names == sorted(names) and len(names) == 7               # alphabetical
     resp = client.post("/settings", data={"theme": "aurora", "next": "/design"})
     assert resp.status_code == 302 and resp.headers["Location"].endswith("/design")
     assert store.load_settings()["theme"] == "aurora"
