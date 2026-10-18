@@ -31,7 +31,7 @@ EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
 DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "language": "en",
                     "last_backup": None}
 # Appearance choices, keyed on <html data-theme> in static/style.css.
-THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora")
+THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid")
 
 
 def new_id() -> str:
