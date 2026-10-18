@@ -609,7 +609,7 @@ def design_new() -> Response:
 def _apply_form(design: dict) -> dict:
     """The workbench posts the whole design; rules maths stays in the ruleset (PLAN 2.7)."""
     form = request.form
-    old_tmf, old_code = design["tmf"], design["type_code"]
+    old_tmf, old_code, old_label = design["tmf"], design["type_code"], design["type_label"]
     design["name"] = form.get("name", design["name"]).strip()[:80] or design["name"]
     design["type_label"] = form.get("type_label", "").strip()[:60]
     design["type_code"] = form.get("type_code", "").strip()[:8]
@@ -621,7 +621,12 @@ def _apply_form(design: dict) -> dict:
     for field in ("tmf", "hull_boxes", "armour", "thrust"):
         if form.get(field) is not None:
             design[field] = max(0, int(form.get(field) or 0))
-    if design["tmf"] != old_tmf and design["type_code"] == old_code:
+    if design["type_code"] != old_code and design["type_label"] == old_label:
+        # A known class code typed in names the type too, unless the type was edited as well.
+        known = presets.class_for_code(design["ruleset"], design["type_code"], design["tmf"])
+        if known:
+            design["type_label"], design["type_code"] = known
+    elif design["tmf"] != old_tmf and design["type_code"] == old_code:
         # MASS moved out of the class's band: the class follows, nothing else is re-preset.
         new_type = presets.reclass(design)
         if new_type:
