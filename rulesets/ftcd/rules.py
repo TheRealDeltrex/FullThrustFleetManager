@@ -567,7 +567,10 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     if not any(s.get("type") == "fire_control" for s in systems):
         info("no_fire_control", _("No fire control: weapons that need one cannot fire."))
     if design.get("ftl") is not True:
-        info("no_ftl", _("No FTL drive: this is a system defence ship."))
+        # CD pp.34-35: a battle rider (MASS 60 at most, carried by a mothership) or a system
+        # defence ship; the fleet decides which (rulesets/ftcd/fleet.py).
+        info("no_ftl", _("No FTL drive: a battle rider (MASS {n} at most) needs a mothership; "
+                         "a system defence ship needs the fleet's agreement.", n=data.RIDER_MAX_MASS))
     for s in systems:
         if s.get("type") in ("screen", "advanced_screen") and _int(s.get("level"), 1) > 2:
             info("screen_backups", _("Screen generators beyond level 2 are backups only."), s.get("uid"))

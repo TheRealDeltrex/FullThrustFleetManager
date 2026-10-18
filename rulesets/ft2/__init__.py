@@ -6,7 +6,7 @@ import json
 
 import paths
 from i18n import _
-from rulesets import ParamDef, QuickRefEntry, Race, SystemDef
+from rulesets import Issue, ParamDef, QuickRefEntry, Race, SystemDef
 from rulesets.ft2 import data, mt, rules
 
 
@@ -69,6 +69,7 @@ class FT2Ruleset:
         "core_systems", "rerolls", "fighter_endurance", "vector_movement",
     )
     catalog_sources: tuple[str, ...] = ()
+    dummy_bogey_points = 0
 
     @property
     def name(self) -> str:
@@ -99,6 +100,9 @@ class FT2Ruleset:
 
     def icon_set_for(self, race: str) -> str:
         return self.icon_set  # FT2 has human tech only
+
+    def fleet_issues(self, fleet: dict, ships: list, options: dict) -> list[Issue]:
+        return []
 
     def adopt_design(self, design: dict) -> dict | None:
         return None

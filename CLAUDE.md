@@ -281,8 +281,11 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   options it offers, in display order; `fleet_rules.option_label()` names them, and the fleet
   form, chips and PDF show only those), `loadout_points()` (fleet
   totals include loadouts, PLAN 5.4), `fighter_types(options, race)` (loadout editor),
-  `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)` and
-  `quickref(systems_present, options, races)`. `loadout=None` means the design's default loadout.
+  `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)`,
+  `quickref(systems_present, options, races)`, `fleet_issues(fleet, [(ship, design)], options)`
+  (rules that judge the whole fleet; `fleet_report` adds them to `fleet_issues`) and
+  `dummy_bogey_points` (0 offers none; `fleet_rules.fleet_points` adds the fleet's
+  `dummy_bogeys` at that price). `loadout=None` means the design's default loadout.
 - **Races are additive modules inside a ruleset, never new rulesets** (PLAN 3 decision 3). A tech
   module is a plain module exposing the per-design half of the protocol (`system_defs()`,
   `design_breakdown`, `validate_design`, `loadout_points`, `damage_track`, `crew_factors`,
@@ -428,6 +431,13 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   Sa'Vasku and Phalon cost as in FB2. The rest of p.21 is play (screens, penetration) and is in
   the quick reference as `cd_kravak`, `cd_savasku`, `cd_phalon` beside the race's FB2 entries;
   `kv_scattergun` is left out because CD's scattergun rules replace it.
+- Fleet-level rules (`fleet.py`, the protocol's `fleet_issues`): a non-FTL ship is a battle
+  rider (MASS 60 at most) and the fleet's live FTL ships must carry every rider, each in one
+  tender bay or tug drive (an exact search, not first-fit; advanced-FTL tugs pool their transfer
+  MASS, CD p.34). Over 60 it is a system defence ship and needs `cd_system_defence`, which also
+  lifts the mothership check (CD p.35). Dummy bogeys (`fleet["dummy_bogeys"]`, CD p.37) cost 20,
+  at most one per live ship, and need `cd_optional_systems`; the Fleet details form offers them
+  as a dropdown.
 - Catalog: CD prints no designs ("all of the ships in fleet book 1 can be used unchanged", p.3),
   so it adopts the FB catalog at load time: `catalog_sources = ("fb",)` and `adopt_design()`
   (Ruleset protocol; FB and FT2 adopt nothing). `store._catalog()` calls it once per FB design:
