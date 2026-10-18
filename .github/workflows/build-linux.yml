@@ -22,13 +22,13 @@ permissions:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -73,7 +73,7 @@ jobs:
             "out/FullThrustFleetManager-${{ steps.version.outputs.value }}-linux-x64.tar.gz" \
             FullThrustFleetManager
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: FullThrustFleetManager-${{ steps.version.outputs.value }}-linux-x64
           path: out/*.tar.gz
