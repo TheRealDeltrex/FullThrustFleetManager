@@ -459,6 +459,16 @@ only standard salvos may have extra stages. Each extra stage adds 2 MASS and dou
 points, so a load pays only what that doubling exceeds the magazine space it fills: nothing
 for two stages, 6 a salvo for three.
 
+**FTCD is complete** (October 2026). Beyond the design system above it has the FB2 races with
+the p.21 changes; fleet-level rules through the protocol's `fleet_issues()`: battle riders
+(non-FTL, MASS 60 at most) carried by the fleet's tender bays and tug drives, system defence
+ships behind a fleet option (CD pp.34-35), and the CD p.57 patrol-battle and capital-share
+limits as fleet options; dummy bogeys at 20 points (CD p.37); jump gates and portals as gate
+drive systems and starbase sections as a hull kind (CD pp.35, 51); fleet morale shown as MASS
+lost against half the fleet's MASS (CD p.40); and quick-reference entries for these play rules.
+What CD leaves to the table (movement, terrain, planets, ramming, hyperspace battles) needs no
+data and is not modelled.
+
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
 errata of 26 April 2017; text layers present). Both need the rulebook treatment first
@@ -481,6 +491,8 @@ violation exists:
 - a design of another race while `allow_race_mixing` is false
 - a design of another ruleset (impossible through the UI; guard on import)
 - More Thrust content while the matching FT2 toggle is off
+- whatever the ruleset's `fleet_issues()` reports (FTCD: battle riders without motherships,
+  non-FTL ships, dummy bogeys, the composition limits)
 
 Campaign damage and ship status never affect conformance.
 
@@ -758,9 +770,9 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 ## 17. After v1 (roadmap, rough order)
 
 1. FTCD ruleset (rulebook processing, rules engine, catalog if the book has designs) -
-   **done** for human tech (6.4), including the loadout extras (FTL and kinetic fighters,
-   swing roles, light vessels in hangars, multi-stage salvo loads). Not yet: jump gates, and
-   the FB2 races under CD's changes (CD p.21).
+   **all done** (6.4): human tech with the loadout extras, the FB2 races under CD's p.21
+   changes, battle riders and motherships, system defence ships, jump gates and portals,
+   starbase sections, dummy bogeys, the tournament composition limits and fleet morale.
 2. FTPC ruleset (incl. the 2017 errata)
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37

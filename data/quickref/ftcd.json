@@ -184,9 +184,37 @@
    "page": 34
   },
   {
+   "key": "battle_riders",
+   "title": "Battle riders and motherships",
+   "text": "Some warships are designed as battle riders without an FTL drive of their own, transported into battle like giant fighters by motherships. The battle riders are designed in exactly the same way as other warships, except that they do not pay mass or points cost for an FTL drive. The mothership is treated as an FTL tug or tender, paying extra mass and points for internal bays or an oversized FTL drive. A fleet with battle riders must deploy the motherships as well. If the mothership makes an FTL entry, the battleriders cannot detach and move independently until the next turn. They start with the velocity and course of the mothership.",
+   "book": "CD",
+   "page": 34
+  },
+  {
+   "key": "system_defence",
+   "title": "System defence ships",
+   "text": "Although most ships in the game are considered capable of FTL travel between star systems, there are many possible classes of non-FTL capable vessels which operate entirely within a single star system. Typical examples are in-system freighters, system defence ships, and monitors (large, low thrust weapon platforms designed for close orbital defence). Non-FTL ships – other than battleriders with a mothership – cannot be part of fleets for one-off battles unless specifically permitted by player agreement or scenario design.",
+   "book": "CD",
+   "page": 35
+  },
+  {
+   "key": "jump_gate",
+   "title": "Jump gates and portals",
+   "text": "Artificial gates have a transfer mass, the maximum capacity or mass that it is capable of handling in one turn. An artificial jump gate must have an FTL drive, which has 10 transfer mass points for every 1 point of drive mass. A jump gate should also have hull boxes equal to at least 10% of the transfer mass. An artificial portal should have the FTL drive with mass equal to the transfer mass of the portal. For each 10% of hull boxes marked off the current transfer mass is reduced in proportion. Artificial gates must be activated before used. If the transfer mass of the gate exceeds that of the combined ships entering, they all transfer successfully. If the transfer mass was reduced due to damage or the gate FTL failed a threshold check, roll a die for each ship. On a 1 the ship transferred successfully, on a 2 it manages to back out in time and remains at the location of the gate with a velocity of zero, on a 3 or higher it is destroyed.",
+   "book": "CD",
+   "page": 35
+  },
+  {
    "key": "enhanced_sensors",
    "title": "Advanced sensors",
    "text": "If not playing an open book game, these optional rules for more advanced sensors can be used for disclosing information about ship capabilities and status to opponents. Advanced sensor suites are classified as enhanced or superior grade. Enhanced sensors require 2 mass, superior 4. The points cost is mass × 4, so 8 for enhanced and 16 for superior. Basic sensors immediately 'illuminate' the ship using them and the scanned ship, so models for both are placed on the table. If enhanced or superior active sensors are used, the scanning player also rolls 1 D6. If the ship is using enhanced active sensors use the die score as rolled; for superior sensors add 2 to the score.",
+   "book": "CD",
+   "page": 37
+  },
+  {
+   "key": "dummy_bogeys",
+   "title": "Dummy bogeys",
+   "text": "These are optional rules for adding extra confusion and uncertainty to play. With the agreement of both players, each side may deploy a number of 'dummy' bogey markers alongside the real ones, representing drones equipped to output the signature of an actual ship and thereby confuse the enemy as to the actual strength and disposition of the fleet. Each dummy bogey costs 20 points from the owner's fleet budget, and emits the drive signature of an escort class ship. It can be moved on the table with the manoeuvring ability of any main drive strength the owner chooses. The dummy is simply removed from play as soon as it is scanned, either with active or passive sensors.",
    "book": "CD",
    "page": 37
   },
@@ -210,6 +238,27 @@
    "text": "Just as certain ships may be equipped to lay mines, so others may be provided with systems to clear enemy mines safely. To attempt to dispose of a mine marker, the minesweeping ship must have its sweeper system activated by noting this in its orders for that turn. It must then pass within 3 MU of the mine during the course of its movement, and at that point 1D6 is rolled. On a score of 1, the mine immediately attacks the minesweeper, detonating and causing damage as normal. On a roll of 2, the mine does not attack, but is also not disabled; it remain in position and can attack other ships as normal.",
    "book": "CD",
    "page": 38
+  },
+  {
+   "key": "boarding",
+   "title": "Boarding actions",
+   "text": "The attacking ship must be within 3 MU of the target at the end of movement, at a velocity not more than 1 factor different from the target's, and on a course not more than 1 point different. The available boarding factors are always equal to the current number of crew factors that the ship has left. The strength of the defenders is determined in the same way. The defensive strength of a full troopship is increased by the number of mass allocated to troop holds divided by 4 (rounded down). If the target is a civilian craft, it will be able to muster only defensive factors equal to half the remaining damage control parties, rounded down. Roll 1D6 per factor for each side and total their results. If either side's total score is more than twice the other player's roll, the higher scoring player has won the action. If this is not the case, then the action continues with the lower scoring force losing 1 factor and both sides then rolling again. If the attacking party loses and is repulsed, they may return half (rounded up) of their surviving factors of marines to their own ship.",
+   "book": "CD",
+   "page": 39
+  },
+  {
+   "key": "fleet_morale",
+   "title": "Fleet morale",
+   "text": "If playing a simple engagement (or a competitive game) then we suggest that the loss of 50% of a player's overall force (calculated in mass of ships destroyed) would be enough to cause the commander to withdraw from battle. For other games we recommend that the level of losses to force a withdrawal should be written into the scenario when it is designed.",
+   "book": "CD",
+   "page": 40
+  },
+  {
+   "key": "starbase",
+   "title": "Starbases",
+   "text": "A starbase is any space station, habitat, drift, orbital, asteroid base, or other artificial construct large enough to be treated as terrain rather than a ship. A starbase is always thrust 0 for movement. A starbase has one or more sections, each with its own SSD. For game purposes these are considered to be arranged on a hexagonal grid with each section having a central point for determining fire arcs and ranges. (The hex grid is purely to determine spatial relationships, ie 'is this bit next to that bit?', and the actual sections can be any desired shape.) Each section has at least symbols for core systems and a hull damage track, plus weapons or defences as appropriate.",
+   "book": "CD",
+   "page": 52
   },
   {
    "key": "nova_cannon",

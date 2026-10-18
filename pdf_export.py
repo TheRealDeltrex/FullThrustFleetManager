@@ -410,6 +410,8 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
     options: dict = {}
     for fleet, designs in zip(fleets, designs_by_fleet):
         options.update({k: v for k, v in fleet_rules.fleet_options(fleet).items() if v})
+        if fleet_rules.dummy_bogeys(fleet):
+            present.add("dummy_bogeys")
         for ship in fleet["ships"]:
             design = designs.get(ship["design_id"])
             for system in design["systems"] if design else []:
@@ -420,6 +422,15 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add("shell_armour")  # layered armour has its own entry (CD p.20)
             if design and design["streamlining"] != "none":
                 present.add("streamlining")
+            # Rules a ship brings without a system (the FTCD quick reference reads these).
+            stationary = design and (design.get("hull_kind") == "starbase" or any(
+                s["type"] in ("jump_gate", "portal") for s in design["systems"]))
+            if design and not design.get("ftl") and not stationary:
+                present.add("no_ftl")
+            if design and design.get("hull_kind") == "starbase":
+                present.add("starbase")
+            if design and any(s.get("kind") == "troop" for s in design["systems"]):
+                present.add("troop_hold")
             if design:
                 races.add(design.get("race") or "human")
     # A race's own entries go on the sheet beside the shared ones (FB2 restates movement, crew
