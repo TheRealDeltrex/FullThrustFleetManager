@@ -39,7 +39,7 @@
         <form method="post" action="{{ url_for('settings_save') }}" class="row">
           <label>{{ _("Look") }}
             <select class="input" name="theme">
-              {% for value, label in (("admiralty", _("Admiralty: warm rulebook, light")), ("lunar", _("Lunar: moonbase white and teal, light")), ("bridge", _("Bridge: tactical console, dark")), ("carbon-armor", _("Carbon Armor: graphite and amber, dark")), ("night-sky", _("Night Sky: starfield and gold, dark")), ("nebula", _("Nebula: violet, pink and teal, colourful"))) %}
+              {% for value, label in (("admiralty", _("Admiralty: warm rulebook, light")), ("lunar", _("Lunar: moonbase white and teal, light")), ("bridge", _("Bridge: tactical console, dark")), ("carbon-armor", _("Carbon Armor: graphite and amber, dark")), ("night-sky", _("Night Sky: starfield and gold, dark")), ("nebula", _("Nebula: violet, pink and teal, colourful")), ("aurora", _("Aurora: northern lights, green"))) %}
                 <option value="{{ value }}" {% if settings.theme == value %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
