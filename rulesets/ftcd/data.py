@@ -38,6 +38,11 @@ SALVO_SPACE = {"std": 2, "er": 3}
 MAX_STAGES = 3
 
 
+# CD p.35: "the maximum mass for any battle rider is 60"; CD p.37: "each dummy bogey costs 20
+# points from the owner's fleet budget".
+RIDER_MAX_MASS = 60
+DUMMY_BOGEY_POINTS = 20
+
 # CD p.42: escorts up to MASS 44, cruisers up to 90, anything bigger is a capital; 300 at most.
 ESCORT_MAX, CRUISER_MAX, MAX_MASS = 44, 90, 300
 

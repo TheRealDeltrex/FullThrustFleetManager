@@ -249,6 +249,8 @@ def _fleet_context(fleet: dict, view: str) -> dict:
                                                           fleet_rules.fleet_options(fleet))
                         for s in fleet["ships"]},
         "hull_damage": sum(s["damage"]["hull"] for s in fleet["ships"]),
+        "dummy_bogeys": fleet_rules.dummy_bogeys(fleet),
+        "dummy_bogey_points": fleet_rules.dummy_bogey_points(fleet),
         "library": library,
         "library_total": len(every_design),
         "show_all_ships": show_all,
@@ -310,6 +312,7 @@ def _update_details(fleet: dict) -> tuple[bool, str]:
                  **{k: form.get("opt-" + k) == "on"
                     for k in fleet_rules.ruleset_option_keys(fleet["ruleset"])}},
         notes=form.get("notes", ""),
+        dummy_bogeys=int(form.get("dummy_bogeys") or 0) if "dummy_bogeys" in form else None,
     )
 
 

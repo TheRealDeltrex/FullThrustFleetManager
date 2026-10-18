@@ -117,6 +117,7 @@
           <span class="muted">{{ _("Points") }}</span>
           <b>{{ selected.report.points }}{% if f.points_limit %} / {{ f.points_limit }}{% endif %}</b>
           <div class="bar"><i style="width: {{ (100 * selected.report.points / f.points_limit) | round | int if f.points_limit else 0 }}%"></i></div>
+          {% if selected.dummy_bogeys %}<span class="muted">{{ _("incl. {n} dummy bogeys ({p})", n=selected.dummy_bogeys, p=selected.dummy_bogey_points) }}</span>{% endif %}
         </div>
         <div class="tile">
           <span class="muted">{{ _("Ships") }}</span>
@@ -280,6 +281,17 @@
                 {% endfor %}
               </select>
             </label>
+            {% if selected.ruleset.dummy_bogey_points %}
+              {# CD p.37: at most one dummy per real ship, so the choice is bounded. #}
+              <label>{{ _("Dummy bogeys") }}
+                <select class="input" name="dummy_bogeys">
+                  {% for n in range([f.ships|length, f.dummy_bogeys]|max + 1) %}
+                    <option value="{{ n }}" {% if f.dummy_bogeys == n %}selected{% endif %}>{{ n }}</option>
+                  {% endfor %}
+                </select>
+                <span class="muted">{{ _("{n} points each", n=selected.ruleset.dummy_bogey_points) }}</span>
+              </label>
+            {% endif %}
             <label class="check"><input type="checkbox" name="allow_race_mixing"
               {% if f.allow_race_mixing %}checked{% endif %} /> {{ _("Allow race mixing") }}</label>
           </div>

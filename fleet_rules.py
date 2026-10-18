@@ -19,7 +19,8 @@ DESTROYED = "destroyed"
 FLEET_OPTION_KEYS = (
     "core_systems", "rerolls", "fighter_endurance", "vector_movement",
     "mt_systems", "mt_superships", "mt_fighters",
-    "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_cpv", "cd_advanced_ftl",
+    "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence", "cd_cpv",
+    "cd_advanced_ftl",
 )
 
 
@@ -36,6 +37,7 @@ def option_label(key: str) -> str:
         "cd_optional_systems": _("Sensors, ECM, mines and ortillery"),
         "cd_multistage": _("Multi-stage missiles"),
         "cd_super_weapons": _("Nova cannon, wave gun, reflex field, cloak"),
+        "cd_system_defence": _("System defence ships (non-FTL)"),
         "cd_cpv": _("Combat Points Value (CPV) hull cost"),
         "cd_advanced_ftl": _("Pay for advanced FTL"),
     }.get(key, key)
@@ -81,13 +83,25 @@ def ship_points(ship: dict, design: dict | None, options: dict) -> int:
     return design_points(design, options) + rs.loadout_points(design, ship.get("loadout"), options)
 
 
+def dummy_bogeys(fleet: dict) -> int:
+    """Dummy bogeys the fleet buys, where its ruleset offers them (CD p.37); else 0."""
+    rs = ruleset_of(fleet)
+    n = fleet.get("dummy_bogeys")
+    return n if rs and rs.dummy_bogey_points and isinstance(n, int) and n > 0 else 0
+
+
+def dummy_bogey_points(fleet: dict) -> int:
+    rs = ruleset_of(fleet)
+    return dummy_bogeys(fleet) * rs.dummy_bogey_points if rs else 0
+
+
 def fleet_points(fleet: dict, designs: dict) -> int:
     opts = fleet_options(fleet)
     return sum(
         ship_points(s, designs.get(s.get("design_id")), opts)
         for s in fleet.get("ships", [])
         if s.get("status") != DESTROYED
-    )
+    ) + dummy_bogey_points(fleet)
 
 
 def design_issues(design: dict, options: dict) -> list[Issue]:
@@ -158,7 +172,10 @@ def fleet_report(fleet: dict, designs: dict) -> FleetReport:
         _ship_report(fleet, s, designs.get(s.get("design_id")), options) for s in fleet.get("ships", [])
     ]
     points = fleet_points(fleet, designs)
-    fleet_issues = []
+    rs = ruleset_of(fleet)
+    with_designs = [(s, designs[s.get("design_id")]) for s in fleet.get("ships", [])
+                    if s.get("design_id") in designs]
+    fleet_issues = list(rs.fleet_issues(fleet, with_designs, options)) if rs else []
     limit = fleet.get("points_limit")
     if isinstance(limit, int) and limit > 0 and points > limit:
         fleet_issues.append(
