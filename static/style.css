@@ -196,7 +196,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
    is bought with power each turn): reads like an input, but is not one. */
 .input.static { display: block; background: var(--panel-2, #f3f4f6); color: var(--muted, #555); }
 
-/* ---- Appearance (Settings): six looks, keyed on <html data-theme> (store.THEMES; Admiralty
+/* ---- Appearance (Settings): seven looks, keyed on <html data-theme> (store.THEMES; Admiralty
    is the default). The unscoped rules above are their shared base and are not offered as a
    look of their own; each block below redefines the variables and restyles colour, type and
    borders only. Ship diagrams stay black ink on a light ground in every theme, and the
@@ -396,3 +396,34 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="nebula"] .notice { border-color: #6a5320; }
 [data-theme="nebula"] .card .mini svg, [data-theme="nebula"] .ssd-wrap svg, [data-theme="nebula"] .sheet svg { background: #f6f1ff; border-radius: 8px; }
 [data-theme="nebula"] input[type=checkbox] { accent-color: var(--accent); }
+
+/* Aurora: the green one. Deep spruce space under a northern-lights glow, emerald and mint
+   accents with a touch of violet at the sky's edge. */
+:root[data-theme="aurora"] { --bg: #08171a; --panel: #0f2427; --panel-2: #0c1e21; --ink: #e3f5ee; --muted: #8fb5aa; --line: #1f4044; --accent: #3ee08f; --accent-soft: #10352a; --mint: #9af5d0; --ok: #3ee08f; --ok-soft: #10352a; --warn: #f0c75e; --warn-soft: #2e2a17; --bad: #ff7a6b; --bad-soft: #36201d; --chrome: #051012; --chrome-ink: #eafbf4; --chrome-muted: #86ada2; --st-ready: #3ee08f; --st-damaged: #f0c75e; --st-docked: #5fc8ff; --st-lost: #56736c; --rs-ft2: #f0b45e; --rs-fb: #5fa8ff; --rs-ftcd: #3ee08f; --rs-ftpc: #b98cff; --rs-current: #24494c; color-scheme: dark; }
+[data-theme="aurora"] body { background: radial-gradient(1400px 620px at 25% 0%, rgba(62,224,143,.30), transparent 70%), radial-gradient(1000px 500px at 70% 5%, rgba(95,200,255,.18), transparent 70%), radial-gradient(700px 420px at 98% 10%, rgba(185,140,255,.18), transparent 70%), var(--bg); background-attachment: fixed; }
+[data-theme="aurora"] .topbar { background: linear-gradient(90deg, #06201a, #071a1d 55%, #0b1830); border-bottom: 1px solid rgba(62,224,143,.25); }
+[data-theme="aurora"] .brand small { color: var(--accent); }
+[data-theme="aurora"] .fleet-select { background: #0a1c1f; border-color: #1f4044; }
+[data-theme="aurora"] .tabs a { border-radius: 6px; }
+[data-theme="aurora"] .tabs a.on { background: rgba(62,224,143,.16); color: var(--mint); }
+[data-theme="aurora"] .bar { background: #143034; }
+[data-theme="aurora"] .bar > i { background: linear-gradient(90deg, #1fb874, var(--accent), var(--mint)); box-shadow: 0 0 8px rgba(62,224,143,.5); }
+[data-theme="aurora"] .panel, [data-theme="aurora"] .tile, [data-theme="aurora"] .card { border-radius: 10px; border-color: var(--line); background-color: rgba(15,36,39,.92); }
+[data-theme="aurora"] .card { background-color: rgba(12,30,33,.92); }
+[data-theme="aurora"] .panel h3 { color: var(--mint); }
+[data-theme="aurora"] .panel.head { border-left: 3px solid var(--accent); }
+[data-theme="aurora"] .tile b { color: #fff; }
+[data-theme="aurora"] .btn { background: #143034; border-color: #24494c; color: var(--ink); }
+[data-theme="aurora"] .btn:hover { border-color: var(--accent); }
+[data-theme="aurora"] .btn.primary { background: var(--accent); border-color: var(--accent); color: #032014; }
+[data-theme="aurora"] .input { background: #0a1c1f; color: var(--ink); border-color: #24494c; }
+[data-theme="aurora"] .input:focus { outline: 2px solid rgba(62,224,143,.3); border-color: var(--accent); }
+[data-theme="aurora"] .chip.ok, [data-theme="aurora"] .chip.st-ready { border-color: #1e6a46; }
+[data-theme="aurora"] .chip.warn, [data-theme="aurora"] .chip.st-damaged { border-color: #6a5a20; }
+[data-theme="aurora"] .chip.bad { border-color: #6b2e28; }
+[data-theme="aurora"] .chip.info, [data-theme="aurora"] .chip.st-docked { background: #0f2a3a; border-color: #23506a; color: #5fc8ff; }
+[data-theme="aurora"] a, [data-theme="aurora"] .lib-list a.on { color: var(--mint); }
+[data-theme="aurora"] .tbl th { color: var(--mint); }
+[data-theme="aurora"] .notice { border-color: #6a5a20; }
+[data-theme="aurora"] .card .mini svg, [data-theme="aurora"] .ssd-wrap svg, [data-theme="aurora"] .sheet svg { background: #eef7f3; border-radius: 6px; }
+[data-theme="aurora"] input[type=checkbox] { accent-color: var(--accent); }

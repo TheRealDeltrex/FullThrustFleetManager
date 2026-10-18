@@ -83,7 +83,7 @@ def test_the_appearance_setting_themes_every_tab(client):
     import store
     css = (ROOT / "static" / "style.css").read_text(encoding="utf-8")
     assert 'data-theme="admiralty"' in client.get("/fleet").get_data(as_text=True)  # the default
-    assert len(store.THEMES) == 6 and "classic" not in store.THEMES  # Classic was retired
+    assert len(store.THEMES) == 7 and "classic" not in store.THEMES  # Classic was retired
     for theme in store.THEMES:
         assert f':root[data-theme="{theme}"]' in css               # every choice has its palette
     client.post("/settings", data={"theme": "nebula"})
