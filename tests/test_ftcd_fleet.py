@@ -251,3 +251,17 @@ def test_fleet_morale_withdraws_at_half_its_mass():
     f, designs = cd_fleet((sized(60), "destroyed"), (sized(40), "ready"), (sized(21), "ready"))
     assert fleet_rules.morale(f, designs) == (60, 61)
     assert fleet_rules.morale(fleet(), {}) is None
+
+
+def test_quick_reference_carries_the_fleet_rules():
+    from test_rules_ftcd import CD
+
+    def keys(present):
+        return {e.key for e in CD.quickref(set(present), {})}
+
+    assert "fleet_morale" in keys([])
+    assert {"battle_riders", "system_defence"} <= keys(["no_ftl"])
+    assert "jump_gate" in keys(["portal"]) and "jump_gate" in keys(["jump_gate"])
+    assert "starbase" in keys(["starbase"]) and "boarding" in keys(["troop_hold"])
+    assert "dummy_bogeys" in keys(["dummy_bogeys"])
+    assert "battle_riders" not in keys([])
