@@ -77,3 +77,21 @@ def test_vendored_fonts_exist_with_licence():
     for url in urls:
         assert (ROOT / "static" / url).is_file(), url
     assert (ROOT / "static" / "fonts" / "OFL-IBMPlexSans.txt").is_file()
+
+
+def test_the_appearance_setting_themes_every_tab(client):
+    import store
+    css = (ROOT / "static" / "style.css").read_text(encoding="utf-8")
+    assert 'data-theme="admiralty"' in client.get("/fleet").get_data(as_text=True)  # the default
+    for theme in store.THEMES:
+        if theme == "classic":
+            continue
+        assert f':root[data-theme="{theme}"]' in css               # every choice has its palette
+    client.post("/settings", data={"theme": "dark"})
+    for path in TAB_PATHS:
+        assert 'data-theme="dark"' in client.get(path).get_data(as_text=True)
+    # Another panel's form leaves the look alone; a made-up look falls back to the default.
+    client.post("/settings", data={"pdf_viewer": "app", "paper": "A4"})
+    assert store.load_settings()["theme"] == "dark"
+    client.post("/settings", data={"theme": "neon"})
+    assert store.load_settings()["theme"] == "admiralty"
