@@ -29,7 +29,10 @@ from rulesets import RULESETS, presets
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
 DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "language": "en",
-                    "last_backup": None}
+                    "last_backup": None,
+                    # The Design tab's faction pickers: the player's own factions are shown and
+                    # other races' (Kra'Vak while designing a human ship) are not, until ticked.
+                    "show_custom_factions": True, "show_other_race_factions": False}
 # Appearance choices, keyed on <html data-theme> in static/style.css.
 THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid")
 
@@ -553,10 +556,14 @@ def builtin_factions(ruleset: str) -> list[dict]:
 def custom_factions() -> list[dict]:
     doc = _read_json(paths.user_data_dir() / "factions.json") or {}
     doc = migrations.upgrade("factions", doc)
-    return [
-        {"id": f["id"], "name": _as_str(f.get("name"), limit=80)}
-        for f in doc.get("factions", []) if isinstance(f, dict) and _safe_id(f.get("id"))
-    ]
+    out = []
+    for f in doc.get("factions", []):
+        if isinstance(f, dict) and _safe_id(f.get("id")):
+            entry = {"id": f["id"], "name": _as_str(f.get("name"), limit=80)}
+            if _safe_id(f.get("race")):
+                entry["race"] = f["race"]
+            out.append(entry)
+    return out
 
 
 def _save_custom_factions(factions: list[dict]) -> None:
@@ -565,7 +572,8 @@ def _save_custom_factions(factions: list[dict]) -> None:
     _write_json(paths.user_data_dir() / "factions.json", doc)
 
 
-def add_custom_faction(name: str, faction_id: str | None = None) -> tuple[bool, str, str | None]:
+def add_custom_faction(name: str, faction_id: str | None = None,
+                       race: str | None = None) -> tuple[bool, str, str | None]:
     name = name.strip()[:80]
     if not name:
         return False, _("Enter a faction name."), None
@@ -573,22 +581,53 @@ def add_custom_faction(name: str, faction_id: str | None = None) -> tuple[bool, 
     if any(f["name"].lower() == name.lower() for f in factions):
         return False, _("That faction already exists."), None
     fid = _safe_id(faction_id) or "cf" + new_id()
-    factions.append({"id": fid, "name": name})
+    entry = {"id": fid, "name": name}
+    if _safe_id(race):
+        entry["race"] = race
+    factions.append(entry)
     _save_custom_factions(factions)
     return True, _("Faction added."), fid
 
 
+def faction_for_name(name: str, race: str | None = None) -> tuple[str | None, str]:
+    """The "New faction" choice: the id of the faction called `name`, made if it is new. A name
+    already taken, built-in or custom, picks that faction, so typing it twice makes no twin."""
+    name = name.strip()[:80]
+    if not name:
+        return None, _("Enter a faction name.")
+    known = [f for r in _builtin_factions() for f in builtin_factions(r)] + custom_factions()
+    for f in known:
+        if f["name"].lower() == name.lower() or f["id"].lower() == name.lower():
+            return f["id"], ""
+    _ok, msg, fid = add_custom_faction(name, race=race)
+    return fid, msg
+
+
 def faction_choices(ruleset: str | None = None, keep: str | None = None) -> list[dict]:
     """What a faction picker offers: the ruleset's built-in factions (every ruleset's, once each,
-    when none is named), then the custom ones. ``keep`` is the value already chosen; it stays on
-    the list even when it is not offered any more, so saving a form does not drop it."""
+    when none is named), then the custom ones that have at least one saved design. ``keep`` is
+    the value already chosen; it stays on the list even when it is not offered any more, so
+    saving a form does not drop it. Each choice says whether it is custom and which races it
+    belongs to (a custom faction's own race plus its ships'), for the pickers' show/hide toggles."""
     rulesets = [ruleset] if ruleset else list(_builtin_factions())
+    custom = custom_factions()
+    ship_races: dict[str, set[str]] = {}
+    if custom:
+        for d in list_designs():
+            if d.get("faction"):
+                ship_races.setdefault(d["faction"], set()).add(d.get("race") or "human")
     choices: list[dict] = []
-    for f in [f for r in rulesets for f in builtin_factions(r)] + custom_factions():
+    for f in [f for r in rulesets for f in builtin_factions(r)]:
         if not any(c["id"] == f["id"] for c in choices):
-            choices.append(f)
+            choices.append({"id": f["id"], "name": f["name"], "custom": False,
+                            "races": [f.get("race") or "human"]})
+    for f in custom:
+        if any(c["id"] == f["id"] for c in choices) or (f["id"] not in ship_races and f["id"] != keep):
+            continue
+        races = ship_races.get(f["id"], set()) | ({f["race"]} if f.get("race") else set())
+        choices.append({"id": f["id"], "name": f["name"], "custom": True, "races": sorted(races)})
     if keep and not any(c["id"] == keep for c in choices):
-        choices.append({"id": keep, "name": faction_name(keep)})
+        choices.append({"id": keep, "name": faction_name(keep), "custom": True, "races": []})
     return choices
 
 
@@ -927,6 +966,9 @@ def load_settings() -> dict:
         out["language"] = doc["language"]
     if isinstance(doc.get("last_backup"), str):
         out["last_backup"] = doc["last_backup"]
+    for key in ("show_custom_factions", "show_other_race_factions"):
+        if isinstance(doc.get(key), bool):
+            out[key] = doc[key]
     return out
 
 
@@ -1011,7 +1053,7 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     for f in doc.get("factions", []) if isinstance(doc.get("factions"), list) else []:
         if isinstance(f, dict) and _safe_id(f.get("id")) and isinstance(f.get("name"), str):
             if not any(c["id"] == f["id"] for c in custom_factions()):
-                add_custom_faction(f["name"], f["id"])
+                add_custom_faction(f["name"], f["id"], f.get("race"))
     kind = doc.get("kind")
     if kind == "FTDesign":
         design = normalize_design(doc.get("design"))
@@ -1073,7 +1115,7 @@ def _import_backup(data: bytes, overwrite_newer: bool) -> tuple[bool, str, list[
             for f in doc.get("factions", []) if isinstance(doc, dict) else []:
                 if isinstance(f, dict) and _safe_id(f.get("id")) and isinstance(f.get("name"), str):
                     if not any(c["id"] == f["id"] for c in custom_factions()):
-                        add_custom_faction(f["name"], f["id"])
+                        add_custom_faction(f["name"], f["id"], f.get("race"))
         for name in names:
             m = re.fullmatch(r"(designs|fleets)/([A-Za-z0-9_-]{1,64})\.json", name)
             if not m:

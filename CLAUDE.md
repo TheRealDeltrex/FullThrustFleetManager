@@ -238,8 +238,12 @@ What exists:
 - `migrations.py`: `CURRENT`, `STEPS[kind][from_version]`, `upgrade()`. A missing or malformed
   `schema_version` counts as 1; anything above `CURRENT` raises `TooNewError` and is refused
   rather than guessed at. Write the step and its test in the commit that bumps `CURRENT`.
-- `data/factions.json` holds the built-in factions per ruleset; custom factions live in the
-  user library and travel with exports.
+- `data/factions.json` holds the built-in factions per ruleset, each with its race; custom
+  factions (with the race they were made for) live in the user library and travel with exports.
+  The Design tab's faction pickers (`templates/_factions.html`, `static/factions.js`) offer
+  "New faction" (`store.faction_for_name`), list a custom faction only once a saved design carries
+  it (`store.faction_choices`), and hide custom and other races' factions by two toggles saved as
+  the `show_custom_factions` / `show_other_race_factions` settings (`POST /settings/factions`).
 
 ## Non-negotiable principles
 
