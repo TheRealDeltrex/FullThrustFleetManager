@@ -5,7 +5,7 @@
 {% block content %}
   {# ---- Left: library tree (PLAN 9.4) ---- #}
   <aside class="panel lib">
-    <h3>{{ _("Library") }}</h3>
+    <h3 class="fold" data-fold="design-library" tabindex="0">{{ _("Library") }}</h3>
     <div class="body">
       <form method="get" action="{{ url_for('design') }}" class="row">
         <input class="input grow" type="search" name="q" value="{{ library.query }}"
@@ -14,7 +14,7 @@
       </form>
     </div>
 
-    <h3 class="sep">{{ _("My designs") }}</h3>
+    <h3 class="sep fold" data-fold="design-mine" tabindex="0">{{ _("My designs") }}</h3>
     <div class="body">
       {% for ruleset_id, designs in library.mine.items() %}
         <div class="lib-group">
@@ -32,7 +32,7 @@
       {% endfor %}
     </div>
 
-    <h3 class="sep">{{ _("Catalog") }}</h3>
+    <h3 class="sep fold" data-fold="design-catalog" tabindex="0">{{ _("Catalog") }}</h3>
     <div class="body">
       {% for book, designs in library.catalog.items() %}
         <details class="lib-group" {% if library.query %}open{% endif %}>
@@ -53,7 +53,7 @@
       {% endfor %}
     </div>
 
-    <h3 class="sep">{{ _("New design") }}</h3>
+    <h3 class="sep fold" data-fold="design-new" tabindex="0">{{ _("New design") }}</h3>
     <div class="body">
       <form method="post" action="{{ url_for('design_new') }}" class="stack">
         <input class="input" type="text" name="name" placeholder="{{ _('Name') }}"
