@@ -184,6 +184,15 @@ REFERENCE_BOOKS: tuple[BookRef, ...] = (
 )
 
 
+# Book codes in publication order, for every list of rulebooks the player sees. A code missing
+# here sorts after these, by code.
+BOOK_ORDER: tuple[str, ...] = ("FT", "MT", "FB1", "FB2", "CD", "PC", "PCE")
+
+
+def book_sort_key(code: str) -> tuple[int, str]:
+    return (BOOK_ORDER.index(code) if code in BOOK_ORDER else len(BOOK_ORDER), code)
+
+
 # Registration imports come last: the packages import the dataclasses above.
 from rulesets import fb, ft2, ftcd  # noqa: E402
 
