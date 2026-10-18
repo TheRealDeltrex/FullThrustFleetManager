@@ -253,19 +253,64 @@ def test_the_no_faction_badge_leads_to_the_faction_picker(client):
 def test_a_factions_fleet_is_offered_only_its_own_ships_until_show_all(client):
     fleet_id = make_fleet(client, faction="NSL")
     page = text(client.get("/fleet"))
-    assert "Show all ships" in page
+    assert "Own faction only" in page and "<optgroup" not in page.split('name="design_id"')[1]
     assert 'value="fb:fb1:nsl-' in page and f'value="{FURIOUS}"' not in page   # Furious is NAC
-    page = text(client.get("/fleet?all_ships=0&all_ships=1"))
+    page = text(client.get("/fleet?ships=all"))
     assert f'value="{FURIOUS}"' in page
     add_ship(client, fleet_id)                                   # the choice survives a redirect
     assert f'value="{FURIOUS}"' in text(client.get("/fleet"))
-    assert f'value="{FURIOUS}"' not in text(client.get("/fleet?all_ships=0"))
+    assert f'value="{FURIOUS}"' not in text(client.get("/fleet?ships=own"))
+    # The old Show all ships toggle's links still work.
+    assert f'value="{FURIOUS}"' in text(client.get("/fleet?all_ships=0&all_ships=1"))
 
 
-def test_a_fleet_without_a_faction_lists_everything_and_no_toggle(client):
+def test_the_ship_list_ends_each_line_with_its_points(client):
+    make_fleet(client, faction="NAC")
+    page = text(client.get("/fleet"))
+    points = fleet_rules.design_points(store.get_design(FURIOUS), {})
+    assert f'<option value="{FURIOUS}">Furious (CE) · {points} pts</option>' in page
+
+
+def test_all_ships_are_grouped_by_faction_with_a_heading_each(client):
+    make_fleet(client, faction="NSL")
+    page = text(client.get("/fleet?ships=all")).split('name="design_id"')[1].split("</select>")[0]
+    headings = [h.split('"')[0] for h in page.split('<optgroup label="')[1:]]
+    assert headings[:4] == ["New Anglian Confederation", "Neu Swabian League",
+                            "Federal States Europa", "Eurasian Solar Union"]
+    nac = page.split('label="New Anglian Confederation"')[1].split("</optgroup>")[0]
+    assert f'value="{FURIOUS}"' in nac and 'value="fb:fb1:nsl-' not in nac
+
+
+def test_only_the_ticked_factions_are_listed_and_kept_per_fleet(client):
+    nsl_fleet = make_fleet(client, faction="NSL")
+    page = text(client.get("/fleet?ships=pick"))
+    assert 'name="faction" value="NSL"' in page and "Factions (1)" in page   # own faction ticked
+    page = text(client.get("/fleet?ships=pick&factions_sent=1&faction=NAC&faction=ESU"))
+    picker = page.split('name="design_id"')[1].split("</select>")[0]
+    assert 'label="New Anglian Confederation"' in picker and 'label="Eurasian Solar Union"' in picker
+    assert 'value="fb:fb1:nsl-' not in picker and "Factions (2)" in page
+    page = text(client.get("/fleet?ships=pick&factions_sent=1"))
+    assert "Tick one or more factions" in page and 'name="design_id"' not in page
+    # Another fleet keeps its own choice.
+    other = make_fleet(client, name="Second Fleet", faction="NAC")
+    client.get(f"/fleet/{other}")
+    page = text(client.get("/fleet"))
+    assert "Own faction only" in page and 'value="fb:fb1:nsl-' not in page
+    client.get(f"/fleet/{nsl_fleet}")
+    assert "Tick one or more factions" in text(client.get("/fleet"))
+
+
+def test_a_custom_faction_can_be_picked_like_a_built_in_one(client):
+    _ok, _m, fid = store.add_custom_faction("Free Traders")
+    make_fleet(client, faction=fid)
+    page = text(client.get("/fleet?ships=pick"))
+    assert f'name="faction" value="{fid}"' in page and "Free Traders" in page
+
+
+def test_a_fleet_without_a_faction_lists_everything_and_no_own_option(client):
     make_fleet(client)
     page = text(client.get("/fleet"))
-    assert "Show all ships" not in page and f'value="{FURIOUS}"' in page
+    assert "Own faction only" not in page and f'value="{FURIOUS}"' in page
 
 
 def test_a_faction_with_no_designs_points_to_the_design_tab_and_the_toggle(client):
@@ -273,7 +318,7 @@ def test_a_faction_with_no_designs_points_to_the_design_tab_and_the_toggle(clien
     make_fleet(client, faction=fid)
     page = text(client.get("/fleet"))
     assert "No Free Traders ship designs yet." in page and "Design one in the Design tab" in page
-    assert "Show all ships" in page and 'name="design_id"' not in page
+    assert "All ships" in page and 'name="design_id"' not in page
 
 
 def test_a_variant_shows_the_custom_ships_badge(client):
