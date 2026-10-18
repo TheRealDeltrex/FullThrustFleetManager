@@ -1,0 +1,24 @@
+{# The Design tab's faction picker. "New faction" opens a name box; the player's own factions
+   join the list once a saved design carries them. The two toggles hide custom factions and
+   factions of races other than the design's; static/factions.js does the hiding and saves the
+   toggles. `race_from` names the race <select> to follow, else `race` is fixed. `keep` is the
+   saved choice, which stays visible whatever the toggles say. #}
+{% macro faction_picker(choices, selected="", race="human", race_from="", keep="", none_label="") %}
+  <div class="faction-picker stack" data-race="{{ race }}" data-race-from="{{ race_from }}">
+    <select class="input" name="faction" aria-label="{{ _('Faction') }}">
+      <option value="">{{ none_label or _("No faction") }}</option>
+      {% for faction in choices %}
+        <option value="{{ faction.id }}"{% if selected == faction.id %} selected{% endif %}
+                data-custom="{{ 1 if faction.custom else 0 }}" data-races="{{ faction.races|join(' ') }}"
+                {%- if keep and faction.id == keep %} data-keep="1"{% endif %}>{{ faction.name }}</option>
+      {% endfor %}
+      <option value="__new__">{{ _("New faction…") }}</option>
+    </select>
+    <input class="input" type="text" name="new_faction" maxlength="80" hidden
+           placeholder="{{ _('New faction name') }}" aria-label="{{ _('New faction name') }}" />
+    <label class="check"><input type="checkbox" data-no-autosave data-toggle="show_custom_factions"
+           {% if SETTINGS.show_custom_factions %}checked{% endif %} /> {{ _("Show custom factions") }}</label>
+    <label class="check"><input type="checkbox" data-no-autosave data-toggle="show_other_race_factions"
+           {% if SETTINGS.show_other_race_factions %}checked{% endif %} /> {{ _("Show other races' factions") }}</label>
+  </div>
+{% endmacro %}

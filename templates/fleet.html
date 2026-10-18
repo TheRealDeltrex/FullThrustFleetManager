@@ -240,27 +240,51 @@
         <p class="body muted">{{ _("No ship designs for {ruleset} yet.", ruleset=selected.ruleset.name) }}
           <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab first.") }}</a></p>
         {% else %}
-        {# A faction narrows the list to its own ships; the toggle shows every design again. #}
-        {% if f.faction %}
-        <form method="get" action="{{ url_for('fleet_overview') }}" class="body row">
+        {# Which ships the list offers: the fleet's own faction, all of them, or the factions
+           ticked in the Pick popover. Remembered per fleet. #}
+        {% set sl = selected.ship_list %}
+        <form method="get" action="{{ url_for('fleet_overview') }}" class="body row ship-list-filter">
           <input type="hidden" name="view" value="{{ selected.view }}" />
-          <input type="hidden" name="all_ships" value="0" />
-          <label class="check"><input type="checkbox" name="all_ships" value="1"
-            {% if selected.show_all_ships %}checked{% endif %} onchange="this.form.submit()" />
-            {{ _("Show all ships") }}</label>
+          <label>{{ _("Show") }}
+            <select class="input" name="ships" onchange="this.form.submit()" aria-label="{{ _('Ships to show') }}">
+              {% if f.faction %}<option value="own" {% if sl.mode == 'own' %}selected{% endif %}>{{ _("Own faction only") }}</option>{% endif %}
+              <option value="all" {% if sl.mode == 'all' %}selected{% endif %}>{{ _("All ships") }}</option>
+              <option value="pick" {% if sl.mode == 'pick' %}selected{% endif %}>{{ _("Selected factions") }}</option>
+            </select></label>
+          {% if sl.mode == 'pick' %}
+          {# Each tick applies at once; the popover stays open while the player is ticking. #}
+          <details class="popover" {% if not sl.factions or request.args.factions_sent %}open{% endif %}>
+            <summary class="btn sm">{{ _("Factions ({n})", n=sl.factions|length) }}</summary>
+            <div class="popover-body">
+              <input type="hidden" name="factions_sent" value="1" />
+              {% for g in selected.library_factions %}
+                <label class="check"><input type="checkbox" name="faction" value="{{ g.id }}"
+                  {% if g.id in sl.factions %}checked{% endif %} onchange="this.form.submit()" /> {{ g.name }}
+                  <span class="muted">({{ g.designs|length }})</span></label>
+              {% endfor %}
+            </div>
+          </details>
+          {% endif %}
           <noscript><button class="btn sm" type="submit">{{ _("Apply") }}</button></noscript>
         </form>
-        {% endif %}
         {% if not selected.library %}
+          {% if sl.mode == 'pick' %}
+          <p class="body muted">{{ _("Tick one or more factions to list their ships.") }}</p>
+          {% else %}
         <p class="body muted">{{ _("No {faction} ship designs yet.", faction=selected.faction_name) }}
           <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab,") }}</a>
-          {{ _("or tick Show all ships to pick from every faction.") }}</p>
+          {{ _("or show all ships to pick from every faction.") }}</p>
+          {% endif %}
         {% else %}
         <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body row">
           <select class="input grow" name="design_id" aria-label="{{ _('Design') }}">
-            {% for d in selected.library %}
-              <option value="{{ d.id }}">{{ d.name }}{% if d.faction %} · {{ d.faction }}{% endif %}
-                {% if d.type_code %} ({{ d.type_code }}){% endif %}</option>
+            {# One faction lists flat; several get a heading per faction (catalog order). #}
+            {% for g in selected.library_groups %}
+              {% if selected.library_groups|length > 1 %}<optgroup label="{{ g.name }}">{% endif %}
+              {% for d in g.designs %}
+                <option value="{{ d.id }}">{{ d.name }}{% if d.type_code %} ({{ d.type_code }}){% endif %} · {{ d.points }} {{ _("pts") }}</option>
+              {% endfor %}
+              {% if selected.library_groups|length > 1 %}</optgroup>{% endif %}
             {% endfor %}
           </select>
           <input class="input" name="name" placeholder="{{ _('Ship name') }}" aria-label="{{ _('Ship name') }}" />

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_factions.html" import faction_picker with context %}
 {% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-3{% endblock %}
 {% block content %}
@@ -61,7 +62,7 @@
           {# The current fleet's ruleset first in mind: a new design is usually for it. #}
           {% for rs in rulesets %}<option value="{{ rs.id }}"{% if current_fleet and current_fleet.ruleset == rs.id %} selected{% endif %}>{{ rs.name }}</option>{% endfor %}
         </select>
-        <select class="input" name="race" aria-label="{{ _('Race') }}">
+        <select class="input" name="race" id="new-design-race" aria-label="{{ _('Race') }}">
           {% for rs, races in races_by_ruleset %}
             <optgroup label="{{ rs.name }}">
               {% for race in races %}
@@ -71,12 +72,8 @@
           {% endfor %}
         </select>
         {# The current fleet's faction by default, so a design made for it does not mark the fleet mixed. #}
-        <select class="input" name="faction" aria-label="{{ _('Faction') }}">
-          <option value="">{{ _("No faction") }}</option>
-          {% for faction in all_factions %}
-            <option value="{{ faction.id }}"{% if current_fleet and current_fleet.faction == faction.id %} selected{% endif %}>{{ faction.name }}</option>
-          {% endfor %}
-        </select>
+        {{ faction_picker(all_factions, selected=current_fleet.faction if current_fleet else "",
+                          race_from="new-design-race") }}
         {# A one-time head start: the class fills MASS, hull, armour, thrust and fire control,
            all editable afterwards. Only the chosen ruleset's classes are shown. #}
         <select class="input" name="class_preset" id="class-preset" aria-label="{{ _('Class') }}">
@@ -155,14 +152,10 @@
             <label>{{ _("Name") }}<input class="input" name="name" value="{{ d.name }}" /></label>
             <label>{{ _("Type") }}<input class="input" name="type_label" value="{{ d.type_label }}" /></label>
             <label>{{ _("Type code") }}<input class="input" name="type_code" value="{{ d.type_code }}" /></label>
-            <label>{{ _("Faction") }}
-              <select class="input" name="faction">
-                <option value="">{{ _("None") }}</option>
-                {% for faction in selected.factions %}
-                  <option value="{{ faction.id }}" {% if d.faction == faction.id %}selected{% endif %}>{{ faction.name }}</option>
-                {% endfor %}
-              </select>
-            </label>
+            <div class="field-group">{{ _("Faction") }}
+              {{ faction_picker(selected.factions, selected=d.faction or "", race=d.race or "human",
+                                keep=d.faction or "", none_label=_("None")) }}
+            </div>
             <label>{{ _("MASS (TMF)") }}<input class="input" type="number" min="0" name="tmf" value="{{ d.tmf }}" /></label>
             <label>{{ _("Hull boxes") }}<input class="input" type="number" min="0" name="hull_boxes" value="{{ d.hull_boxes }}" /></label>
             {# Cross Dimensions tech levels (CD pp.43-44), each beside the part it upgrades. #}
@@ -494,4 +487,5 @@
       </div>
     </div>
   </aside>
+  <script src="{{ url_for('static', filename='factions.js') }}"></script>
 {% endblock %}

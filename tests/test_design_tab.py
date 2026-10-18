@@ -347,7 +347,7 @@ def test_a_new_design_inherits_the_current_fleets_race(client):
 def test_a_new_design_defaults_to_the_current_fleets_faction(client):
     client.post("/fleet/new", data={"ruleset": "ftcd", "name": "Rim patrol", "faction": "NSL"})
     body = client.get("/design").get_data(as_text=True)
-    assert '<option value="NSL" selected>' in body
+    assert '<option value="NSL" selected' in body
     client.post("/design/new", data={"ruleset": "ftcd", "name": "Picket", "faction": "NSL"})
     assert next(d for d in store.list_designs() if d["name"] == "Picket")["faction"] == "NSL"
 
@@ -601,6 +601,65 @@ def test_a_class_of_another_ruleset_is_ignored(client):
     client.post("/design/new", data={"ruleset": "fb", "name": "Odd",
                                      "class_preset": _preset_index("ftcd", "CA")})
     assert next(d for d in store.list_designs() if d["name"] == "Odd")["type_code"] == ""
+
+
+def test_new_faction_from_the_new_design_form_makes_the_faction_and_its_first_ship(client):
+    client.post("/design/new", data={"ruleset": "ftcd", "name": "Raider", "race": "human",
+                                     "faction": "__new__", "new_faction": "Rim Pirates"})
+    design = next(d for d in store.list_designs() if d["name"] == "Raider")
+    faction = next(f for f in store.custom_factions() if f["name"] == "Rim Pirates")
+    assert design["faction"] == faction["id"] and faction["race"] == "human"
+    # It has a ship now, so the pickers list it; the same name again reuses it.
+    assert ">Rim Pirates</option>" in client.get("/design").get_data(as_text=True)
+    client.post("/design/new", data={"ruleset": "ftcd", "name": "Corsair", "race": "human",
+                                     "faction": "__new__", "new_faction": "rim pirates"})
+    assert len(store.custom_factions()) == 1
+    assert next(d for d in store.list_designs() if d["name"] == "Corsair")["faction"] == faction["id"]
+
+
+def test_new_faction_without_a_name_makes_no_design(client):
+    client.post("/design/new", data={"ruleset": "ftcd", "name": "Ghost", "faction": "__new__"})
+    assert not store.list_designs() and not store.custom_factions()
+
+
+def test_a_custom_faction_shows_in_the_pickers_only_once_it_has_a_ship(client):
+    _ok, _m, fid = store.add_custom_faction("Free Traders")
+    assert fid not in {f["id"] for f in store.faction_choices()}
+    design_id = make(client, ruleset="ftcd")
+    client.post(f"/design/{design_id}", data=fields(store.get_design(design_id), action="save",
+                                                    faction=fid, allow_rule_breaking="on"))
+    choice = next(f for f in store.faction_choices() if f["id"] == fid)
+    assert choice["custom"] and choice["races"] == ["human"]
+
+
+def test_the_workbench_names_a_new_faction(client):
+    design_id = make(client, ruleset="ftcd")
+    client.post(f"/design/{design_id}", data=fields(store.get_design(design_id), action="save",
+                                                    faction="__new__", new_faction="Belt Union",
+                                                    allow_rule_breaking="on"))
+    assert store.faction_name(store.get_design(design_id)["faction"]) == "Belt Union"
+    # "New faction" with the name box left empty keeps the faction the design had.
+    client.post(f"/design/{design_id}", data=fields(store.get_design(design_id), action="save",
+                                                    faction="__new__", allow_rule_breaking="on"))
+    assert store.faction_name(store.get_design(design_id)["faction"]) == "Belt Union"
+
+
+def test_built_in_factions_carry_their_race_for_the_other_races_toggle(client):
+    races = {f["id"]: f["races"] for f in store.faction_choices("ftcd")}
+    assert races["NAC"] == ["human"] and races["KV"] == ["kravak"] and races["PH"] == ["phalon"]
+    body = client.get("/design").get_data(as_text=True)
+    assert 'data-races="kravak"' in body and 'value="__new__"' in body
+
+
+def test_the_faction_toggles_are_saved_settings(client):
+    assert store.load_settings()["show_custom_factions"] is True
+    assert store.load_settings()["show_other_race_factions"] is False
+    assert client.post("/settings/factions", data={"show_other_race_factions": "1"}).status_code == 204
+    client.post("/settings/factions", data={"show_custom_factions": "0"})
+    settings = store.load_settings()
+    assert settings["show_other_race_factions"] is True and settings["show_custom_factions"] is False
+    body = client.get("/design").get_data(as_text=True)
+    assert re.search(r'data-toggle="show_other_race_factions"\s+checked', body)
 
 
 # ---- Edits save as they are made (static/autosave.js) ----------------------------------------------

@@ -123,6 +123,9 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .lib-list .lib-faction { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
 .grid-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .grid-fields label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.grid-fields .field-group { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.faction-picker { gap: 4px; }
+.faction-picker label.check { font-size: 12px; }
 .grid-fields label.check, label.check { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tbl th, .tbl td { padding: 6px 10px; border-top: 1px solid var(--line); text-align: left; vertical-align: middle; }
@@ -139,6 +142,14 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .loadout-row .swing summary { cursor: pointer; color: var(--muted); }
 .loadout-row .swing[open] { flex-basis: 100%; }
 .loadout-row .swing .row { margin-top: 4px; }
+/* Add ship: the Selected factions checklist opens as a small popover over the panel. */
+.ship-list-filter { align-items: center; }
+.popover { position: relative; }
+.popover > summary { list-style: none; cursor: pointer; }
+.popover > summary::-webkit-details-marker { display: none; }
+.popover-body { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; width: max-content; max-width: min(380px, 90vw);
+  max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding: 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
 .arc, .param { font-size: 11px; color: var(--muted); display: inline-flex; align-items: center; gap: 3px; }
 /* The aft arcs start a little apart from the fore ones. */
 .arc.aft { margin-left: 8px; }
