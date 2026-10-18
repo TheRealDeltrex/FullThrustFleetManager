@@ -9,6 +9,28 @@ Read this only when actually shipping. CLAUDE.md holds the rule that **`main` is
 only and is never pushed without the owner**, and that applies here too: this file is the
 mechanics, not the permission. Tags and GitHub releases are the owner's.
 
+## Where each step runs
+
+Learned the hard way on v0.4.0 and v0.4.1. Split the work by what each place can do, and do not
+"try it once" in the wrong place:
+
+- **Cloud session** (claude.ai): steps 1 and the release notes. Branch pushes and GitHub MCP
+  PRs/merges work. **Tag pushes do not**: `git push origin vX.Y.Z` from the cloud container dies
+  with `fatal: the remote end hung up unexpectedly` / `send-pack: unexpected disconnect while
+  reading sideband packet` while branch pushes in the same session succeed, and the agent proxy
+  logs nothing. The cloud also has no tool that creates a release. So never tag in the cloud, and
+  never leave a local tag there either.
+- **Owner's Windows PC**, through a Remote Control session started in
+  `E:\ClaudeCodeFolder` (the checkout is `E:\ClaudeCodeFolder\FullThrustFleetManager`;
+  `E:\ClaudeOnlineFolder` is empty): steps 2 to 4. PyInstaller and the signing key only exist
+  there.
+- **The PC's permission check blocks `git push` of a tag and `gh release create`** ("creating a
+  public surface") unless the owner's explicit OK for *this* version is in the session's
+  instructions. On v0.4.0 that cost a full round trip. Get the OK first (the owner's own "ship
+  it" message, or a decision card), then quote it in the Remote Control instructions up front.
+- If the cloud container's `pip install` fails with `Cannot uninstall blinker ... RECORD file not
+  found` (a Debian-installed package), use `pip install --ignore-installed blinker -r ...`.
+
 ## The shape of it
 
 Version is single-sourced from `pyproject.toml` `[project] version`, read at runtime by
@@ -24,6 +46,10 @@ still point at commits that carry the whole source, which is why the history loo
 before that point.)
 
 Check `gh release list` before picking a tag; a tag is never reused.
+
+Workflows run on `ubuntu-24.04` (pinned, not `ubuntu-latest`) with Node 24 action versions
+(checkout v7, setup-python v7, upload-pages-artifact v5, deploy-pages v5). If GitHub warns about a
+retired runtime or runner image again, bump them on `devversion` and copy the files to `main`.
 
 **The order below matters.** The two version badges on the landing page each state the truth
 about their own channel, which is the point of them:
@@ -123,14 +149,32 @@ one thing that proves the PDFs got bundled) and a fleet PDF.
 
 ## 3. Tag and release
 
-Owner's call, every time. Tag `vX.Y.Z` on `devversion`, push the tag, then create the release
-and attach the zip:
+Owner's call, every time (see "Where each step runs" for how the OK reaches the PC).
+
+First make sure the PC builds exactly the commit you release. Fast-forward only, so a stray
+local commit or a dirty tree stops the release instead of being shipped:
 
 ```bash
-git tag vX.Y.Z && git push origin vX.Y.Z
-gh release create vX.Y.Z dist/FullThrustFleetManager-<version>-win64.zip \
-  --target devversion --title "vX.Y.Z" --notes "..."
+git fetch origin devversion
+git checkout devversion
+git merge --ff-only origin/devversion
+git status --porcelain            # must print nothing (dist/ and build/ are ignored)
+git rev-parse HEAD                # must equal the version-bump merge commit
 ```
+
+Then **let GitHub create the tag** instead of pushing one. `gh release create` with `--target`
+set to the full commit SHA creates the tag server-side, which removes the tag push (the git
+operation that failed on v0.4.0) from the release entirely:
+
+```bash
+gh release view vX.Y.Z && echo "STOP: vX.Y.Z already exists"   # a tag is never reused
+gh release create vX.Y.Z dist/FullThrustFleetManager-<version>-win64.zip \
+  --target <full SHA of HEAD> --title "vX.Y.Z" --notes-file <notes file>
+git fetch --tags origin && git rev-parse vX.Y.Z^{commit}       # must equal HEAD
+```
+
+Pass the SHA, not `devversion`: a branch name resolves at the moment GitHub creates the tag, so
+anything merged in the meantime would be tagged without having been built or tested.
 
 `main` is not touched. It only ever changes when the README, the licence or a **workflow file**
 changes — and a workflow file changing on `devversion` is the one case where `main` genuinely
@@ -140,6 +184,7 @@ has to be updated too, or the dispatchable copy goes stale. See step 4 for why t
 
 ```bash
 gh workflow run deploy-pages.yml --ref devversion -f ref=devversion
+sleep 5; gh run watch "$(gh run list --workflow deploy-pages.yml --limit 1 --json databaseId -q '.[0].databaseId')" --exit-status
 ```
 
 **Pass `--ref devversion` as well as `-f ref=devversion`.** They do different jobs and both
