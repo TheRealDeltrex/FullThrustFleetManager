@@ -79,6 +79,8 @@ What exists:
   clicking Add system. Per-system inputs are named `sys-<uid>-<param>`; arcs are checkboxes
   plus a hidden `sys-<uid>-arcs-present` marker, because an all-unchecked arc set posts nothing.
   Remove buttons carry the uid in their `formaction` query, so the table needs no script.
+- `store.add_system` re-sorts `systems` into the picker's order (stable, so one type keeps its
+  add order); the Add-system picker remembers its last pick in `session["system_type"]`.
 - Actions: `apply` (recalculate), `add_system`, `remove_system`, `save` / `refit` / `variant`
   (`store.save_design` modes), `discard`, `delete`, `make_variant`. Everything but
   `make_variant` is refused on a catalog design.

@@ -413,10 +413,21 @@ def test_settings_defaults_and_validation():
 def test_an_added_system_takes_the_pickers_default_arcs(ruleset, race, system_type, arcs):
     design, _msg = store.new_design(ruleset, race=race)
     ok, _msg = store.add_system(design, system_type)
-    assert ok and design["systems"][-1]["arcs"] == arcs
+    added = next(s for s in design["systems"] if s["type"] == system_type)
+    assert ok and added["arcs"] == arcs
     codes = {i.code for i in RULESETS[ruleset].validate_design(design, {})
-             if i.system_uid == design["systems"][-1]["uid"] and i.severity == "violation"}
+             if i.system_uid == added["uid"] and i.severity == "violation"}
     assert not codes
+
+
+def test_added_systems_sort_into_the_pickers_order():
+    design, _msg = store.new_design("fb", class_preset="")
+    design["systems"] = []
+    for system_type in ("hangar", "sm_rack", "beam", "pds", "beam"):
+        store.add_system(design, system_type)
+    assert [s["type"] for s in design["systems"]] == ["beam", "beam", "sm_rack", "pds", "hangar"]
+    beams = [s["uid"] for s in design["systems"] if s["type"] == "beam"]
+    assert beams == ["s3", "s5"]  # one type keeps the order it was added in
 
 
 def test_normalize_keeps_the_cross_dimensions_loadout_fields():

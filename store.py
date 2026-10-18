@@ -456,8 +456,8 @@ def add_system(design: dict, system_type: str) -> tuple[bool, str]:
     if not rs:
         return False, _("Unknown ruleset.")
     options = {k: True for k in fleet_rules.FLEET_OPTION_KEYS}
-    definition = next((s for s in rs.system_types(design.get("race", "human"), options)
-                       if s.type == system_type), None)
+    picker = rs.system_types(design.get("race", "human"), options)
+    definition = next((s for s in picker if s.type == system_type), None)
     if not definition:
         return False, _("This ruleset has no such system.")
     uids = {s["uid"] for s in design["systems"]}
@@ -475,6 +475,10 @@ def add_system(design: dict, system_type: str) -> tuple[bool, str]:
         elif param.default is not None:
             system[param.name] = param.default
     design["systems"].append(system)
+    # The list sorts itself into the picker's order (its groups, then the book's order within
+    # each); the sort is stable, so systems of one type keep the order they were added in.
+    order = {d.type: i for i, d in enumerate(picker)}
+    design["systems"].sort(key=lambda s: order.get(s.get("type"), len(order)))
     return True, _("{name} added.", name=definition.label)
 
 
