@@ -344,9 +344,9 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="night-sky"] .card .mini svg, [data-theme="night-sky"] .ssd-wrap svg, [data-theme="night-sky"] .sheet svg { background: #eef0fa; border-radius: 8px; }
 [data-theme="night-sky"] input[type=checkbox] { accent-color: var(--lavender); }
 
-/* Lunar: bright regolith greys and white panels, a light top bar, and a deep teal accent. */
-:root[data-theme="lunar"] { --bg: #e9ebee; --panel: #ffffff; --panel-2: #f4f5f7; --ink: #1b1f24; --muted: #646b75; --line: #d3d7dd; --accent: #0e6f7e; --accent-soft: #dcf0f2; --ok: #2b7a4b; --ok-soft: #e1f2e7; --warn: #9a6100; --warn-soft: #fbefd9; --bad: #b3261e; --bad-soft: #fbe6e4; --chrome: #f8f9fa; --chrome-ink: #1b1f24; --chrome-muted: #646b75; --st-ready: #2b7a4b; --st-damaged: #d98a00; --st-docked: #0e6f7e; --st-lost: #9aa1ab; --rs-ft2: #d98a00; --rs-fb: #2c64b0; --rs-ftcd: #2b7a4b; --rs-ftpc: #6b3fa0; --rs-current: #b7bdc6; }
-[data-theme="lunar"] body { background: radial-gradient(1200px 700px at 110% -20%, #ffffff 0%, transparent 60%), var(--bg); }
+/* Lunar: pale full-moon greys, silvery panels with a soft moonglow and faint mare shadows, and a deep teal accent. */
+:root[data-theme="lunar"] { --bg: #d6d8db; --panel: #eceded; --panel-2: #e2e4e6; --ink: #1d2126; --muted: #5d636b; --line: #c4c8cd; --accent: #0e6f7e; --accent-soft: #dcf0f2; --ok: #2b7a4b; --ok-soft: #e1f2e7; --warn: #9a6100; --warn-soft: #fbefd9; --bad: #b3261e; --bad-soft: #fbe6e4; --chrome: #e6e7e9; --chrome-ink: #1d2126; --chrome-muted: #5d636b; --st-ready: #2b7a4b; --st-damaged: #d98a00; --st-docked: #0e6f7e; --st-lost: #9aa1ab; --rs-ft2: #d98a00; --rs-fb: #2c64b0; --rs-ftcd: #2b7a4b; --rs-ftpc: #6b3fa0; --rs-current: #b7bdc6; }
+[data-theme="lunar"] body { background: radial-gradient(900px 900px at 100% -10%, rgba(255,255,252,.85) 0%, rgba(240,241,240,.4) 35%, transparent 65%), radial-gradient(260px 200px at 18% 70%, rgba(150,155,162,.12) 0%, transparent 70%), radial-gradient(180px 150px at 62% 88%, rgba(150,155,162,.10) 0%, transparent 70%), radial-gradient(220px 170px at 40% 30%, rgba(150,155,162,.08) 0%, transparent 70%), var(--bg); background-attachment: fixed; }
 [data-theme="lunar"] .topbar { border-bottom: 1px solid var(--line); box-shadow: 0 1px 8px rgba(30,40,55,.06); }
 [data-theme="lunar"] .brand { letter-spacing: 1.5px; text-transform: uppercase; font-size: 13px; }
 [data-theme="lunar"] .brand small { color: var(--accent); }
