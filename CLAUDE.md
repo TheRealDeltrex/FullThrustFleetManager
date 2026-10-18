@@ -36,7 +36,7 @@ What exists:
   `rulebook.html` and `tournament_check.html`.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
   variables, panes stack below 1100 px. The Settings "Look" (`settings["theme"]`, one of
-  `store.THEMES`: admiralty (default), lunar, bridge, carbon-armor, night-sky, nebula, aurora) sets
+  `store.THEMES`: admiralty (default), lunar, bridge, carbon-armor, night-sky, nebula, aurora, asteroid) sets
   `<html data-theme>`; each look is a block at the end of the file that redefines the variables and
   restyles colour, type and borders only. The unscoped rules are their shared base, not a look
   (Classic was retired; a stored unknown value falls back to the default). Ship diagrams keep a

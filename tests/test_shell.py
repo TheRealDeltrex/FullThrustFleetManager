@@ -83,7 +83,7 @@ def test_the_appearance_setting_themes_every_tab(client):
     import store
     css = (ROOT / "static" / "style.css").read_text(encoding="utf-8")
     assert 'data-theme="admiralty"' in client.get("/fleet").get_data(as_text=True)  # the default
-    assert len(store.THEMES) == 7 and "classic" not in store.THEMES  # Classic was retired
+    assert len(store.THEMES) == 8 and "classic" not in store.THEMES  # Classic was retired
     for theme in store.THEMES:
         assert f':root[data-theme="{theme}"]' in css               # every choice has its palette
     client.post("/settings", data={"theme": "nebula"})
@@ -103,7 +103,7 @@ def test_the_top_bar_look_picker_shares_the_setting(client):
     assert all(f'value="{t}"' in bar for t in store.THEMES)    # every look, short names
     assert ">Night Sky<" in bar
     names = [o.split(">", 1)[1].split("<", 1)[0].strip() for o in bar.split("<option")[1:]]
-    assert names == sorted(names) and len(names) == 7               # alphabetical
+    assert names == sorted(names) and len(names) == 8               # alphabetical
     resp = client.post("/settings", data={"theme": "aurora", "next": "/design"})
     assert resp.status_code == 302 and resp.headers["Location"].endswith("/design")
     assert store.load_settings()["theme"] == "aurora"
