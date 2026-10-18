@@ -10,7 +10,7 @@
     <div class="panel">
       <h3>{{ _("Rulebooks") }}</h3>
       <div class="body stack">
-        <form method="post" action="{{ url_for('settings_save') }}" class="row">
+        <form method="post" action="{{ url_for('settings_save') }}" class="row" data-autosave="save">
           <label>{{ _("Open page references in") }}
             <select class="input" name="pdf_viewer">
               <option value="app" {% if settings.pdf_viewer == 'app' %}selected{% endif %}>{{ _("The in-app viewer") }}</option>
@@ -24,7 +24,7 @@
               {% endfor %}
             </select>
           </label>
-          <button class="btn primary" type="submit">{{ _("Save settings") }}</button>
+          <noscript><button class="btn primary" type="submit">{{ _("Save settings") }}</button></noscript>
         </form>
         <div class="row">
           {% for book in books %}
@@ -37,13 +37,13 @@
     <div class="panel">
       <h3>{{ _("Appearance") }}</h3>
       <div class="body">
-        <form method="post" action="{{ url_for('settings_save') }}" class="row">
+        <form method="post" action="{{ url_for('settings_save') }}" class="row" data-autosave="save">
           <label>{{ _("Look") }}
             <select class="input" name="theme">
               {{ theme_options(settings.theme) }}
             </select>
           </label>
-          <button class="btn primary" type="submit">{{ _("Save settings") }}</button>
+          <noscript><button class="btn primary" type="submit">{{ _("Save settings") }}</button></noscript>
         </form>
       </div>
     </div>

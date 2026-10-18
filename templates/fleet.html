@@ -25,11 +25,12 @@
       <h3 class="sep">{{ _("Squadrons") }}</h3>
       <div class="body stack">
         {% for squadron in selected.fleet.squadrons %}
-          <form method="post" action="{{ url_for('fleet_action', fleet_id=selected.fleet.id) }}" class="row">
+          <form method="post" action="{{ url_for('fleet_action', fleet_id=selected.fleet.id) }}" class="row"
+                data-autosave="rename_squadron">
             <input type="hidden" name="squadron" value="{{ squadron.id }}" />
             <input class="input grow" name="name" value="{{ squadron.name }}"
                    aria-label="{{ _('Squadron name') }}" />
-            <button class="btn sm" type="submit" name="action" value="rename_squadron">{{ _("Rename") }}</button>
+            <noscript><button class="btn sm" type="submit" name="action" value="rename_squadron">{{ _("Rename") }}</button></noscript>
             <button class="btn sm ghost" type="submit" name="action" value="move_squadron"
                     formnovalidate title="{{ _('Move up') }}">&uarr;</button>
             <button class="btn sm ghost" type="submit" name="action" value="remove_squadron"
@@ -200,7 +201,8 @@
                     {% else %}{{ _("Missing design") }}{% endif %}
                     · {{ selected.ship_points[ship.uid] }} {{ _("pts") }}
                   </footer>
-                  <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="row">
+                  <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="row"
+                        data-autosave="update_ship">
                     <input type="hidden" name="uid" value="{{ ship.uid }}" />
                     <input class="input sm" name="table_id" value="{{ ship.table_id }}" maxlength="16" required
                            aria-label="{{ _('Ship ID') }}" title="{{ _('Ship ID') }}" />
@@ -216,7 +218,7 @@
                         <option value="{{ sq.id }}" {% if ship.squadron == sq.id %}selected{% endif %}>{{ sq.name }}</option>
                       {% endfor %}
                     </select>
-                    <button class="btn sm" type="submit" name="action" value="update_ship">{{ _("Apply") }}</button>
+                    <noscript><button class="btn sm" type="submit" name="action" value="update_ship">{{ _("Apply") }}</button></noscript>
                     <button class="btn sm ghost" type="submit" name="action" value="remove_ship"
                             formnovalidate title="{{ _('Remove ship') }}">&times;</button>
                   </form>
@@ -275,7 +277,8 @@
       {# ---- Fleet details ---- #}
       <div class="panel" id="fleet-details">
         <h3>{{ _("Fleet details") }}</h3>
-        <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body stack">
+        <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body stack"
+              data-autosave="update_details">
           <div class="grid-fields">
             <label>{{ _("Name") }}<input class="input" name="name" value="{{ f.name }}" /></label>
             <label>{{ _("Admiral") }}<input class="input" name="admiral" value="{{ f.admiral }}" /></label>
@@ -312,7 +315,7 @@
           </fieldset>
           <textarea class="input wide" name="notes" rows="2" aria-label="{{ _('Notes') }}">{{ f.notes }}</textarea>
           <div class="row">
-            <button class="btn primary" type="submit" name="action" value="update_details">{{ _("Save fleet") }}</button>
+            <noscript><button class="btn primary" type="submit" name="action" value="update_details">{{ _("Save fleet") }}</button></noscript>
             <div class="spacer"></div>
             <button class="btn ghost" type="submit" name="action" value="delete_fleet"
                     formnovalidate>{{ _("Delete fleet") }}</button>

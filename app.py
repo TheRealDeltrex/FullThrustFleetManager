@@ -173,7 +173,8 @@ def dispatch_action(target: dict) -> bool:
     except ValueError:
         flash(_("Please enter a valid number."), "error")
         return False
-    if msg:
+    # An edit saved as it is made (static/autosave.js) reports only what went wrong.
+    if msg and not (ok and request.form.get("autosave")):
         flash(msg, "success" if ok else "error")
     return ok
 
@@ -683,19 +684,26 @@ def design_update(design_id: str) -> Response:
 
     if action == "add_system":
         ok, msg = store.add_system(working, request.form.get("system_type", ""))
-        flash(msg, "success" if ok else "error")
+        if not (ok and request.form.get("autosave")):
+            flash(msg, "success" if ok else "error")
     elif action == "remove_system":
         ok, msg = store.remove_system(working, request.args.get("uid") or request.form.get("uid", ""))
-        flash(msg, "success" if ok else "error")
+        if not (ok and request.form.get("autosave")):
+            flash(msg, "success" if ok else "error")
     elif action in ("save", "refit", "variant"):
         ok, msg, saved_id = store.save_design(working, mode=action)
         flash(msg, "success" if ok else "error")
         if ok:
             return redirect(url_for("design_detail", design_id=saved_id))
-    elif action != "apply":
+    elif action not in ("apply", "autosave"):
         flash(_("Unknown action."), "error")
         return redirect(url_for("design_detail", design_id=design_id))
 
+    # Edits made in the page (static/autosave.js) are saved as they come, as long as no ship
+    # uses the design and it keeps the rules; otherwise they wait in the draft for a refit, a
+    # new variant or a fix. Either way the page says so, so there is no message here.
+    if request.form.get("autosave") and store.save_design(working)[0]:
+        return redirect(url_for("design_detail", design_id=design_id))
     store.save_draft(working)
     return redirect(url_for("design_detail", design_id=design_id))
 
@@ -916,13 +924,16 @@ def settings_save() -> Response:
     # Each Settings panel posts its own fields; a field a form leaves out keeps its value.
     fields = ("paper", "pdf_viewer", "theme")
     ok, msg = store.save_settings(**{k: request.form[k] for k in fields if k in request.form})
+    if ok and request.form.get("autosave"):
+        msg = ""
     # The top-bar look picker posts `next` and goes back to its page without a flash.
     nxt = request.form.get("next", "")
     if nxt.startswith("/") and not nxt.startswith(("//", "/\\")):
         if not ok:
             flash(msg, "error")
         return redirect(nxt)
-    flash(msg, "success" if ok else "error")
+    if msg:
+        flash(msg, "success" if ok else "error")
     return redirect(url_for("settings"))
 
 

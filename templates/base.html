@@ -85,6 +85,7 @@
       {% block content %}{% endblock %}
     </main>
 
+    <script src="{{ url_for('static', filename='autosave.js') }}"></script>
     {% if IS_FROZEN %}
       <script>
         (function () {
