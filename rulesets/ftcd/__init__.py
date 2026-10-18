@@ -123,7 +123,7 @@ class FTCDRuleset:
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
         races = frozenset(races)
-        always = {"turn_sequence", "arcs", "hull_track", "threshold", "rerolls"}
+        always = {"turn_sequence", "arcs", "hull_track", "threshold", "rerolls", "fleet_morale"}
         if any(r == "human" or aliens.module_for(r).CREWED for r in races):
             always |= {"crew", "fire_control"}  # a Sa'Vasku construct has neither (FB2 p.22)
         wanted = set(systems_present)
@@ -151,6 +151,12 @@ SHARED_ENTRIES = {
     "superior_sensors": {"enhanced_sensors"},
     "weasel_capital": {"weasel_cruiser"},
     "area_ecm": {"ecm"},
+    # Not systems: what the fleet sheet adds for a non-FTL design, a starbase section, a troop
+    # hold or bought dummy bogeys (pdf_export.quickref_page).
+    "no_ftl": {"battle_riders", "system_defence"},
+    "tender_bay": {"battle_riders"},
+    "portal": {"jump_gate"},
+    "troop_hold": {"boarding"},
 }
 
 

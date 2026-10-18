@@ -22,7 +22,7 @@ three rules engines (FB with the FB2 races, FT2 + More Thrust, and FTCD, Cross D
 also fields every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
 layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
 rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
-Next on the roadmap: Project Continuum (FTPC). Releases follow
+Cross Dimensions is complete. Next on the roadmap: Project Continuum (FTPC). Releases follow
 `.claude/skills/shipping-a-release/SKILL.md`.
 
 What exists:
@@ -414,7 +414,9 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   each entry names the next heading and a printed-page window instead; `gap_text()` restores the
   word spaces the justified text layer drops (glyph gap > 0.1 x font size) and skips the
   all-italic lines, which are the book's worked examples. That cleanup runs for CD only, so the
-  FB and FT2 output does not move.
+  FB and FT2 output does not move. Play rules with no system of their own are reached through
+  keys `pdf_export` adds to the present set (`no_ftl`, `starbase`, `troop_hold`,
+  `dummy_bogeys`) and `SHARED_ENTRIES` maps to entries; `fleet_morale` is on every sheet.
 - Loadout extras (CD pp.25, 30, 47) live in the loadout, not the design, under optional keys
   `store._norm_loadout` keeps only when used: fighter `extras` / `swing`, magazine `stages`,
   top-level `craft` ({hangar, mass}). `derived["rich_loadout"]` makes the Design tab draw one
