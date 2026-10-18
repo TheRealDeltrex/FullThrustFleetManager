@@ -500,7 +500,7 @@ def design_detail(design_id: str) -> str:
     return render_template(
         "design.html", active_tab="design", library=_library(request.args.get("q", "")),
         rulesets=list(RULESETS.values()), selected=_design_context(working, dirty),
-        class_presets=_class_presets(),
+        class_presets=_class_presets(), last_system_type=session.get("system_type", ""),
     )
 
 
@@ -676,6 +676,10 @@ def design_update(design_id: str) -> Response:
     except ValueError:
         flash(_("Please enter a valid number."), "error")
         return redirect(url_for("design_detail", design_id=design_id))
+
+    # The Add-system picker stays on the last pick, so adding several of a kind is one click each.
+    if request.form.get("system_type"):
+        session["system_type"] = request.form["system_type"]
 
     if action == "add_system":
         ok, msg = store.add_system(working, request.form.get("system_type", ""))
