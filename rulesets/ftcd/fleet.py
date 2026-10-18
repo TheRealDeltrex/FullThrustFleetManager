@@ -10,6 +10,7 @@ from __future__ import annotations
 from i18n import _
 from rulesets import Issue
 from rulesets.fb import rules as fb_rules
+from rulesets.ftcd import rules as cd_rules
 from rulesets.ftcd.data import RIDER_MAX_MASS
 
 _int = fb_rules._int
@@ -68,7 +69,8 @@ def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict) -> 
 
     if options.get("cd_system_defence"):
         return issues
-    riders = [(s, d) for s, d in live if d.get("ftl") is not True]
+    # Starbase sections and gates are terrain, not battle riders: they never move.
+    riders = [(s, d) for s, d in live if d.get("ftl") is not True and not cd_rules.stationary(d)]
     if not riders:
         return issues
     for s, d in riders:

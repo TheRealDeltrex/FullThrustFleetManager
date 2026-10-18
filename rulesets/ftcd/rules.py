@@ -42,6 +42,20 @@ def _extra_arcs(system: dict) -> int:
     return 2 if _is_broadside(system) else max(0, len(_arcs(system)) - 1)
 
 
+def _transfer(system: dict) -> int:
+    return max(1, _int(system.get("transfer_mass"), 1))
+
+
+def transfer_mass(design: dict) -> int:
+    """What the design's gate or portal drives move in one turn (CD p.35); 0 for a ship."""
+    return sum(_transfer(s) for s in _systems(design) if s.get("type") in data.GATE_TYPES)
+
+
+def stationary(design: dict) -> bool:
+    """A starbase section or an artificial gate: terrain that never moves (CD pp.35, 51)."""
+    return design.get("hull_kind") == "starbase" or transfer_mass(design) > 0
+
+
 def _class(system: dict) -> int:
     return max(1, _int(system.get("class"), 1))
 
@@ -182,6 +196,17 @@ SYSTEM_RULES: dict[str, SystemRule] = {
         lambda s, t: max(1, math.ceil(max(1, _int(s.get("tow_mass"), 1)) / 5)),
         lambda s, m: 2 * m,
         lambda s: _("Tug jump drive (tows MASS {n})", n=max(1, _int(s.get("tow_mass"), 1))),
+    ),
+    # CD p.35: the drive is paid as an FTL drive, 2 a MASS; it need not cover the gate's own MASS.
+    "jump_gate": (
+        lambda s, t: max(1, round_half_up(_transfer(s), data.GATE_TRANSFER_PER_MASS)),
+        lambda s, m: 2 * m,
+        lambda s: _("Jump gate drive (transfer MASS {n})", n=_transfer(s)),
+    ),
+    "portal": (
+        lambda s, t: _transfer(s),
+        lambda s, m: 2 * m,
+        lambda s: _("Portal drive (transfer MASS {n})", n=_transfer(s)),
     ),
     "enhanced_sensors": (lambda s, t: 2, lambda s, m: 8, lambda s: _("Enhanced sensors")),
     "superior_sensors": (lambda s, t: 4, lambda s, m: 16, lambda s: _("Superior sensors")),
@@ -332,6 +357,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "rich_loadout": True,
         "advanced_drive": advanced_drive,
         "advanced_ftl": advanced_ftl,
+        "transfer_mass": transfer_mass(design),
     }
     return Breakdown(tuple(rows), sum(r.mass for r in rows), sum(r.points for r in rows), derived)
 
@@ -473,6 +499,13 @@ def suggest_type(design: dict) -> tuple[str, str]:
     tmf = max(0, _int(design.get("tmf")))
     if design.get("hull_kind") == "merchant":
         return fb_rules.data.translated_class_label("Merchant"), "M"
+    # CD prints no codes for these; the letters only have to be short and distinct.
+    if any(s.get("type") == "portal" for s in _systems(design)):
+        return _("Portal"), "PT"
+    if transfer_mass(design):
+        return _("Jump gate"), "JG"
+    if design.get("hull_kind") == "starbase":
+        return _("Starbase section"), "SB"
     bays = sum(max(1, _int(s.get("bays"), 1)) for s in _systems(design) if s.get("type") == "hangar")
     if bays >= data.CARRIER_MIN_BAYS and tmf >= data.CARRIER_CLASSES[0][2]:
         return _pick(tmf, data.CARRIER_CLASSES)
@@ -564,9 +597,11 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     _validate_magazine_loads(design, by_uid, options, violation, info)
     _validate_hangars(design, by_uid, violation, info)
 
+    _validate_stationary(design, systems, violation)
+
     if not any(s.get("type") == "fire_control" for s in systems):
         info("no_fire_control", _("No fire control: weapons that need one cannot fire."))
-    if design.get("ftl") is not True:
+    if design.get("ftl") is not True and not stationary(design):
         # CD pp.34-35: a battle rider (MASS 60 at most, carried by a mothership) or a system
         # defence ship; the fleet decides which (rulesets/ftcd/fleet.py).
         info("no_ftl", _("No FTL drive: a battle rider (MASS {n} at most) needs a mothership; "
@@ -575,6 +610,25 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
         if s.get("type") in ("screen", "advanced_screen") and _int(s.get("level"), 1) > 2:
             info("screen_backups", _("Screen generators beyond level 2 are backups only."), s.get("uid"))
     return issues
+
+
+def _validate_stationary(design: dict, systems: list[dict], violation) -> None:
+    """Gates and starbases (CD pp.35, 51): stationary, so thrust 0; a gate needs hull boxes of
+    at least 10% of its transfer MASS and is either a jump gate or a portal."""
+    gates = [s for s in systems if s.get("type") in data.GATE_TYPES]
+    if not stationary(design):
+        return
+    if _int(design.get("thrust")) > 0:
+        violation("stationary_thrust",
+                  _("A starbase section or gate is stationary: its thrust is always 0."))
+    if not gates:
+        return
+    if len({s.get("type") for s in gates}) > 1:
+        violation("gate_and_portal", _("A gate is either a jump gate or a portal, not both."))
+    need = pct(transfer_mass(design), 100)
+    if _int(design.get("hull_boxes")) < need:
+        violation("gate_hull", _("A gate needs at least {n} hull boxes (10% of its transfer MASS).",
+                                 n=need))
 
 
 ARCED_TYPES = {
