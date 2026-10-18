@@ -203,8 +203,10 @@
             </label>
             <label>{{ _("Hull kind") }}
               <select class="input" name="hull_kind">
-                <option value="warship" {% if d.hull_kind == 'warship' %}selected{% endif %}>{{ _("Warship") }}</option>
-                <option value="merchant" {% if d.hull_kind == 'merchant' %}selected{% endif %}>{{ _("Merchant") }}</option>
+                {% set kind_names = {"warship": _("Warship"), "merchant": _("Merchant"), "starbase": _("Starbase section")} %}
+                {% for kind in selected.ruleset.hull_kinds %}
+                  <option value="{{ kind }}" {% if d.hull_kind == kind %}selected{% endif %}>{{ kind_names[kind] }}</option>
+                {% endfor %}
               </select>
             </label>
             <label class="check"><input type="checkbox" name="ftl" {% if d.ftl %}checked{% endif %} /> {{ _("FTL drive") }}</label>

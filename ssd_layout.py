@@ -279,6 +279,16 @@ def _labelled(text, wide: bool = False):
     return draw
 
 
+def _gate(text):
+    """A gate or portal drive, CD p.35: the FTL box widened to carry its transfer MASS, as the
+    tug drive of figure 23 carries its own."""
+    def draw(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+        mass = system.get("transfer_mass", 0)
+        return [Rect(x - 17, y - 7, 34, 14, fill=WHITE, stroke=1.2),
+                Text(x, y + 3.0, f"{text()} {mass}", size=7, bold=True)]
+    return draw
+
+
 _SHARED_ICONS = {
     "beam": _beam,
     "pulse_torpedo": _torpedo,
@@ -306,6 +316,8 @@ _SHARED_ICONS = {
     "reflex_field": _labelled(lambda: _("RFX")),
     "cloak": _labelled(lambda: _("CLK")),
     "tug_drive": _labelled(lambda: _("TUG")),
+    "jump_gate": _gate(lambda: _("GATE")),
+    "portal": _gate(lambda: _("PORT")),
     "hold": _labelled(lambda: _("HOLD"), wide=True),
 }
 
@@ -643,7 +655,7 @@ WEAPONS = {
     "sm_launcher", "sm_rack", "submunition", "kgun", "mkp", "stinger", "pod_launcher",
     "pulser", "plasma_bolt_launcher", "graser", "heavy_missile",
 }
-BOTTOM_ROW = {"hold", "tug_drive", "tender_bay"}
+BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
 
 
 def _side(arcs_of_system: list[str], all_arcs: tuple[str, ...]) -> str:
