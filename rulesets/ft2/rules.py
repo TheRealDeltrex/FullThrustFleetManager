@@ -12,7 +12,7 @@ Survey Cruiser (MASS 48 merchant carrying 5 MASS of systems).
 from __future__ import annotations
 
 from i18n import _
-from rulesets import Breakdown, BreakdownRow, Issue
+from rulesets import Breakdown, BreakdownRow, Issue, common
 from rulesets.common import arcs_valid
 from rulesets.ft2 import data, mt
 
@@ -21,20 +21,8 @@ def _ceil_div(a: int, b: int) -> int:
     return -(-a // b)
 
 
-def _int(value: object, default: int = 0) -> int:
-    """Stored designs are semi-untrusted, so a bad number reads as default instead of raising."""
-    if isinstance(value, bool):
-        return default
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float) and value.is_integer():
-        return int(value)
-    return default
-
-
-def _systems(design: dict) -> list[dict]:
-    systems = design.get("systems")
-    return [s for s in systems if isinstance(s, dict)] if isinstance(systems, list) else []
+_int = common.as_int
+_systems = common.systems_of
 
 
 def _arcs(system: dict) -> list:
@@ -236,10 +224,7 @@ def _hull_type(design: dict) -> str:
 # ---- Loadout and More Thrust requirements ------------------------------------------------------
 
 
-def _loadout_entries(loadout: object, key: str) -> list[dict]:
-    if not isinstance(loadout, dict) or not isinstance(loadout.get(key), list):
-        return []
-    return [e for e in loadout[key] if isinstance(e, dict)]
+_loadout_entries = common.loadout_entries
 
 
 def loadout_points(design: dict, loadout: dict | None, options: dict) -> int:

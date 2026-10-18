@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from rulesets import RULESETS
+from rulesets import RULESETS, common
 from rulesets.fb import data as fb_data
 from rulesets.ft2 import data as ft2_data
 from rulesets.ftcd import data as ftcd_data
@@ -89,7 +89,7 @@ def class_presets(ruleset_id: str) -> list[ClassPreset]:
     if ruleset_id in ("fb", "ftcd"):
         data = fb_data if ruleset_id == "fb" else ftcd_data
         share = _average_hull(data.HULL_DESCRIPTORS)
-        label_of = fb_data.translated_class_label
+        label_of = common.class_label
         return (_banded(data.SHIP_CLASSES, share, label_of)
                 + _banded(data.CARRIER_CLASSES, share, label_of)
                 + [_merchant(label_of, 50, share)])
@@ -192,7 +192,7 @@ def class_for_code(ruleset_id: str, code: str, tmf: int = 0) -> tuple[str, str] 
     for table in _tables(ruleset_id):
         band = next((c for c in table if c[1] == code), None)
         if band:
-            return fb_data.translated_class_label(band[0]), band[1]
+            return common.class_label(band[0]), band[1]
     return None
 
 
@@ -205,4 +205,4 @@ def _nearest_band(tmf: int, table: tuple) -> tuple[str, str]:
     else:
         label, code, _low, _high = min(
             inside, key=lambda c: abs(tmf - (c[2] if c[3] is None else (c[2] + c[3]) / 2)))
-    return fb_data.translated_class_label(label), code
+    return common.class_label(label), code

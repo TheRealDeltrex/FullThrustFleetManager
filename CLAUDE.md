@@ -306,9 +306,15 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - `validate_design(design, options)` also flags More Thrust content whose fleet toggle is off in
   `options` (`mt_toggle_off`, `mass_over_100`), so fleet conformance is just validation with the
   fleet's options.
-- `rulesets/common.py`: integer rounding (`round_half_up`, `pct_mass`: .5 up, never 0 MASS),
-  arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`), `split_rows`, `cf_positions`. Never compute
-  percentages with floats: 85 x 30% must be 25.5 exactly to round to 26.
+- `rulesets/common.py`: what more than one ruleset needs. Integer rounding (`round_half_up`,
+  `pct_mass`: .5 up, never 0 MASS), arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`),
+  `split_rows`, `cf_positions`, the semi-untrusted readers (`as_int`, `systems_of`, `arcs_of`,
+  `loadout_entries`), `half_turn_thrust`, labels (`hangar_label`, `hold_label`, `class_label`,
+  `hull_descriptor`), `pick_class` and the salvo-missile check `validate_missiles`. **A ruleset
+  imports shared pieces from here, never from another ruleset's `rules.py`**; only a race module
+  reused across rulesets (FTCD's FB2 races) crosses packages. The FB modules keep their old
+  underscore names as aliases. Never compute percentages with floats: 85 x 30% must be 25.5
+  exactly to round to 26.
 - `rulesets/fb/`: `data.py` (books, `system_defs()` for the picker, fighter points, FB1 p.12
   classes, hull descriptors), `rules.py` (human tech: `SYSTEM_RULES` type -> (mass, points,
   label), breakdown, validation, derived values), `kravak.py` (Kra'Vak tech, FB2 pp.9-11),
@@ -402,8 +408,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 ## FTCD ruleset (`rulesets/ftcd/`)
 
 - Cross Dimensions chapter 11, human tech. `data.py` (book, picker, CD p.42 classes),
-  `rules.py` (costing, validation), `__init__.py`. It reuses FB's helpers and its missile check
-  (`rulesets.fb.rules`) because CD is the Fleet Book design system gathered into one book; what
+  `rules.py` (costing, validation), `__init__.py`. It uses the shared helpers and missile check in
+  `rulesets/common.py`, since CD is the Fleet Book design system gathered into one book; what
   CD changes is in `rules.py`'s docstring. Golden: the CD p.46 Heavy Cruiser is 294.
 - New design fields `hull_advanced`, `drive_advanced`, `ftl_advanced` (normalised in `store`;
   other rulesets ignore them). An advanced hull has three rows (thresholds 6, 5) and is a
