@@ -98,6 +98,7 @@ class Ruleset(Protocol):
     icon_set: Any  # the human icon table in ssd_layout.ICON_SETS; per race, icon_set_for()
     option_keys: tuple[str, ...]  # the fleet options this ruleset offers, in display order
     catalog_sources: tuple[str, ...]  # rulesets whose catalog designs this one adopts
+    dummy_bogey_points: int  # points per dummy bogey a fleet may buy; 0 offers none
 
     def races(self) -> list[Race]: ...
 
@@ -137,6 +138,12 @@ class Ruleset(Protocol):
 
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]: ...
+
+    def fleet_issues(self, fleet: dict, ships: list[tuple[dict, dict]],
+                     options: dict) -> list[Issue]:
+        """Rules that judge the fleet as a whole rather than one design, given each ship with
+        its design (ships whose design is missing are left out)."""
+        ...
 
     def adopt_design(self, design: dict) -> dict | None:
         """A catalog design of a `catalog_sources` ruleset as this ruleset's own: a new id and

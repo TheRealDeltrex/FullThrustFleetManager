@@ -15,7 +15,7 @@ from i18n import _
 from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common
 from rulesets.fb import _load_quickref, _quickref
 from rulesets.fb import tech as fb_tech
-from rulesets.ftcd import aliens, data, rules
+from rulesets.ftcd import aliens, data, fleet, rules
 
 
 class FTCDRuleset:
@@ -28,7 +28,7 @@ class FTCDRuleset:
     # In the order a player reads them: what the fleet may field, then how points are counted,
     # then play rules the quick reference adds. Re-rolls are standard in CD (p.14), so no toggle.
     option_keys = (
-        "cd_optional_systems", "cd_multistage", "cd_super_weapons",
+        "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence",
         "cd_cpv", "cd_advanced_ftl",
         "core_systems", "fighter_endurance", "vector_movement",
     )
@@ -42,6 +42,12 @@ class FTCDRuleset:
         return "FTCD"
 
     catalog_sources = ("fb",)
+    dummy_bogey_points = data.DUMMY_BOGEY_POINTS
+
+    def fleet_issues(self, fleet_doc: dict, ships: list[tuple[dict, dict]],
+                     options: dict) -> list[Issue]:
+        """Battle riders and motherships, system defence ships, dummy bogeys (CD pp.34-37)."""
+        return fleet.fleet_issues(fleet_doc, ships, options)
 
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *aliens.races()]

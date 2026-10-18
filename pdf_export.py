@@ -238,6 +238,8 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
         f"{_('Race')}: {fleet['race']} · {_('Faction')}: {fleet['faction'] or _('none')}",
         f"{_('Admiral')}: {fleet['admiral'] or '-'}",
         f"{_('Points')}: {report.points} / {limit}",
+        *([_("Dummy bogeys: {n} ({p} points)", n=fleet_rules.dummy_bogeys(fleet),
+             p=fleet_rules.dummy_bogey_points(fleet))] if fleet_rules.dummy_bogeys(fleet) else []),
         f"{_('Ships')}: " + ", ".join(f"{k} {v}" for k, v in fleet_rules.ship_counts(fleet).items()),
     ]
     active = [fleet_rules.option_label(k) for k in fleet_rules.ruleset_option_keys(fleet["ruleset"])

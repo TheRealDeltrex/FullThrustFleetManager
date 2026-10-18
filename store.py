@@ -287,6 +287,7 @@ def normalize_fleet(doc: object) -> dict | None:
         "admiral": _as_str(doc.get("admiral"), limit=80),
         "points_limit": _as_int(limit, 0, 0, 1000000) if limit is not None else 0,
         "options": {k: options.get(k) is True for k in fleet_rules.FLEET_OPTION_KEYS},
+        "dummy_bogeys": _as_int(doc.get("dummy_bogeys"), 0, 0, 1000),
         "squadrons": squadrons,
         "ships": ships,
         "campaign_id": _as_opt_str(doc.get("campaign_id")),  # reserved for the campaign module
@@ -672,7 +673,8 @@ def designs_for_fleet(fleet: dict) -> dict[str, dict]:
 def update_fleet_details(fleet: dict, *, name: str | None = None, admiral: str | None = None,
                          faction: str | None = "", points_limit: int | None = None,
                          allow_race_mixing: bool | None = None, options: dict | None = None,
-                         notes: str | None = None) -> tuple[bool, str]:
+                         notes: str | None = None,
+                         dummy_bogeys: int | None = None) -> tuple[bool, str]:
     if name is not None:
         if not name.strip():
             return False, _("Enter a fleet name.")
@@ -691,6 +693,10 @@ def update_fleet_details(fleet: dict, *, name: str | None = None, admiral: str |
         fleet["options"] = {k: bool(options.get(k)) for k in fleet_rules.FLEET_OPTION_KEYS}
     if notes is not None:
         fleet["notes"] = notes[:4000]
+    if dummy_bogeys is not None:
+        if dummy_bogeys < 0:
+            return False, _("The number of dummy bogeys cannot be negative.")
+        fleet["dummy_bogeys"] = min(dummy_bogeys, 1000)
     return True, _("Fleet updated.")
 
 
