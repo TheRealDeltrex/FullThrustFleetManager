@@ -1,7 +1,7 @@
 """FTCD costing, derived values and validation (Cross Dimensions chapter 11, human tech).
 
 Cross Dimensions is the Fleet Book design system gathered into one book with a few additions,
-so the shapes match rulesets/fb/rules.py and its missile and fighter checks are reused. What CD
+so the shapes match rulesets/fb/rules.py and the shared helpers come from rulesets/common.py. What CD
 changes: advanced hulls (three rows, x3), advanced drives and FTL (x3), streamlining at 5% and
 10%, broadside arcs, classed torpedoes, grasers, advanced screens, scatterguns, heavy and
 multi-stage missiles, the chapter 10 sensors and ECM, MASS limits, and the CPV hull cost.
@@ -17,12 +17,11 @@ from collections.abc import Callable
 from i18n import _
 from rulesets import Breakdown, BreakdownRow, Issue, common
 from rulesets.common import ARCS, arcs_contiguous, arcs_valid, round_half_up, split_rows
-from rulesets.fb import rules as fb_rules
 from rulesets.ftcd import data
 
-_int = fb_rules._int
-_systems = fb_rules._systems
-_arcs = fb_rules._arcs
+_int = common.as_int
+_systems = common.systems_of
+_arcs = common.arcs_of
 
 STREAMLINING_PERCENT = {"none": 0, "partial": 5, "full": 10}  # CD p.44
 BROADSIDE = frozenset({"FS", "AS", "AP", "FP"})  # CD p.15: both side arcs each way, not F or A
@@ -183,7 +182,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "hangar": (
         lambda s, t: 9 * max(1, _int(s.get("bays"), 1)),
         lambda s, m: 3 * m,
-        lambda s: fb_rules._hangar_label(max(1, _int(s.get("bays"), 1))),
+        lambda s: common.hangar_label(max(1, _int(s.get("bays"), 1))),
     ),
     "tender_bay": (
         lambda s, t: max(1, round_half_up(3 * max(1, _int(s.get("capacity"), 1)), 2)),
@@ -228,7 +227,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "hold": (
         lambda s, t: max(1, _int(s.get("mass"), 1)),
         lambda s, m: 0,
-        lambda s: fb_rules._hold_label(s.get("kind")),
+        lambda s: common.hold_label(s.get("kind")),
     ),
 }
 
@@ -342,7 +341,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "ship_class": ship_class(tmf),
         "ftl_mass": ftl_mass,
         "drive_mass": drive_mass,
-        "turn_thrust": thrust if advanced_drive else fb_rules._turn_thrust(thrust),
+        "turn_thrust": thrust if advanced_drive else common.half_turn_thrust(thrust),
         "hull_descriptor": _hull_descriptor(boxes, tmf),
         "damage_track": damage_track(design),
         "crew_factors": crew_factors(design),
@@ -370,11 +369,7 @@ def ship_class(tmf: int) -> str:
 
 
 def _hull_descriptor(boxes: int, tmf: int) -> str:
-    percent = 100 * boxes / tmf if tmf else 0
-    for low, label in data.HULL_DESCRIPTORS:
-        if percent >= low:
-            return fb_rules.data.translated_hull_descriptor(label)
-    return fb_rules.data.translated_hull_descriptor("Fragile")
+    return common.hull_descriptor(boxes, tmf, data.HULL_DESCRIPTORS)
 
 
 # ---- Damage track, crew, thresholds -------------------------------------------------------------
@@ -403,7 +398,7 @@ def threshold_numbers(design: dict) -> list[int]:
 
 
 def _entries(loadout: object, key: str) -> list[dict]:
-    return fb_rules._loadout_entries(loadout, key)
+    return common.loadout_entries(loadout, key)
 
 
 def _magazine_stages(entry: dict) -> int:
@@ -498,7 +493,7 @@ OPTION_NAMES = {
 def suggest_type(design: dict) -> tuple[str, str]:
     tmf = max(0, _int(design.get("tmf")))
     if design.get("hull_kind") == "merchant":
-        return fb_rules.data.translated_class_label("Merchant"), "M"
+        return common.class_label("Merchant"), "M"
     # CD prints no codes for these; the letters only have to be short and distinct.
     if any(s.get("type") == "portal" for s in _systems(design)):
         return _("Portal"), "PT"
@@ -512,18 +507,7 @@ def suggest_type(design: dict) -> tuple[str, str]:
     return _pick(tmf, data.SHIP_CLASSES)
 
 
-def _pick(tmf: int, classes: tuple) -> tuple[str, str]:
-    """The band containing tmf whose centre is nearest, ties to the smaller (as FB)."""
-    best = None
-    for label, code, low, high in classes:
-        if low <= tmf <= high:
-            dist = abs(tmf - (low + high) / 2)
-            if best is None or dist < best[0]:
-                best = (dist, label, code)
-    if best is None:
-        label, code = (classes[0] if tmf < classes[0][2] else classes[-1])[:2]
-        return fb_rules.data.translated_class_label(label), code
-    return fb_rules.data.translated_class_label(best[1]), best[2]
+_pick = common.pick_class
 
 
 # ---- Validation ---------------------------------------------------------------------------------
@@ -593,7 +577,7 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     if {"pds", "scattergun"} <= types:
         violation("mixed_point_defence", _("A ship cannot have both PDS and scatterguns."))
 
-    fb_rules._validate_missiles(design, systems, by_uid, violation, salvo_space)
+    common.validate_missiles(design, systems, by_uid, violation, salvo_space)
     _validate_magazine_loads(design, by_uid, options, violation, info)
     _validate_hangars(design, by_uid, violation, info)
 
