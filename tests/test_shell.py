@@ -94,3 +94,20 @@ def test_the_appearance_setting_themes_every_tab(client):
     assert store.load_settings()["theme"] == "nebula"
     client.post("/settings", data={"theme": "classic"})
     assert store.load_settings()["theme"] == "admiralty"
+
+
+def test_the_top_bar_look_picker_shares_the_setting(client):
+    import store
+    page = client.get("/design").get_data(as_text=True)
+    bar = page.split('id="theme-select"', 1)[1].split("</select>", 1)[0]
+    assert all(f'value="{t}"' in bar for t in store.THEMES)    # every look, short names
+    assert ">Night Sky<" in bar
+    resp = client.post("/settings", data={"theme": "aurora", "next": "/design"})
+    assert resp.status_code == 302 and resp.headers["Location"].endswith("/design")
+    assert store.load_settings()["theme"] == "aurora"
+    settings = client.get("/settings").get_data(as_text=True)
+    assert '<option value="aurora" selected>Aurora: northern lights, green' in " ".join(settings.split())
+    assert "Settings saved" not in client.get("/design").get_data(as_text=True)  # no flash
+    # Only same-site paths are followed back.
+    resp = client.post("/settings", data={"theme": "lunar", "next": "//evil.example/"})
+    assert resp.headers["Location"].endswith("/settings")

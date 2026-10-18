@@ -912,6 +912,12 @@ def settings_save() -> Response:
     # Each Settings panel posts its own fields; a field a form leaves out keeps its value.
     fields = ("paper", "pdf_viewer", "theme")
     ok, msg = store.save_settings(**{k: request.form[k] for k in fields if k in request.form})
+    # The top-bar look picker posts `next` and goes back to its page without a flash.
+    nxt = request.form.get("next", "")
+    if nxt.startswith("/") and not nxt.startswith(("//", "/\\")):
+        if not ok:
+            flash(msg, "error")
+        return redirect(nxt)
     flash(msg, "success" if ok else "error")
     return redirect(url_for("settings"))
 
