@@ -4,7 +4,7 @@
 {% block content %}
   {# ---- Left: fleets by ruleset, squadrons of the current fleet (PLAN 9.3) ---- #}
   <aside class="panel lib">
-    <h3>{{ _("Fleets") }}</h3>
+    <h3 class="fold" data-fold="fleet-fleets" tabindex="0">{{ _("Fleets") }}</h3>
     <div class="body">
       {% if all_fleets %}
         <ul class="lib-list">
@@ -22,7 +22,7 @@
     </div>
 
     {% if selected %}
-      <h3 class="sep">{{ _("Squadrons") }}</h3>
+      <h3 class="sep fold" data-fold="fleet-squadrons" tabindex="0">{{ _("Squadrons") }}</h3>
       <div class="body stack">
         {% for squadron in selected.fleet.squadrons %}
           <form method="post" action="{{ url_for('fleet_action', fleet_id=selected.fleet.id) }}" class="row"
@@ -46,7 +46,7 @@
       </div>
     {% endif %}
 
-    <h3 class="sep">{{ _("New fleet") }}</h3>
+    <h3 class="sep fold" data-fold="fleet-new" tabindex="0">{{ _("New fleet") }}</h3>
     <div class="body">
       <form method="post" action="{{ url_for('fleet_new') }}" class="stack">
         <label class="field">{{ _("Fleet name") }}
