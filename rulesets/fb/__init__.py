@@ -24,6 +24,7 @@ class FBRuleset:
     option_keys = ("core_systems", "rerolls", "fighter_endurance", "vector_movement")
     catalog_sources: tuple[str, ...] = ()
     dummy_bogey_points = 0
+    hull_kinds = ("warship", "merchant")
 
     @property
     def name(self) -> str:

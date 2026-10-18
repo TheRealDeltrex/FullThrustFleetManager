@@ -43,6 +43,7 @@ class FTCDRuleset:
 
     catalog_sources = ("fb",)
     dummy_bogey_points = data.DUMMY_BOGEY_POINTS
+    hull_kinds = data.HULL_KINDS
 
     def fleet_issues(self, fleet_doc: dict, ships: list[tuple[dict, dict]],
                      options: dict) -> list[Issue]:
