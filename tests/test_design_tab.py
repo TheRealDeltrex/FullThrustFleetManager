@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import app as app_module
@@ -117,6 +119,15 @@ def test_adding_and_removing_systems(client):
 
     client.post(f"/design/{design_id}", data=fields(saved, action="add_system", system_type="nonsense"))
     assert "no such system" in client.get(f"/design/{design_id}").get_data(as_text=True)
+
+
+def test_the_add_system_picker_keeps_the_last_pick(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}",
+                data=fields(store.get_design(design_id), action="add_system", system_type="sm_rack"))
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert re.search(r'<option value="sm_rack"\s+selected>', page)
+    assert not re.search(r'<option value="beam"\s+selected>', page)
 
 
 def test_arcs_are_edited_as_checkboxes(client):
