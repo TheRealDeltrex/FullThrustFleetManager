@@ -516,6 +516,14 @@ def _library(query: str = "") -> dict:
     return {"mine": mine, "catalog": catalog, "query": query}
 
 
+def _system_groups(definitions: list) -> list[tuple[str, list]]:
+    """The Add-system picker's groups in the ruleset's order, each with its systems in order."""
+    groups: dict[str, list] = {}
+    for definition in definitions:
+        groups.setdefault(definition.group, []).append(definition)
+    return list(groups.items())
+
+
 def _design_context(design: dict, dirty: bool) -> dict:
     """Everything the workbench shows about one design: breakdown, issues, SSD, usage."""
     rs = RULESETS[design["ruleset"]]
@@ -536,7 +544,7 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "can_save": not violations or design["allow_rule_breaking"],
         "used_by": used_by,
         "factions": store.faction_choices(design["ruleset"], keep=design["faction"]),
-        "system_types": rs.system_types(design.get("race", "human"), options),
+        "system_groups": _system_groups(rs.system_types(design.get("race", "human"), options)),
         "fighter_types": rs.fighter_types(options),
         "fighter_label": common.fighter_label,
         # Field names and choices for each system type's parameters, from the picker.

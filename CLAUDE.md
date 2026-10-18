@@ -81,6 +81,9 @@ What exists:
   Remove buttons carry the uid in their `formaction` query, so the table needs no script.
 - `store.add_system` re-sorts `systems` into the picker's order (stable, so one type keeps its
   add order); the Add-system picker remembers its last pick in `session["system_type"]`.
+  The picker is one `<optgroup>` per ruleset group (`_system_groups`, ruleset order) with a filter
+  box (`static/syspicker.js`: every typed word must appear in the option's `data-search`, Enter
+  adds the first match, the text survives the autosave swap; hidden without script).
 - Actions: `apply` (recalculate), `add_system`, `remove_system`, `save` / `refit` / `variant`
   (`store.save_design` modes), `discard`, `delete`, `make_variant`. Everything but
   `make_variant` is refused on a catalog design.
