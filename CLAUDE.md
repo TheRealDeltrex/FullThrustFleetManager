@@ -35,7 +35,10 @@ What exists:
   `<main class="work cols-N">` grid. One template per tab plus `error.html`, `print.html`,
   `rulebook.html` and `tournament_check.html`.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
-  variables, panes stack below 1100 px.
+  variables, panes stack below 1100 px. The Settings "Look" (`settings["theme"]`, one of
+  `store.THEMES`, default `admiralty`) sets `<html data-theme>`; Dark, Bridge and Admiralty are
+  blocks at the end of the file that redefine the variables and restyle colour, type and
+  borders only. Classic is the unscoped rules. Ship diagrams keep a light ground in every look.
 - `static/fonts/` — IBM Plex Sans (owner's choice) Regular, Italic, SemiBold, Bold as TTF from the
   IBM/plex 1.1.0 release, with its OFL licence. The same files are for the PDF (M9). The web
   shell rewrites `url("fonts/` to `url("static/fonts/` when it inlines the CSS; keep that exact
