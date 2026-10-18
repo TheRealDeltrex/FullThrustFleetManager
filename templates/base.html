@@ -1,3 +1,4 @@
+{% from "_themes.html" import theme_options %}
 <!DOCTYPE html>
 <html lang="{{ LANG }}" data-theme="{{ THEME }}">
   <head>
@@ -15,12 +16,12 @@
         <a class="brand" href="{{ url_for('home') }}">
           {{ _("FT Fleet Manager") }}{% if APP_VERSION %}<small>v{{ APP_VERSION }}</small>{% endif %}
         </a>
-        <div class="fleet-select" title="{{ _('Current fleet') }}">
+        <div class="chrome-field fleet-select" title="{{ _('Current fleet') }}">
           {% if all_fleets %}
             {# Every fleet is prefixed with its ruleset (PLAN 9.2). #}
-            <form method="get" action="{{ url_for('fleet_overview') }}" class="row">
+            <form method="get" action="{{ url_for('fleet_overview') }}">
               <label class="sr-only" for="fleet-select">{{ _("Current fleet") }}</label>
-              <select class="input sm" id="fleet-select" name="go"
+              <select id="fleet-select" name="go"
                       onchange="location.href='/fleet/' + this.value">
                 {% for f in all_fleets %}
                   <option value="{{ f.id }}" {% if current_fleet and current_fleet.id == f.id %}selected{% endif %}>
@@ -38,21 +39,35 @@
           <a href="{{ url_for('campaign') }}" class="{% if active_tab == 'campaign' %}on{% endif %}">{{ _("Campaign") }}</a>
           <a href="{{ url_for('settings') }}" class="{% if active_tab == 'settings' %}on{% endif %}">{{ _("Settings") }}</a>
         </nav>
+        {# Same stored value as Settings > Appearance; saving returns to this page. #}
+        <form class="chrome-field theme-select" method="post" action="{{ url_for('settings_save') }}"
+              title="{{ _('Look') }}">
+          <input type="hidden" name="next" value="{{ request.full_path if request.query_string else request.path }}" />
+          <label class="sr-only" for="theme-select">{{ _("Look") }}</label>
+          <select id="theme-select" name="theme"
+                  onchange="document.documentElement.dataset.theme = this.value; this.form.submit()">
+            {{ theme_options(THEME, short=True) }}
+          </select>
+          <noscript><button class="btn sm" type="submit">{{ _("Apply") }}</button></noscript>
+        </form>
         <div class="spacer"></div>
-        <div class="meter">
-          <div class="lbl"><span>{{ _("Fleet points") }}</span>
-            <b>{% if current_fleet %}{{ fleet_points }} / {{ current_fleet.points_limit or "&ndash;"|safe }}{% else %}&ndash; / &ndash;{% endif %}</b></div>
-          <div class="bar"><i style="width: {{ (100 * fleet_points / current_fleet.points_limit) | round | int if current_fleet and current_fleet.points_limit else 0 }}%"></i></div>
+        {# Points and print wrap together, to the right, when the bar runs out of room. #}
+        <div class="topbar-end">
+          <div class="meter">
+            <div class="lbl"><span>{{ _("Fleet points") }}</span>
+              <b>{% if current_fleet %}{{ fleet_points }} / {{ current_fleet.points_limit or "&ndash;"|safe }}{% else %}&ndash; / &ndash;{% endif %}</b></div>
+            <div class="bar"><i style="width: {{ (100 * fleet_points / current_fleet.points_limit) | round | int if current_fleet and current_fleet.points_limit else 0 }}%"></i></div>
+          </div>
+          {% if current_fleet and fleet_badges and fleet_badges.non_conforming %}
+            <span class="chip bad">{{ _("Non-conforming") }}</span>
+          {% endif %}
+          {% if current_fleet %}
+            <a class="btn primary" href="{{ url_for('print_dialog') }}">&#9113; {{ _("Print fleet PDF") }}</a>
+          {% else %}
+            <button type="button" class="btn primary" disabled
+                    title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
+          {% endif %}
         </div>
-        {% if current_fleet and fleet_badges and fleet_badges.non_conforming %}
-          <span class="chip bad">{{ _("Non-conforming") }}</span>
-        {% endif %}
-        {% if current_fleet %}
-          <a class="btn primary" href="{{ url_for('print_dialog') }}">&#9113; {{ _("Print fleet PDF") }}</a>
-        {% else %}
-          <button type="button" class="btn primary" disabled
-                  title="{{ _('Create a fleet first') }}">&#9113; {{ _("Print fleet PDF") }}</button>
-        {% endif %}
       </div>
     </header>
 
