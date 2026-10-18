@@ -123,6 +123,9 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .lib-list .lib-faction { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
 .grid-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .grid-fields label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.grid-fields .field-group { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
+.faction-picker { gap: 4px; }
+.faction-picker label.check { font-size: 12px; }
 .grid-fields label.check, label.check { flex-direction: row; align-items: center; gap: 6px; color: var(--ink); }
 .tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .tbl th, .tbl td { padding: 6px 10px; border-top: 1px solid var(--line); text-align: left; vertical-align: middle; }
