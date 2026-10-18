@@ -140,11 +140,21 @@ CD_ENTRIES = [
     ("ftcd", "hold", "Cargo and passengers", "Cargo and passengers", None, 32, 32),
     ("ftcd", "tug_drive", "FTL tugs and tenders", "FTL tugs and tenders",
      "Battle riders and motherships", 34, 34),
+    ("ftcd", "battle_riders", "Battle riders and motherships", "Battle riders and motherships",
+     "System defence ships", 34, 35),
+    ("ftcd", "system_defence", "System defence ships", "System defence ships",
+     "Jump gates and portals", 35, 35),
+    ("ftcd", "jump_gate", "Jump gates and portals", "Representation", "Battles in hyperspace", 35, 36),
     ("ftcd", "enhanced_sensors", "Advanced sensors", "Advanced sensors",
      "Dummy bogeys and weasel boats", 37, 37),
+    ("ftcd", "dummy_bogeys", "Dummy bogeys", "Dummy bogeys and weasel boats", "‘Weasel’ boats",
+     37, 38),
     ("ftcd", "ecm", "Electronic counter measures", "Electronic counter measures", "Mines", 38, 38),
     ("ftcd", "minelayer", "Minelaying", "Minelaying", "Minesweeping", 38, 38),
     ("ftcd", "minesweeper", "Minesweeping", "Minesweeping", "Ortillery", 38, 39),
+    ("ftcd", "boarding", "Boarding actions", "Boarding actions", "Fleet morale", 39, 40),
+    ("ftcd", "fleet_morale", "Fleet morale", "Fleet morale", "Striking the colours", 40, 40),
+    ("ftcd", "starbase", "Starbases", "Starbases", "Planets", 52, 52),
     ("ftcd", "nova_cannon", "Spinal mount nova cannon", "Spinal mount nova cannon", "Wave gun", 55, 55),
     ("ftcd", "wave_gun", "Wave gun", "Wave gun", "Reflex field", 55, 55),
     ("ftcd", "reflex_field", "Reflex field", "Reflex field", "Cloaking field", 55, 56),
@@ -299,6 +309,40 @@ OVERRIDES = {
         "the weasel boat is represented by a bogey marker, that bogey is labelled as if it were "
         "the classification that the decoy system is emitting. Once it is scanned, the true nature "
         "of the ship is revealed.",
+    # CD pp.35-36: the design and operation paragraphs; the extracted text stops at the first.
+    ("ftcd", "jump_gate"):
+        "Artificial gates have a transfer mass, the maximum capacity or mass that it is capable "
+        "of handling in one turn. An artificial jump gate must have an FTL drive, which has 10 "
+        "transfer mass points for every 1 point of drive mass. A jump gate should also have hull "
+        "boxes equal to at least 10% of the transfer mass. An artificial portal should have the "
+        "FTL drive with mass equal to the transfer mass of the portal. For each 10% of hull boxes "
+        "marked off the current transfer mass is reduced in proportion. Artificial gates must be "
+        "activated before used. If the transfer mass of the gate exceeds that of the combined "
+        "ships entering, they all transfer successfully. If the transfer mass was reduced due to "
+        "damage or the gate FTL failed a threshold check, roll a die for each ship. On a 1 the "
+        "ship transferred successfully, on a 2 it manages to back out in time and remains at the "
+        "location of the gate with a velocity of zero, on a 3 or higher it is destroyed.",
+    # CD pp.39-40: the rule, without the scene-setting before it.
+    ("ftcd", "boarding"):
+        "The attacking ship must be within 3 MU of the target at the end of movement, at a "
+        "velocity not more than 1 factor different from the target's, and on a course not more "
+        "than 1 point different. The available boarding factors are always equal to the current "
+        "number of crew factors that the ship has left. The strength of the defenders is "
+        "determined in the same way. The defensive strength of a full troopship is increased by "
+        "the number of mass allocated to troop holds divided by 4 (rounded down). If the target "
+        "is a civilian craft, it will be able to muster only defensive factors equal to half the "
+        "remaining damage control parties, rounded down. Roll 1D6 per factor for each side and "
+        "total their results. If either side's total score is more than twice the other player's "
+        "roll, the higher scoring player has won the action. If this is not the case, then the "
+        "action continues with the lower scoring force losing 1 factor and both sides then "
+        "rolling again. If the attacking party loses and is repulsed, they may return half "
+        "(rounded up) of their surviving factors of marines to their own ship.",
+    ("ftcd", "fleet_morale"):
+        "If playing a simple engagement (or a competitive game) then we suggest that the loss of "
+        "50% of a player's overall force (calculated in mass of ships destroyed) would be enough "
+        "to cause the commander to withdraw from battle. For other games we recommend that the "
+        "level of losses to force a withdrawal should be written into the scenario when it is "
+        "designed.",
 }
 # Where an override's text sits, for the entries that have no extracted body at all.
 OVERRIDE_PAGES = {
