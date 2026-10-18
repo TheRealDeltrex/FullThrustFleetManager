@@ -709,3 +709,18 @@ def test_six_arcs_read_fore_then_aft_with_a_gap(client):
     arcs = re.findall(r'name="sys-[^"]+-arcs" value="(\w+)"', page)
     assert arcs == ["F", "FP", "FS", "A", "AP", "AS"]
     assert re.search(r'<label class="arc aft"><input type="checkbox" name="sys-[^"]+-arcs" value="A"', page)
+
+
+def test_a_class_code_typed_in_fills_the_type(client):
+    design_id = make(client)
+    client.post(f"/design/{design_id}", data=fields(store.get_design(design_id), type_code="cl",
+                                                    action="apply"))
+    draft = store.get_draft(design_id)
+    assert (draft["type_label"], draft["type_code"]) == ("Light Cruiser", "CL")
+    # A type edited together with the code is kept, and an unknown code leaves the type alone.
+    client.post(f"/design/{design_id}", data=fields(draft, type_code="DD", type_label="Picket",
+                                                    action="apply"))
+    assert store.get_draft(design_id)["type_label"] == "Picket"
+    client.post(f"/design/{design_id}", data=fields(store.get_draft(design_id), type_code="ZZ",
+                                                    action="apply"))
+    assert store.get_draft(design_id)["type_label"] == "Picket"
