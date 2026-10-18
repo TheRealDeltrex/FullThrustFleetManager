@@ -250,16 +250,16 @@
               <option value="pick" {% if sl.mode == 'pick' %}selected{% endif %}>{{ _("Selected factions") }}</option>
             </select></label>
           {% if sl.mode == 'pick' %}
-          <details class="popover" {% if not sl.factions %}open{% endif %}>
+          {# Each tick applies at once; the popover stays open while the player is ticking. #}
+          <details class="popover" {% if not sl.factions or request.args.factions_sent %}open{% endif %}>
             <summary class="btn sm">{{ _("Factions ({n})", n=sl.factions|length) }}</summary>
             <div class="popover-body">
               <input type="hidden" name="factions_sent" value="1" />
               {% for g in selected.library_factions %}
                 <label class="check"><input type="checkbox" name="faction" value="{{ g.id }}"
-                  {% if g.id in sl.factions %}checked{% endif %} /> {{ g.name }}
+                  {% if g.id in sl.factions %}checked{% endif %} onchange="this.form.submit()" /> {{ g.name }}
                   <span class="muted">({{ g.designs|length }})</span></label>
               {% endfor %}
-              <button class="btn sm primary" type="submit">{{ _("Apply") }}</button>
             </div>
           </details>
           {% endif %}
