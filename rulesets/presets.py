@@ -43,9 +43,9 @@ class ClassPreset:
 # Lowest non-zero armour among the Fleet Book ships of each class (catalog data, FB1/FB2).
 ARMOUR = {
     "SC": 1, "CT": 1, "FF": 2, "DD": 2, "DH": 2, "CL": 3, "CE": 3, "CH": 5, "CA": 5,
-    "BC": 5, "BB": 5, "BDN": 7, "DN": 7, "SDN": 7, "CVE": 6, "CVL": 9, "CV": 9, "CVH": 12,
+    "BC": 5, "BB": 5, "BDN": 7, "DN": 7, "SDN": 7, "CVE": 6, "CVL": 9, "CVA": 12,
 }
-SLOW = {"SDN", "CVH", "CV"}
+SLOW = {"SDN", "CVA"}
 CARRIER_BAYS = 2  # hangar bays a carrier preset starts with, one fighter group each
 # A band with no top ("160+", FB1 p.12) is treated as this wide, so its middle stays sensible.
 OPEN_BAND_WIDTH = 80

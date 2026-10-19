@@ -71,7 +71,7 @@ BASIC_CLASSES = {
         ("Battledreadnought", "BDN", 60),
         ("Superdreadnought", "SDN", 80),
     ),
-    "carrier": (("Light Carrier", "CVL", 70), ("Fleet Carrier", "CV", 98)),
+    "carrier": (("Light Carrier", "CVL", 70), ("Attack Carrier", "CVA", 98)),
     "merchant": (("Exploration Cruiser", "M", 48), ("Heavy Freighter", "M", 60), ("Bulk Tanker", "M", 100)),
 }
 CARRIER_MIN_GROUPS = 2
@@ -92,7 +92,7 @@ def class_label(label: str) -> str:
         "Battledreadnought": _("Battledreadnought"),
         "Superdreadnought": _("Superdreadnought"),
         "Light Carrier": _("Light Carrier"),
-        "Fleet Carrier": _("Fleet Carrier"),
+        "Attack Carrier": _("Attack Carrier"),
         "Exploration Cruiser": _("Exploration Cruiser"),
         "Heavy Freighter": _("Heavy Freighter"),
         "Bulk Tanker": _("Bulk Tanker"),

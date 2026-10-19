@@ -565,8 +565,8 @@ def test_fire_controls_grow_with_the_class(client, code, fcs):
 
 
 def test_carriers_start_with_two_hangar_bays_and_merchants_with_no_fire_control(client):
-    cvh = _new(client, "fb", "CVH")
-    assert _count(cvh, "hangar") == 2 and _count(cvh, "fire_control") == 2
+    cva = _new(client, "fb", "CVA")
+    assert _count(cva, "hangar") == 2 and _count(cva, "fire_control") == 2
     merchant = _new(client, "fb", "M")
     assert merchant["hull_kind"] == "merchant" and _count(merchant, "fire_control") == 0
     assert _count(_new(client, "ft2", "CVL"), "fighter_group") == 2

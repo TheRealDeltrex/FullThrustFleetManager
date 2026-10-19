@@ -149,7 +149,7 @@ def class_label(label: str) -> str:
         "Superdreadnought": _("Superdreadnought"),
         "Escort Carrier": _("Escort Carrier"),
         "Light Carrier": _("Light Carrier"),
-        "Heavy Carrier": _("Heavy Carrier"),
+        "Attack Carrier": _("Attack Carrier"),
         "Merchant": _("Merchant"),
     }[label]
 

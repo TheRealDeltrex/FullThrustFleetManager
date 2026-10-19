@@ -45,11 +45,10 @@ SHIP_CLASSES = (
     ("Dreadnought", "DN", 140, 180),
     ("Superdreadnought", "SDN", 160, None),
 )
-# Attack Carrier (CVA, 150+) is a role rather than a size band, so it is never suggested.
 CARRIER_CLASSES = (
     ("Escort Carrier", "CVE", 80, 140),
     ("Light Carrier", "CVL", 120, 180),
-    ("Heavy Carrier", "CVH", 160, None),
+    ("Attack Carrier", "CVA", 150, None),
 )
 # Suggest a carrier class from this many fighter bays up.
 CARRIER_MIN_BAYS = 2

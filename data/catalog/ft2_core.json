@@ -1160,7 +1160,7 @@
    "faction": null,
    "name": "Fleet Carrier",
    "type_label": "Fleet Carrier",
-   "type_code": "CV",
+   "type_code": "CVA",
    "hull_kind": "warship",
    "tmf": 98,
    "hull_boxes": 0,
