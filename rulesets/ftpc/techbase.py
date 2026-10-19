@@ -116,7 +116,8 @@ SYSTEM_TECH = {
     "am_missile": "am_missile", "sm_launcher": "sml", "sm_rack": "sml", "rocket_pod": "rocket_pods",
     "heavy_missile": "heavy_missiles", "minelayer": "mines", "mkp": "mkp",
     "plasma_bolt": "plasma_bolt", "fighter_rack": "robot_fighters", "gunboat_rack": "gunboats",
-    "superior_sensors": "superior_sensors", "minesweeper": "minesweeper",
+    "superior_sensors": "superior_sensors", "compact_superior_sensors": "superior_sensors",
+    "minesweeper": "minesweeper",
 }
 FIGHTER_TECH = {
     "heavy": "heavy_fighters", "fast": "fast_fighters", "long_range": "long_range_fighters",

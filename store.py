@@ -220,6 +220,11 @@ def normalize_design(doc: object) -> dict | None:
             page=_as_int(source.get("page"), 0, 0),
             npv_book=_as_int(source.get("npv_book"), 0, 0),
         )
+        url = source.get("url")
+        # A catalog design printed on a web page links to it; only plain https links are kept.
+        if isinstance(url, str) and url.startswith("https://") and len(url) <= 200 and not any(
+                c.isspace() or c in "\"'<>" for c in url):
+            clean_source["url"] = url
     raw_systems = doc.get("systems") if isinstance(doc.get("systems"), list) else []
     systems = [s for s in (_norm_system(x) for x in raw_systems) if s]
     return {
@@ -247,9 +252,9 @@ def normalize_design(doc: object) -> dict | None:
         "hull_advanced": doc.get("hull_advanced") is True,
         "drive_advanced": doc.get("drive_advanced") is True,
         "ftl_advanced": doc.get("ftl_advanced") is True,
-        # Project Continuum hulls (PC pp.57-58, 108): four, five or six rows, a stealth hull
-        # level and regenerative armour. Other rulesets ignore them.
-        "hull_rows": doc["hull_rows"] if doc.get("hull_rows") in (5, 6) else 4,
+        # Hull rows: Project Continuum's four, five or six (PC p.108), and the three to six the
+        # Star Ranger catalog designs print under FB. Each ruleset reads only the counts it knows.
+        "hull_rows": doc["hull_rows"] if doc.get("hull_rows") in (3, 5, 6) else 4,
         "stealth_hull": doc["stealth_hull"] if doc.get("stealth_hull") in (1, 2) else 0,
         # A PC monster ship section's whole-ship MASS, which its drives are sized for (PC p.116).
         "ship_mass": _as_int(doc.get("ship_mass"), 0, 0, 100000),
@@ -349,22 +354,37 @@ def normalize_fleet(doc: object) -> dict | None:
 
 @lru_cache(maxsize=1)
 def _catalog() -> dict[str, dict]:
-    out: dict[str, dict] = {}
+    raw: dict[str, dict] = {}
     for path in sorted((paths.bundle_dir() / "data" / "catalog").glob("*.json")):
         doc = _read_json(path) or {}
         for d in doc.get("designs", []):
             clean = normalize_design(d)
             if clean:
-                out[clean["id"]] = clean
+                raw[clean["id"]] = clean
+    # A design from outside its ruleset's books (the Star Ranger pages) is listed there only when
+    # that ruleset's own rules make it legal; the rest still feed the adopting rulesets below.
+    out = {i: d for i, d in raw.items()
+           if d["ruleset"] in RULESETS and _adoptable(RULESETS[d["ruleset"]], RULESETS[d["ruleset"]], d)}
     # A ruleset with no designs of its own may adopt another's (Cross Dimensions takes the Fleet
     # Book ships, CD p.3), converted by the ruleset rather than kept as a second file.
     for rs in RULESETS.values():
         for source in rs.catalog_sources:
-            for d in [d for d in out.values() if d["ruleset"] == source]:
+            for d in [d for d in raw.values() if d["ruleset"] == source]:
                 clean = normalize_design(rs.adopt_design(json.loads(json.dumps(d))))
-                if clean and clean["ruleset"] == rs.id and clean["id"] not in out:
+                if (clean and clean["ruleset"] == rs.id and clean["id"] not in out
+                        and _adoptable(RULESETS[source], rs, clean)):
                     out[clean["id"]] = clean
     return out
+
+
+def _adoptable(source, rs, design: dict) -> bool:
+    """A rulebook design is always adopted. One from outside the source ruleset's books (the
+    Star Ranger pages) only when it is legal unchanged, since it may use systems or rules the
+    adopting ruleset lacks (the Fleet Books and Cross Dimensions are closed; owner's ruling)."""
+    if design["source"].get("book") in {b.code for b in source.books}:
+        return True
+    opts = {o: True for o in rs.required_options(design, None)}
+    return not any(i.severity == "violation" for i in rs.validate_design(design, opts))
 
 
 def catalog_designs(ruleset: str | None = None) -> list[dict]:
@@ -730,7 +750,8 @@ def create_fleet(ruleset: str, name: str, race: str = "human", faction: str | No
     fleet = normalize_fleet({
         "id": new_id(), "ruleset": ruleset, "race": race, "faction": faction or None,
         "name": name.strip() or _("New fleet"), "admiral": admiral, "points_limit": points_limit,
-        "allow_race_mixing": allow_race_mixing, "options": options or {},
+        "allow_race_mixing": allow_race_mixing,
+        "options": fleet_rules.default_options(ruleset) if options is None else options,
         "squadrons": [{"id": "sq1", "name": _("Main body")}],
     })
     save_fleet(fleet)
@@ -871,6 +892,27 @@ def add_ship(fleet: dict, design_id: str, name: str = "", table_id: str = "", sq
         "notes": "",
     })
     return True, _("{name} added.", name=fleet["ships"][-1]["name"])
+
+
+def order_squadron(fleet: dict, squadron_id: str, uids: list[str]) -> tuple[bool, str]:
+    """Puts the listed ships in this squadron in that order; a ship dragged in from another
+    squadron joins it. Ships not listed keep their places."""
+    if squadron_id not in {q["id"] for q in fleet["squadrons"]}:
+        return False, _("Squadron not found.")
+    by_uid = {s["uid"]: s for s in fleet["ships"]}
+    picked = [by_uid[u] for u in dict.fromkeys(uids) if u in by_uid]
+    if not picked:
+        return False, _("Ship not found.")
+    moved = {s["uid"] for s in picked}
+    ships = fleet["ships"]
+    # The squadron's block starts where its first ship (listed or not) stood.
+    first = next(i for i, s in enumerate(ships) if s["uid"] in moved or s["squadron"] == squadron_id)
+    rest = [s for s in ships if s["uid"] not in moved]
+    at = sum(1 for s in ships[:first] if s["uid"] not in moved)
+    for s in picked:
+        s["squadron"] = squadron_id
+    fleet["ships"] = rest[:at] + picked + rest[at:]
+    return True, ""
 
 
 def _ship(fleet: dict, uid: str) -> dict | None:

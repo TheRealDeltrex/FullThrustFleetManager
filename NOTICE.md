@@ -17,5 +17,9 @@ non-commercial publications distributed with the agreement of Ground Zero Games,
 on their own title pages. Neither is covered by the GPL. They are included here to be read, not
 because the app implements their rules.
 
+The ship designs in `data/catalog/fb_starranger.json` come from the Star Ranger Full Thrust pages
+(https://fullthrust.star-ranger.com/), interim Fleet Book stats published there with Ground Zero
+Games' sanction, and so do the rules in `data/quickref/sr.json`. They remain the work of their authors and of GZG and are not covered by the GPL.
+
 Full Thrust Fleet Manager is an unofficial fan project and is not affiliated with or endorsed by
 Ground Zero Games. Get the miniatures at https://shop.groundzerogames.co.uk/.

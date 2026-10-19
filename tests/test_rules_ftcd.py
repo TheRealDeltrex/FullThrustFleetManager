@@ -419,10 +419,15 @@ def _catalog() -> list[dict]:
 
 
 def test_every_fleet_book_design_is_adopted():
+    from test_catalog_gate import DESIGNS
+
     import store
 
-    fb_ids = {d["id"].split(":", 1)[1] for d in store.catalog_designs("fb")}
-    assert {d["id"].split(":", 1)[1] for d in _catalog()} == fb_ids
+    fb_ids = {d["id"].split(":", 1)[1] for d in DESIGNS if d["ruleset"] == "fb"}
+    rulebook_ids = {d["id"].split(":", 1)[1] for d in store.catalog_designs("fb")
+                    if d["source"]["book"] != "SR"}
+    # Star Ranger designs carry over only where they are legal unchanged (store._adoptable).
+    assert rulebook_ids <= {d["id"].split(":", 1)[1] for d in _catalog()} <= fb_ids
     assert all(d["id"].startswith("ftcd:") and d["ruleset"] == "ftcd" for d in _catalog())
 
 

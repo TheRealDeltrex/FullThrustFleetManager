@@ -34,14 +34,18 @@
     mark();
   }
 
+  // A link to a folded section (#fleet-details, or a page opened at one) opens it.
+  function reveal(id) {
+    var target = id && document.getElementById(id);
+    var shut = target && target.querySelector('[data-fold][aria-expanded="false"]');
+    if (shut) toggle(shut);
+  }
+
   document.addEventListener("click", function (e) {
     var h = e.target.closest && e.target.closest("[data-fold]");
     if (h) return toggle(h);
-    // A link to a folded section (#fleet-details) opens it.
     var a = e.target.closest && e.target.closest('a[href^="#"]');
-    var target = a && a.hash && document.getElementById(a.hash.slice(1));
-    var shut = target && target.querySelector('[data-fold][aria-expanded="false"]');
-    if (shut) toggle(shut);
+    if (a && a.hash) reveal(a.hash.slice(1));
   });
   document.addEventListener("keydown", function (e) {
     var h = e.target.closest && e.target.closest("[data-fold]");
@@ -49,4 +53,5 @@
   });
   document.addEventListener("ft:swapped", mark);
   mark();
+  reveal(location.hash.slice(1));
 })();

@@ -30,6 +30,7 @@
           {% for book in books %}
             <a class="btn sm" href="{{ book_url(book.code) }}">{{ book.title }}</a>
           {% endfor %}
+          <a class="btn sm" href="{{ url_for('star_ranger_rules') }}">{{ _("Star Ranger rules") }}</a>
         </div>
       </div>
     </div>
