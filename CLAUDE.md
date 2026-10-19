@@ -55,7 +55,7 @@ What exists:
   FTCD ruleset below.
 - `data/catalog/` — the read-only catalog; see Catalog below. `data/errata.json` — book values
   that disagree with the rules, with the reason (PLAN 8).
-- `.github/workflows/tests.yml` (ruff + full pytest on push/PR), `deploy-pages.yml` and
+- `.github/workflows/tests.yml` (ruff + full pytest, and a web-build boot check, on push/PR), `deploy-pages.yml` and
   `build-linux.yml` (both manual, workflow_dispatch).
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
@@ -693,6 +693,10 @@ Two steps finish the landing page and both run on every deploy:
   `-linux-x64.tar.gz`). The asset name carries the version, so the link is never hard-coded,
   and a platform with no release at all **loses its whole card** rather than publishing a vDEV
   badge over a dead button. An unreachable API changes nothing.
+
+`tests/test_web_boot.py` boots the built site in headless Chromium and saves a fleet. It needs
+Playwright and the network, so it is skipped unless `FTFM_WEB_BOOT=1`; the Tests workflow's
+`web-build` job sets that.
 
 Keep the `data-version-badge` / `data-download` / `data-platform-card` markers in
 `landing.html`: `tests/test_landing_page.py` holds that contract, since a broken marker is
