@@ -1,0 +1,60 @@
+/* Shared portraits: independent of theme, data-driven; never style SSD internals. */
+.ship-portrait { display:block; width:240px; max-width:100%; height:auto; aspect-ratio:1;
+  flex-shrink:0; background-color:#121c26; background-repeat:no-repeat; object-fit:contain;
+  border-radius:8px; border:1px solid var(--line); }
+.ship-portrait.small { width:144px; }
+.portrait-summary { display:flex; gap:24px; align-items:center; flex-wrap:wrap; }
+.portrait-summary > div:not(.ship-portrait) { flex:1; min-width:220px; }
+.portrait-editor { max-width:1100px; width:100%; margin:auto; }
+.portrait-gallery { display:flex; flex-wrap:wrap; gap:14px; padding:16px; border:1px solid var(--line); }
+.portrait-choice { display:grid; gap:6px; justify-items:center; cursor:pointer; padding:8px;
+  border:2px solid transparent; border-radius:8px; }
+.portrait-choice:has(input:checked) { border-color:var(--accent); background:var(--accent-soft); }
+.portrait-choice:has(input:focus-visible) { outline:3px solid var(--accent); outline-offset:2px; }
+.fleet-portrait { display:flex; align-items:center; gap:14px; padding:12px; }
+.fleet-portrait .ship-portrait { width:112px; }
+.theme-art { display:none; }
+
+/* Only these two selectors introduce the illustrated themes. Controls remain native HTML. */
+:root[data-theme="orbital-foundry"] {
+  color-scheme:dark; --bg:#101416; --panel:#202729; --panel-2:#293235; --ink:#f3f0e8;
+  --muted:#bac2c2; --line:#526064; --accent:#edb462; --accent-soft:#3e3424;
+  --chrome:#151c20; --chrome-ink:#f3f0e8; --chrome-muted:#bac2c2;
+}
+:root[data-theme="celestial-archive"] {
+  color-scheme:light; --bg:#eee9df; --panel:#fcfaf5; --panel-2:#e8e4da; --ink:#142b42;
+  --muted:#536475; --line:#b5b0a5; --accent:#07536a; --accent-soft:#dce9e9;
+  --chrome:#142b42; --chrome-ink:#fcfaf5; --chrome-muted:#d3dedf;
+}
+html[data-theme="orbital-foundry"] .theme-art,
+html[data-theme="celestial-archive"] .theme-art {
+  display:block; height:clamp(100px,17vw,230px); background-size:cover; background-position:center;
+  border-bottom:2px solid var(--accent);
+}
+html[data-theme="orbital-foundry"] .theme-art { background-image:url("themes/orbital-foundry.webp"); }
+html[data-theme="celestial-archive"] .theme-art { background-image:url("themes/celestial-archive.webp"); }
+html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .panel {
+  box-shadow:0 6px 20px #00000014; border-radius:10px;
+}
+html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .panel > h3 {
+  background:var(--panel-2); letter-spacing:.04em;
+}
+html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .input {
+  color:var(--ink); background:var(--panel); border-color:var(--line);
+}
+html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .chrome-field {
+  --chrome-field:var(--chrome); border-color:var(--chrome-muted);
+}
+html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .tabs a.on {
+  background:var(--accent); color:var(--panel); box-shadow:inset 0 -2px 0 currentColor;
+}
+html[data-theme="orbital-foundry"] .btn.primary { color:#101416; }
+html[data-theme="orbital-foundry"] .lib-list a.on { color:var(--ink); background:var(--accent-soft); }
+@media (max-width:600px) {
+  .portrait-summary .ship-portrait { width:160px; }
+  .portrait-gallery { gap:4px; padding:6px; }
+  .portrait-choice .ship-portrait { width:112px; }
+}
+@media print {
+  .theme-art, .portrait-summary, .fleet-portrait, .portrait-editor { display:none !important; }
+}

@@ -67,5 +67,17 @@ def test_the_web_build_boots_and_saves_a_fleet(site_url):
         with page.expect_download(timeout=60_000) as download:
             frame.locator("form.backup-due button.primary").click()
         assert download.value.suggested_filename.endswith(".FTBackup")
+        # Artwork has a separate persistence path and explicit form actions in the iframe.
+        frame.locator("body").evaluate(
+            "() => window.ftNavigate('/portrait/design/ftpc:fb1:nac-harrison')")
+        frame.locator('input[name="art"][value="custom:SC:2"]').check(timeout=30_000)
+        frame.get_by_role("button", name="Use selected picture", exact=True).click()
+        page.wait_for_function(
+            "() => JSON.parse(localStorage.getItem('ftfm_library_v1') || '{}')"
+            "['/data/portraits.json'] === '@indexeddb'", timeout=30_000)
+        page.reload()
+        frame.locator("header.topbar").wait_for(timeout=300_000)
+        # The chosen atlas cell persists, rather than reverting to the official NAC default.
+        assert "custom-1.webp" in frame.locator(".ship-portrait").first.get_attribute("style")
         browser.close()
     assert errors == []

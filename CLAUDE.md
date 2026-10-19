@@ -36,15 +36,23 @@ What exists:
   `rulebook.html` and `tournament_check.html`.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
   variables, panes stack below 1100 px. The Settings "Look" (`settings["theme"]`, one of
-  `store.THEMES`: admiralty (default), lunar, bridge, carbon-armor, night-sky, nebula, aurora, asteroid) sets
+  `store.THEMES`: admiralty (default), lunar, bridge, carbon-armor, night-sky, nebula, aurora, asteroid,
+  orbital-foundry, celestial-archive) sets
   `<html data-theme>`; each look is a block at the end of the file that redefines the variables and
   restyles colour, type and borders only. The unscoped rules are their shared base, not a look
   (Classic was retired; a stored unknown value falls back to the default). Ship diagrams keep a
   light ground in every look.
+- `static/artwork.css` adds the two illustrated palettes and decorative banners from
+  `static/themes/`. `portraits.py`, `data/ship_art.json`, `static/ships/` and `_portraits.html`
+  provide portraits in every theme. See `docs/SHIP-ARTWORK.md` for extension and storage rules.
+  Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
+  record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
+  across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds
+  user choices/uploads separately from immutable catalog and design/fleet statistics.
 - `static/fonts/` — IBM Plex Sans (owner's choice) Regular, Italic, SemiBold, Bold as TTF from the
   IBM/plex 1.1.0 release, with its OFL licence. The same files are for the PDF (M9). The web
-  shell rewrites `url("fonts/` to `url("static/fonts/` when it inlines the CSS; keep that exact
-  spelling in `@font-face`.
+  shell rewrites `url("fonts/` and `url("themes/` to `static/` paths when it inlines CSS;
+  keep that spelling in CSS assets. Portrait HTML uses `art_url` for desktop/web paths.
 - `i18n.py` + `translations/en.json` — see Translation below.
 - `paths.py`, `tray.py`, `idle_watchdog.py`, `run_app.py`, `fleetmanager.spec` and
   `fleetmanager-linux.spec` — copied from Frostgrave and adapted (env prefix `FTFM_`).

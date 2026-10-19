@@ -73,6 +73,26 @@
     var sessionDirty = false;
     var suppressHistoryPush = false;
     var snapshotTimer = null;
+    var snapshotRevision = 0;
+
+    // Uploaded artwork can exceed localStorage's small allowance. Keep it in IndexedDB;
+    // the existing fleet snapshot remains compatible, with a marker for the artwork file.
+    function artworkStorage(mode, value) {
+      return new Promise(function (resolve, reject) {
+        var open = indexedDB.open("ftfm_artwork_v1", 1);
+        open.onupgradeneeded = function () { open.result.createObjectStore("artwork"); };
+        open.onerror = function () { reject(open.error); };
+        open.onblocked = function () { reject(new Error("Artwork storage is blocked")); };
+        open.onsuccess = function () {
+          var db = open.result;
+          var tx = db.transaction("artwork", mode === "get" ? "readonly" : "readwrite");
+          var request = mode === "get" ? tx.objectStore("artwork").get("portraits")
+                                      : tx.objectStore("artwork").put(value, "portraits");
+          tx.oncomplete = function () { db.close(); resolve(request.result); };
+          tx.onabort = tx.onerror = function () { db.close(); reject(tx.error); };
+        };
+      });
+    }
 
     function setMsg(m) { loadingMsg.textContent = m; }
 
@@ -99,17 +119,22 @@
       });
     }
 
-    // The whole user library is small JSON, so it is snapshotted as one blob. Failures are never
+    // Fleet data remains JSON; uploaded artwork uses IndexedDB. Failures are never
     // silent: "storage full" and "storage disabled" otherwise look like "the app saves nothing".
-    function snapshotToStorage() {
+    async function snapshotToStorage() {
       if (!pyodide) return;
+      var revision = snapshotRevision;
       var data = {};
       fsWalk(DATA_DIR).forEach(function (p) {
         try { data[p] = pyodide.FS.readFile(p, { encoding: "utf8" }); } catch (e) { /* skip */ }
       });
       try {
+        if (data[DATA_DIR + "/portraits.json"] !== undefined) {
+          await artworkStorage("put", data[DATA_DIR + "/portraits.json"]);
+          data[DATA_DIR + "/portraits.json"] = "@indexeddb";
+        }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        sessionDirty = false;
+        if (revision === snapshotRevision) sessionDirty = false;
       } catch (e) {
         showToast("Couldn't save to this browser's storage (full, or blocked in a private window). " +
           "Export a backup before you close this tab.", 10000);
@@ -117,16 +142,22 @@
     }
 
     function scheduleSnapshot() {
+      snapshotRevision += 1;
       clearTimeout(snapshotTimer);
       snapshotTimer = setTimeout(snapshotToStorage, 500);
     }
 
-    function restoreFromStorage() {
+    async function restoreFromStorage() {
       var restored = 0;
       try {
         var raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return 0;
         var data = JSON.parse(raw);
+        if (data[DATA_DIR + "/portraits.json"] === "@indexeddb") {
+          var artwork = await artworkStorage("get");
+          if (typeof artwork !== "string") throw new Error("Saved artwork is unavailable");
+          data[DATA_DIR + "/portraits.json"] = artwork;
+        }
         Object.keys(data).forEach(function (p) {
           if (p.indexOf(DATA_DIR + "/") !== 0) return;
           try {
@@ -135,7 +166,11 @@
             restored++;
           } catch (e) { /* skip this file */ }
         });
-      } catch (e) { /* storage unavailable: session only */ }
+      } catch (e) {
+        // Do not start an empty library and later overwrite a saved artwork collection.
+        if (data && data[DATA_DIR + "/portraits.json"] === "@indexeddb") throw e;
+        /* localStorage unavailable: session only */
+      }
       return restored;
     }
 
@@ -297,7 +332,7 @@
       html = html.replace(/<link[^>]*href="[^"]*?([\w.-]+\.css)"[^>]*>/gi, function (tag, name) {
         var src = STATIC_TEXT[name];
         // Font URLs are relative to style.css (/static/), but inlined they resolve against this page.
-        return src === undefined ? tag : "<style>" + src.replace(/url\("fonts\//g, 'url("static/fonts/') + "</style>";
+        return src === undefined ? tag : "<style>" + src.replace(/url\("(fonts|themes)\//g, 'url("static/$1/') + "</style>";
       });
       html = html.replace(/<script[^>]*\ssrc="[^"]*?([\w.-]+\.js)"[^>]*><\/script>/gi, function (tag, name) {
         var src = STATIC_TEXT[name];
@@ -441,7 +476,7 @@
         navigatePy = pyodide.globals.get("navigate");
 
         setMsg("Restoring your library…");
-        var restored = restoreFromStorage();
+        var restored = await restoreFromStorage();
 
         var initialPath = "/";
         if (location.hash.length > 1) {

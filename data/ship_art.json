@@ -1,0 +1,1458 @@
+{
+  "version": 1,
+  "provenance": "AI-generated faction-style interpretations; not official miniature photographs. Fleet Book 1 pp13,20,27,34 and Fleet Book 2 pp12,26,38 supplied as shape-language references.",
+  "official": {
+    "fb1:nac-harrison": "official:fb1:nac-harrison",
+    "fb1:nac-arapaho": "official:fb1:nac-arapaho",
+    "fb1:nac-minerva": "official:fb1:nac-minerva",
+    "fb1:nac-tacoma": "official:fb1:nac-tacoma",
+    "fb1:nac-ticonderoga": "official:fb1:nac-ticonderoga",
+    "fb1:nac-huron": "official:fb1:nac-huron",
+    "fb1:nac-furious": "official:fb1:nac-furious",
+    "fb1:nac-vandenburg": "official:fb1:nac-vandenburg",
+    "fb1:nac-majestic": "official:fb1:nac-majestic",
+    "fb1:nac-victoria": "official:fb1:nac-victoria",
+    "fb1:nac-excalibur": "official:fb1:nac-excalibur",
+    "fb1:nac-valley-forge": "official:fb1:nac-valley-forge",
+    "fb1:nac-inflexible": "official:fb1:nac-inflexible",
+    "fb1:nac-ark-royal": "official:fb1:nac-ark-royal",
+    "fb1:nsl-falke": "official:fb1:nsl-falke",
+    "fb1:nsl-stroschen": "official:fb1:nsl-stroschen",
+    "fb1:nsl-ehrenhold": "official:fb1:nsl-ehrenhold",
+    "fb1:nsl-waldburg": "official:fb1:nsl-waldburg",
+    "fb1:nsl-waldburg-m": "official:fb1:nsl-waldburg-m",
+    "fb1:nsl-kronprinz-wilhelm": "official:fb1:nsl-kronprinz-wilhelm",
+    "fb1:nsl-radetzky": "official:fb1:nsl-radetzky",
+    "fb1:nsl-markgraf": "official:fb1:nsl-markgraf",
+    "fb1:nsl-maximilian": "official:fb1:nsl-maximilian",
+    "fb1:nsl-richthofen": "official:fb1:nsl-richthofen",
+    "fb1:nsl-maria-von-burgund": "official:fb1:nsl-maria-von-burgund",
+    "fb1:nsl-szent-istvan": "official:fb1:nsl-szent-istvan",
+    "fb1:nsl-von-tegetthoff": "official:fb1:nsl-von-tegetthoff",
+    "fb1:nsl-der-theuerdank": "official:fb1:nsl-der-theuerdank",
+    "fb1:fse-mistral": "official:fb1:fse-mistral",
+    "fb1:fse-athena": "official:fb1:fse-athena",
+    "fb1:fse-ibiza": "official:fb1:fse-ibiza",
+    "fb1:fse-san-miguel": "official:fb1:fse-san-miguel",
+    "fb1:fse-trieste": "official:fb1:fse-trieste",
+    "fb1:fse-suffren": "official:fb1:fse-suffren",
+    "fb1:fse-milan": "official:fb1:fse-milan",
+    "fb1:fse-jerez": "official:fb1:fse-jerez",
+    "fb1:fse-ypres": "official:fb1:fse-ypres",
+    "fb1:fse-roma": "official:fb1:fse-roma",
+    "fb1:fse-bonaparte": "official:fb1:fse-bonaparte",
+    "fb1:fse-foch": "official:fb1:fse-foch",
+    "fb1:fse-bologna": "official:fb1:fse-bologna",
+    "fb1:fse-jeanne-d-arc": "official:fb1:fse-jeanne-d-arc",
+    "fb1:esu-lenov": "official:fb1:esu-lenov",
+    "fb1:esu-nanuchka-ii": "official:fb1:esu-nanuchka-ii",
+    "fb1:esu-novgorod": "official:fb1:esu-novgorod",
+    "fb1:esu-warsaw": "official:fb1:esu-warsaw",
+    "fb1:esu-volga": "official:fb1:esu-volga",
+    "fb1:esu-tibet": "official:fb1:esu-tibet",
+    "fb1:esu-beijing-b": "official:fb1:esu-beijing-b",
+    "fb1:esu-gorshkov": "official:fb1:esu-gorshkov",
+    "fb1:esu-voroshilev": "official:fb1:esu-voroshilev",
+    "fb1:esu-manchuria": "official:fb1:esu-manchuria",
+    "fb1:esu-petrograd": "official:fb1:esu-petrograd",
+    "fb1:esu-rostov": "official:fb1:esu-rostov",
+    "fb1:esu-tsiolkovsky": "official:fb1:esu-tsiolkovsky",
+    "fb1:esu-komarov": "official:fb1:esu-komarov",
+    "fb1:esu-konstantin": "official:fb1:esu-konstantin",
+    "fb1:heavy-freighter": "official:fb1:heavy-freighter",
+    "fb1:medium-freighter": "official:fb1:medium-freighter",
+    "fb1:light-freighter": "official:fb1:light-freighter",
+    "fb1:free-trader": "official:fb1:free-trader",
+    "fb1:fleet-auxiliary": "official:fb1:fleet-auxiliary",
+    "fb1:assault-transport": "official:fb1:assault-transport",
+    "fb1:bulk-carrier": "official:fb1:bulk-carrier",
+    "fb1:starliner": "official:fb1:starliner",
+    "fb2:kv-lu-dak": "official:fb2:kv-lu-dak",
+    "fb2:kv-ka-tak": "official:fb2:kv-ka-tak",
+    "fb2:kv-da-kak": "official:fb2:kv-da-kak",
+    "fb2:kv-di-tok": "official:fb2:kv-di-tok",
+    "fb2:kv-vo-bok": "official:fb2:kv-vo-bok",
+    "fb2:kv-si-tek": "official:fb2:kv-si-tek",
+    "fb2:kv-ko-tek": "official:fb2:kv-ko-tek",
+    "fb2:kv-va-dok": "official:fb2:kv-va-dok",
+    "fb2:kv-ti-dak": "official:fb2:kv-ti-dak",
+    "fb2:kv-ko-vol": "official:fb2:kv-ko-vol",
+    "fb2:kv-lo-vok": "official:fb2:kv-lo-vok",
+    "fb2:kv-yu-kas": "official:fb2:kv-yu-kas",
+    "fb2:kv-do-san": "official:fb2:kv-do-san",
+    "fb2:kv-ko-san": "official:fb2:kv-ko-san",
+    "fb2:kv-to-rok": "official:fb2:kv-to-rok",
+    "fb2:kv-sha-ken": "official:fb2:kv-sha-ken",
+    "fb2:ph-phyaa": "official:fb2:ph-phyaa",
+    "fb2:ph-vlath": "official:fb2:ph-vlath",
+    "fb2:ph-dorrth": "official:fb2:ph-dorrth",
+    "fb2:ph-tyaph": "official:fb2:ph-tyaph",
+    "fb2:ph-phuun": "official:fb2:ph-phuun",
+    "fb2:ph-dinth": "official:fb2:ph-dinth",
+    "fb2:ph-tsaara": "official:fb2:ph-tsaara",
+    "fb2:ph-huulth": "official:fb2:ph-huulth",
+    "fb2:ph-tuuloth": "official:fb2:ph-tuuloth",
+    "fb2:ph-keraph": "official:fb2:ph-keraph",
+    "fb2:ph-ptath": "official:fb2:ph-ptath",
+    "fb2:ph-saath": "official:fb2:ph-saath",
+    "fb2:ph-voth": "official:fb2:ph-voth",
+    "fb2:ph-taanis": "official:fb2:ph-taanis",
+    "fb2:ph-draath": "official:fb2:ph-draath",
+    "fb2:sv-sa-an-tha": "official:fb2:sv-sa-an-tha",
+    "fb2:sv-sa-kess-tha": "official:fb2:sv-sa-kess-tha",
+    "fb2:sv-fo-kiir-tha": "official:fb2:sv-fo-kiir-tha",
+    "fb2:sv-fo-sath-aan": "official:fb2:sv-fo-sath-aan",
+    "fb2:sv-fo-vur-ath": "official:fb2:sv-fo-vur-ath",
+    "fb2:sv-var-arr-sha": "official:fb2:sv-var-arr-sha",
+    "fb2:sv-var-kiir-sha": "official:fb2:sv-var-kiir-sha",
+    "fb2:sv-var-thee-sha": "official:fb2:sv-var-thee-sha",
+    "fb2:sv-thy-sa-teth": "official:fb2:sv-thy-sa-teth",
+    "fb2:sv-shyy-tha-var": "official:fb2:sv-shyy-tha-var",
+    "fb2:sv-ann-var-teth": "official:fb2:sv-ann-var-teth",
+    "fb2:sv-sla-tha-rosh": "official:fb2:sv-sla-tha-rosh",
+    "fb2:sv-vas-sa-rosh": "official:fb2:sv-vas-sa-rosh",
+    "fb2:sv-vas-sa-teth": "official:fb2:sv-vas-sa-teth",
+    "ft:courier": "official:ft:courier",
+    "ft:scout-ship": "official:ft:scout-ship",
+    "ft:corvette": "official:ft:corvette",
+    "ft:frigate": "official:ft:frigate",
+    "ft:destroyer": "official:ft:destroyer",
+    "ft:light-cruiser": "official:ft:light-cruiser",
+    "ft:escort-cruiser": "official:ft:escort-cruiser",
+    "ft:heavy-cruiser": "official:ft:heavy-cruiser",
+    "ft:battlecruiser": "official:ft:battlecruiser",
+    "ft:battleship": "official:ft:battleship",
+    "ft:battledreadnought": "official:ft:battledreadnought",
+    "ft:superdreadnought": "official:ft:superdreadnought",
+    "ft:light-carrier": "official:ft:light-carrier",
+    "ft:fleet-carrier": "official:ft:fleet-carrier",
+    "ft:bulk-tanker": "official:ft:bulk-tanker",
+    "ft:heavy-freighter": "official:ft:heavy-freighter",
+    "ft:survey-cruiser": "official:ft:survey-cruiser",
+    "mt:strikeboat": "official:mt:strikeboat",
+    "mt:lancer": "official:mt:lancer",
+    "mt:torpedo-destroyer": "official:mt:torpedo-destroyer",
+    "mt:super-destroyer": "official:mt:super-destroyer",
+    "mt:privateer": "official:mt:privateer",
+    "mt:needle-cruiser": "official:mt:needle-cruiser",
+    "mt:strike-cruiser": "official:mt:strike-cruiser",
+    "mt:missile-cruiser": "official:mt:missile-cruiser",
+    "mt:planetary-bombardment-monitor": "official:mt:planetary-bombardment-monitor",
+    "mt:system-defence-cruiser": "official:mt:system-defence-cruiser",
+    "mt:escort-patrol-carrier": "official:mt:escort-patrol-carrier",
+    "mt:free-trader": "official:mt:free-trader",
+    "mt:medium-tug": "official:mt:medium-tug",
+    "mt:armed-merchantman": "official:mt:armed-merchantman"
+  },
+  "portraits": {
+    "official:fb1:nac-harrison": {
+      "file": "ships/nac.webp",
+      "cell": 0,
+      "label": "Harrison",
+      "code": "SC",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-arapaho": {
+      "file": "ships/nac.webp",
+      "cell": 1,
+      "label": "Arapaho",
+      "code": "CT",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-minerva": {
+      "file": "ships/nac.webp",
+      "cell": 2,
+      "label": "Minerva",
+      "code": "FF",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-tacoma": {
+      "file": "ships/nac.webp",
+      "cell": 3,
+      "label": "Tacoma",
+      "code": "FF",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-ticonderoga": {
+      "file": "ships/nac.webp",
+      "cell": 4,
+      "label": "Ticonderoga",
+      "code": "DD",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-huron": {
+      "file": "ships/nac.webp",
+      "cell": 5,
+      "label": "Huron",
+      "code": "CL",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-furious": {
+      "file": "ships/nac.webp",
+      "cell": 6,
+      "label": "Furious",
+      "code": "CE",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-vandenburg": {
+      "file": "ships/nac.webp",
+      "cell": 7,
+      "label": "Vandenburg",
+      "code": "CH",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-majestic": {
+      "file": "ships/nac.webp",
+      "cell": 8,
+      "label": "Majestic",
+      "code": "BC",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-victoria": {
+      "file": "ships/nac.webp",
+      "cell": 9,
+      "label": "Victoria",
+      "code": "BB",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-excalibur": {
+      "file": "ships/nac.webp",
+      "cell": 10,
+      "label": "Excalibur",
+      "code": "BDN",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-valley-forge": {
+      "file": "ships/nac.webp",
+      "cell": 11,
+      "label": "Valley Forge",
+      "code": "SDN",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-inflexible": {
+      "file": "ships/nac.webp",
+      "cell": 12,
+      "label": "Inflexible",
+      "code": "CVL",
+      "faction": "NAC"
+    },
+    "official:fb1:nac-ark-royal": {
+      "file": "ships/nac.webp",
+      "cell": 13,
+      "label": "Ark Royal",
+      "code": "CVA",
+      "faction": "NAC"
+    },
+    "official:fb1:nsl-falke": {
+      "file": "ships/nsl.webp",
+      "cell": 0,
+      "label": "Falke",
+      "code": "SC",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-stroschen": {
+      "file": "ships/nsl.webp",
+      "cell": 1,
+      "label": "Stroschen",
+      "code": "CT",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-ehrenhold": {
+      "file": "ships/nsl.webp",
+      "cell": 2,
+      "label": "Ehrenhold",
+      "code": "FF",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-waldburg": {
+      "file": "ships/nsl.webp",
+      "cell": 3,
+      "label": "Waldburg",
+      "code": "DD",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-waldburg-m": {
+      "file": "ships/nsl.webp",
+      "cell": 4,
+      "label": "Waldburg/M",
+      "code": "DD",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-kronprinz-wilhelm": {
+      "file": "ships/nsl.webp",
+      "cell": 5,
+      "label": "Kronprinz Wilhelm",
+      "code": "CL",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-radetzky": {
+      "file": "ships/nsl.webp",
+      "cell": 6,
+      "label": "Radetzky",
+      "code": "CE",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-markgraf": {
+      "file": "ships/nsl.webp",
+      "cell": 7,
+      "label": "Markgraf",
+      "code": "CH",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-maximilian": {
+      "file": "ships/nsl.webp",
+      "cell": 8,
+      "label": "Maximilian",
+      "code": "BC",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-richthofen": {
+      "file": "ships/nsl.webp",
+      "cell": 9,
+      "label": "Richthofen",
+      "code": "BC",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-maria-von-burgund": {
+      "file": "ships/nsl.webp",
+      "cell": 10,
+      "label": "Maria Von Burgund",
+      "code": "BB",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-szent-istvan": {
+      "file": "ships/nsl.webp",
+      "cell": 11,
+      "label": "Szent Istvan",
+      "code": "BDN",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-von-tegetthoff": {
+      "file": "ships/nsl.webp",
+      "cell": 12,
+      "label": "Von Tegetthoff",
+      "code": "SDN",
+      "faction": "NSL"
+    },
+    "official:fb1:nsl-der-theuerdank": {
+      "file": "ships/nsl.webp",
+      "cell": 13,
+      "label": "Der Theuerdank",
+      "code": "CVA",
+      "faction": "NSL"
+    },
+    "official:fb1:fse-mistral": {
+      "file": "ships/fse.webp",
+      "cell": 0,
+      "label": "Mistral",
+      "code": "SC",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-athena": {
+      "file": "ships/fse.webp",
+      "cell": 1,
+      "label": "Athena",
+      "code": "CT",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-ibiza": {
+      "file": "ships/fse.webp",
+      "cell": 2,
+      "label": "Ibiza",
+      "code": "FF",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-san-miguel": {
+      "file": "ships/fse.webp",
+      "cell": 3,
+      "label": "San Miguel",
+      "code": "DD",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-trieste": {
+      "file": "ships/fse.webp",
+      "cell": 4,
+      "label": "Trieste",
+      "code": "DH",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-suffren": {
+      "file": "ships/fse.webp",
+      "cell": 5,
+      "label": "Suffren",
+      "code": "CL",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-milan": {
+      "file": "ships/fse.webp",
+      "cell": 6,
+      "label": "Milan",
+      "code": "CE",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-jerez": {
+      "file": "ships/fse.webp",
+      "cell": 7,
+      "label": "Jerez",
+      "code": "CH",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-ypres": {
+      "file": "ships/fse.webp",
+      "cell": 8,
+      "label": "Ypres",
+      "code": "BC",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-roma": {
+      "file": "ships/fse.webp",
+      "cell": 9,
+      "label": "Roma",
+      "code": "BB",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-bonaparte": {
+      "file": "ships/fse.webp",
+      "cell": 10,
+      "label": "Bonaparte",
+      "code": "BDN",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-foch": {
+      "file": "ships/fse.webp",
+      "cell": 11,
+      "label": "Foch",
+      "code": "SDN",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-bologna": {
+      "file": "ships/fse.webp",
+      "cell": 12,
+      "label": "Bologna",
+      "code": "CVL",
+      "faction": "FSE"
+    },
+    "official:fb1:fse-jeanne-d-arc": {
+      "file": "ships/fse.webp",
+      "cell": 13,
+      "label": "Jeanne D'Arc",
+      "code": "CVA",
+      "faction": "FSE"
+    },
+    "official:fb1:esu-lenov": {
+      "file": "ships/esu.webp",
+      "cell": 0,
+      "label": "Lenov",
+      "code": "SC",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-nanuchka-ii": {
+      "file": "ships/esu.webp",
+      "cell": 1,
+      "label": "Nanuchka II",
+      "code": "CT",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-novgorod": {
+      "file": "ships/esu.webp",
+      "cell": 2,
+      "label": "Novgorod",
+      "code": "FF",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-warsaw": {
+      "file": "ships/esu.webp",
+      "cell": 3,
+      "label": "Warsaw",
+      "code": "DD",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-volga": {
+      "file": "ships/esu.webp",
+      "cell": 4,
+      "label": "Volga",
+      "code": "DH",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-tibet": {
+      "file": "ships/esu.webp",
+      "cell": 5,
+      "label": "Tibet",
+      "code": "CL",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-beijing-b": {
+      "file": "ships/esu.webp",
+      "cell": 6,
+      "label": "Beijing/B",
+      "code": "CE",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-gorshkov": {
+      "file": "ships/esu.webp",
+      "cell": 7,
+      "label": "Gorshkov",
+      "code": "CH",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-voroshilev": {
+      "file": "ships/esu.webp",
+      "cell": 8,
+      "label": "Voroshilev",
+      "code": "CH",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-manchuria": {
+      "file": "ships/esu.webp",
+      "cell": 9,
+      "label": "Manchuria",
+      "code": "BC",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-petrograd": {
+      "file": "ships/esu.webp",
+      "cell": 10,
+      "label": "Petrograd",
+      "code": "BB",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-rostov": {
+      "file": "ships/esu.webp",
+      "cell": 11,
+      "label": "Rostov",
+      "code": "BDN",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-tsiolkovsky": {
+      "file": "ships/esu.webp",
+      "cell": 12,
+      "label": "Tsiolkovsky",
+      "code": "CVL",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-komarov": {
+      "file": "ships/esu.webp",
+      "cell": 13,
+      "label": "Komarov",
+      "code": "SDN",
+      "faction": "ESU"
+    },
+    "official:fb1:esu-konstantin": {
+      "file": "ships/esu.webp",
+      "cell": 14,
+      "label": "Konstantin",
+      "code": "CVA",
+      "faction": "ESU"
+    },
+    "official:fb1:heavy-freighter": {
+      "file": "ships/civilian.webp",
+      "cell": 0,
+      "label": "Heavy Freighter",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:medium-freighter": {
+      "file": "ships/civilian.webp",
+      "cell": 1,
+      "label": "Medium Freighter",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:light-freighter": {
+      "file": "ships/civilian.webp",
+      "cell": 2,
+      "label": "Light Freighter",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:free-trader": {
+      "file": "ships/civilian.webp",
+      "cell": 3,
+      "label": "Free Trader",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:fleet-auxiliary": {
+      "file": "ships/civilian.webp",
+      "cell": 4,
+      "label": "Fleet Auxiliary",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:assault-transport": {
+      "file": "ships/civilian.webp",
+      "cell": 5,
+      "label": "Assault Transport",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:bulk-carrier": {
+      "file": "ships/civilian.webp",
+      "cell": 6,
+      "label": "Bulk Carrier",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb1:starliner": {
+      "file": "ships/civilian.webp",
+      "cell": 7,
+      "label": "Starliner",
+      "code": "M",
+      "faction": "civilian"
+    },
+    "official:fb2:kv-lu-dak": {
+      "file": "ships/kv.webp",
+      "cell": 0,
+      "label": "Lu'Dak",
+      "code": "SC",
+      "faction": "KV"
+    },
+    "official:fb2:kv-ka-tak": {
+      "file": "ships/kv.webp",
+      "cell": 1,
+      "label": "Ka'Tak",
+      "code": "CT",
+      "faction": "KV"
+    },
+    "official:fb2:kv-da-kak": {
+      "file": "ships/kv.webp",
+      "cell": 2,
+      "label": "Da'Kak",
+      "code": "FF",
+      "faction": "KV"
+    },
+    "official:fb2:kv-di-tok": {
+      "file": "ships/kv.webp",
+      "cell": 3,
+      "label": "Di'Tok",
+      "code": "DH",
+      "faction": "KV"
+    },
+    "official:fb2:kv-vo-bok": {
+      "file": "ships/kv.webp",
+      "cell": 4,
+      "label": "Vo'Bok",
+      "code": "CL",
+      "faction": "KV"
+    },
+    "official:fb2:kv-si-tek": {
+      "file": "ships/kv.webp",
+      "cell": 5,
+      "label": "Si'Tek",
+      "code": "CE",
+      "faction": "KV"
+    },
+    "official:fb2:kv-ko-tek": {
+      "file": "ships/kv.webp",
+      "cell": 6,
+      "label": "Ko'Tek",
+      "code": "CE",
+      "faction": "KV"
+    },
+    "official:fb2:kv-va-dok": {
+      "file": "ships/kv.webp",
+      "cell": 7,
+      "label": "Va'Dok",
+      "code": "CH",
+      "faction": "KV"
+    },
+    "official:fb2:kv-ti-dak": {
+      "file": "ships/kv.webp",
+      "cell": 8,
+      "label": "Ti'Dak",
+      "code": "BC",
+      "faction": "KV"
+    },
+    "official:fb2:kv-ko-vol": {
+      "file": "ships/kv.webp",
+      "cell": 9,
+      "label": "Ko'Vol",
+      "code": "BB",
+      "faction": "KV"
+    },
+    "official:fb2:kv-lo-vok": {
+      "file": "ships/kv.webp",
+      "cell": 10,
+      "label": "Lo'Vok",
+      "code": "BDN",
+      "faction": "KV"
+    },
+    "official:fb2:kv-yu-kas": {
+      "file": "ships/kv.webp",
+      "cell": 11,
+      "label": "Yu'Kas",
+      "code": "SDN",
+      "faction": "KV"
+    },
+    "official:fb2:kv-do-san": {
+      "file": "ships/kv.webp",
+      "cell": 12,
+      "label": "Do'San",
+      "code": "CVL",
+      "faction": "KV"
+    },
+    "official:fb2:kv-ko-san": {
+      "file": "ships/kv.webp",
+      "cell": 13,
+      "label": "Ko'San",
+      "code": "CVA",
+      "faction": "KV"
+    },
+    "official:fb2:kv-to-rok": {
+      "file": "ships/kv.webp",
+      "cell": 14,
+      "label": "To'Rok",
+      "code": "CE",
+      "faction": "KV"
+    },
+    "official:fb2:kv-sha-ken": {
+      "file": "ships/kv.webp",
+      "cell": 15,
+      "label": "Sha'Ken",
+      "code": "M",
+      "faction": "KV"
+    },
+    "official:fb2:ph-phyaa": {
+      "file": "ships/ph.webp",
+      "cell": 0,
+      "label": "Phyaa",
+      "code": "SC",
+      "faction": "PH"
+    },
+    "official:fb2:ph-vlath": {
+      "file": "ships/ph.webp",
+      "cell": 1,
+      "label": "Vlath",
+      "code": "SC",
+      "faction": "PH"
+    },
+    "official:fb2:ph-dorrth": {
+      "file": "ships/ph.webp",
+      "cell": 2,
+      "label": "Dorrth",
+      "code": "CT",
+      "faction": "PH"
+    },
+    "official:fb2:ph-tyaph": {
+      "file": "ships/ph.webp",
+      "cell": 3,
+      "label": "Tyaph",
+      "code": "FF",
+      "faction": "PH"
+    },
+    "official:fb2:ph-phuun": {
+      "file": "ships/ph.webp",
+      "cell": 4,
+      "label": "Phuun",
+      "code": "FF",
+      "faction": "PH"
+    },
+    "official:fb2:ph-dinth": {
+      "file": "ships/ph.webp",
+      "cell": 5,
+      "label": "Dinth",
+      "code": "DH",
+      "faction": "PH"
+    },
+    "official:fb2:ph-tsaara": {
+      "file": "ships/ph.webp",
+      "cell": 6,
+      "label": "Tsaara",
+      "code": "CL",
+      "faction": "PH"
+    },
+    "official:fb2:ph-huulth": {
+      "file": "ships/ph.webp",
+      "cell": 7,
+      "label": "Huulth",
+      "code": "CH",
+      "faction": "PH"
+    },
+    "official:fb2:ph-tuuloth": {
+      "file": "ships/ph.webp",
+      "cell": 8,
+      "label": "Tuuloth",
+      "code": "CH",
+      "faction": "PH"
+    },
+    "official:fb2:ph-keraph": {
+      "file": "ships/ph.webp",
+      "cell": 9,
+      "label": "Keraph",
+      "code": "BC",
+      "faction": "PH"
+    },
+    "official:fb2:ph-ptath": {
+      "file": "ships/ph.webp",
+      "cell": 10,
+      "label": "Ptath",
+      "code": "BB",
+      "faction": "PH"
+    },
+    "official:fb2:ph-saath": {
+      "file": "ships/ph.webp",
+      "cell": 11,
+      "label": "Saath",
+      "code": "BDN",
+      "faction": "PH"
+    },
+    "official:fb2:ph-voth": {
+      "file": "ships/ph.webp",
+      "cell": 12,
+      "label": "Voth",
+      "code": "SDN",
+      "faction": "PH"
+    },
+    "official:fb2:ph-taanis": {
+      "file": "ships/ph.webp",
+      "cell": 13,
+      "label": "Taanis",
+      "code": "CVL",
+      "faction": "PH"
+    },
+    "official:fb2:ph-draath": {
+      "file": "ships/ph.webp",
+      "cell": 14,
+      "label": "Draath",
+      "code": "CVA",
+      "faction": "PH"
+    },
+    "official:fb2:sv-sa-an-tha": {
+      "file": "ships/sv.webp",
+      "cell": 0,
+      "label": "Sa'An'Tha",
+      "code": "SC",
+      "faction": "SV"
+    },
+    "official:fb2:sv-sa-kess-tha": {
+      "file": "ships/sv.webp",
+      "cell": 1,
+      "label": "Sa'Kess'Tha",
+      "code": "SC",
+      "faction": "SV"
+    },
+    "official:fb2:sv-fo-kiir-tha": {
+      "file": "ships/sv.webp",
+      "cell": 2,
+      "label": "Fo'Kiir'Tha",
+      "code": "CT",
+      "faction": "SV"
+    },
+    "official:fb2:sv-fo-sath-aan": {
+      "file": "ships/sv.webp",
+      "cell": 3,
+      "label": "Fo'Sath'Aan",
+      "code": "FF",
+      "faction": "SV"
+    },
+    "official:fb2:sv-fo-vur-ath": {
+      "file": "ships/sv.webp",
+      "cell": 4,
+      "label": "Fo'Vur'Ath",
+      "code": "DH",
+      "faction": "SV"
+    },
+    "official:fb2:sv-var-arr-sha": {
+      "file": "ships/sv.webp",
+      "cell": 5,
+      "label": "Var'Arr'Sha",
+      "code": "CL",
+      "faction": "SV"
+    },
+    "official:fb2:sv-var-kiir-sha": {
+      "file": "ships/sv.webp",
+      "cell": 6,
+      "label": "Var'Kiir'Sha",
+      "code": "CE",
+      "faction": "SV"
+    },
+    "official:fb2:sv-var-thee-sha": {
+      "file": "ships/sv.webp",
+      "cell": 7,
+      "label": "Var'Thee'Sha",
+      "code": "CH",
+      "faction": "SV"
+    },
+    "official:fb2:sv-thy-sa-teth": {
+      "file": "ships/sv.webp",
+      "cell": 8,
+      "label": "Thy'Sa'Teth",
+      "code": "CVE",
+      "faction": "SV"
+    },
+    "official:fb2:sv-shyy-tha-var": {
+      "file": "ships/sv.webp",
+      "cell": 9,
+      "label": "Shyy'Tha'Var",
+      "code": "BC",
+      "faction": "SV"
+    },
+    "official:fb2:sv-ann-var-teth": {
+      "file": "ships/sv.webp",
+      "cell": 10,
+      "label": "Ann'Var'Teth",
+      "code": "BB",
+      "faction": "SV"
+    },
+    "official:fb2:sv-sla-tha-rosh": {
+      "file": "ships/sv.webp",
+      "cell": 11,
+      "label": "Sla'Tha'Rosh",
+      "code": "BDN",
+      "faction": "SV"
+    },
+    "official:fb2:sv-vas-sa-rosh": {
+      "file": "ships/sv.webp",
+      "cell": 12,
+      "label": "Vas'Sa'Rosh",
+      "code": "SDN",
+      "faction": "SV"
+    },
+    "official:fb2:sv-vas-sa-teth": {
+      "file": "ships/sv.webp",
+      "cell": 13,
+      "label": "Vas'Sa'Teth",
+      "code": "CVA",
+      "faction": "SV"
+    },
+    "official:ft:courier": {
+      "file": "ships/ft2-1.webp",
+      "cell": 0,
+      "label": "Courier",
+      "code": "SC",
+      "faction": "ft2"
+    },
+    "official:ft:scout-ship": {
+      "file": "ships/ft2-1.webp",
+      "cell": 1,
+      "label": "Scout Ship",
+      "code": "SC",
+      "faction": "ft2"
+    },
+    "official:ft:corvette": {
+      "file": "ships/ft2-1.webp",
+      "cell": 2,
+      "label": "Corvette",
+      "code": "CT",
+      "faction": "ft2"
+    },
+    "official:ft:frigate": {
+      "file": "ships/ft2-1.webp",
+      "cell": 3,
+      "label": "Frigate",
+      "code": "FF",
+      "faction": "ft2"
+    },
+    "official:ft:destroyer": {
+      "file": "ships/ft2-1.webp",
+      "cell": 4,
+      "label": "Destroyer",
+      "code": "DD",
+      "faction": "ft2"
+    },
+    "official:ft:light-cruiser": {
+      "file": "ships/ft2-1.webp",
+      "cell": 5,
+      "label": "Light Cruiser",
+      "code": "CL",
+      "faction": "ft2"
+    },
+    "official:ft:escort-cruiser": {
+      "file": "ships/ft2-1.webp",
+      "cell": 6,
+      "label": "Escort Cruiser",
+      "code": "CE",
+      "faction": "ft2"
+    },
+    "official:ft:heavy-cruiser": {
+      "file": "ships/ft2-1.webp",
+      "cell": 7,
+      "label": "Heavy Cruiser",
+      "code": "CH",
+      "faction": "ft2"
+    },
+    "official:ft:battlecruiser": {
+      "file": "ships/ft2-1.webp",
+      "cell": 8,
+      "label": "Battlecruiser",
+      "code": "BC",
+      "faction": "ft2"
+    },
+    "official:ft:battleship": {
+      "file": "ships/ft2-1.webp",
+      "cell": 9,
+      "label": "Battleship",
+      "code": "BB",
+      "faction": "ft2"
+    },
+    "official:ft:battledreadnought": {
+      "file": "ships/ft2-1.webp",
+      "cell": 10,
+      "label": "Battledreadnought",
+      "code": "BDN",
+      "faction": "ft2"
+    },
+    "official:ft:superdreadnought": {
+      "file": "ships/ft2-1.webp",
+      "cell": 11,
+      "label": "Superdreadnought",
+      "code": "CVL",
+      "faction": "ft2"
+    },
+    "official:ft:light-carrier": {
+      "file": "ships/ft2-1.webp",
+      "cell": 12,
+      "label": "Light Carrier",
+      "code": "CVL",
+      "faction": "ft2"
+    },
+    "official:ft:fleet-carrier": {
+      "file": "ships/ft2-1.webp",
+      "cell": 13,
+      "label": "Fleet Carrier",
+      "code": "CVA",
+      "faction": "ft2"
+    },
+    "official:ft:bulk-tanker": {
+      "file": "ships/ft2-1.webp",
+      "cell": 14,
+      "label": "Bulk Tanker",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "official:ft:heavy-freighter": {
+      "file": "ships/ft2-1.webp",
+      "cell": 15,
+      "label": "Heavy Freighter",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "official:ft:survey-cruiser": {
+      "file": "ships/ft2-2.webp",
+      "cell": 0,
+      "label": "Survey Cruiser",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "official:mt:strikeboat": {
+      "file": "ships/ft2-2.webp",
+      "cell": 1,
+      "label": "Strikeboat",
+      "code": "SC",
+      "faction": "ft2"
+    },
+    "official:mt:lancer": {
+      "file": "ships/ft2-2.webp",
+      "cell": 2,
+      "label": "Lancer",
+      "code": "CT",
+      "faction": "ft2"
+    },
+    "official:mt:torpedo-destroyer": {
+      "file": "ships/ft2-2.webp",
+      "cell": 3,
+      "label": "Torpedo Destroyer",
+      "code": "DD",
+      "faction": "ft2"
+    },
+    "official:mt:super-destroyer": {
+      "file": "ships/ft2-2.webp",
+      "cell": 4,
+      "label": "Super Destroyer",
+      "code": "DD",
+      "faction": "ft2"
+    },
+    "official:mt:privateer": {
+      "file": "ships/ft2-2.webp",
+      "cell": 5,
+      "label": "Privateer",
+      "code": "DD",
+      "faction": "ft2"
+    },
+    "official:mt:needle-cruiser": {
+      "file": "ships/ft2-2.webp",
+      "cell": 6,
+      "label": "Needle Cruiser",
+      "code": "CL",
+      "faction": "ft2"
+    },
+    "official:mt:strike-cruiser": {
+      "file": "ships/ft2-2.webp",
+      "cell": 7,
+      "label": "Strike Cruiser",
+      "code": "CE",
+      "faction": "ft2"
+    },
+    "official:mt:missile-cruiser": {
+      "file": "ships/ft2-2.webp",
+      "cell": 8,
+      "label": "Missile Cruiser",
+      "code": "CE",
+      "faction": "ft2"
+    },
+    "official:mt:planetary-bombardment-monitor": {
+      "file": "ships/ft2-2.webp",
+      "cell": 9,
+      "label": "Planetary Bombardment Monitor",
+      "code": "CH",
+      "faction": "ft2"
+    },
+    "official:mt:system-defence-cruiser": {
+      "file": "ships/ft2-2.webp",
+      "cell": 10,
+      "label": "System Defence Cruiser",
+      "code": "CH",
+      "faction": "ft2"
+    },
+    "official:mt:escort-patrol-carrier": {
+      "file": "ships/ft2-2.webp",
+      "cell": 11,
+      "label": "Escort/Patrol Carrier",
+      "code": "CVL",
+      "faction": "ft2"
+    },
+    "official:mt:free-trader": {
+      "file": "ships/ft2-2.webp",
+      "cell": 12,
+      "label": "Free Trader",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "official:mt:medium-tug": {
+      "file": "ships/ft2-2.webp",
+      "cell": 13,
+      "label": "Medium Tug",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "official:mt:armed-merchantman": {
+      "file": "ships/ft2-2.webp",
+      "cell": 14,
+      "label": "Armed Merchantman",
+      "code": "M",
+      "faction": "ft2"
+    },
+    "custom:SC:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 0,
+      "label": "SC 1",
+      "code": "SC",
+      "variant": 1
+    },
+    "custom:SC:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 1,
+      "label": "SC 2",
+      "code": "SC",
+      "variant": 2
+    },
+    "custom:CT:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 2,
+      "label": "CT 1",
+      "code": "CT",
+      "variant": 1
+    },
+    "custom:CT:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 3,
+      "label": "CT 2",
+      "code": "CT",
+      "variant": 2
+    },
+    "custom:FF:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 4,
+      "label": "FF 1",
+      "code": "FF",
+      "variant": 1
+    },
+    "custom:FF:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 5,
+      "label": "FF 2",
+      "code": "FF",
+      "variant": 2
+    },
+    "custom:DD:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 6,
+      "label": "DD 1",
+      "code": "DD",
+      "variant": 1
+    },
+    "custom:DD:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 7,
+      "label": "DD 2",
+      "code": "DD",
+      "variant": 2
+    },
+    "custom:DH:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 8,
+      "label": "DH 1",
+      "code": "DH",
+      "variant": 1
+    },
+    "custom:DH:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 9,
+      "label": "DH 2",
+      "code": "DH",
+      "variant": 2
+    },
+    "custom:CL:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 10,
+      "label": "CL 1",
+      "code": "CL",
+      "variant": 1
+    },
+    "custom:CL:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 11,
+      "label": "CL 2",
+      "code": "CL",
+      "variant": 2
+    },
+    "custom:CE:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 12,
+      "label": "CE 1",
+      "code": "CE",
+      "variant": 1
+    },
+    "custom:CE:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 13,
+      "label": "CE 2",
+      "code": "CE",
+      "variant": 2
+    },
+    "custom:CH:1": {
+      "file": "ships/custom-1.webp",
+      "cell": 14,
+      "label": "CH 1",
+      "code": "CH",
+      "variant": 1
+    },
+    "custom:CH:2": {
+      "file": "ships/custom-1.webp",
+      "cell": 15,
+      "label": "CH 2",
+      "code": "CH",
+      "variant": 2
+    },
+    "custom:CA:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 0,
+      "label": "CA 1",
+      "code": "CA",
+      "variant": 1
+    },
+    "custom:CA:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 1,
+      "label": "CA 2",
+      "code": "CA",
+      "variant": 2
+    },
+    "custom:BC:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 2,
+      "label": "BC 1",
+      "code": "BC",
+      "variant": 1
+    },
+    "custom:BC:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 3,
+      "label": "BC 2",
+      "code": "BC",
+      "variant": 2
+    },
+    "custom:BB:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 4,
+      "label": "BB 1",
+      "code": "BB",
+      "variant": 1
+    },
+    "custom:BB:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 5,
+      "label": "BB 2",
+      "code": "BB",
+      "variant": 2
+    },
+    "custom:BDN:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 6,
+      "label": "BDN 1",
+      "code": "BDN",
+      "variant": 1
+    },
+    "custom:BDN:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 7,
+      "label": "BDN 2",
+      "code": "BDN",
+      "variant": 2
+    },
+    "custom:DN:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 8,
+      "label": "DN 1",
+      "code": "DN",
+      "variant": 1
+    },
+    "custom:DN:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 9,
+      "label": "DN 2",
+      "code": "DN",
+      "variant": 2
+    },
+    "custom:SDN:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 10,
+      "label": "SDN 1",
+      "code": "SDN",
+      "variant": 1
+    },
+    "custom:SDN:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 11,
+      "label": "SDN 2",
+      "code": "SDN",
+      "variant": 2
+    },
+    "custom:CVE:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 12,
+      "label": "CVE 1",
+      "code": "CVE",
+      "variant": 1
+    },
+    "custom:CVE:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 13,
+      "label": "CVE 2",
+      "code": "CVE",
+      "variant": 2
+    },
+    "custom:CVL:1": {
+      "file": "ships/custom-2.webp",
+      "cell": 14,
+      "label": "CVL 1",
+      "code": "CVL",
+      "variant": 1
+    },
+    "custom:CVL:2": {
+      "file": "ships/custom-2.webp",
+      "cell": 15,
+      "label": "CVL 2",
+      "code": "CVL",
+      "variant": 2
+    },
+    "custom:CVA:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 0,
+      "label": "CVA 1",
+      "code": "CVA",
+      "variant": 1
+    },
+    "custom:CVA:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 1,
+      "label": "CVA 2",
+      "code": "CVA",
+      "variant": 2
+    },
+    "custom:M:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 2,
+      "label": "M 1",
+      "code": "M",
+      "variant": 1
+    },
+    "custom:M:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 3,
+      "label": "M 2",
+      "code": "M",
+      "variant": 2
+    },
+    "custom:BASE:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 4,
+      "label": "BASE 1",
+      "code": "BASE",
+      "variant": 1
+    },
+    "custom:BASE:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 5,
+      "label": "BASE 2",
+      "code": "BASE",
+      "variant": 2
+    },
+    "custom:SECTION:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 6,
+      "label": "SECTION 1",
+      "code": "SECTION",
+      "variant": 1
+    },
+    "custom:SECTION:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 7,
+      "label": "SECTION 2",
+      "code": "SECTION",
+      "variant": 2
+    },
+    "custom:JG:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 8,
+      "label": "JG 1",
+      "code": "JG",
+      "variant": 1
+    },
+    "custom:JG:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 9,
+      "label": "JG 2",
+      "code": "JG",
+      "variant": 2
+    },
+    "custom:PT:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 10,
+      "label": "PT 1",
+      "code": "PT",
+      "variant": 1
+    },
+    "custom:PT:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 11,
+      "label": "PT 2",
+      "code": "PT",
+      "variant": 2
+    },
+    "custom:GENERIC:1": {
+      "file": "ships/custom-3.webp",
+      "cell": 12,
+      "label": "GENERIC 1",
+      "code": "GENERIC",
+      "variant": 1
+    },
+    "custom:GENERIC:2": {
+      "file": "ships/custom-3.webp",
+      "cell": 13,
+      "label": "GENERIC 2",
+      "code": "GENERIC",
+      "variant": 2
+    }
+  }
+}
