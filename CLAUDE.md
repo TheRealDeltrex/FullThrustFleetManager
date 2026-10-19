@@ -220,7 +220,8 @@ What exists:
 
 ## Storage (layers 2-3)
 
-- `fleet_rules.py` (pure): `fleet_options()`, `design_points()` / `ship_points()` (NPV plus the
+- `fleet_rules.py` (pure): `fleet_options()`, `default_options(ruleset)` (what `create_fleet`
+  starts with: gear and mechanics on, selection limits and alternative core rules off), `design_points()` / `ship_points()` (NPV plus the
   ship's loadout, its own or the design default) / `fleet_points()` (skips destroyed ships),
   `design_issues()`, `fleet_report()` (the tournament check: fleet issues + a `ShipReport` each),
   `badges()` (`non_conforming`, `no_faction`, `mixed_faction`, `custom_ships`; names from
