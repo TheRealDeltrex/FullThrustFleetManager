@@ -276,9 +276,11 @@ def hull_rows(design: dict) -> int:
 
 
 def hull_integrity_points(design: dict) -> int:
-    """2 a box on four rows; x3 / x1.5 / x1 on three / five / six (.5 up)."""
+    """2 a box on four rows; x3 / x1.5 / x1 on three / five / six (.5 up). A hull of three
+    boxes or fewer can only be drawn on three rows, so it costs 2 a box however it is drawn
+    (owner's ruling: a ship is not dearer for being small)."""
     boxes = max(0, _int(design.get("hull_boxes")))
-    halves = {3: 6, 4: 4, 5: 3, 6: 2}[hull_rows(design)]
+    halves = {3: 6, 4: 4, 5: 3, 6: 2}[hull_rows(design)] if boxes > 3 else 4
     return round_half_up(halves * boxes, 2)
 
 
