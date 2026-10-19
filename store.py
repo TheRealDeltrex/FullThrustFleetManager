@@ -354,18 +354,22 @@ def normalize_fleet(doc: object) -> dict | None:
 
 @lru_cache(maxsize=1)
 def _catalog() -> dict[str, dict]:
-    out: dict[str, dict] = {}
+    raw: dict[str, dict] = {}
     for path in sorted((paths.bundle_dir() / "data" / "catalog").glob("*.json")):
         doc = _read_json(path) or {}
         for d in doc.get("designs", []):
             clean = normalize_design(d)
             if clean:
-                out[clean["id"]] = clean
+                raw[clean["id"]] = clean
+    # A design from outside its ruleset's books (the Star Ranger pages) is listed there only when
+    # that ruleset's own rules make it legal; the rest still feed the adopting rulesets below.
+    out = {i: d for i, d in raw.items()
+           if d["ruleset"] in RULESETS and _adoptable(RULESETS[d["ruleset"]], RULESETS[d["ruleset"]], d)}
     # A ruleset with no designs of its own may adopt another's (Cross Dimensions takes the Fleet
     # Book ships, CD p.3), converted by the ruleset rather than kept as a second file.
     for rs in RULESETS.values():
         for source in rs.catalog_sources:
-            for d in [d for d in out.values() if d["ruleset"] == source]:
+            for d in [d for d in raw.values() if d["ruleset"] == source]:
                 clean = normalize_design(rs.adopt_design(json.loads(json.dumps(d))))
                 if (clean and clean["ruleset"] == rs.id and clean["id"] not in out
                         and _adoptable(RULESETS[source], rs, clean)):
@@ -375,8 +379,8 @@ def _catalog() -> dict[str, dict]:
 
 def _adoptable(source, rs, design: dict) -> bool:
     """A rulebook design is always adopted. One from outside the source ruleset's books (the
-    Star Ranger pages) only when it is legal unchanged, since it may use systems the adopting
-    rules lack."""
+    Star Ranger pages) only when it is legal unchanged, since it may use systems or rules the
+    adopting ruleset lacks (the Fleet Books and Cross Dimensions are closed; owner's ruling)."""
     if design["source"].get("book") in {b.code for b in source.books}:
         return True
     opts = {o: True for o in rs.required_options(design, None)}

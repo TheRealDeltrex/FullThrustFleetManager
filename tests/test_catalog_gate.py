@@ -41,9 +41,12 @@ def test_npv_gate(design):
         assert erratum["rules_value"] == b.points, "errata rules_value is stale"
         assert len(erratum["reason"]) > 20
         return
-    # A Star Ranger variant often prints no NPV (0); it still has to be legal.
+    # A Star Ranger variant often prints no NPV (0); it still has to be legal, bar the systems and
+    # hull options the Fleet Books lack (such a design is listed only by Project Continuum).
     if design["source"]["npv_book"] or design["source"].get("book") != "SR":
         assert b.points == design["source"]["npv_book"]
+    if design["source"].get("book") == "SR":
+        violations = [v for v in violations if v != "not_in_books"]
     assert violations == []
 
 
