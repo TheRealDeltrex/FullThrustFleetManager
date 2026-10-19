@@ -299,11 +299,18 @@
               {% endfor %}
             </tbody>
           </table>
-          <div class="body row">
+          <div class="body row system-picker">
+            {# Typing in the filter narrows the list (static/syspicker.js); without script it stays hidden. #}
+            <input class="input system-filter" type="search" hidden data-no-autosave autocomplete="off"
+                   placeholder="{{ _('Filter') }}" aria-label="{{ _('Filter systems') }}">
             <select class="input grow" name="system_type" aria-label="{{ _('System to add') }}" data-no-autosave>
-              {% for definition in selected.system_types %}
-                <option value="{{ definition.type }}"
-                  {% if definition.type == last_system_type %}selected{% endif %}>{{ definition.group }} · {{ definition.label }}</option>
+              {% for group, definitions in selected.system_groups %}
+                <optgroup label="{{ group }}">
+                  {% for definition in definitions %}
+                    <option value="{{ definition.type }}" data-search="{{ (group ~ ' ' ~ definition.label) | lower }}"
+                      {% if definition.type == last_system_type %}selected{% endif %}>{{ definition.label }}</option>
+                  {% endfor %}
+                </optgroup>
               {% endfor %}
             </select>
             <button class="btn" type="submit" name="action" value="add_system" data-autosave-click>{{ _("Add system") }}</button>
@@ -488,4 +495,5 @@
     </div>
   </aside>
   <script src="{{ url_for('static', filename='factions.js') }}"></script>
+  <script src="{{ url_for('static', filename='syspicker.js') }}"></script>
 {% endblock %}

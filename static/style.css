@@ -111,6 +111,7 @@ a.chip:hover { text-decoration: underline; }
 
 /* Design tab workbench (PLAN 9.4) */
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.system-picker .system-filter { width: 9rem; }
 .stack { display: flex; flex-direction: column; gap: 8px; }
 label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
 .grow { flex: 1; }
