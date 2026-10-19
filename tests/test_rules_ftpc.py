@@ -488,3 +488,110 @@ def test_the_quick_reference_quotes_project_continuum():
     assert "hangar_criticals" not in {e.key for e in PC.quickref({"hangar_bay"}, {})}
     kravak = {e.key for e in PC.quickref({"kgun"}, {}, frozenset({"kravak"}))}
     assert {"kv_kgun", "kv_thrust", "kgun"} <= kravak
+
+
+# ---- Turrets, racks, gunboats and the PC fighter modifications (PC pp.46, 75-82, 110, 123) ----
+
+
+@pytest.mark.parametrize("arcs, weapon_mass, mass", [
+    (SIX, 4, 2), (SIX[:5], 4, 2), (SIX[:4], 4, 1), (SIX[:3], 6, 2), (["F", "A"], 6, 1),
+    (["F", "A"], 7, 2),
+])
+def test_a_turret_holds_more_weapon_mass_the_fewer_arcs_it_bears(arcs, weapon_mass, mass):
+    # p.46: one MASS of a 6-arc turret holds 2 MASS of weapons ... a 2-arc one holds 6.
+    weapons = [sys_(f"w{i}", "beam", **{"class": 1, "arcs": ["F"]}) for i in range(weapon_mass)]
+    turret = sys_("t", "turret", arcs=arcs, mounts=[w["uid"] for w in weapons])
+    d = design(tmf=100, hull_boxes=10, systems=[*weapons, turret])
+    row = next(r for r in PC.design_breakdown(d, {}).rows if r.system_uid == "t")
+    assert (row.mass, row.points) == (mass, 3 * mass)
+
+
+def test_turret_limits():
+    beam = sys_("b", "beam", **{"class": 3, "arcs": ["F"]})
+    spinal = sys_("s", "spinal_mount", kind="beam", size="small")
+    turret = sys_("t", "turret", arcs=["F", "A"], mounts=["b"])
+    assert codes(design(tmf=50, hull_boxes=5, systems=[beam, turret])) <= {"mass_over"}
+    two = design(tmf=50, hull_boxes=5, systems=[beam, turret, dict(turret, uid="u", mounts=[])])
+    assert {"turret_count"} <= codes(two)
+    assert "turret_shared" in codes(design(tmf=120, hull_boxes=12, systems=[
+        beam, turret, dict(turret, uid="u")]))
+    assert "turret_bad_mount" in codes(design(systems=[spinal, dict(turret, mounts=["s"])]))
+    assert "turret_arcs" in codes(design(systems=[beam, dict(turret, arcs=["F"])]))
+    wide = dict(beam, arcs=FRONT3)
+    assert "turret_weapon_arcs" in infos(design(systems=[wide, turret]))
+
+
+def test_removing_a_weapon_takes_it_out_of_its_turret():
+    import store
+
+    d = store.normalize_design(design(systems=[
+        sys_("b", "beam", **{"class": 1, "arcs": ["F"]}), sys_("t", "turret", arcs=SIX, mounts=["b"])]))
+    store.remove_system(d, "b")
+    assert d["systems"][0]["mounts"] == []
+
+
+def test_fighter_racks_carry_one_robot_wing():
+    rack = sys_("r", "fighter_rack")
+    assert mass_points("fighter_rack") == (6, 6)
+    robots = design(systems=[rack], default_loadout={"fighters": [
+        {"hangar": "r", "type": "standard", "extras": ["robot"]}], "magazines": []})
+    assert PC.loadout_points(robots, None, {}) == 12             # p.76: 12 a wing
+    assert codes(robots) <= {"mass_over"} and "bays_without_tubes" not in codes(robots)
+    pilots = dict(robots, default_loadout={"fighters": [{"hangar": "r", "type": "standard"}]})
+    assert "rack_needs_robots" in codes(pilots)
+    two = dict(robots, default_loadout={"fighters": [
+        {"hangar": "r", "type": "standard", "extras": ["robot"]}] * 2})
+    assert "hangar_overfull" in codes(two)
+
+
+def test_light_wings_cost_as_six_and_take_only_some_types():
+    bay = [sys_("h", "hangar_bay"), sys_("t", "launch_tube")]
+
+    def wing(fighter_type, *extras):
+        return design(systems=bay, default_loadout={"fighters": [
+            {"hangar": "h", "type": fighter_type, "extras": ["light", *extras]}]})
+    assert PC.loadout_points(wing("attack"), None, {}) == 24    # p.75: as six regular fighters
+    assert "light_wing" not in codes(wing("missile", "fast"))
+    assert "light_wing" in codes(wing("torpedo"))
+    assert "light_wing" in codes(wing("standard", "heavy"))
+
+
+def test_a_robot_assault_shuttle_wing_never_costs_less_than_nothing():
+    from rulesets.ftpc import rules
+
+    assert rules.fighter_group_points({"type": "assault_shuttle", "extras": ["robot"]}) == 0
+
+
+@pytest.mark.parametrize("squadron, points", [
+    ({"type": "beam"}, 54), ({"type": "gatling"}, 90), ({"type": "kgun", "extras": ["heavy"]}, 84),
+    ({"type": "missile", "extras": ["ftl"], "ecm": 2}, 72 + 6 + 36),
+])
+def test_gunboat_squadrons(squadron, points):
+    # PC pp.123-124: points each for six, FTL +6 and heavy +12 a squadron, +3 a boat per ECM level.
+    d = design(tmf=60, hull_boxes=6, systems=[sys_("g", "boat_bay", mass=24)],
+               default_loadout={"fighters": [], "magazines": [], "gunboats": [{"carrier": "g", **squadron}]})
+    assert PC.loadout_points(d, None, {}) == points
+    assert not codes(d) & {"unknown_gunboat_type", "boat_bay_full", "gunboat_ecm"}
+
+
+def test_gunboat_racks_and_bays():
+    assert mass_points("gunboat_rack") == (18, 0)
+
+    def carried(system, *squadrons):
+        return design(tmf=60, hull_boxes=6, systems=[system],
+                      default_loadout={"gunboats": [{"carrier": "g", **s} for s in squadrons]})
+    rack = sys_("g", "gunboat_rack")
+    assert "ftl_gunboat_rack" in codes(carried(rack, {"type": "beam", "extras": ["ftl"]}))
+    assert "gunboat_rack_full" in codes(carried(rack, {"type": "beam"}, {"type": "beam"}))
+    assert "boat_bay_full" in codes(carried(sys_("g", "boat_bay", mass=20), {"type": "beam"}))
+    assert "gunboat_ecm" in codes(carried(rack, {"type": "beam", "ecm": 4}))
+    assert "gunboats_without_carrier" in codes(carried(sys_("g", "hangar_bay"), {"type": "beam"}))
+
+
+def test_gunboats_survive_normalisation_on_a_design_and_a_ship():
+    import store
+
+    loadout = {"fighters": [], "magazines": [],
+               "gunboats": [{"carrier": "g", "type": "ads", "extras": ["heavy"], "ecm": 1}]}
+    d = store.normalize_design(design(systems=[sys_("g", "gunboat_rack")], default_loadout=loadout))
+    assert d["default_loadout"]["gunboats"] == loadout["gunboats"]

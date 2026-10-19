@@ -301,6 +301,8 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "twin_particle_array": (_battery_mass, _times(4), lambda s: _("Twin particle array")),
     "meson": (_battery_mass, _times(4), lambda s: _("Meson projector")),
     "pulser": (_battery_mass, _times(5), lambda s: _("Pulser")),
+    "turret": (lambda s, d: turret_mass(s, d), _times(3),
+               lambda s: _("{n}-arc turret", n=len(s.get("arcs") or []))),
     "needle_beam": (_needle_mass, _times(3), lambda s: _("NB-{n}", n=_class(s, 4))),
     # ---- Projectile weapons (PC pp.41-45, 54) ----
     "pulse_torpedo": (
@@ -394,6 +396,10 @@ SYSTEM_RULES: dict[str, SystemRule] = {
         lambda s: _("Launch tube with catapult") if _yes(s, "catapult") else _("Launch tube"),
     ),
     "hangar": (lambda s, d: 9, _times(3), lambda s: _("Combined hangar bay")),
+    "fighter_rack": (lambda s, d: data.FIGHTER_RACK_MASS, _times(1),
+                     lambda s: _("Fighter rack (1 robot wing)")),
+    "gunboat_rack": (lambda s, d: data.GUNBOAT_RACK_MASS, lambda s, m, d: 0,
+                     lambda s: _("Gunboat rack (1 squadron)")),
     "boat_bay": (
         lambda s, d: max(1, round_half_up(3 * _mass_param(s), 2)), lambda s, m, d: 0,
         lambda s: _("Boat bay (craft MASS {n})", n=_mass_param(s)),
@@ -439,6 +445,29 @@ SYSTEM_RULES: dict[str, SystemRule] = {
 }
 
 BAY_TYPES = ("hangar_bay", "hangar")
+# Where a fighter wing may sit: a bay, or a fighter rack for robot fighters (PC p.110).
+WING_HOLDERS = (*BAY_TYPES, "fighter_rack")
+# Weapons a turret cannot hold (PC p.46: spinal mounts "cannot be turret mounted").
+UNTURRETED = frozenset({"turret", "spinal_mount", "nova_cannon", "wave_gun"})
+
+
+def mounts_of(turret: dict) -> list[str]:
+    mounts = turret.get("mounts")
+    return [u for u in mounts if isinstance(u, str)] if isinstance(mounts, list) else []
+
+
+def turret_mass(turret: dict, design: dict) -> int:
+    """PC p.46: one MASS of turret holds 2 (six arcs) to 6 (two arcs) MASS of weapons, fractions
+    rounded up; an empty turret still takes 1."""
+    by_uid = {s.get("uid"): s for s in _systems(design)}
+    weapons = 0
+    for uid in mounts_of(turret):
+        weapon = by_uid.get(uid)
+        rule = SYSTEM_RULES.get(weapon.get("type")) if weapon else None
+        if rule and weapon.get("type") not in UNTURRETED:
+            weapons += rule[0](weapon, design)
+    holds = data.TURRET_HOLDS.get(len(turret.get("arcs") or []), data.TURRET_HOLDS[2])
+    return max(1, math.ceil(weapons / holds))
 
 
 # ---- Hull and armour ----------------------------------------------------------------------------
@@ -614,6 +643,9 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "advanced_drive": advanced_drive,
         "advanced_ftl": advanced_ftl,
         "transfer_mass": transfer_mass(design),
+        # Weapons a turret may hold, for the Design tab's turret checkboxes (PC p.46).
+        "turret_weapons": [s["uid"] for s in _systems(design) if isinstance(s.get("uid"), str)
+                           and s.get("type") in ARCED_TYPES and s.get("type") not in UNTURRETED],
     }
     return Breakdown(tuple(rows), sum(r.mass for r in rows), points, derived)
 
@@ -680,13 +712,34 @@ def _group_extras(entry: dict) -> list[str]:
 
 def fighter_group_points(entry: dict) -> int:
     """PC p.123, per wing: the type, then its modifications. Swing roles are the CD rule (CD
-    p.30): the dearest type in full and half of each other."""
+    p.30): the dearest type in full and half of each other. A robot assault shuttle wing would
+    come to 0, never less."""
     costs = sorted((data.FIGHTER_POINTS[t] for t in _group_types(entry) if t in data.FIGHTER_POINTS),
                    reverse=True)
     if not costs:
         return 0
-    return (costs[0] + sum(c // 2 for c in costs[1:])
-            + sum(data.FIGHTER_EXTRAS.get(x, 0) for x in _group_extras(entry)))
+    return max(0, costs[0] + sum(c // 2 for c in costs[1:])
+               + sum(data.FIGHTER_EXTRAS.get(x, 0) for x in _group_extras(entry)))
+
+
+def _gunboat_extras(entry: dict) -> list[str]:
+    extras = entry.get("extras") if isinstance(entry.get("extras"), list) else []
+    return list(dict.fromkeys(x for x in extras if isinstance(x, str)))
+
+
+def gunboat_ecm(entry: dict) -> int:
+    return max(0, _int(entry.get("ecm")))
+
+
+def gunboat_squadron_points(entry: dict) -> int:
+    """PC pp.123-124: six gunboats of the type, +6 FTL and +12 heavy for the squadron, +3 a
+    gunboat per level of electronic warfare."""
+    each = data.GUNBOAT_POINTS.get(entry.get("type"))
+    if each is None:
+        return 0
+    return (data.GUNBOAT_SQUADRON * each
+            + sum(data.GUNBOAT_EXTRAS.get(x, 0) for x in _gunboat_extras(entry))
+            + data.GUNBOAT_SQUADRON * data.GUNBOAT_ECM_POINTS * gunboat_ecm(entry))
 
 
 def salvo_space(entry: dict, salvo: str) -> int | None:
@@ -711,6 +764,7 @@ def loadout_points(design: dict, loadout: dict | None, options: dict) -> int:
         loadout = design.get("default_loadout")
     craft_mass = sum(max(0, _int(c.get("mass"))) for c in _entries(loadout, "craft"))
     return (sum(fighter_group_points(f) for f in _entries(loadout, "fighters"))
+            + sum(gunboat_squadron_points(g) for g in _entries(loadout, "gunboats"))
             + data.CRAFT_POINTS_PER_MASS * craft_mass
             + sum(_salvo_surcharge(m) for m in _entries(loadout, "magazines")))
 
@@ -775,7 +829,7 @@ ARCED_TYPES = {
     "beam", "emp", "transporter", "grav_gun", "plasma_cannon", "graser", "phaser", "heavy_graser",
     "gatling", "twin_particle_array", "meson", "pulser", "needle_beam", "pulse_torpedo",
     "submunition", "kgun", "mkp", "boarding_torpedo_launcher", "fusion_array", "plasma_bolt",
-    "sm_launcher", "sm_rack", "heavy_missile", "am_missile", "rocket_pod", "ads",
+    "sm_launcher", "sm_rack", "heavy_missile", "am_missile", "rocket_pod", "ads", "turret",
 }
 
 
@@ -828,6 +882,8 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
             violation("unknown_system", _("Unknown system type: {t}.", t=str(stype)), uid)
             continue
         _validate_arcs(s, uid, violation)
+        if stype == "turret":
+            _validate_turret(s, uid, by_uid, violation, info)
         key = _option_for(s)
         if key:
             _option_issue(key, options, uid, violation, info)
@@ -842,6 +898,7 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     common.validate_missiles(design, systems, by_uid, violation, salvo_space)
     _validate_magazine_loads(design, by_uid, options, violation, info)
     _validate_hangars(design, systems, by_uid, violation, info)
+    _validate_gunboats(design, by_uid, violation)
     _validate_crew(design, systems, violation)
     _validate_stationary(design, systems, violation)
 
@@ -863,6 +920,12 @@ def _validate_counts(design: dict, systems: list[dict], violation, info) -> None
     types = [s.get("type") for s in systems]
     if {"screen", "advanced_screen"} <= set(types):
         violation("mixed_screens", _("A ship cannot have both advanced and standard screens."))
+    if types.count("turret") > per_50:
+        # PC p.46: "A ship is limited to one turret per size 50 mass of ship."
+        violation("turret_count", _("A ship mounts one turret per 50 MASS: {n} at most.", n=per_50))
+    mounted = [u for s in systems if s.get("type") == "turret" for u in mounts_of(s)]
+    if len(mounted) != len(set(mounted)):
+        violation("turret_shared", _("A weapon sits in one turret only."))
     if types.count("plasma_bolt") > per_50:
         # PC p.54: one launcher per 50 MASS of ship (1-50 one, 101-150 three).
         violation("plasma_bolt_count", _("A ship mounts one plasma bolt launcher per 50 MASS: "
@@ -927,6 +990,22 @@ def _validate_stationary(design: dict, systems: list[dict], violation) -> None:
                                  n=need))
 
 
+def _validate_turret(s: dict, uid: str | None, by_uid: dict, violation, info) -> None:
+    """PC p.46: a turret bears into two to six arcs, holds weapons (never a spinal mount), and
+    its weapons fire only into the one arc it faces, so a weapon's own extra arcs are wasted."""
+    if len(s.get("arcs") or []) < 2:
+        violation("turret_arcs", _("A turret bears into two arcs or more."), uid)
+    for mount in mounts_of(s):
+        weapon = by_uid.get(mount)
+        if not weapon or weapon.get("type") not in ARCED_TYPES or weapon.get("type") in UNTURRETED:
+            violation("turret_bad_mount", _("A turret holds this ship's weapons, never a spinal mount."), uid)
+        elif len(weapon.get("arcs") or []) > 1:
+            info("turret_weapon_arcs", _("A weapon in a turret fires into the turret's arc only; "
+                                         "its own extra arcs are paid for and unused."), mount)
+    if not mounts_of(s):
+        info("turret_empty", _("This turret holds no weapons."), uid)
+
+
 def _validate_arcs(s: dict, uid: str | None, violation) -> None:
     stype = s["type"]
     arcs = s.get("arcs")
@@ -979,13 +1058,21 @@ def _validate_hangars(design: dict, systems: list[dict], by_uid: dict, violation
     used: dict[str, int] = {}
     for entry in _entries(loadout, "fighters"):
         hangar = by_uid.get(entry.get("hangar"))
-        if not hangar or hangar.get("type") not in BAY_TYPES:
+        if not hangar or hangar.get("type") not in WING_HOLDERS:
             violation("fighters_without_hangar",
                       _("Fighter group assigned to a hangar this design does not have."))
             continue
         if (any(t not in data.FIGHTER_POINTS for t in _group_types(entry))
                 or any(x not in data.FIGHTER_EXTRAS for x in _group_extras(entry))):
             violation("unknown_fighter_type", _("Unknown fighter type."), hangar["uid"])
+        extras = set(_group_extras(entry))
+        if hangar.get("type") == "fighter_rack" and "robot" not in extras:
+            violation("rack_needs_robots", _("A fighter rack carries robot fighters only."), hangar["uid"])
+        if "light" in extras and (any(t not in data.LIGHT_TYPES for t in _group_types(entry))
+                                  or extras & data.LIGHT_FORBIDDEN):
+            # PC p.75: light fighters may be fast, interceptors, attack or missile fighters.
+            violation("light_wing", _("Light fighters may be standard, fast, interceptor, attack "
+                                      "or missile fighters, never heavy or long range."), hangar["uid"])
         used[hangar["uid"]] = used.get(hangar["uid"], 0) + data.BAY_CRAFT_MASS
     for entry in _entries(loadout, "craft"):
         hangar = by_uid.get(entry.get("hangar"))
@@ -1000,3 +1087,32 @@ def _validate_hangars(design: dict, systems: list[dict], by_uid: dict, violation
             violation("hangar_overfull",
                       _("The hangar holds {cap} MASS of fighters and light vessels; {n} are loaded.",
                         cap=bays * data.BAY_CRAFT_MASS, n=craft_mass), uid)
+
+
+def _validate_gunboats(design: dict, by_uid: dict, violation) -> None:
+    """PC pp.79-80: a gunboat rack carries one squadron and never FTL gunboats; a boat bay holds
+    squadrons of MASS-4 boats within the craft MASS it was built for."""
+    loaded: dict[str, int] = {}
+    for entry in _entries(design.get("default_loadout"), "gunboats"):
+        carrier = by_uid.get(entry.get("carrier"))
+        if not carrier or carrier.get("type") not in data.GUNBOAT_CARRIERS:
+            violation("gunboats_without_carrier",
+                      _("Gunboat squadron assigned to a rack or bay this design does not have."))
+            continue
+        uid = carrier["uid"]
+        if (entry.get("type") not in data.GUNBOAT_POINTS
+                or any(x not in data.GUNBOAT_EXTRAS for x in _gunboat_extras(entry))):
+            violation("unknown_gunboat_type", _("Unknown gunboat type."), uid)
+        if gunboat_ecm(entry) > data.GUNBOAT_ECM_MAX:
+            violation("gunboat_ecm", _("Electronic warfare gunboats carry ECM up to level 3."), uid)
+        if carrier["type"] == "gunboat_rack" and "ftl" in _gunboat_extras(entry):
+            violation("ftl_gunboat_rack", _("FTL gunboats cannot be carried in racks."), uid)
+        loaded[uid] = loaded.get(uid, 0) + 1
+    for uid, squadrons in loaded.items():
+        carrier = by_uid[uid]
+        if carrier["type"] == "gunboat_rack" and squadrons > 1:
+            violation("gunboat_rack_full", _("A gunboat rack carries one squadron."), uid)
+        need = squadrons * data.GUNBOAT_SQUADRON * data.GUNBOAT_BOAT_MASS
+        if carrier["type"] == "boat_bay" and need > _mass_param(carrier):
+            violation("boat_bay_full", _("The boat bay holds {cap} MASS of craft; the gunboats need {n}.",
+                                         cap=_mass_param(carrier), n=need), uid)

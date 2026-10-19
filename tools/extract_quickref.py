@@ -201,6 +201,7 @@ PC_ENTRIES = [
     ("ftpc", "fusion_array", "Fusion array", "5.19 Fusion Array"),
     ("ftpc", "grav_gun", "Gravitic guns", "5.20 Gravitic Guns"),
     ("ftpc", "pulser", "Pulsers", "5.21 Pulsers (P)"),
+    ("ftpc", "turret", "Turrets", "5.22 Turrets"),
     ("ftpc", "spinal_mount", "Spinal mounts", "5.23 Spinal Mounts"),
     ("ftpc", "sm_launcher", "Launching missiles", "6.3 Launching missiles"),
     ("ftpc", "missile_damage", "Missile damage", "6.5 Damage (SAP)"),
@@ -234,6 +235,8 @@ PC_ENTRIES = [
     ("ftpc", "hangar", "Fighter launch and recovery", "8.1 Launch and recovery"),
     ("ftpc", "launch_tube", "Launch tubes", "8.2 Launch tubes / flight deck"),
     ("ftpc", "fighter_endurance", "Fighter endurance", "8.13 Endurance"),
+    ("ftpc", "fighter_rack", "Robot fighters", "Robot Fighters"),
+    ("ftpc", "gunboat_rack", "Gunboats", "9.1 Gunboat Rules"),
     ("ftpc", "hangar_criticals", "Critical hits on hangar bays",
      "10.2 Critical hits on hangar bays (optional)"),
     ("ftpc", "core_systems", "Core systems", "10.3 Core Systems"),
@@ -612,8 +615,10 @@ def body_between(pages: list[str], heading: str, end: str | None,
     return text, lines[start][1]
 
 
-# Headings the page breaks over two lines: the first line is what the text layer matches.
+# Headings the page sets differently from the bookmark: broken over two lines (the first line is
+# what the text layer matches), or with more words.
 PC_SPLIT_HEADINGS = {
+    "Robot Fighters": "Robot Fighters (+mod)",
     "4.9 Ship damage and how weapons inflict damage": "4.9 Ship damage and how weapons",
     "10.2 Critical hits on hangar bays (optional)": "10.2 Critical hits on hangar bays",
 }

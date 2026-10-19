@@ -50,7 +50,16 @@ class FTPCRuleset:
     def fighter_extras(self) -> tuple[tuple[str, str], ...]:
         """The per-wing modifications the loadout editor offers (PC p.123)."""
         return (("ftl", _("FTL")), ("fast", _("Fast")), ("long_range", _("Long range")),
-                ("heavy", _("Heavy")))
+                ("heavy", _("Heavy")), ("light", _("Light")), ("robot", _("Robot")))
+
+    @property
+    def gunboat_types(self) -> tuple[tuple[str, str], ...]:
+        """The gunboat squadrons the loadout editor offers (PC pp.80-82), dearest last."""
+        return tuple((key, gunboat_label(key)) for key in data.GUNBOAT_POINTS)
+
+    @property
+    def gunboat_extras(self) -> tuple[tuple[str, str], ...]:
+        return (("ftl", _("FTL")), ("heavy", _("Heavy or screened")))
 
     def fleet_issues(self, fleet_doc: dict, ships: list[tuple[dict, dict]],
                      options: dict) -> list[Issue]:
@@ -180,6 +189,18 @@ ALIEN_ENTRIES = (
     ("phalon", "ph_", {"ph_shell", "ph_pds"}),
     ("savasku", "sv_", {"sv_power", "sv_thrust", "sv_biomass", "sv_repair"}),
 )
+
+
+def gunboat_label(key: str) -> str:
+    return {
+        "beam": _("Beam gunboats"), "plasma": _("Plasma gun gunboats"),
+        "graser": _("Graser gunboats"), "gatling": _("Gatling gunboats"),
+        "needle": _("Needle gunboats"), "pulse_torpedo": _("Pulse torpedo gunboats"),
+        "submunition": _("Submunition gunboats"), "mkp": _("MKP gunboats"),
+        "kgun": _("K-gunboats"), "missile": _("Missile gunboats"), "rocket": _("Rocket gunboats"),
+        "pds": _("Point defence gunboats"), "ads": _("ADS gunboats"),
+        "scatterpack": _("Scatterpack gunboats"), "plasma_bomber": _("Plasma bomber gunboats"),
+    }.get(key, key)
 
 
 def _is_alien(race: object) -> bool:
