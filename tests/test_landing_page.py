@@ -141,7 +141,8 @@ def test_the_page_names_every_ruleset_you_can_design_to(html):
     from rulesets import RULESETS
 
     # How the page's prose names each ruleset; a new ruleset fails here until the page says so.
-    prose = {"fb": "Fleet Book", "ft2": "Full Thrust 2nd edition", "ftcd": "Cross Dimensions"}
+    prose = {"fb": "Fleet Book", "ft2": "Full Thrust 2nd edition", "ftcd": "Cross Dimensions",
+              "ftpc": "Project Continuum"}
     assert set(prose) == set(RULESETS), "a ruleset the landing page does not describe"
     design_line = next(line for line in html.splitlines() if "<strong>Design ships</strong>" in line)
     for name in prose.values():

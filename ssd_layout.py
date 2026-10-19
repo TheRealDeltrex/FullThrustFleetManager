@@ -627,9 +627,85 @@ _CD_ICONS = dict(_SHARED_ICONS) | {
 }
 
 
+# ---- Project Continuum icons ------------------------------------------------------------------
+#
+# PC draws most of its many weapons as variations on the beam circle. Until each has its own
+# icon, a weapon is a boxed abbreviation with its class and, where it has arcs, the arc ring, so
+# a sheet still shows what bears where; everything else PC shares with Cross Dimensions.
+
+
+def _pc_weapon(prefix, classed: bool = True):
+    """A boxed abbreviation (callable, translated at draw time) with the class and arc ring."""
+    def draw(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+        label = prefix() if callable(prefix) else prefix
+        cls = system.get("class")
+        if classed and isinstance(cls, int):
+            label = f"{label}{cls}"
+        out: list[Primitive] = [Rect(x - 9, y - 7, 18, 14, fill=WHITE, stroke=1.2),
+                                Text(x, y + 3.0, label, size=6.5, bold=True)]
+        if system.get("arcs"):
+            out += _arc_ring(x, y, 11.5, system.get("arcs", []), arcs)
+        return out
+    return draw
+
+
+def _pc_counted(prefix):
+    """Crew parties: the abbreviation and how many."""
+    def draw(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
+        return [Rect(x - 13, y - 7, 26, 14, fill=WHITE, stroke=1.2),
+                Text(x, y + 3.0, f"{prefix()} {system.get('count', 1)}", size=7, bold=True)]
+    return draw
+
+
+_PC_ICONS = dict(_CD_ICONS) | {
+    "pulse_torpedo": _torpedo,
+    "advanced_fire_control": _labelled(lambda: _("AFC")),
+    "emp": _pc_weapon(lambda: _("EMP")),
+    "transporter": _pc_weapon(lambda: _("TB")),
+    "grav_gun": _pc_weapon(lambda: _("GR")),
+    "plasma_cannon": _pc_weapon(lambda: _("PL")),
+    "phaser": _pc_weapon(lambda: _("PH")),
+    "heavy_graser": _graser,
+    "gatling": _pc_weapon(lambda: _("GAT"), classed=False),
+    "twin_particle_array": _pc_weapon(lambda: _("TPA"), classed=False),
+    "meson": _pc_weapon(lambda: _("MES"), classed=False),
+    "pulser": _pc_weapon(lambda: _("PUL"), classed=False),
+    "needle_beam": _pc_weapon(lambda: _("NB")),
+    "kgun": _pc_weapon(lambda: _("K")),
+    "mkp": _pc_weapon(lambda: _("MKP"), classed=False),
+    "boarding_torpedo_launcher": _pc_weapon(lambda: _("BTL"), classed=False),
+    "boarding_torpedoes": _pc_counted(lambda: _("BT")),
+    "fusion_array": _pc_weapon(lambda: _("FUS"), classed=False),
+    "plasma_bolt": _pc_weapon(lambda: _("PBL")),
+    "am_missile": _pc_weapon(lambda: _("AM"), classed=False),
+    "rocket_pod": _pc_weapon(lambda: _("RP"), classed=False),
+    "spinal_mount": _big_gun("SM"),
+    "area_screen": _labelled(lambda: _("ASCR"), wide=True),
+    "advanced_area_screen": _labelled(lambda: _("AASC"), wide=True),
+    "ads": _pc_weapon(lambda: _("ADS"), classed=False),
+    "aadfc": _labelled(lambda: _("AADF"), wide=True),
+    "grapeshot": _labelled(lambda: _("GS")),
+    "amsc": _labelled(lambda: _("AMSC"), wide=True),
+    "stealth_field": _labelled(lambda: _("STL")),
+    "holofield": _labelled(lambda: _("HOLO"), wide=True),
+    "cloaking_device": _labelled(lambda: _("CLD")),
+    "cloaking_field": _labelled(lambda: _("CLF")),
+    "hangar_bay": _hangar,
+    "launch_tube": _labelled(lambda: _("LT")),
+    "boat_bay": _labelled(lambda: _("BOAT"), wide=True),
+    "marines": _pc_counted(lambda: _("MAR")),
+    "dcp": _pc_counted(lambda: _("DCP")),
+    "troop_berthing": _labelled(lambda: _("TRB")),
+    "passenger_berthing": _labelled(lambda: _("PSB")),
+    "shipyard": _labelled(lambda: _("YARD"), wide=True),
+    "flawed_design": _labelled(lambda: _("FLAW"), wide=True),
+}
+
+
 ICON_SETS: dict[str, dict] = {
     "fb": dict(_SHARED_ICONS),
     "ftcd": _CD_ICONS,
+    "ftpc": _PC_ICONS,
     "ft2": dict(_SHARED_ICONS),
     "fb_kravak": _KRAVAK_ICONS,
     "fb_savasku": _SAVASKU_ICONS,
@@ -654,6 +730,10 @@ WEAPONS = {
     "beam", "pulse_torpedo", "needle_beam", "nova_cannon", "wave_gun", "aa_battery",
     "sm_launcher", "sm_rack", "submunition", "kgun", "mkp", "stinger", "pod_launcher",
     "pulser", "plasma_bolt_launcher", "graser", "heavy_missile",
+    # Project Continuum
+    "emp", "transporter", "grav_gun", "plasma_cannon", "phaser", "heavy_graser", "gatling",
+    "twin_particle_array", "meson", "boarding_torpedo_launcher", "fusion_array", "plasma_bolt",
+    "am_missile", "rocket_pod", "spinal_mount", "ads",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
 

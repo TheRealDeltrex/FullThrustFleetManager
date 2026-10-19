@@ -8,7 +8,7 @@ from rulesets import RULESETS, Ruleset
 
 
 def test_rulesets_registered():
-    assert set(RULESETS) == {"fb", "ft2", "ftcd"}
+    assert set(RULESETS) == {"fb", "ft2", "ftcd", "ftpc"}
 
 
 @pytest.mark.parametrize("rid", sorted(RULESETS))

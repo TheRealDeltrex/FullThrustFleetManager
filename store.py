@@ -197,7 +197,7 @@ def normalize_design(doc: object) -> dict | None:
         "name": _as_str(doc.get("name"), _("Unnamed design"), 80),
         "type_label": _as_str(doc.get("type_label"), limit=60),
         "type_code": _as_str(doc.get("type_code"), limit=8),
-        # A ruleset that knows no starbases reads one as a warship (only FTCD offers it).
+        # A ruleset that knows no starbases reads one as a warship (FTCD and FTPC offer it).
         "hull_kind": doc["hull_kind"] if doc.get("hull_kind") in ("merchant", "starbase") else "warship",
         "tmf": _as_int(doc.get("tmf"), 10, 0, 10000),
         "hull_boxes": _as_int(doc.get("hull_boxes"), 0, 0, 10000),
@@ -212,6 +212,11 @@ def normalize_design(doc: object) -> dict | None:
         "hull_advanced": doc.get("hull_advanced") is True,
         "drive_advanced": doc.get("drive_advanced") is True,
         "ftl_advanced": doc.get("ftl_advanced") is True,
+        # Project Continuum hulls (PC pp.57-58, 108): four, five or six rows, a stealth hull
+        # level and regenerative armour. Other rulesets ignore them.
+        "hull_rows": doc["hull_rows"] if doc.get("hull_rows") in (5, 6) else 4,
+        "stealth_hull": doc["stealth_hull"] if doc.get("stealth_hull") in (1, 2) else 0,
+        "armour_regen": doc.get("armour_regen") is True,
         "streamlining": streamlining,
         "systems": systems,
         "default_loadout": _norm_loadout(doc.get("default_loadout"))
@@ -373,8 +378,8 @@ def new_design(ruleset: str, race: str = "human", faction: str | None = None,
         return None, _("Unknown race for this ruleset.")
     design = normalize_design({
         "id": new_id(), "ruleset": ruleset, "race": race, "faction": faction or None,
-        "name": name.strip() or _("New design"), "tmf": 50 if ruleset in ("fb", "ftcd") else 20,
-        "hull_boxes": 15 if ruleset in ("fb", "ftcd") else 0, "thrust": 4, "ftl": True,
+        "name": name.strip() or _("New design"), "tmf": 50 if ruleset in ("fb", "ftcd", "ftpc") else 20,
+        "hull_boxes": 15 if ruleset in ("fb", "ftcd", "ftpc") else 0, "thrust": 4, "ftl": True,
         "source": {"kind": "custom"},
     })
     preset = presets.find_preset(ruleset, class_preset)
