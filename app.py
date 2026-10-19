@@ -545,8 +545,10 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "used_by": used_by,
         "factions": store.faction_choices(design["ruleset"], keep=design["faction"]),
         "system_groups": _system_groups(rs.system_types(design.get("race", "human"), options)),
-        "fighter_types": rs.fighter_types(options),
+        "fighter_types": rs.fighter_types(options, design.get("race", "human")),
         "fighter_label": common.fighter_label,
+        # The per-group extras a rich loadout row offers as checkboxes (CD p.30, PC p.123).
+        "fighter_extras": getattr(rs, "fighter_extras", ()),
         # Field names and choices for each system type's parameters, from the picker.
         "param_defs": {d.type: {p.name: p for p in d.params}
                        for d in rs.system_types(design.get("race", "human"), options)},
@@ -651,6 +653,14 @@ def _apply_form(design: dict) -> dict:
         # box from reading as "the form did not say".
         for field in ("hull_advanced", "drive_advanced", "ftl_advanced"):
             design[field] = form.get(field) == "on"
+    if "pc-hull-present" in form:
+        # Project Continuum hulls (PC pp.57-58, 108); store normalises out-of-range values.
+        # The rows select is disabled under an advanced hull, so an absent value keeps the old one.
+        if form.get("hull_rows", "").isdigit():
+            design["hull_rows"] = int(form["hull_rows"])
+        design["stealth_hull"] = (int(form.get("stealth_hull", "0"))
+                                  if form.get("stealth_hull", "").isdigit() else 0)
+        design["armour_regen"] = form.get("armour_regen") == "on"
     design["streamlining"] = form.get("streamlining", "none")
     design["allow_rule_breaking"] = form.get("allow_rule_breaking") == "on"
     design["notes"] = form.get("notes", "")[:4000]
@@ -685,9 +695,9 @@ def _read_loadout(design: dict) -> dict:
     magazines: list[dict] = []
     for system in design["systems"]:
         uid = system["uid"]
-        if system["type"] in ("hangar", "fighter_group", "drone_womb"):
+        if system["type"] in common.FIGHTER_BAY_TYPES:
             if f"fighter-{uid}-0-type" in form:
-                fighters += _read_fighter_groups(system)
+                fighters += _read_fighter_groups(system, design)
                 mass = _form_count(f"craft-{uid}")
                 if mass:
                     craft.append({"hangar": uid, "mass": mass})
@@ -726,9 +736,9 @@ def _form_count(name: str) -> int:
     return min(999, int(value)) if value.isdigit() else 0
 
 
-def _read_fighter_groups(hangar: dict) -> list[dict]:
-    """One row per bay: the type ("" leaves the bay empty), FTL and kinetic capability, and the
-    swing roles it may also launch as (Cross Dimensions, CD p.30)."""
+def _read_fighter_groups(hangar: dict, design: dict) -> list[dict]:
+    """One row per bay: the type ("" leaves the bay empty), the extras the ruleset offers (FTL,
+    kinetic, PC's modifications), and the swing roles it may also launch as (CD p.30)."""
     groups = []
     bays = hangar.get("bays") if isinstance(hangar.get("bays"), int) else 1
     for index in range(max(1, min(bays, 99))):
@@ -737,7 +747,8 @@ def _read_fighter_groups(hangar: dict) -> list[dict]:
         if not fighter_type:
             continue
         entry = {"hangar": hangar["uid"], "type": fighter_type}
-        extras = [x for x in ("ftl", "kinetic") if request.form.get(prefix + x) == "on"]
+        offered = getattr(RULESETS.get(design["ruleset"]), "fighter_extras", ())
+        extras = [key for key, _label in offered if request.form.get(prefix + key) == "on"]
         swing = [t for t in request.form.getlist(prefix + "swing") if t != fighter_type]
         if extras:
             entry["extras"] = extras
@@ -990,6 +1001,7 @@ def book_url(code: str, page: int | None = None) -> str:
 
 
 app.jinja_env.globals["book_url"] = book_url
+app.jinja_env.globals["FIGHTER_BAY_TYPES"] = common.FIGHTER_BAY_TYPES
 
 
 @app.route("/rulebook/<code>")

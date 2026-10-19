@@ -12,10 +12,10 @@ import copy
 from types import ModuleType
 
 from i18n import _
-from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common
+from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common, fleet_common
 from rulesets.fb import _load_quickref, _quickref
 from rulesets.fb import tech as fb_tech
-from rulesets.ftcd import aliens, data, fleet, rules
+from rulesets.ftcd import aliens, data, rules
 
 
 class FTCDRuleset:
@@ -42,6 +42,11 @@ class FTCDRuleset:
         return "FTCD"
 
     catalog_sources = ("fb",)
+
+    @property
+    def fighter_extras(self) -> tuple[tuple[str, str], ...]:
+        """The per-group extras the loadout editor offers (CD pp.30, 47)."""
+        return (("ftl", _("FTL")), ("kinetic", _("Kinetic")))
     dummy_bogey_points = data.DUMMY_BOGEY_POINTS
     hull_kinds = data.HULL_KINDS
 
@@ -52,11 +57,14 @@ class FTCDRuleset:
         def points(ship: dict, design: dict) -> int:
             return (self.design_breakdown(design, options).points
                     + self.loadout_points(design, ship.get("loadout"), options))
-        return fleet.fleet_issues(fleet_doc, ships, options, points)
+        return fleet_common.fleet_issues(
+            fleet_doc, ships, options, ship_class=rules.ship_class, stationary=rules.stationary,
+            ship_points=points,
+            dummy_option=("cd_optional_systems", _("Sensors, ECM, mines and ortillery")))
 
     def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
         """(MASS lost, MASS at which the fleet withdraws), CD p.40; None where no rule."""
-        return fleet.morale_mass(ships)
+        return fleet_common.morale_mass(ships)
 
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *aliens.races()]

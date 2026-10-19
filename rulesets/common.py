@@ -11,16 +11,24 @@ from i18n import _
 
 
 def fighter_label(fighter_type: str) -> str:
-    """The name a loadout key is shown by, in every ruleset (FB1 p.11, FT/MT, FB2, CD p.47)."""
+    """The name a loadout key is shown by, in every ruleset (FB1 p.11, FT/MT, FB2, CD p.47,
+    PC p.123)."""
     return {
         "standard": _("Standard"), "interceptor": _("Interceptor"), "fast": _("Fast"),
         "attack": _("Attack"), "long_range": _("Long range"), "heavy": _("Heavy"),
-        "torpedo": _("Torpedo"), "drone": _("Drone"),
+        "torpedo": _("Torpedo"), "drone": _("Drone"), "graser": _("Graser"),
+        "plasma": _("Plasma"), "mkp": _("MKP"), "missile": _("Missile"),
+        "multi_role": _("Multi-role"), "assault_shuttle": _("Assault shuttles"),
     }.get(fighter_type, fighter_type)
 
 
 # FB six arcs, clockwise from fore (PLAN 5.1). FT2 has its own four (rulesets/ft2/data.py).
 ARCS = ("F", "FS", "AS", "A", "AP", "FP")
+
+# Systems that hold fighter groups, in every ruleset: a hangar (FB, CD; PC's combined bay), a PC
+# hangar bay, an FT2 fighter group and a Sa'Vasku drone womb. The loadout editor, the loadout
+# reader and the PDF tracker all list fighters by these.
+FIGHTER_BAY_TYPES = ("hangar", "hangar_bay", "fighter_group", "drone_womb")
 
 
 def round_half_up(numerator: int, denominator: int = 1) -> int:
