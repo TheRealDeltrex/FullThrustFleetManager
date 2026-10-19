@@ -198,6 +198,13 @@
    "page": 45
   },
   {
+   "key": "turret",
+   "title": "Turrets",
+   "text": "While not technically a 'weapon system', turrets are mechanical assemblies into which entire weapon mounts are fitted. By rotating the turret, the weapon may be brought to bear into a variety of arcs. While turrets allow some limited arc weapons a wider field of coverage, they have a number of operational restrictions. Like multi-arc weapons, turret arcs do not have to be contiguous. A turret is a system that appears on the SSD with the weapons within. If the turret is damaged due to a threshold test or a Needle Beam hit, it remains stuck in its current facing until repaired. Turrets can bear into a number of arcs (the exact number depending on the construction of the turret).",
+   "book": "PC",
+   "page": 45
+  },
+  {
    "key": "spinal_mount",
    "title": "Spinal mounts",
    "text": "Spinal Mounts are weapons so immense and powerful that the gun forms the central core around which the rest of the ship is assembled. The devastating firepower of Spinal Mounts comes with some considerable tactical costs and limitations. --A ship may only mount up to 16 mass of Spinal Mount weapon per 50 mass of ship. So a battleship (mass 101-150) could mount up to three Medium Spinal Mounts. --Spinal Mounts must face forward, cannot be turret mounted, and have a fire arc that is half the normal width (30 degrees). --The turn after a Spinal Mount if fired a ship cannot maneuver at all, apply thrust, nor can it charge its FTL drive.",
@@ -427,6 +434,20 @@
    "text": "A group will use up 1 CEF each turn it engages in combat, whether attacking a ship, another fighter group, or missiles. A fighter group also uses 1 CEF every time it makes a secondary move or evade. Normal movement during the first Fighter Movement Phase does not consume combat endurance factors. When all combat endurance is exhausted, the group may still move normally (though it may make no secondary moves) but may not make any attacks. There is no time limit on a group returning to its carrier after exhausting its CEF. A group that is engaged in a dogfight by an enemy group after exhausting its CEF may return fire, but only scores one kill on rolls of 6.",
    "book": "PC",
    "page": 71
+  },
+  {
+   "key": "fighter_rack",
+   "title": "Robot fighters",
+   "text": "Robot Fighters remove the cockpit and pilot of a normal fighter, replacing it with a computer control system. This reduces the cost and complexity of the fighter, but at a cost of some combat abilities. Robot Fighters is a modification that can be applied to any other fighter type. Purchasing the Robot Fighters technology comes with standard Robot Fighters. Robot Fighters cost 1 less per fighter (6 less per wing) than normal piloted fighters. Because computer control systems are not as creative and adaptable as a living pilot, they take their secondary (endurance-burning) move at the end of the end of phase 4 after all fighters and missiles have made their moves.",
+   "book": "PC",
+   "page": 76
+  },
+  {
+   "key": "gunboat_rack",
+   "title": "Gunboats",
+   "text": "Gunboats are an interesting military unit. In design and tactical use, they straddle the line between a very small ship, and a very large fighter. Gunboats are carried on hull mounted racks, and are launched at the same time as other ordnance/fighters. They operate in squadrons of six, like fighters. Gunboats have a speed of 18 MU, and move like fighters. They can fly in escort of a ship like fighters. Gunboats have six points of combat endurance. This endurance is used to make attacks on enemy ships, fighters or ordnance. It can also be used to make a secondary move of 9 MU during the Fighter Secondary Movement Phase.",
+   "book": "PC",
+   "page": 79
   },
   {
    "key": "hangar_criticals",

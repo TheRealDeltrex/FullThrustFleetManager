@@ -757,3 +757,28 @@ def test_a_project_continuum_design_takes_every_system_and_its_hull_options(clie
         draft, action="apply", **{"pc-hull-present": "1", "advanced-present": "1",
                                   "hull_advanced": "on"}))
     assert store.working_design(design_id)[0]["hull_rows"] == 6
+
+
+def test_a_turret_gunboats_and_robot_fighters_are_edited_on_the_workbench(client):
+    design_id = make(client, "Monitor", ruleset="ftpc")
+    for system_type in ("beam", "turret", "gunboat_rack", "fighter_rack"):
+        draft, _dirty = store.working_design(design_id)
+        client.post(f"/design/{design_id}", data=fields(draft, action="add_system", system_type=system_type))
+    draft, _dirty = store.working_design(design_id)
+    uid = {s["type"]: s["uid"] for s in draft["systems"]}
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert f'name="sys-{uid["turret"]}-mounts" value="{uid["beam"]}"' in page
+    assert f'name="gunboat-{uid["gunboat_rack"]}-type"' in page
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{
+        f"sys-{uid['turret']}-mounts-present": "1", f"sys-{uid['turret']}-mounts": uid["beam"],
+        f"gunboat-{uid['gunboat_rack']}-type": "gatling", f"gunboat-{uid['gunboat_rack']}-heavy": "on",
+        f"gunboat-{uid['gunboat_rack']}-ecm": "1",
+        f"fighter-{uid['fighter_rack']}-0-type": "attack", f"fighter-{uid['fighter_rack']}-0-robot": "on",
+    }))
+    draft, _dirty = store.working_design(design_id)
+    turret = next(s for s in draft["systems"] if s["type"] == "turret")
+    assert turret["mounts"] == [uid["beam"]]
+    assert draft["default_loadout"]["gunboats"] == [
+        {"carrier": uid["gunboat_rack"], "type": "gatling", "extras": ["heavy"], "ecm": 1}]
+    assert draft["default_loadout"]["fighters"] == [
+        {"hangar": uid["fighter_rack"], "type": "attack", "extras": ["robot"]}]

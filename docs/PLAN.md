@@ -478,7 +478,8 @@ pp.113-114 heavy cruiser, MASS 86 = **294 points**. Judgment calls, recorded in
 a class-2 beam on a broadside pair of arcs is 1 MASS (pp.36, 120); rows past the third keep
 checking on 4+ (p.32); multi-arc weapons need not be contiguous (p.45); advanced FTL is paid x3
 whenever it is chosen (p.108); dummy bogeys are not behind an option (p.95). Under PC the FB1
-Tibet costs 159, not 162, because PC screens have no minimum MASS (p.56). The quick reference quotes PC section by section. Still to come: turrets, gunboats and fighter racks, the remaining fighter kinds, monster
+Tibet costs 159, not 162, because PC screens have no minimum MASS (p.56). The quick reference quotes PC section by section. Turrets, gunboat squadrons (racks and boat bays), fighter racks, light and robot fighters
+followed. Still to come: monster
 ships and the Imperial tech base (pp.125-127).
 
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
@@ -786,7 +787,7 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    changes, battle riders and motherships, system defence ships, jump gates and portals,
    starbase sections, dummy bogeys, the tournament composition limits and fleet morale.
 2. FTPC ruleset (incl. the 2017 errata) - design system, catalog and fleet rules done (6.4);
-   quick reference done; turrets, gunboats, fighter racks and the Imperial tech base to come
+   quick reference, turrets, gunboats and fighter racks done; the Imperial tech base to come
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37
    Phalon one = 379. Races are additive tech modules inside a ruleset (decision 3), not new

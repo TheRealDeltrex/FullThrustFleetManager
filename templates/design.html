@@ -253,7 +253,15 @@
                       {% for key, value in system.items() if key not in ('uid', 'type', 'arcs') %}
                         {% set param = defs.get(key) %}
                         {% set name = param.label if param else key %}
-                        {% if key == 'feeds' %}
+                        {% if key == 'mounts' %}
+                          {# The weapons a turret holds (PC p.46); checkboxes plus a marker. #}
+                          <input type="hidden" name="sys-{{ system.uid }}-mounts-present" value="1" />
+                          <span class="param">{{ name }}</span>
+                          {% for row2 in selected.breakdown.rows if row2.system_uid and row2.system_uid in selected.breakdown.derived.turret_weapons %}
+                            <label class="arc"><input type="checkbox" name="sys-{{ system.uid }}-mounts" value="{{ row2.system_uid }}"
+                              {% if row2.system_uid in value %}checked{% endif %} /> {{ row2.label }}</label>
+                          {% endfor %}
+                        {% elif key == 'feeds' %}
                           {# The launchers a magazine feeds; checkboxes plus a marker, like arcs. #}
                           <input type="hidden" name="sys-{{ system.uid }}-feeds-present" value="1" />
                           <span class="param">{{ name }}</span>
@@ -342,7 +350,8 @@
         {% set carriers = d.systems | selectattr('type', 'in', FIGHTER_BAY_TYPES) | list %}
         {% set magazines = d.systems | selectattr('type', 'equalto', 'sm_magazine') | list %}
         {% set pulsers = d.systems | selectattr('type', 'equalto', 'pulser') | list %}
-        {% if carriers or magazines or pulsers %}
+        {% set gunboat_carriers = (d.systems | selectattr('type', 'in', GUNBOAT_CARRIER_TYPES) | list) if selected.gunboat_types else [] %}
+        {% if carriers or magazines or pulsers or gunboat_carriers %}
           <div class="panel">
             <h3>{{ _("Default loadout") }}</h3>
             <div class="body stack">
@@ -354,8 +363,13 @@
                   {% set groups = d.default_loadout.fighters | selectattr('hangar', 'equalto', system.uid) | list %}
                   {% set craft = (d.default_loadout.craft or []) | selectattr('hangar', 'equalto', system.uid) | sum(attribute='mass') %}
                   <fieldset class="loadout-group">
+                    {% if system.type == 'fighter_rack' %}
+                    <legend>{{ _("Fighter rack {uid}", uid=system.uid) }}
+                      <span class="muted">{{ _("1 wing of robot fighters") }}</span></legend>
+                    {% else %}
                     <legend>{{ _("Hangar {uid}", uid=system.uid) }}
                       <span class="muted">{% if (system.bays or 1) == 1 %}{{ _("6 fighters or 6 MASS of craft") }}{% else %}{{ _("{n} bays, 6 fighters or 6 MASS of craft each", n=system.bays) }}{% endif %}</span></legend>
+                    {% endif %}
                     {% for index in range(system.bays or 1) %}
                       {% set group = groups[index] if index < groups|length else None %}
                       {% set prefix = "fighter-" ~ system.uid ~ "-" ~ index ~ "-" %}
@@ -385,8 +399,10 @@
                         </details>
                       </div>
                     {% endfor %}
+                    {% if system.type != 'fighter_rack' %}
                     <label class="loadout-row">{{ _("Light vessels (MASS of craft)") }}
                       <input class="input sm" type="number" min="0" name="craft-{{ system.uid }}" value="{{ craft }}" /></label>
+                    {% endif %}
                   </fieldset>
                 {% endfor %}
                 {% for system in magazines %}
@@ -411,6 +427,36 @@
                       <label>{{ _("ER salvos") }}
                         <input class="input sm" type="number" min="0" name="salvos-{{ system.uid }}-er"
                                value="{{ salvos | select('equalto', 'er') | list | length }}" /></label>
+                    </div>
+                  </fieldset>
+                {% endfor %}
+                {% for system in gunboat_carriers %}
+                  {# PC pp.79-82: a squadron of six per rack or boat bay. #}
+                  {% set squadron = ((d.default_loadout.gunboats or []) | selectattr('carrier', 'equalto', system.uid) | list | first) %}
+                  {% set prefix = "gunboat-" ~ system.uid ~ "-" %}
+                  <fieldset class="loadout-group">
+                    <legend>{% if system.type == 'gunboat_rack' %}{{ _("Gunboat rack {uid}", uid=system.uid) }}{% else %}{{ _("Boat bay {uid}", uid=system.uid) }}{% endif %}
+                      <span class="muted">{{ _("1 squadron of 6 gunboats") }}</span></legend>
+                    <div class="loadout-row">
+                      <label>{{ _("Squadron") }}
+                        <select class="input" name="{{ prefix }}type">
+                          <option value="">{{ _("Empty") }}</option>
+                          {% for key, text in selected.gunboat_types %}
+                            <option value="{{ key }}" {% if squadron and squadron.type == key %}selected{% endif %}>{{ text }}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
+                      {% for key, text in selected.gunboat_extras %}
+                        <label class="check"><input type="checkbox" name="{{ prefix }}{{ key }}"
+                          {% if squadron and key in (squadron.extras or []) %}checked{% endif %} /> {{ text }}</label>
+                      {% endfor %}
+                      <label>{{ _("ECM") }}
+                        <select class="input sm" name="{{ prefix }}ecm">
+                          {% for n in range(0, 4) %}
+                            <option value="{{ n }}" {% if squadron and (squadron.ecm or 0) == n %}selected{% endif %}>{% if n %}{{ _("Level {n}", n=n) }}{% else %}{{ _("None") }}{% endif %}</option>
+                          {% endfor %}
+                        </select>
+                      </label>
                     </div>
                   </fieldset>
                 {% endfor %}
