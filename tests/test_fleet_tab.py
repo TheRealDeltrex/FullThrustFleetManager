@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import fleet_rules
@@ -32,6 +34,13 @@ def add_ship(client, fleet_id, design_id=FURIOUS, **extra):
 
 def text(response) -> str:
     return response.get_data(as_text=True)
+
+
+def test_the_add_ship_picker_keeps_the_last_pick(client):
+    fleet_id = make_fleet(client)
+    page = text(add_ship(client, fleet_id))
+    assert re.search(r'<option value="%s"\s+selected>' % FURIOUS, page)
+    assert len(re.findall(r'<option value="fb:[^"]+"\s+selected>', page)) == 1
 
 
 # ---- Fleets, selection and the top bar ----------------------------------------------------------
