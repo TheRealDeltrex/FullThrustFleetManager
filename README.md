@@ -2,8 +2,8 @@
 
 Fleet management tool for the *Full Thrust* starship wargame (Ground Zero Games): design ships,
 build fleets to a points limit, track campaign damage, and print a fleet PDF for the table.
-Supports the Full Thrust 2nd edition and Fleet Book rulesets, including the Fleet Book 2 alien
-races; Cross Dimensions and Project Continuum later.
+Supports Full Thrust 2nd edition with More Thrust, the Fleet Books (with the Fleet Book 2 alien
+races), Cross Dimensions and Project Continuum.
 
 [![Full Thrust Fleet Manager](https://raw.githubusercontent.com/TheRealDeltrex/FullThrustFleetManager/devversion/static/logo.jpg)](https://therealdeltrex.github.io/FullThrustFleetManager/)
 
@@ -18,9 +18,9 @@ the current version of each build. Licensed GPL-3.0; Ground Zero Games content n
 
 ## What it does
 
-- **Design ships** to the Fleet Book or Full Thrust 2nd edition rules, with live MASS and NPV,
-  an arc picker and a rules check. Break the rules deliberately if you want to; the design is
-  then marked non-conforming.
+- **Design ships** to any of the four rulesets, with live MASS and NPV, an arc picker and a
+  rules check. Break the rules deliberately if you want to; the design is then marked
+  non-conforming.
 - **Build fleets** to a points limit, in squadrons, from your own designs or the ship classes
   of the books, with a tournament check that lists every violation.
 - **Field the alien races**: Kra'Vak, Sa'Vasku and Phalon, each with its own systems,
@@ -89,7 +89,9 @@ bookmarks:
 | `Fleet Book 2.pdf` | native text, overprints hidden |
 
 Bookmarks follow each book's contents page; the Fleet Books also have one bookmark per ship
-class under each fleet's "Ship Designs" entry.
+class under each fleet's "Ship Designs" entry. *Cross Dimensions* and *Project Continuum*
+(with its errata), free non-commercial publications distributed with Ground Zero Games'
+agreement, are bundled the same way.
 
 The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
 `tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and
