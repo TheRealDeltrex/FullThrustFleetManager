@@ -10,5 +10,299 @@
     "book_value": 671,
     "rules_value": 691,
     "reason": "FB2 p.18 Do'San: the spec panel and SSD agree (hull 54, thrust 4A, FTL, 4 x K-3, 3 x K-1, 7 scatterguns, 3 fire controls, 4 hangar bays) and close the MASS at exactly 180, so the systems fit is not in doubt. Those items cost 691. The three other Kra'Vak classes with hangar bays (Lo'Vok 626, Yu'Kas 883, Ko'San 917) all price a bay at 27 points and match their printed NPV exactly, so the printed 671 is 20 points light: a transcription slip for 691."
+  },
+  {
+    "id": "fb:sr:nac-suffolk-e",
+    "book_value": 213,
+    "rules_value": 215,
+    "reason": "Star Ranger NAC page: the Suffolk/E swaps the Suffolk's class-3 battery (MASS 6, 18 points) for an ADFC and four more PDS (MASS 6, 20 points) yet keeps the Suffolk's NPV 213. The listed systems cost 215."
+  },
+  {
+    "id": "fb:sr:esu-grisha",
+    "book_value": 73,
+    "rules_value": 74,
+    "reason": "Star Ranger ESU page: hull 7, armour 2, thrust 4, FTL, 1 fire control, 1 PDS, 2 class-1 and a six-arc class-2 battery close the MASS at 22 and cost 74; the page prints 73."
+  },
+  {
+    "id": "fb:sr:fse-littorio",
+    "book_value": 580,
+    "rules_value": 586,
+    "reason": "Star Ranger FSE page: the listed systems (3 FC, 6 PDS, ADFC, screen-1, 2 class-1, class-2 on F/FP/AP, F/FS/AS and 2 x all arcs, 2 class-3, 2 SML, mass-8 magazine, a fighter bay) need MASS 172 of 170 and cost 586 against the printed 580."
+  },
+  {
+    "id": "fb:sr:nsl-falke-s",
+    "book_value": 60,
+    "rules_value": 28,
+    "reason": "Star Ranger NSL page: the Falke/S (MASS 8, hull 2, no armour, thrust 6, FTL, 1 fire control, 1 class-1, 1 submunition pack) costs 30; the printed NPV 60 repeats the Nibelung beside it and cannot be right for an 8-MASS scout."
+  },
+  {
+    "id": "fb:sr:nsl-prinz-eugen",
+    "book_value": 247,
+    "rules_value": 249,
+    "reason": "Star Ranger NSL page: hull 23, armour 9, thrust 4, FTL, 2 fire controls, 2 PDS, 2 class-1, 4 broadside class-2, a class-3 and 2 MASS lost to age close the MASS at 77 and cost 249; the page prints 247."
+  },
+  {
+    "id": "fb:sr:ijsf-musashi",
+    "book_value": 541,
+    "rules_value": 526,
+    "reason": "Star Ranger IJSF page: the stat block lists '4 PDS' and '3 FCS' twice; read once, the systems use MASS 151 of 156 and cost 526 against the printed 541. The missing 5 MASS and 15 points would be five more PDS-sized systems."
+  },
+  {
+    "id": "fb:sr:ni-sa-ar",
+    "book_value": 51,
+    "rules_value": 54,
+    "reason": "Star Ranger NI page: the Sa'ar's class-2 battery is listed on all arcs (MASS 3), which needs MASS 15 of 14 and costs 54; priced as a three-arc mount (MASS 2) it closes at 14 and the printed 51."
+  },
+  {
+    "id": "fb:sr:ni-ben-gurion-g",
+    "book_value": 918,
+    "rules_value": 919,
+    "reason": "Star Ranger NI page: the Ben Gurion-G refit lists hull 74 on three rows, 11 armour and its systems, which close the MASS at 240 and cost 919; the page prints 918."
+  },
+  {
+    "id": "fb:sr:scanfed-saint-olaf-e",
+    "book_value": 220,
+    "rules_value": 226,
+    "reason": "Star Ranger ScanFed page: the Saint Olaf-E's two class-2 batteries are listed on all arcs (MASS 3 each), which needs MASS 68 of 66 and costs 226; priced as three-arc mounts they close at 66 and the printed 220."
+  },
+  {
+    "id": "fb:sr:kv-kata",
+    "book_value": 75,
+    "rules_value": 77,
+    "reason": "Star Ranger Kra'Vak Wave 2 page: hull 5 on three rows (15 points), thrust 6 advanced, FTL, fire control, scattergun, K-1 and 2 MKP close the MASS at 18 and cost 77; the page prints 75."
+  },
+  {
+    "id": "fb:sr:kv-krait-f",
+    "book_value": 266,
+    "rules_value": 256,
+    "reason": "Star Ranger Kra'Vak Wave 2 page: hull 16 on three rows, thrust 8 advanced, FTL, 2 fire controls, 3 scatterguns and 2 K-3 close the MASS at 61 and cost 256; the printed 266 is 10 more, though its CPV (232) is below the Krait's."
+  },
+  {
+    "id": "fb:sr:kv-korma",
+    "book_value": 309,
+    "rules_value": 304,
+    "reason": "Star Ranger Kra'Vak Wave 2 page: the listed systems (2 fire controls, 3 scatterguns, 2 K-2 on two arcs, 3 K-1) with hull 24 on three rows use MASS 72 of 73 and cost 304 against the printed 309."
+  },
+  {
+    "id": "fb:sr:kv-ketone-beta",
+    "book_value": 399,
+    "rules_value": 435,
+    "reason": "Star Ranger Kra'Vak Wave 2 page: the Ketone-Beta's listed three K-4 guns with hull 33 need MASS 104 of 94 and cost 435; the printed 399 sits 4 above the Ketone-Alpha, so the page likely lists one gun or class too many."
+  },
+  {
+    "id": "fb:sr:if-jibrail",
+    "book_value": 527,
+    "rules_value": 527,
+    "reason": "Star Ranger IF page: the two PTorp(5) torpedoes cover five arcs each; their MASS (4 +1 per extra arc) closes the design at 154 and the printed 527, but FB1 p.7 limits a pulse torpedo to three adjacent arcs."
+  },
+  {
+    "id": "fb:sr:if-arabiya",
+    "book_value": 694,
+    "rules_value": 694,
+    "reason": "Star Ranger IF page: the two PTorp(4) torpedoes cover four arcs each; their MASS (4 +1 per extra arc) closes the design at 204 and the printed 694, but FB1 p.7 limits a pulse torpedo to three adjacent arcs."
+  },
+  {
+    "id": "fb:sr:oudf-freemantle",
+    "book_value": 99,
+    "rules_value": 97,
+    "reason": "Star Ranger Oceanic Union page: hull 16, grade 2 armour, thrust 5, FTL, a class-1 battery and a fire control use MASS 31 of 32 and cost 97; the page prints 99 and names no other system."
+  },
+  {
+    "id": "fb:sr:oudf-numbat",
+    "book_value": 184,
+    "rules_value": 169,
+    "reason": "Star Ranger Oceanic Union page: the Numbat is listed as both TMF 63 and MASS Factor 62, and its listed hull and systems plus one 8-MASS module use MASS 56 of 62 and cost 169 against the printed 184. Arcs and some counts are not given."
+  },
+  {
+    "id": "fb:sr:oudf-tuvalu-block-i",
+    "book_value": 227,
+    "rules_value": 224,
+    "reason": "Star Ranger Oceanic Union page: the listed hull and systems plus two 8-MASS modules use MASS 80 of 81 and cost 224 against the printed 227; one more PDS-sized system would close both."
+  },
+  {
+    "id": "fb:sr:oudf-tuvalu-block-ii",
+    "book_value": 246,
+    "rules_value": 240,
+    "reason": "Star Ranger Oceanic Union page: the listed hull 32 and systems plus one 8-MASS module use MASS 80 of 81 and cost 240 against the printed 246. Arcs are not given."
+  },
+  {
+    "id": "fb:sr:oudf-waikato",
+    "book_value": 322,
+    "rules_value": 319,
+    "reason": "Star Ranger Oceanic Union page: the page gives no fighter bay count; with two bays the listed hull and systems plus one module use MASS 101 of 102 and cost 319 against the printed 322."
+  },
+  {
+    "id": "fb:sr:oudf-brisbane",
+    "book_value": 392,
+    "rules_value": 389,
+    "reason": "Star Ranger Oceanic Union page: the conjectural Brisbane's listed hull and systems plus four 8-MASS modules use MASS 143 of 144 and cost 389 against the printed 392."
+  },
+  {
+    "id": "fb:sr:nac-arrow",
+    "book_value": 26,
+    "rules_value": 24,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nac-gladius",
+    "book_value": 37,
+    "rules_value": 35,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nac-comanche",
+    "book_value": 51,
+    "rules_value": 48,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:esu-zheng-he",
+    "book_value": 28,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:esu-cossack",
+    "book_value": 51,
+    "rules_value": 50,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:fse-requin",
+    "book_value": 36,
+    "rules_value": 35,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:fse-cygne",
+    "book_value": 29,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nsl-gepard",
+    "book_value": 40,
+    "rules_value": 37,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nsl-nymphe",
+    "book_value": 36,
+    "rules_value": 33,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-ninja",
+    "book_value": 36,
+    "rules_value": 34,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-naginata",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-naginata-s",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-bakemono",
+    "book_value": 58,
+    "rules_value": 55,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ni-sheir",
+    "book_value": 29,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ni-nitznutz",
+    "book_value": 70,
+    "rules_value": 68,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:unsc-hermes",
+    "book_value": 30,
+    "rules_value": 28,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:unsc-hermes-sc",
+    "book_value": 33,
+    "rules_value": 31,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:scanfed-thorson",
+    "book_value": 30,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:rav-attacker",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:rav-attacker-missile",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-alpha",
+    "book_value": 42,
+    "rules_value": 39,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-beta",
+    "book_value": 42,
+    "rules_value": 39,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-charlie",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-ch-ka-tk",
+    "book_value": 28,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-sss-tk-vk",
+    "book_value": 32,
+    "rules_value": 31,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-k-knn-tk",
+    "book_value": 55,
+    "rules_value": 53,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:if-al-shaulah",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:if-khabar",
+    "book_value": 50,
+    "rules_value": 48,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
   }
 ]

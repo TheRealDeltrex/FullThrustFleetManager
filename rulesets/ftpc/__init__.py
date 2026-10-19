@@ -14,7 +14,7 @@ from types import ModuleType
 
 from i18n import _
 from rulesets import Breakdown, BreakdownRow, Issue, QuickRefEntry, Race, SystemDef, common, fleet_common
-from rulesets.fb import _load_quickref, _quickref
+from rulesets.fb import _load_quickref, _quickref, star_ranger_quickref
 from rulesets.fb import tech as fb_tech
 from rulesets.ftpc import data, rules, techbase
 
@@ -134,13 +134,14 @@ class FTPCRuleset:
         out = copy.deepcopy(design)
         out["id"] = "ftpc:" + str(design.get("id", "")).split(":", 1)[-1]
         out["ruleset"] = self.id
+        common.convert_star_ranger(out, {"range": "long"}, superior_sensors="compact_superior_sensors")
         source = out.get("source") if isinstance(out.get("source"), dict) else {}
         printed = source.get("npv_book")
         points = self.design_breakdown(out, {}).points
         if printed and printed != points:
             source["npv_book"] = 0
             out["notes"] = " ".join([
-                f"Project Continuum: {source.get('book')} p.{source.get('page')} prints NPV "
+                f"Project Continuum: {common.source_ref(source)} prints NPV "
                 f"{printed}; under Project Continuum the design costs {points}.",
                 out.get("notes") or ""]).strip()
         return out
@@ -164,8 +165,13 @@ class FTPCRuleset:
             if race in races:
                 alien |= base | {f"{prefix}{t}" for t in systems_present}
         fb = [e for e in _load_quickref("fb") if e.key in alien]
-        return _quickref("ftpc", wanted, tuple(sorted(always)), options) + fb
+        sr = star_ranger_quickref(systems_present, SR_KEYS)
+        return _quickref("ftpc", wanted, tuple(sorted(always)), options) + fb + sr
 
+
+# Star Ranger's rules for the systems PC lacks (data/quickref/sr.json).
+SR_KEYS = frozenset({"rocket_cannon", "amt", "hdc", "age_penalty", "sr_hull_rows",
+                     "compact_superior_sensors"})
 
 # Systems the book describes together share one entry; the keys after the comment are not
 # systems but what the fleet sheet adds for a design (pdf_export.quickref_page).
@@ -181,6 +187,7 @@ SHARED_ENTRIES = {
     "heavy_missile": {"sm_launcher", "missile_damage", "sm_magazine"},
     "advanced_area_screen": {"area_screen"},
     "superior_sensors": {"enhanced_sensors"},
+    "compact_superior_sensors": {"superior_sensors", "enhanced_sensors"},
     "weasel_cruiser": {"dummy_bogeys"},
     "weasel_capital": {"dummy_bogeys"},
     "area_ecm": {"ecm"},

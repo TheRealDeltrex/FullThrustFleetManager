@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import fleet_rules
@@ -32,6 +34,13 @@ def add_ship(client, fleet_id, design_id=FURIOUS, **extra):
 
 def text(response) -> str:
     return response.get_data(as_text=True)
+
+
+def test_the_add_ship_picker_keeps_the_last_pick(client):
+    fleet_id = make_fleet(client)
+    page = text(add_ship(client, fleet_id))
+    assert re.search(r'<option value="%s"\s+selected>' % FURIOUS, page)
+    assert len(re.findall(r'<option value="fb:[^"]+"\s+selected>', page)) == 1
 
 
 # ---- Fleets, selection and the top bar ----------------------------------------------------------
@@ -208,32 +217,20 @@ def test_an_unknown_action_is_refused(client):
 # ---- Views ------------------------------------------------------------------------------------------
 
 
-def test_the_three_views_render(client):
+def test_the_two_views_render(client):
     fleet_id = make_fleet(client)
     add_ship(client, fleet_id)
     cards = text(client.get("/fleet?view=cards"))
-    assert "Main body" in cards
+    assert "Main body" in cards and "<svg viewBox=" in cards
 
     roster = text(client.get("/fleet?view=roster"))
     assert "Roster" in roster and "CE-1" in roster and "Furious" in roster
-
-    sheet = text(client.get("/fleet?view=sheet"))
-    assert "Record sheets" in sheet and "<svg viewBox=" in sheet
-
-
-def test_docked_and_destroyed_ships_are_left_off_the_record_sheets(client):
-    fleet_id = make_fleet(client)
-    add_ship(client, fleet_id)
-    uid = store.get_fleet(fleet_id)["ships"][0]["uid"]
-    client.post(f"/fleet/{fleet_id}/action",
-                data={"action": "update_ship", "uid": uid, "status": "docked", "squadron": "sq1"})
-    page = text(client.get("/fleet?view=sheet"))
-    assert "Not printed:" in page and "CE-1" in page
 
 
 def test_an_unknown_view_falls_back_to_cards(client):
     make_fleet(client)
     assert "Main body" in text(client.get("/fleet?view=nonsense"))
+    assert "Main body" in text(client.get("/fleet?view=sheet"))    # the retired record-sheet view
 
 
 # ---- Badges and the tournament check --------------------------------------------------------------
@@ -435,3 +432,18 @@ def test_card_and_details_edits_save_as_made_without_a_message(client):
     }, follow_redirects=True))
     assert store.get_fleet(fleet_id)["name"] == "Task Force"
     assert "Fleet updated." not in page
+
+
+def test_ships_are_reordered_by_dragging_and_saved_as_dropped(client):
+    fleet_id = make_fleet(client)
+    for _ in range(3):
+        add_ship(client, fleet_id)
+    page = text(client.get("/fleet"))
+    assert 'data-autosave="order_ships"' in page and 'class="drag-handle"' in page
+    assert "reorder.js" in page
+    page = text(client.post(f"/fleet/{fleet_id}/action", data={
+        "action": "order_ships", "autosave": "1", "squadron": "sq1", "order": "sh3,sh1,sh2",
+    }, follow_redirects=True))
+    assert [s["uid"] for s in store.get_fleet(fleet_id)["ships"]] == ["sh3", "sh1", "sh2"]
+    assert page.index('data-uid="sh3"') < page.index('data-uid="sh1"') < page.index('data-uid="sh2"')
+    assert 'class="flash' not in page

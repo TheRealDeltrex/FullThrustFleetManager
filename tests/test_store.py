@@ -167,6 +167,17 @@ def test_create_and_list_fleets():
     assert store.create_fleet("nope", "x")[0] is None
 
 
+def test_new_fleet_option_defaults():
+    on = {k for k, v in store.create_fleet("ftcd", "x")[0]["options"].items() if v}
+    assert on == {"cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence",
+                  "core_systems", "fighter_endurance"}
+    on = {k for k, v in store.create_fleet("ftpc", "x")[0]["options"].items() if v}
+    assert {"pc_tech_base", "cd_patrol_battle", "cd_capital_limit", "vector_movement",
+            "cd_cpv", "pc_adfc_no_mass"}.isdisjoint(on) and "cd_multistage" in on
+    assert store.create_fleet("ft2", "x")[0]["options"]["mt_superships"]
+    assert not any(store.create_fleet("fb", "x", options={})[0]["options"].values())
+
+
 def test_squadrons():
     f = a_fleet()
     assert store.add_squadron(f, "Escort")[0]
@@ -180,6 +191,24 @@ def test_squadrons():
     assert store.remove_squadron(f, "sq2")[0]
     assert f["ships"][0]["squadron"] == "sq1"
     assert not store.remove_squadron(f, "sq1")[0]  # at least one squadron remains
+
+
+def test_order_squadron_reorders_and_moves_ships():
+    f = a_fleet()
+    store.add_squadron(f, "Escort")
+    d = a_design()
+    for sq in ("sq1", "sq1", "sq2", "sq1"):
+        store.add_ship(f, d["id"], squadron=sq)
+    assert [s["uid"] for s in f["ships"]] == ["sh1", "sh2", "sh3", "sh4"]
+    assert store.order_squadron(f, "sq1", ["sh4", "sh1", "sh2"])[0]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq1"] == ["sh4", "sh1", "sh2"]
+    # Dragged into Escort ahead of its ship.
+    assert store.order_squadron(f, "sq2", ["sh1", "sh3"])[0]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq2"] == ["sh1", "sh3"]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq1"] == ["sh4", "sh2"]
+    assert len(f["ships"]) == 4
+    assert not store.order_squadron(f, "nope", ["sh1"])[0]
+    assert not store.order_squadron(f, "sq1", ["nope", ""])[0]
 
 
 def test_add_ship_names_and_numbers_by_type_code():

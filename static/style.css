@@ -199,14 +199,15 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .card header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .card .mini svg { width: 100%; height: auto; max-height: 220px; background: #fff; }
 .card.st-destroyed, tr.st-destroyed { opacity: .55; }
+.drag-handle { border: 0; background: none; color: var(--muted); cursor: grab; padding: 0 2px;
+  font: inherit; line-height: 1; touch-action: none; }
+.drag-handle:hover, .drag-handle:focus-visible { color: var(--accent); }
+.card.dragging { opacity: .4; outline: 2px dashed var(--accent); }
+.cards:has(.card) > .empty { display: none; }
 .chip.st-ready { background: var(--ok-soft); color: var(--ok); }
 .chip.st-damaged { background: var(--warn-soft); color: var(--warn); }
 .chip.st-docked { background: var(--accent-soft); color: var(--accent); }
 .chip.st-hulk, .chip.st-destroyed { background: var(--panel-2); color: var(--muted); }
-.sheets { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
-.sheet { margin: 0; }
-.sheet figcaption { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-.sheet svg { width: 100%; height: auto; background: #fff; }
 .options { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; display: flex;
   gap: 14px; flex-wrap: wrap; }
 .options legend { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
@@ -273,7 +274,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="bridge"] .badge { border-radius: 2px; color: #04121f; }
 [data-theme="bridge"] .card { background: var(--panel-2); border-radius: 4px; }
 [data-theme="bridge"] .card header b, [data-theme="bridge"] .card header strong { color: #fff; }
-[data-theme="bridge"] .card .mini svg, [data-theme="bridge"] .ssd-wrap svg, [data-theme="bridge"] .sheet svg { background: #e9f1fa; border-radius: 3px; box-shadow: 0 0 0 1px #2a3c58, 0 0 18px rgba(79,179,255,.12); }
+[data-theme="bridge"] .card .mini svg, [data-theme="bridge"] .ssd-wrap svg { background: #e9f1fa; border-radius: 3px; box-shadow: 0 0 0 1px #2a3c58, 0 0 18px rgba(79,179,255,.12); }
 [data-theme="bridge"] .tbl th { color: var(--accent); }
 [data-theme="bridge"] .tbl td { border-color: #1b2940; }
 [data-theme="bridge"] .tbl tr:hover td { background: rgba(79,179,255,.04); }
@@ -316,7 +317,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="admiralty"] .chip.info, [data-theme="admiralty"] .chip.st-docked { background: #e3e9f1; border-color: #bccbe0; color: #2f4f7a; }
 [data-theme="admiralty"] .badge { border-radius: 2px; }
 [data-theme="admiralty"] .card { background: var(--panel); border-color: var(--line); border-radius: 2px; box-shadow: 2px 2px 0 rgba(60,40,20,.08); }
-[data-theme="admiralty"] .card .mini svg, [data-theme="admiralty"] .ssd-wrap svg, [data-theme="admiralty"] .sheet svg { background: #fffdf8; border: 1px solid #e3d8c3; }
+[data-theme="admiralty"] .card .mini svg, [data-theme="admiralty"] .ssd-wrap svg { background: #fffdf8; border: 1px solid #e3d8c3; }
 [data-theme="admiralty"] .tbl th { color: var(--accent); }
 [data-theme="admiralty"] .tbl tr:nth-child(even) td { background: rgba(201,162,90,.07); }
 [data-theme="admiralty"] .lib-list a.on { color: var(--accent); }
@@ -349,7 +350,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="carbon-armor"] .chip.info, [data-theme="carbon-armor"] .chip.st-docked { background: #172333; border-color: #2c4566; color: #6aa6e8; }
 [data-theme="carbon-armor"] .tbl th { color: var(--accent); }
 [data-theme="carbon-armor"] .notice { border-color: #6a5418; }
-[data-theme="carbon-armor"] .card .mini svg, [data-theme="carbon-armor"] .ssd-wrap svg, [data-theme="carbon-armor"] .sheet svg { background: #ecebe7; box-shadow: 0 0 0 1px #3a3b3f; }
+[data-theme="carbon-armor"] .card .mini svg, [data-theme="carbon-armor"] .ssd-wrap svg { background: #ecebe7; box-shadow: 0 0 0 1px #3a3b3f; }
 [data-theme="carbon-armor"] input[type=checkbox] { accent-color: var(--accent); }
 
 /* Night Sky: deep indigo with a faint starfield, starlight-gold accent, soft rounded panels. */
@@ -431,7 +432,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="nebula"] a, [data-theme="nebula"] .lib-list a.on { color: var(--teal); }
 [data-theme="nebula"] .tbl th { color: var(--teal); }
 [data-theme="nebula"] .notice { border-color: #6a5320; }
-[data-theme="nebula"] .card .mini svg, [data-theme="nebula"] .ssd-wrap svg, [data-theme="nebula"] .sheet svg { background: #f6f1ff; border-radius: 8px; }
+[data-theme="nebula"] .card .mini svg, [data-theme="nebula"] .ssd-wrap svg { background: #f6f1ff; border-radius: 8px; }
 [data-theme="nebula"] input[type=checkbox] { accent-color: var(--accent); }
 
 /* Aurora: the green one. Deep spruce space under a northern-lights glow, soft jade and sage
@@ -462,7 +463,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="aurora"] a, [data-theme="aurora"] .lib-list a.on { color: var(--mint); }
 [data-theme="aurora"] .tbl th { color: var(--mint); }
 [data-theme="aurora"] .notice { border-color: #6a5a20; }
-[data-theme="aurora"] .card .mini svg, [data-theme="aurora"] .ssd-wrap svg, [data-theme="aurora"] .sheet svg { background: #eef7f3; border-radius: 6px; }
+[data-theme="aurora"] .card .mini svg, [data-theme="aurora"] .ssd-wrap svg { background: #eef7f3; border-radius: 6px; }
 [data-theme="aurora"] input[type=checkbox] { accent-color: var(--accent); }
 
 /* Asteroid: mid-tone rock greys, a cratered ground and deep-orange accents, like a hot strike on stone.
@@ -490,5 +491,5 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="asteroid"] .chip.info, [data-theme="asteroid"] .chip.st-docked { background: #4f5a68; border-color: #6f849c; color: #cfe5ff; }
 [data-theme="asteroid"] a, [data-theme="asteroid"] .lib-list a.on { color: var(--ember); }
 [data-theme="asteroid"] .tbl th { color: var(--ember); }
-[data-theme="asteroid"] .card .mini svg, [data-theme="asteroid"] .ssd-wrap svg, [data-theme="asteroid"] .sheet svg { background: #f1efec; border-radius: 6px; }
+[data-theme="asteroid"] .card .mini svg, [data-theme="asteroid"] .ssd-wrap svg { background: #f1efec; border-radius: 6px; }
 [data-theme="asteroid"] input[type=checkbox] { accent-color: var(--accent); }

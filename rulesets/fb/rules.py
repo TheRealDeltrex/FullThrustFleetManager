@@ -60,6 +60,18 @@ def _magazine_mass(system: dict, tmf: int) -> int:
     return max(1, _int(system.get("capacity"), 0))
 
 
+def _graser_mass(system: dict, tmf: int) -> int:
+    """The Star Ranger graser table, as CD p.45: class 1 is 2 for one arc, 3 for three, 4 for
+    more; class 2 is 9 +3 per extra arc, class 3 is 24 +6, each larger class triples the base and
+    doubles the extra."""
+    cls = max(1, _int(system.get("class"), 1))
+    n = max(1, len(_arcs(system)))
+    if cls == 1:
+        return 2 if n <= 1 else 3 if n <= 3 else 4
+    base = 9 if cls == 2 else 24 * 3 ** (cls - 3)
+    return base + 3 * 2 ** (cls - 2) * (n - 1)
+
+
 # type -> (mass(system, tmf), points(system, mass), label(system))
 SystemRule = tuple[Callable[[dict, int], int], Callable[[dict, int], int], Callable[[dict], str]]
 
@@ -75,6 +87,40 @@ SYSTEM_RULES: dict[str, SystemRule] = {
         lambda s: _("Pulse torpedo"),
     ),
     "needle_beam": (lambda s, t: 2, lambda s, m: 6, lambda s: _("Needle beam")),
+    # The Star Ranger fleet pages' extra weapons. An EMP battery has the MASS and cost of a beam
+    # of its class and arcs (ORC page); a graser costs 4 x MASS, or 3 x on the NAC's version
+    # that may not re-roll (UNSC and NAC pages); an anti-matter torpedo is MASS 2, 8 points.
+    "emp": (
+        _beam_mass,
+        lambda s, m: 3 if _int(s.get("class"), 1) <= 1 else 3 * m,
+        lambda s: _("Class-{n} EMP battery", n=_int(s.get("class"), 1)),
+    ),
+    # The Crusty rocket cannon: "same mass, cost, arcs and range bands as a beam battery of the
+    # same size" (Star Ranger Crusty page).
+    "rocket_cannon": (
+        _beam_mass,
+        lambda s, m: 3 if _int(s.get("class"), 1) <= 1 else 3 * m,
+        lambda s: _("Class-{n} rocket cannon", n=_int(s.get("class"), 1)),
+    ),
+    "graser": (
+        _graser_mass,
+        lambda s, m: (3 if s.get("no_reroll") else 4) * m,
+        lambda s: _("Class-{n} graser", n=_int(s.get("class"), 1)),
+    ),
+    "amt": (lambda s, t: 2, lambda s, m: 8, lambda s: _("Anti-matter torpedo")),
+    # The New Israeli long-range pulse torpedo: MASS 8 +2 per extra arc, 3 points a MASS.
+    "lrpt": (
+        lambda s, t: 8 + 2 * max(0, len(_arcs(s)) - 1),
+        lambda s, m: 3 * m,
+        lambda s: _("Long-range pulse torpedo"),
+    ),
+    # The IJSF's spinal hyperspatial distortion cannon: MASS class x 8 - 4, 3 points a MASS.
+    "hdc": (
+        lambda s, t: 8 * max(1, _int(s.get("class"), 1)) - 4,
+        lambda s, m: 3 * m,
+        lambda s: _("Class-{n} hyperspatial distortion cannon", n=_int(s.get("class"), 1)),
+    ),
+    "superior_sensors": (lambda s, t: 2, lambda s, m: 30, lambda s: _("Superior sensors")),
     "submunition": (lambda s, t: 1, lambda s, m: 3, lambda s: _("Submunition pack")),
     "sm_launcher": (lambda s, t: 3, lambda s, m: 9, lambda s: _("Salvo missile launcher")),
     "sm_magazine": (
@@ -128,6 +174,12 @@ SYSTEM_RULES: dict[str, SystemRule] = {
         lambda s, m: 0,
         lambda s: _hold_label(s.get("kind")),
     ),
+    # An old design's "mass penalty for age" on the Star Ranger pages: MASS it cannot use.
+    "age_penalty": (
+        lambda s, t: max(1, _int(s.get("mass"), 1)),
+        lambda s, m: 0,
+        lambda s: _("MASS lost to age ({n})", n=max(1, _int(s.get("mass"), 1))),
+    ),
 }
 
 
@@ -146,10 +198,16 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
 
     rows = [
         BreakdownRow("hull", _("Basic hull (MASS {n})", n=tmf), 0, tmf),
-        BreakdownRow("hull_integrity", _("Hull integrity ({n} boxes)", n=boxes), boxes, 2 * boxes),
+        BreakdownRow("hull_integrity", _hull_label(design, boxes), boxes, hull_integrity_points(design)),
     ]
     if armour:
         rows.append(BreakdownRow("armour", _("Armour ({n} boxes)", n=armour), armour, 2 * armour))
+    stealth = stealth_level(design)
+    if stealth:
+        # The New Israeli stealth hulls (Star Ranger NI page): no MASS, 2 points a hull or
+        # armour box per level.
+        rows.append(BreakdownRow("stealth_hull", _("Stealth hull level-{n}", n=stealth), 0,
+                                 2 * stealth * (boxes + armour)))
     if drive_mass:
         rows.append(
             BreakdownRow("main_drive", _("Main drive (thrust-{n})", n=thrust), drive_mass, 2 * drive_mass)
@@ -183,7 +241,8 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "drive_mass": drive_mass,
         "turn_thrust": _turn_thrust(thrust),
         "hull_descriptor": _hull_descriptor(boxes, tmf),
-        "damage_track": split_rows(boxes, 4),
+        "damage_track": damage_track(design),
+        "hull_row_choices": HULL_ROW_CHOICES,
         "crew_factors": crew_factors(design),
         "cf_positions": cf_positions(design),
         "thresholds": threshold_numbers(design),
@@ -200,8 +259,40 @@ def _hull_descriptor(boxes: int, tmf: int) -> str:
 # ---- Damage track, crew, thresholds -------------------------------------------------------------
 
 
+# The GZG-authorized designs on the Star Ranger fleet pages (data/catalog/fb_starranger.json)
+# print each hull's row split and price a box by its rows, as Kra'Vak-style three-row hulls and
+# Project Continuum's five and six (PC p.108) do: x3, x2, x1.5, x1. Four rows is FB1's track.
+HULL_ROW_CHOICES = (3, 4, 5, 6)
+
+
+def stealth_level(design: dict) -> int:
+    level = _int(design.get("stealth_hull"), 0)
+    return level if level in (1, 2) else 0
+
+
+def hull_rows(design: dict) -> int:
+    rows = _int(design.get("hull_rows"), 4)
+    return rows if rows in HULL_ROW_CHOICES else 4
+
+
+def hull_integrity_points(design: dict) -> int:
+    """2 a box on four rows; x3 / x1.5 / x1 on three / five / six (.5 up). A hull of three
+    boxes or fewer can only be drawn on three rows, so it costs 2 a box however it is drawn
+    (owner's ruling: a ship is not dearer for being small)."""
+    boxes = max(0, _int(design.get("hull_boxes")))
+    halves = {3: 6, 4: 4, 5: 3, 6: 2}[hull_rows(design)] if boxes > 3 else 4
+    return round_half_up(halves * boxes, 2)
+
+
+def _hull_label(design: dict, boxes: int) -> str:
+    rows = hull_rows(design)
+    if rows == 4:
+        return _("Hull integrity ({n} boxes)", n=boxes)
+    return _("Hull integrity ({n} boxes, {rows} rows)", n=boxes, rows=rows)
+
+
 def damage_track(design: dict) -> list[int]:
-    return split_rows(_int(design.get("hull_boxes")), 4)
+    return split_rows(_int(design.get("hull_boxes")), hull_rows(design))
 
 
 def crew_factors(design: dict) -> int:
@@ -215,8 +306,9 @@ def cf_positions(design: dict) -> list[int]:
 
 
 def threshold_numbers(design: dict) -> list[int]:
-    # FB1 p.5: checks at the end of rows 1-3; core systems roll at +1.
-    return [6, 5, 4]
+    # FB1 p.5: checks at the end of rows 1-3; core systems roll at +1. The Star Ranger pages
+    # give a three-row hull 6 and 5, five rows 6 to 3 and six rows 6 to 2.
+    return [6, 5, 4, 3, 2][: hull_rows(design) - 1]
 
 
 # ---- Loadout --------------------------------------------------------------------------------
@@ -305,8 +397,11 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     return issues
 
 
-ARCED_TYPES = {"beam", "pulse_torpedo", "needle_beam", "sm_launcher", "sm_rack", "nova_cannon", "wave_gun"}
-SINGLE_ARC_TYPES = {"needle_beam", "nova_cannon", "wave_gun"}
+ARCED_TYPES = {
+    "beam", "emp", "rocket_cannon", "graser", "pulse_torpedo", "needle_beam", "sm_launcher",
+    "sm_rack", "nova_cannon", "wave_gun", "hdc", "lrpt",
+}
+SINGLE_ARC_TYPES = {"needle_beam", "nova_cannon", "wave_gun", "hdc"}
 
 
 def _validate_arcs(s: dict, uid: str | None, violation) -> None:
@@ -321,7 +416,7 @@ def _validate_arcs(s: dict, uid: str | None, violation) -> None:
             "bad_arcs", _("Choose at least one fire arc ({arcs}), each once.", arcs=", ".join(ARCS)), uid
         )
         return
-    if stype == "beam":
+    if stype in ("beam", "emp", "rocket_cannon"):
         cls = _int(s.get("class"), 1)
         if cls == 1 and len(arcs) != 6:
             violation("beam_arcs", _("A class-1 battery always fires through all six arcs."), uid)

@@ -47,7 +47,8 @@ class FBRuleset:
         return tech.module_for_design(design).design_breakdown(design, options)
 
     def validate_design(self, design: dict, options: dict) -> list[Issue]:
-        return tech.module_for_design(design).validate_design(design, options)
+        issues = tech.module_for_design(design).validate_design(design, options)
+        return issues + _not_in_books(design)
 
     def loadout_points(self, design: dict, loadout: dict | None, options: dict) -> int:
         return tech.module_for_design(design).loadout_points(design, loadout, options)
@@ -108,7 +109,8 @@ class FBRuleset:
             # every Sa'Vasku sheet whatever nodes the ship carries.
             always |= {"sv_power", "sv_thrust", "sv_biomass", "sv_repair"}
             wanted |= {f"sv_{t}" for t in systems_present}
-        return _quickref("fb", wanted, tuple(sorted(always)), options)
+        return (_quickref("fb", wanted, tuple(sorted(always)), options)
+                + star_ranger_quickref(systems_present, SR_KEYS))
 
 
 def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:
@@ -120,9 +122,26 @@ def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:
     except (OSError, ValueError):
         return []
     return [
-        QuickRefEntry(key=e["key"], title=e["title"], text=e["text"], book=e["book"], page=e["page"])
+        QuickRefEntry(key=e["key"], title=e["title"], text=e["text"], book=e["book"], page=e["page"],
+                      url=e.get("url", ""))
         for e in doc.get("entries", []) if isinstance(e, dict)
     ]
+
+
+def load_star_ranger_rules() -> list[QuickRefEntry]:
+    """Every Star Ranger rule the app keeps, for the in-app rules page."""
+    return _load_quickref("sr")
+
+
+def star_ranger_quickref(systems_present: set[str], keys: frozenset[str]) -> list[QuickRefEntry]:
+    """The Star Ranger rules (data/quickref/sr.json) for the `keys` among the systems present."""
+    wanted = set(systems_present) & keys
+    return [e for e in _load_quickref("sr") if e.key in wanted]
+
+
+# The Star Ranger entries each ruleset shows: FB has none of these systems in its books; PC
+# has its own long-range torpedo and heavy missiles.
+SR_KEYS = frozenset({"rocket_cannon", "amt", "hdc", "lrpt", "age_penalty", "sr_hull_rows"})
 
 
 def _quickref(ruleset_id: str, systems_present: set[str], keys_always: tuple[str, ...],
@@ -138,3 +157,21 @@ def _quickref(ruleset_id: str, systems_present: set[str], keys_always: tuple[str
 
 
 RULESET = FBRuleset()
+
+
+# The Fleet Books are a closed system (owner's ruling): what the rules code knows only to price the
+# Star Ranger pages is costed, so the catalog gate can check those pages, but is never legal here.
+NOT_IN_BOOKS = frozenset({"emp", "rocket_cannon", "graser", "hdc", "lrpt", "amt", "superior_sensors",
+                          "age_penalty"})
+
+
+def _not_in_books(design: dict) -> list[Issue]:
+    issues = [Issue("not_in_books", "violation", _("Not in the Fleet Books: {t}.", t=str(s.get("type"))),
+                    s.get("uid") if isinstance(s.get("uid"), str) else None)
+              for s in common.systems_of(design) if s.get("type") in NOT_IN_BOOKS]
+    if common.as_int(design.get("hull_rows"), 4) != 4:
+        issues.append(Issue("not_in_books", "violation", _("Not in the Fleet Books: hull rows.")))
+    if common.as_int(design.get("stealth_hull"), 0):
+        issues.append(Issue("not_in_books", "violation", _("Not in the Fleet Books: stealth hull.")))
+    return issues
+

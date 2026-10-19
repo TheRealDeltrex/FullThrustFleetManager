@@ -40,6 +40,7 @@ from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
 from rulesets import REFERENCE_BOOKS, RULESETS, book_sort_key, common, presets
 from rulesets.fb import data as fb_data
+from rulesets.fb import load_star_ranger_rules
 
 logger = logging.getLogger(__name__)
 
@@ -193,7 +194,7 @@ def home() -> Response:
 
 # ---- Fleet overview tab (PLAN 9.3) -------------------------------------------------------------
 
-VIEWS = ("cards", "sheet", "roster")
+VIEWS = ("cards", "roster")
 
 
 def current_fleet() -> dict | None:
@@ -347,7 +348,8 @@ def fleet_overview() -> str:
         _remember_ship_list(fleet)
     return render_template("fleet.html", active_tab="fleet_overview",
                            selected=_fleet_context(fleet, request.args.get("view", "cards")),
-                           rulesets=list(RULESETS.values()))
+                           rulesets=list(RULESETS.values()),
+                           last_design_id=session.get("design_id", ""))
 
 
 @app.route("/fleet/<fleet_id>")
@@ -413,6 +415,9 @@ def _remove_squadron(fleet: dict) -> tuple[bool, str]:
 
 @register_action("add_ship")
 def _add_ship(fleet: dict) -> tuple[bool, str]:
+    # The design picker stays on the last pick, so adding several of a kind is one click each.
+    if request.form.get("design_id"):
+        session["design_id"] = request.form["design_id"]
     return store.add_ship(fleet, request.form.get("design_id", ""), request.form.get("name", ""),
                           request.form.get("table_id", ""), request.form.get("squadron", ""))
 
@@ -420,6 +425,12 @@ def _add_ship(fleet: dict) -> tuple[bool, str]:
 @register_action("remove_ship")
 def _remove_ship(fleet: dict) -> tuple[bool, str]:
     return store.remove_ship(fleet, request.form.get("uid", ""))
+
+
+@register_action("order_ships")
+def _order_ships(fleet: dict) -> tuple[bool, str]:
+    return store.order_squadron(fleet, request.form.get("squadron", ""),
+                                request.form.get("order", "").split(","))
 
 
 @register_action("update_ship")
@@ -461,7 +472,8 @@ def fleet_check(fleet_id: str) -> str:
 
 
 def _catalog_group(design: dict) -> str:
-    book = design["source"].get("book") or design["ruleset"]
+    code = design["source"].get("book") or design["ruleset"]
+    book = common.WEB_SOURCES.get(code, code)
     race = design.get("race") or "human"
     rs = RULESETS.get(design["ruleset"])
     group = book
@@ -470,7 +482,9 @@ def _catalog_group(design: dict) -> str:
         group = f"{book} · {name}"
     # A ruleset may adopt another's book (Cross Dimensions takes the Fleet Book ships), so the
     # adopted copies get their own group, named for the ruleset they are costed under.
-    if rs and book not in {b.code for b in rs.books}:
+    # Web sources (Star Ranger) belong to the Fleet Books.
+    own = {b.code for b in rs.books} | (set(common.WEB_SOURCES) if rs.id == "fb" else set()) if rs else set()
+    if rs and code not in own:
         group = f"{group} ({rs.short_label})"
     return group
 
@@ -492,7 +506,8 @@ def _class_rank(design: dict) -> int:
 def _catalog_key(design: dict) -> tuple:
     """Book and race (the group), then faction (factionless last), class size, mass and name."""
     faction = design.get("faction") or ""
-    return (design["ruleset"], design.get("race") or "human", not faction, faction,
+    return (design["ruleset"], book_sort_key(design["source"].get("book") or ""),
+            design.get("race") or "human", not faction, faction,
             _class_rank(design), design.get("tmf", 0), design["name"].lower())
 
 
@@ -562,6 +577,9 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "max_stages": getattr(rs, "max_stages", 1),
         "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
         "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
+        "source_name": common.WEB_SOURCES.get(design["source"].get("book") or ""),
+        # Systems whose rules come from the Star Ranger pages link to them on the rules page.
+        "sr_rules": {e.key for e in load_star_ranger_rules()},
     }
 
 
@@ -1041,6 +1059,13 @@ def rulebook(code: str) -> str | Response:
         return redirect(url_for("rulebook_file", code=code) + f"#page={pdf_page}")
     return render_template("rulebook.html", active_tab="settings", book=book, page=page,
                            pdf_page=pdf_page, books=books_in_order())
+
+
+@app.route("/rules/star-ranger")
+def star_ranger_rules() -> str:
+    """The Star Ranger pages' rules for the systems their designs use, kept in the app."""
+    return render_template("star_ranger_rules.html", active_tab="settings",
+                           entries=load_star_ranger_rules())
 
 
 @app.route("/rulebook/<code>/file")

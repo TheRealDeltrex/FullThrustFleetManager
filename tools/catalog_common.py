@@ -12,7 +12,7 @@ System notation, space separated, `*n` repeats a token:
   SMR:arcs[:er]     SM rack                PDS  FC  ADFC   PDAF  ADAF
   S<level>          screen                 HB   one fighter hangar bay (FB) / fighter group (FT2)
   H:<mass> P:<mass> T:<mass>  cargo / passenger / troop space      TB:<capacity>  tender bay
-  NOVA:arc  WAVE:arc  AA:arc  MSL  ORTILLERY  MINELAYER  MINESWEEPER  TUG
+  NOVA:arc  WAVE:arc  AA:arc  MSL  ORTILLERY  MINELAYER  MINESWEEPER  TUG[:tow mass]
   K<class>[:arcs]   Kra'Vak K-gun (class 1 defaults to all arcs, the rest to F)
   MKP[:arc]         Kra'Vak MKP pack (defaults to F)      SG   Kra'Vak scattergun
   S:<mass>          science-lab space
@@ -21,6 +21,11 @@ System notation, space separated, `*n` repeats a token:
   SN                screen node            DW  drone womb (one drone group by default)
   PU:arcs           Phalon pulser battery (1, 3 or 6 arcs)       VS  vapour shroud gland
   PBL<class>[:arcs] plasma bolt launcher (3 arcs, defaults to FP,F,FS)
+  EMP<class>[:arcs] EMP battery (as a beam)   G<class>:arcs[:nr]  graser (nr: may not re-roll)
+  RC<class>[:arcs]  Crusty rocket cannon (as a beam)
+  HDC<class>[:arc]  hyperspatial distortion cannon (defaults to F)
+  LRPT:arcs         long-range pulse torpedo
+  AMT  anti-matter torpedo   SSENS  superior sensors   AGE:<mass>  MASS lost to age
 Arcs are comma separated ("F,FS,FP") or "all".
 """
 
@@ -96,6 +101,27 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
             # the icon carries no arc marks, so the book's norm is the default.
             add({"type": "plasma_bolt_launcher", "class": int(head[3:]),
                  "arcs": _arcs(rest, ruleset) if rest else ["FP", "F", "FS"]})
+        elif re.fullmatch(r"EMP[1-6]", head):
+            add({"type": "emp", "class": int(head[3:]),
+                 "arcs": _arcs(rest, ruleset) if rest else list(FB_ALL)})
+        elif re.fullmatch(r"RC[1-6]", head):
+            add({"type": "rocket_cannon", "class": int(head[2:]),
+                 "arcs": _arcs(rest, ruleset) if rest else list(FB_ALL)})
+        elif re.fullmatch(r"G[1-6]", head):
+            # G2:F or G2:F:nr, the NAC graser that may not re-roll (3 points a MASS).
+            arcs, _, flag = rest.partition(":")
+            add({"type": "graser", "class": int(head[1:]), "arcs": _arcs(arcs, ruleset),
+                 **({"no_reroll": True} if flag == "nr" else {})})
+        elif re.fullmatch(r"HDC[1-9]", head):
+            add({"type": "hdc", "class": int(head[3:]), "arcs": _arcs(rest, ruleset) if rest else ["F"]})
+        elif head == "LRPT":
+            add({"type": "lrpt", "arcs": _arcs(rest, ruleset)})
+        elif head == "AMT":
+            add({"type": "amt"})
+        elif head == "SSENS":
+            add({"type": "superior_sensors"})
+        elif head == "AGE":
+            add({"type": "age_penalty", "mass": int(rest)})
         elif head == "VS":
             add({"type": "vapour_shroud"})
         elif head == "DW":
@@ -113,6 +139,8 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
         elif head == "SMR":
             arcs, _, load = rest.partition(":")
             add({"type": "sm_rack", "load": load or "std", "arcs": _arcs(arcs, ruleset)})
+        elif head == "TUG" and rest:
+            add({"type": "tug_drive", "tow_mass": int(rest)})
         elif head in (
             "PDS",
             "PDAF",
@@ -199,10 +227,13 @@ def design(
     kind: str = "warship",
     race: str = "human",
     notes: str = "",
+    hull_rows: int = 4,
+    stealth: int = 0,
+    url: str = "",
 ) -> dict:
     ident = f"{ruleset}:{slug(book)}:{slug((faction or '') + ' ' + name)}"
     parsed, loadout = parse_systems(systems, ruleset)
-    return {
+    out = {
         "schema_version": 2,
         "id": ident,
         "ruleset": ruleset,
@@ -226,6 +257,13 @@ def design(
         "source": {"kind": "catalog", "book": book, "page": page, "npv_book": npv},
         "notes": notes,
     }
+    if hull_rows != 4:
+        out["hull_rows"] = hull_rows
+    if stealth:
+        out["stealth_hull"] = stealth
+    if url:
+        out["source"]["url"] = url
+    return out
 
 
 def write(filename: str, designs: list[dict]) -> Path:

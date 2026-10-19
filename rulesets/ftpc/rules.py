@@ -453,6 +453,18 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     "shipyard": (lambda s, d: _mass_param(s), _times(2),
                  lambda s: _("Shipyard (MASS {n})", n=_mass_param(s))),
     "flawed_design": (lambda s, d: 0, lambda s, m, d: 0, lambda s: _("Flawed design")),
+    # ---- Star Ranger systems (fullthrust.star-ranger.com; text in data/quickref/sr.json) ----
+    # Rocket cannon (Crusty page): "the same mass, cost, arcs and range bands as a beam battery".
+    "rocket_cannon": (_beam_mass, _times(3), lambda s: _("Class-{n} rocket cannon", n=_class(s))),
+    "amt": _flat(2, 8, lambda: _("Anti-matter torpedo")),  # UNSC page
+    # IJSF Shoya: "Superior Sensors (rated as 2 mass, 30 points)", beside PC's 4 MASS / 16 kind.
+    "compact_superior_sensors": _flat(2, 30, lambda: _("Compact superior sensors")),
+    # Hyperspatial distortion cannon (IJSF page): (class x 8) - 4 MASS, 3 a MASS, one arc.
+    "hdc": (lambda s, d: 8 * _class(s, 3) - 4, _times(3),
+            lambda s: _("Class-{n} hyperspatial distortion cannon", n=_class(s, 3))),
+    # Fleet Book Reinforcements: "a mass penalty ... to account for older less efficient systems".
+    "age_penalty": (lambda s, d: max(1, _int(s.get("mass"), 1)), lambda s, m, d: 0,
+                    lambda s: _("MASS lost to age ({n})", n=max(1, _int(s.get("mass"), 1)))),
 }
 
 BAY_TYPES = ("hangar_bay", "hangar")
@@ -497,9 +509,11 @@ def hull_rows(design: dict) -> int:
 
 
 def hull_integrity_points(design: dict) -> int:
-    """PC p.108: per box x2 for four rows, x1.5 for five, x1 for six, x3 advanced (.5 up)."""
+    """PC p.108: per box x2 for four rows, x1.5 for five, x1 for six, x3 advanced (.5 up).
+    Three rows is also Star Ranger's (UNSC page) at x3; a hull of three boxes or fewer costs
+    2 a box however it is drawn (owner's ruling: a ship is not dearer for being small)."""
     boxes = max(0, _int(design.get("hull_boxes")))
-    halves = {3: 6, 4: 4, 5: 3, 6: 2}[hull_rows(design)]
+    halves = {3: 6, 4: 4, 5: 3, 6: 2}[hull_rows(design)] if boxes > 3 else 4
     return round_half_up(halves * boxes, 2)
 
 
@@ -839,13 +853,14 @@ def suggest_type(design: dict) -> tuple[str, str]:
 MAX_ARCS = {
     "needle_beam": 3, "pulse_torpedo": 3, "fusion_array": 3, "plasma_bolt": 3,
     "submunition": 3, "sm_launcher": 3, "sm_rack": 3, "heavy_missile": 3, "am_missile": 3,
-    "boarding_torpedo_launcher": 3, "mkp": 1, "rocket_pod": 1,
+    "boarding_torpedo_launcher": 3, "mkp": 1, "rocket_pod": 1, "hdc": 1,
 }
 ARCED_TYPES = {
     "beam", "emp", "transporter", "grav_gun", "plasma_cannon", "graser", "phaser", "heavy_graser",
     "gatling", "twin_particle_array", "meson", "pulser", "needle_beam", "pulse_torpedo",
     "submunition", "kgun", "mkp", "boarding_torpedo_launcher", "fusion_array", "plasma_bolt",
     "sm_launcher", "sm_rack", "heavy_missile", "am_missile", "rocket_pod", "ads", "turret",
+    "rocket_cannon", "hdc",
 }
 
 

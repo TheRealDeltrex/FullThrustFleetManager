@@ -508,3 +508,27 @@ def test_races_and_books():
     assert [r.id for r in FB.races()][0] == "human"
     assert {b.code for b in FB.books} == {"FB1", "FB2"}
     assert all(b.page_offset == 0 for b in FB.books)
+
+
+def test_hull_rows_reprice_the_hull_but_not_a_small_one():
+    # Star Ranger rows: x3 / x1.5 / x1 a box on three / five / six rows; a hull of three boxes
+    # or fewer still costs 2 a box (owner's ruling: a ship is not dearer for being small).
+    from rulesets.fb.rules import hull_integrity_points
+
+    costs = [hull_integrity_points({"hull_boxes": 12, "hull_rows": r}) for r in (3, 4, 5, 6)]
+    assert costs == [36, 24, 18, 12]
+    assert hull_integrity_points({"hull_boxes": 3, "hull_rows": 3}) == 6
+
+
+def test_the_fleet_books_are_closed():
+    # Owner's ruling: Fleet Books use only what FB1 and FB2 print. Systems known only to price the
+    # Star Ranger pages are violations, and such a design is not listed in the FB catalog.
+    import store
+
+    design = {"tmf": 10, "hull_boxes": 3, "hull_rows": 3, "stealth_hull": 1,
+              "systems": [{"uid": "s1", "type": "amt"}]}
+    assert [i.code for i in FB.validate_design(design, {})].count("not_in_books") == 3
+    listed = [d for d in store.catalog_designs("fb") if d["source"]["book"] == "SR"]
+    assert listed and all(
+        not [i for i in FB.validate_design(d, {}) if i.severity == "violation"] for d in listed)
+    assert "fb:sr:ijsf-shoya" not in {d["id"] for d in listed}
