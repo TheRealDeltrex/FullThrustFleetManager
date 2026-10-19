@@ -17,7 +17,7 @@
       {% for row in selected.ships %}
         {% set ship = row.ship %}
         <div class="panel campaign-ship">
-          <h3>{{ ship.table_id }} · {{ ship.name }}
+          <h3 class="fold" data-fold="campaign-ship-{{ ship.uid }}" tabindex="0">{{ ship.table_id }} · {{ ship.name }}
             <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
             {% if row.crippled %}<span class="chip bad">{{ _("Crippled") }}</span>{% endif %}
           </h3>
@@ -117,7 +117,7 @@
       {% endfor %}
 
       <div class="panel">
-        <h3>{{ _("Fleet log") }}</h3>
+        <h3 class="fold" data-fold="campaign-log" tabindex="0">{{ _("Fleet log") }}</h3>
         <div class="body stack">
           {% for entry in f.log %}
             <p><b>{{ _("Week {n}", n=entry.week) }}</b> · {{ entry.text }}</p>

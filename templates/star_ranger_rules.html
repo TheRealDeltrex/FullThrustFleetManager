@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ _("Star Ranger rules") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% block work_class %}cols-1{% endblock %}
+{% block content %}
+  <section class="main-col">
+    <div class="panel head">
+      <h2>{{ _("Star Ranger rules") }}</h2>
+    </div>
+    {# The wording from the Star Ranger pages (data/quickref/sr.json), kept in the app in case
+       the site goes away; each entry links to its page. #}
+    {% for entry in entries %}
+      <div class="panel" id="{{ entry.key }}">
+        <h3 class="fold" data-fold="sr-{{ entry.key }}" tabindex="0">{{ entry.title }}</h3>
+        <div class="body stack">
+          <p>{{ entry.text }}</p>
+          <a href="{{ entry.url }}" target="_blank" rel="noopener">{{ entry.url }}</a>
+        </div>
+      </div>
+    {% endfor %}
+  </section>
+{% endblock %}

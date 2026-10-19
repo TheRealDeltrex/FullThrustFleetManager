@@ -100,6 +100,7 @@ def get(path: str, follow: bool = False) -> str:
 def sanitize(html: str, *, banner: str) -> str:
     """Rewrites app-absolute asset paths to the ones the Pages site serves, and neuters the UI."""
     html = re.sub(r'(href|src)="/static/', r'\1="app/static/', html)
+    html = html.replace("url('/static/", "url('app/static/")
     html = re.sub(r'<ul class="flashes".*?</ul>', "", html, flags=re.S)
     html = html.replace("</head>", BANNER_STYLE + "  </head>", 1)
     html = html.replace('<main class="work', banner + '<main class="work', 1)
