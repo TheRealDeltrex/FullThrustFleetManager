@@ -1,4 +1,4 @@
-"""The web build boots in headless Chromium and saves a fleet (PLAN 15).
+"""The web build boots in headless Chromium, saves a fleet and backs it up (PLAN 15).
 
 It needs Playwright with Chromium and the network (Pyodide comes from jsdelivr), so it runs only
 with FTFM_WEB_BOOT=1, which the Tests workflow's web-build job sets. The site is assembled the
@@ -63,5 +63,9 @@ def test_the_web_build_boots_and_saves_a_fleet(site_url):
         page.wait_for_function(
             "() => (localStorage.getItem('ftfm_library_v1') || '').includes('Web boot check')",
             timeout=30_000)
+        # The library now holds something, so the page offers a backup; it downloads as a file.
+        with page.expect_download(timeout=60_000) as download:
+            frame.locator("form.backup-due button.primary").click()
+        assert download.value.suggested_filename.endswith(".FTBackup")
         browser.close()
     assert errors == []

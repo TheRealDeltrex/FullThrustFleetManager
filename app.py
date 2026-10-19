@@ -84,6 +84,8 @@ def _inject_globals() -> dict:
         "LANG": i18n.get_language(),
         "THEME": settings["theme"],
         "SETTINGS": settings,
+        # The library lives in browser storage there, so the page reminds the player to back up.
+        "BACKUP_DUE": BROWSER_MODE and store.backup_due(),
     }
 
 
@@ -537,6 +539,7 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "dirty": dirty,
         "ruleset": rs,
         "read_only": store.is_catalog(design["id"]),
+        "saved": store.get_design(design["id"]) is not None,
         "breakdown": breakdown,
         "mass_limit": breakdown.derived.get("mass_limit") or design["tmf"],
         "issues": issues,
@@ -1054,7 +1057,7 @@ def rulebook_file(code: str) -> Response:
 @app.route("/settings")
 def settings() -> str:
     return render_template("settings.html", active_tab="settings", languages=i18n.LANGUAGES,
-                           settings=store.load_settings(),
+                           settings=store.load_settings(), held_import=store.held_import(),
                            books=books_in_order())
 
 
@@ -1074,6 +1077,70 @@ def settings_save() -> Response:
     if msg:
         flash(msg, "success" if ok else "error")
     return redirect(url_for("settings"))
+
+
+# ---- Export, import and backup (PLAN 5.6, 9.6) ----------------------------------------------------
+
+
+def _attachment(filename: str, data: str | bytes, mimetype: str) -> Response:
+    # store._filename keeps names to letters, digits, space, dot, underscore and hyphen.
+    return Response(data, mimetype=mimetype,
+                    headers={"Content-Disposition": f'attachment; filename="{filename}"'})
+
+
+@app.route("/export/fleet/<fleet_id>")
+def export_fleet(fleet_id: str) -> Response:
+    exported = store.export_fleet(fleet_id)
+    if not exported:
+        abort(404)
+    return _attachment(*exported, "application/json")
+
+
+@app.route("/export/design/<design_id>")
+def export_design(design_id: str) -> Response:
+    exported = None if store.is_catalog(design_id) else store.export_design(design_id)
+    if not exported:
+        abort(404)
+    return _attachment(*exported, "application/json")
+
+
+@app.route("/backup", methods=["POST"])
+def export_backup() -> Response:
+    name, data = store.export_backup()
+    return _attachment(name, data, "application/zip")
+
+
+@app.route("/backup/later", methods=["POST"])
+def backup_later() -> Response:
+    store.save_settings(backup_snoozed=store.now())
+    nxt = request.form.get("next", "")
+    return redirect(nxt if nxt.startswith("/") and not nxt.startswith(("//", "/\\")) else url_for("settings"))
+
+
+@app.route("/import", methods=["POST"])
+def import_upload() -> Response:
+    upload = request.files.get("file")
+    if not upload or not upload.filename:
+        flash(_("Choose a file to import."), "error")
+        return redirect(url_for("settings", _anchor="files"))
+    data = upload.read()
+    store.drop_held_import()
+    ok, msg, conflicts = store.import_file(upload.filename, data)
+    if ok and conflicts:
+        # Newer local copies were kept; the Files panel asks whether to replace them.
+        store.hold_import(upload.filename, data, conflicts)
+    flash(msg, "success" if ok else "error")
+    return redirect(url_for("settings", _anchor="files"))
+
+
+@app.route("/import/held", methods=["POST"])
+def import_held() -> Response:
+    held = store.held_import()
+    store.drop_held_import()
+    if held and request.form.get("action") == "replace":
+        ok, msg, _conflicts = store.import_file(held["filename"], held["data"], overwrite_newer=True)
+        flash(msg, "success" if ok else "error")
+    return redirect(url_for("settings", _anchor="files"))
 
 
 @app.route("/settings/factions", methods=["POST"])

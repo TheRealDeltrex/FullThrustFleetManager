@@ -178,6 +178,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .issues li.violation { border-color: var(--bad); color: var(--bad); }
 .notice { margin: 0; padding: 8px 12px; border-radius: 6px; background: var(--warn-soft);
   border: 1px solid #f0d6a8; color: var(--warn); font-size: 13px; }
+.notice.backup-due { margin: 12px 12px 0; }
 
 /* Fleet overview (PLAN 9.3) */
 .ruleset-strip.rs-fb { background: var(--rs-fb); }

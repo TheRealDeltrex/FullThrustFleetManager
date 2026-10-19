@@ -11,6 +11,7 @@ and then 500s every page that shows it). Every new field goes through them.
 
 from __future__ import annotations
 
+import base64
 import io
 import json
 import math
@@ -31,6 +32,8 @@ STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
 DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "language": "en",
                     "last_backup": None,
+                    # The web build's backup reminder, put off for a while by "Later" (PLAN 5.7).
+                    "backup_snoozed": None,
                     # The Design tab's faction pickers: the player's own factions are shown and
                     # other races' (Kra'Vak while designing a human ship) are not, until ticked.
                     "show_custom_factions": True, "show_other_race_factions": False}
@@ -1005,8 +1008,9 @@ def load_settings() -> dict:
         out["theme"] = doc["theme"]
     if isinstance(doc.get("language"), str):
         out["language"] = doc["language"]
-    if isinstance(doc.get("last_backup"), str):
-        out["last_backup"] = doc["last_backup"]
+    for key in ("last_backup", "backup_snoozed"):
+        if isinstance(doc.get(key), str):
+            out[key] = doc[key]
     for key in ("show_custom_factions", "show_other_race_factions"):
         if isinstance(doc.get(key), bool):
             out[key] = doc[key]
@@ -1073,6 +1077,55 @@ def export_backup() -> tuple[str, bytes]:
 def _newer(local: dict | None, incoming: dict) -> bool:
     """True if a local copy exists and is newer than the incoming one (ISO strings compare)."""
     return bool(local) and (local.get("modified") or "") > (incoming.get("modified") or "")
+
+
+BACKUP_REMINDER_DAYS = 14  # PLAN 5.7
+
+
+def backup_due() -> bool:
+    """The web build's reminder: the library holds something and neither a backup nor a "Later"
+    happened in the last two weeks."""
+    if not any(_dir("designs").glob("*.json")) and not any(_dir("fleets").glob("*.json")):
+        return False
+    settings = load_settings()
+    stamps = [settings[k] for k in ("last_backup", "backup_snoozed") if settings[k]]
+    if not stamps:
+        return True
+    try:
+        latest = max(datetime.fromisoformat(t) for t in stamps)
+        return (datetime.now(timezone.utc) - latest).days >= BACKUP_REMINDER_DAYS
+    except (ValueError, TypeError):  # not an ISO time with a zone: remind
+        return True
+
+
+# An import that found newer local copies waits here for the player's answer (PLAN 5.6). It is
+# JSON (the file as base64) because the web build snapshots the data folder as text.
+def _pending_path() -> Path:
+    return paths.user_data_dir() / "pending_import.json"
+
+
+def hold_import(filename: str, data: bytes, conflicts: list[str]) -> None:
+    paths.user_data_dir().mkdir(parents=True, exist_ok=True)
+    _write_json(_pending_path(), {"filename": filename[:200], "conflicts": conflicts[:200],
+                                  "data": base64.b64encode(data).decode("ascii")})
+
+
+def held_import() -> dict | None:
+    """{"filename", "conflicts", "data": bytes} of the import waiting for an answer, or None."""
+    doc = _read_json(_pending_path()) if _pending_path().is_file() else None
+    if not isinstance(doc, dict) or not isinstance(doc.get("data"), str):
+        return None
+    try:
+        data = base64.b64decode(doc["data"], validate=True)
+    except ValueError:
+        return None
+    conflicts = [c for c in doc.get("conflicts", []) if isinstance(c, str)] \
+        if isinstance(doc.get("conflicts"), list) else []
+    return {"filename": _as_str(doc.get("filename"), limit=200), "conflicts": conflicts, "data": data}
+
+
+def drop_held_import() -> None:
+    _pending_path().unlink(missing_ok=True)
 
 
 # A backup is a few hundred KB of JSON; anything far bigger unpacked is not one of ours.
