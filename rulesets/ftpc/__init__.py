@@ -13,7 +13,7 @@ import copy
 from types import ModuleType
 
 from i18n import _
-from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common, fleet_common
+from rulesets import Breakdown, BreakdownRow, Issue, QuickRefEntry, Race, SystemDef, common, fleet_common
 from rulesets.fb import _load_quickref, _quickref
 from rulesets.fb import tech as fb_tech
 from rulesets.ftpc import data, rules, techbase
@@ -91,7 +91,13 @@ class FTPCRuleset:
         return data.system_defs() if race == "human" else []
 
     def design_breakdown(self, design: dict, options: dict) -> Breakdown:
-        return _engine(design).design_breakdown(design, options)
+        b = _engine(design).design_breakdown(design, options)
+        if not _alien(design) or not options.get("cd_cpv"):
+            return b
+        # The CPV option (PC p.140) prices every basic hull, alien ones too, as CD's does.
+        rows = tuple(BreakdownRow(r.key, r.label, r.mass, rules.hull_cost(rules._tmf(design), options),
+                                  r.system_uid) if r.key == "hull" else r for r in b.rows)
+        return Breakdown(rows, b.mass_used, sum(r.points for r in rows), b.derived)
 
     def validate_design(self, design: dict, options: dict) -> list[Issue]:
         return _engine(design).validate_design(design, options)

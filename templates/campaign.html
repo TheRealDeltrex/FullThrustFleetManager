@@ -82,7 +82,7 @@
                 <input type="hidden" name="uid" value="{{ ship.uid }}" />
                 <div class="row">
                   <label class="check">{{ _("Hull points repaired (1D6)") }}
-                    <input class="input sm" type="number" min="0" name="hull_repaired" value="0" /></label>
+                    <input class="input sm" type="number" min="0" max="6" name="hull_repaired" value="0" /></label>
                   <button class="btn sm ghost" type="button" data-roll="6"
                           data-target="hull_repaired">{{ _("Roll") }}</button>
                   <label class="check">{{ _("Drive repair successes") }}
