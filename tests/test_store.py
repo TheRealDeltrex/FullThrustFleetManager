@@ -458,3 +458,9 @@ def test_table_ids_stay_unique_within_a_fleet():
     assert b["name"] != "Renamed"  # nothing applied when the ID clashes
     assert store.update_ship(f, a["uid"], table_id=a["table_id"])[0]  # keeping its own ID is fine
     assert not store.add_ship(f, d["id"], table_id=a["table_id"])[0]
+
+
+def test_old_carrier_codes_load_as_cva():
+    for old in ("CV", "CVH"):
+        assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": old})["type_code"] == "CVA"
+    assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": "CVL"})["type_code"] == "CVL"

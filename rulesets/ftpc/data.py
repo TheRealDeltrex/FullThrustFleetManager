@@ -80,11 +80,10 @@ SHIP_CLASSES = (
     ("Dreadnought", "DN", 140, 180),
     ("Superdreadnought", "SDN", 160, 300),
 )
-# The Attack Carrier (CVA, 150-300) is a role, so like FB and CD it is never suggested.
 CARRIER_CLASSES = (
     ("Escort Carrier", "CVE", 60, 140),
     ("Light Carrier", "CVL", 120, 180),
-    ("Heavy Carrier", "CVH", 160, 300),
+    ("Attack Carrier", "CVA", 150, 300),
 )
 CARRIER_MIN_BAYS = 2
 

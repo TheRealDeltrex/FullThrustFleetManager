@@ -377,7 +377,7 @@ Derived rules:
   dots: step = ceil(boxes / CF), a dot every step boxes, the last dot in the last box.
 - **Holds:** cargo/passenger/troop MASS split into 4 spaces, larger first.
 - **Turn thrust:** floor(thrust / 2); thrust 1 may always turn 1.
-- **Type suggestion:** FB1 p.12 table (SC 4-10 ... SDN 160+, carriers CVE/CVL/CVH/CVA).
+- **Type suggestion:** FB1 p.12 table (SC 4-10 ... SDN 160+, carriers CVE/CVL/CVA).
 - **Core systems** box is always drawn on FB SSDs; the fleet option decides whether it is used.
 
 Violations (FB): MASS used ≠ TMF (over or under); hull boxes < 10% TMF; C1 not all-arc; C2 with
