@@ -811,7 +811,8 @@ OPTION_NAMES = {
 
 
 def _bays(design: dict) -> int:
-    return sum(max(1, _int(s.get("bays"), 1)) for s in _systems(design) if s.get("type") in BAY_TYPES)
+    # One bay a system: a `bays` count from another ruleset's data is ignored, as in the cost.
+    return sum(1 for s in _systems(design) if s.get("type") in BAY_TYPES)
 
 
 def suggest_type(design: dict) -> tuple[str, str]:
@@ -928,6 +929,14 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     return issues
 
 
+# Screen and field technology for the holofield and cloaking device rules (PC pp.60, 62). ECM is
+# neither: the book combines it with a holofield.
+SCREENS_AND_FIELDS = frozenset({
+    "screen", "advanced_screen", "area_screen", "advanced_area_screen", "stealth_field",
+    "reflex_field", "holofield", "cloaking_device", "cloaking_field", "cloak",
+})
+
+
 def _validate_counts(design: dict, systems: list[dict], violation, info) -> None:
     """Limits that count systems on the whole ship."""
     tmf = _tmf(design)
@@ -935,6 +944,13 @@ def _validate_counts(design: dict, systems: list[dict], violation, info) -> None
     types = [s.get("type") for s in systems]
     if {"screen", "advanced_screen"} <= set(types):
         violation("mixed_screens", _("A ship cannot have both advanced and standard screens."))
+    # PC p.60: holofields "cannot be combined with other screen or field technology" (ECM can);
+    # p.62: the cloaking device "may not be combined with any fields or screens".
+    for alone in ("holofield", "cloaking_device"):
+        if alone in types and set(types) & (SCREENS_AND_FIELDS - {alone}):
+            violation(f"{alone}_combined", _("A holofield cannot be combined with screens or other "
+                                             "fields.") if alone == "holofield" else
+                      _("A cloaking device cannot be combined with screens or fields."))
     if types.count("turret") > per_50:
         # PC p.46: "A ship is limited to one turret per size 50 mass of ship."
         violation("turret_count", _("A ship mounts one turret per 50 MASS: {n} at most.", n=per_50))
@@ -1097,11 +1113,12 @@ def _validate_hangars(design: dict, systems: list[dict], by_uid: dict, violation
             continue
         used[hangar["uid"]] = used.get(hangar["uid"], 0) + max(0, _int(entry.get("mass")))
     for uid, craft_mass in used.items():
-        bays = max(1, _int(by_uid[uid].get("bays"), 1))
-        if craft_mass > bays * data.BAY_CRAFT_MASS:
+        # One wing a bay (p.109), whatever `bays` count imported data carries: the bay is priced
+        # as one, so it holds as one.
+        if craft_mass > data.BAY_CRAFT_MASS:
             violation("hangar_overfull",
                       _("The hangar holds {cap} MASS of fighters and light vessels; {n} are loaded.",
-                        cap=bays * data.BAY_CRAFT_MASS, n=craft_mass), uid)
+                        cap=data.BAY_CRAFT_MASS, n=craft_mass), uid)
 
 
 def _validate_gunboats(design: dict, by_uid: dict, violation) -> None:

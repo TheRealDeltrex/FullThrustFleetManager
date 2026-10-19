@@ -136,6 +136,8 @@
             <input type="hidden" name="action" value="make_variant" />
             <button class="btn primary" type="submit">{{ _("Make a variant") }}</button>
           </form>
+        {% elif selected.saved %}
+          <a class="btn sm" href="{{ url_for('export_design', design_id=d.id) }}">{{ _("Export") }}</a>
         {% endif %}
       </div>
 

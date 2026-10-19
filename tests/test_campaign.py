@@ -69,6 +69,13 @@ def test_repair_plan_follows_ft_p35():
     assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 1})["drive_hits"] == 1
     assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 2})["drive_hits"] == 2
 
+    # The drive is one of the three systems a week: each drive roll takes a place.
+    assert fleet_rules.repair_plan(design, damage, 0, out[:3], {"drive": 2})["too_many"]
+    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 1})["too_many"] is False
+    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 2})["too_many"]
+    # 1D6 of hull a week.
+    assert fleet_rules.repair_plan(design, {"hull": 20}, 9, [], {})["hull"] == 6
+
 
 def test_repair_ignores_systems_the_ship_does_not_have():
     design = store.get_design(FURIOUS)
@@ -220,6 +227,18 @@ def test_the_dice_route_rolls_one_die(client):
     values = {int(client.get("/dice/6").get_data(as_text=True)) for _ in range(40)}
     assert values <= set(range(1, 7)) and len(values) > 1
     assert client.get("/dice/20").status_code == 404
+
+
+def test_the_online_version_rolls_in_the_page(client, monkeypatch):
+    """GitHub Pages has no server for /dice/6, so the browser build marks the button to roll
+    locally (static/campaign.js)."""
+    import app as app_module
+
+    a_fleet()
+    assert 'data-roll="6"' in text(client.get("/campaign"))
+    assert "data-local" not in text(client.get("/campaign"))
+    monkeypatch.setattr(app_module, "BROWSER_MODE", True)
+    assert 'data-local="1"' in text(client.get("/campaign"))
 
 
 def test_unknown_fleet_and_action(client):

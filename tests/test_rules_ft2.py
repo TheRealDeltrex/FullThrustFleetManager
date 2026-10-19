@@ -447,7 +447,8 @@ def test_merchant_system_limits():
 
 
 def test_hull_mass_limits():
-    assert "mass_over_100" in codes(design(tmf=120))
+    assert "mass_over_100" in codes(design(tmf=120), opts={"mt_superships": False})
+    assert "option_needed" in codes(design(tmf=120), "info")
     assert "mass_over_100" not in codes(design(tmf=120), opts={"mt_superships": True})
     assert "bad_tmf" in codes(design(hull_kind="merchant", tmf=1))
 
@@ -506,12 +507,14 @@ def test_books_and_badge():
 
 def test_mt_content_needs_its_toggle():
     wave = design(tmf=60, systems=[sys_("w", "wave_gun", arcs=["F"])])
-    assert "mt_toggle_off" in codes(wave)
+    assert "mt_toggle_off" in codes(wave, opts={"mt_systems": False})
+    assert "mt_toggle_off" not in codes(wave)  # a design alone only notes the option
+    assert "option_needed" in codes(wave, "info")
     assert "mt_toggle_off" not in codes(wave, opts={"mt_systems": True})
     fighters = design(
         tmf=60,
         systems=[sys_("g", "fighter_group")],
         default_loadout={"fighters": [{"hangar": "g", "type": "fast"}], "magazines": []},
     )
-    assert "mt_toggle_off" in codes(fighters)
+    assert "mt_toggle_off" in codes(fighters, opts={"mt_fighters": False})
     assert "mt_toggle_off" not in codes(fighters, opts={"mt_fighters": True})

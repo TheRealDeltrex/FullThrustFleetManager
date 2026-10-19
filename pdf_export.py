@@ -364,44 +364,75 @@ def orders_page(pdf: FleetPDF, fleet: dict, options: PrintOptions) -> None:
         pdf.ln()
 
 
+def _tracker_rows(ship: dict, design: dict) -> list[tuple[str, int, int, str]]:
+    """(label, boxes, endurance circles, uid) for what the ship actually carries: its own loadout
+    or the design's default. A wing is six fighters with six endurance, a light wing eight with
+    four (PC p.75); a magazine shows the salvos loaded in it, a rack its one salvo."""
+    loadout = ship.get("loadout")
+    if loadout is None:
+        loadout = design.get("default_loadout") or {}
+    by_uid = {s["uid"]: s for s in design["systems"]}
+    labels = fleet_rules.system_labels(design)
+    rows: list[tuple[str, int, int, str]] = []
+    wings = [f for f in common.loadout_entries(loadout, "fighters")
+             if by_uid.get(f.get("hangar"), {}).get("type") in common.FIGHTER_BAY_TYPES]
+    for system in design["systems"]:
+        uid = system["uid"]
+        if system["type"] in common.FIGHTER_BAY_TYPES:
+            groups = [f for f in wings if f.get("hangar") == uid]
+            if not groups and system["type"] == "fighter_group":
+                groups = [{}]  # FT2 pays for the group in the design itself (FT p.31)
+            for group in groups:
+                light = "light" in (group.get("extras") or [])
+                rows.append((_("Fighter group"), 8 if light else 6, 4 if light else 6, uid))
+        elif system["type"] in common.GUNBOAT_CARRIER_TYPES:
+            # PC p.79: six gunboats, six points of combat endurance.
+            for _squadron in (g for g in common.loadout_entries(loadout, "gunboats")
+                              if g.get("carrier") == uid):
+                rows.append((_("Gunboat squadron"), 6, 6, uid))
+        elif system["type"] == "sm_magazine":
+            salvos = sum(len(m.get("salvos") or []) for m in common.loadout_entries(loadout, "magazines")
+                         if m.get("magazine") == uid)
+            if salvos:
+                rows.append((_("Salvos"), salvos, 0, uid))
+        elif system["type"] == "sm_rack":
+            rows.append((_("Salvos"), 1, 0, uid))
+        elif system["type"] in ("submunition", "nova_cannon", "wave_gun", "mt_missile"):
+            rows.append((labels.get(uid, system["type"]), 1, 0, uid))
+    return rows
+
+
 def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
-    """Fighter and ordnance tracker; only printed when the fleet carries any (PLAN 10.2)."""
-    rows: list[tuple[str, str, int, str]] = []  # (ship, label, boxes, kind)
+    """Fighter and ordnance tracker; only printed when the fleet carries any (PLAN 10.2). With
+    campaign damage printed, lost fighters and spent salvos and one-shot systems are struck out."""
+    rows: list[tuple[str, str, int, int, int]] = []  # (ship, label, boxes, endurance, spent)
     for ship in fleet["ships"]:
         design = designs.get(ship["design_id"])
         if not design or ship["status"] in ("destroyed", "hulk"):
             continue
-        labels = fleet_rules.system_labels(design)
-        for system in design["systems"]:
-            if system["type"] in common.FIGHTER_BAY_TYPES:
-                rows.append((f"{ship['table_id']} {ship['name']}", _("Fighter group"), 6, "fighters"))
-            elif system["type"] == "gunboat_rack" or (system["type"] == "boat_bay" and any(
-                    g.get("carrier") == system["uid"]
-                    for g in (ship.get("loadout") or design["default_loadout"]).get("gunboats", []))):
-                # PC p.79: six gunboats, six points of combat endurance.
-                rows.append((f"{ship['table_id']} {ship['name']}", _("Gunboat squadron"), 6, "fighters"))
-            elif system["type"] in ("sm_magazine", "sm_rack"):
-                salvos = max(1, int(system.get("capacity", 2) or 2) // 2)
-                rows.append((f"{ship['table_id']} {ship['name']}", _("Salvos"), salvos, "salvos"))
-            elif system["type"] in ("submunition", "nova_cannon", "wave_gun", "mt_missile"):
-                name = labels.get(system["uid"], system["type"])
-                rows.append((f"{ship['table_id']} {ship['name']}", name, 1,
-                             "one_shot"))
+        damage = _ship_damage(ship, options) or {}
+        lost = dict(damage.get("fighters_lost") or {})
+        lost.update(damage.get("salvos_spent") or {})
+        used = set(damage.get("one_shot_used") or [])
+        for label, boxes, endurance, uid in _tracker_rows(ship, design):
+            spent = min(boxes, 1 if uid in used else int(lost.pop(uid, 0)))
+            rows.append((f"{ship['table_id']} {ship['name']}", label, boxes, endurance, spent))
     if not rows:
         return
     pdf.add_page()
     pdf.set_font("plex", "B", 12)
     pdf.cell(0, 7, _("Fighters and ordnance"), new_x="LMARGIN", new_y="NEXT")
-    for ship_label, label, boxes, kind in rows:
+    for ship_label, label, boxes, endurance, spent in rows:
         pdf.set_font("plex", "", 8)
         pdf.cell(55, 7, ship_label[:32])
         pdf.cell(28, 7, label[:18])
         x, y = pdf.get_x(), pdf.get_y()
         for index in range(boxes):
             pdf.rect(x + index * 6, y + 1.5, 4.5, 4.5)
-        if kind == "fighters":
-            for index in range(6):
-                pdf.circle(x + 46 + index * 6, y + 3.7, 2.2)
+            if index < spent:
+                pdf.line(x + index * 6, y + 6, x + index * 6 + 4.5, y + 1.5)
+        for index in range(endurance):
+            pdf.circle(x + 58 + index * 6, y + 3.7, 2.2)
         pdf.ln(7)
 
 
@@ -438,6 +469,10 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add("no_ftl")
             if design and design.get("hull_kind") == "starbase":
                 present.add("starbase")
+            loadout = ship.get("loadout") if ship.get("loadout") is not None else (design or {}).get(
+                "default_loadout")
+            if common.loadout_entries(loadout, "gunboats"):
+                present.add("gunboats")  # carried in a boat bay too, not only on a rack (PC p.80)
             if design and any(s.get("kind") == "troop" for s in design["systems"]):
                 present.add("troop_hold")
             if design:

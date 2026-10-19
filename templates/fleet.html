@@ -110,6 +110,7 @@
           {% endfor %}
         </nav>
         <a class="btn sm" href="{{ url_for('fleet_check', fleet_id=f.id) }}">{{ _("Tournament check") }}</a>
+        <a class="btn sm" href="{{ url_for('export_fleet', fleet_id=f.id) }}">{{ _("Export") }}</a>
       </div>
 
       {# Stat tiles #}

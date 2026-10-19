@@ -746,3 +746,49 @@ def test_a_monster_ship_section_sizes_its_drives_for_the_whole_ship():
     assert "no_ftl" not in infos(rest) and "mass_over_300" not in infos(rest)
     assert PC.suggest_type(rest)[1] == "MS"
     assert "riders_without_mothership" not in _tech_fleet(rest, options={"pc_tech_base": False})
+
+
+# ---- Audit counterexamples --------------------------------------------------------------------
+
+
+def test_holofield_and_cloaking_device_stand_alone():
+    """PC p.60: a holofield combines with no other screen or field (ECM aside); p.62: nor does
+    a cloaking device."""
+    for alone in ("holofield", "cloaking_device"):
+        code = f"{alone}_combined"
+        assert code in codes(design(tmf=100, systems=[sys_("a", alone), sys_("s", "screen", level=1)]))
+        assert code in codes(design(tmf=100, systems=[sys_("a", alone), sys_("s", "stealth_field", level=1)]))
+        assert code not in codes(design(tmf=100, systems=[sys_("a", alone), sys_("e", "ecm", level=2)]))
+    assert "holofield_combined" in codes(design(tmf=100, systems=[sys_("h", "holofield"),
+                                                                   sys_("c", "cloaking_device")]))
+
+
+def test_a_bay_holds_one_wing_whatever_its_bays_count():
+    """The PC bay is priced as one bay (9 MASS), so a `bays` count from imported data must not
+    let it hold ten wings."""
+    d = design(tmf=100, systems=[sys_("h", "hangar", bays=10)],
+               default_loadout={"fighters": [{"hangar": "h", "type": "standard"}] * 2, "magazines": []})
+    assert "hangar_overfull" in codes(d)
+
+
+def test_duplicate_magazine_loads_add_up():
+    d = heavy_cruiser()
+    d["systems"] = [s if s["uid"] != "m1" else {**s, "capacity": 2} for s in d["systems"]]
+    d["default_loadout"]["magazines"] = [{"magazine": "m1", "salvos": ["std"]}] * 2
+    assert {"magazine_overloaded", "magazine_loaded_twice"} <= codes(d)
+
+
+@pytest.mark.parametrize("race", ["human", "kravak", "savasku", "phalon"])
+@pytest.mark.parametrize("tmf,hull", [(1, 1), (40, 16), (100, 100), (140, 196)])
+def test_cpv_prices_every_race_hull(race, tmf, hull):
+    """PC p.140: with CPV the basic hull is MASS squared / 100, at least 1, for aliens too."""
+    d = design(race=race, tmf=tmf)
+    assert rows(d, {"cd_cpv": True})["hull"].points == hull
+    assert rows(d)["hull"].points == tmf
+
+
+def test_the_holofield_reference_keeps_its_exceptions():
+    """PC p.60: the paragraphs after the effect limit it, so the sheet must carry them."""
+    text = next(e.text for e in PC.quickref({"holofield"}, {}) if e.key == "holofield")
+    assert "6 MU or less" in text and "Graviton Beams" in text
+    assert "cannot be combined with other screen or field technology" in text

@@ -34,6 +34,27 @@
       </div>
     </div>
 
+    <div class="panel" id="files">
+      <h3>{{ _("Files") }}</h3>
+      <div class="body stack">
+        <form method="post" action="{{ url_for('export_backup') }}" class="row">
+          <button class="btn" type="submit">{{ _("Back up library") }}</button>
+          {% if settings.last_backup %}<span class="muted">{{ _("Last backup: {date}", date=settings.last_backup[:10]) }}</span>{% endif %}
+        </form>
+        <form method="post" action="{{ url_for('import_upload') }}" enctype="multipart/form-data" class="row">
+          <input class="input" type="file" name="file" accept=".FTFleet,.FTDesign,.FTBackup" required />
+          <button class="btn" type="submit">{{ _("Import") }}</button>
+        </form>
+        {% if held_import %}
+          <form method="post" action="{{ url_for('import_held') }}" class="notice row">
+            <span>{{ _("Newer copies kept here: {names}.", names=held_import.conflicts|join(", ")) }}</span>
+            <button class="btn sm" type="submit" name="action" value="replace">{{ _("Replace them") }}</button>
+            <button class="btn sm ghost" type="submit" name="action" value="keep">{{ _("Keep mine") }}</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
     <div class="panel">
       <h3>{{ _("Appearance") }}</h3>
       <div class="body">

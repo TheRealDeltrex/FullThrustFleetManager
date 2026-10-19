@@ -193,3 +193,25 @@ def test_report_lists_infos_as_well_as_violations():
 def test_ship_counts():
     f = fleet(ships=[ship(), ship(uid="sh2", status="damaged"), ship(uid="sh3", status="damaged")])
     assert fleet_rules.ship_counts(f) == {"ready": 1, "damaged": 2}
+
+
+def test_the_check_judges_the_loadout_the_ship_carries():
+    """The ship's own loadout is what it costs and carries, so it is what the check judges: a
+    fighter group on a ship with no hangar is a violation even when the design's default is clean."""
+    d = design()
+    f = fleet(ships=[ship(design_id="d1")])
+    assert fleet_rules.fleet_report(f, {"d1": d}).conforming
+    f["ships"][0]["loadout"] = {"fighters": [{"hangar": "absent", "type": "nonsense"}], "magazines": []}
+    assert not fleet_rules.fleet_report(f, {"d1": d}).conforming
+    f["ships"][0]["loadout"] = {"fighters": [], "magazines": []}  # explicitly empty is fine
+    assert fleet_rules.fleet_report(f, {"d1": d}).conforming
+
+
+def test_a_fleet_with_more_thrust_off_flags_it_even_on_the_design():
+    d = design(ruleset="ft2", faction=None, tmf=60, hull_boxes=0, armour=0, thrust=2,
+               systems=[{"uid": "w", "type": "wave_gun", "arcs": ["F"]},
+                        {"uid": "f", "type": "fire_control"}])
+    f = fleet(ruleset="ft2", faction=None, ships=[ship(design_id="d1")],
+              options={"mt_systems": False})
+    codes = {i.code for s in fleet_rules.fleet_report(f, {"d1": d}).ships for i in s.issues}
+    assert "mt_toggle_off" in codes
