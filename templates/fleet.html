@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_portraits.html" import picture with context %}
 {% block title %}{{ _("Fleet overview") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-2{% endblock %}
 {% block content %}
@@ -184,6 +185,10 @@
                     <b>{{ ship.table_id }}</b> {{ ship.name }}
                     <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
                   </header>
+                  {% if d %}<div class="fleet-portrait">
+                    {{ picture(ship_portrait(d, portrait_target(f.id, ship.uid)), ship.name, True) }}
+                    <a class="btn sm" href="{{ url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid) }}">{{ _("Change picture") }}</a>
+                  </div>{% endif %}
                   <div class="mini">{{ selected.sheets[ship.uid] if ship.uid in selected.sheets }}</div>
                   <footer class="muted">
                     {% if d %}

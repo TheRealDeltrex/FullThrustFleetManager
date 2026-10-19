@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_portraits.html" import picture with context %}
 {% block title %}{{ _("Campaign") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-1{% endblock %}
 {% block content %}
@@ -20,6 +21,10 @@
             <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
             {% if row.crippled %}<span class="chip bad">{{ _("Crippled") }}</span>{% endif %}
           </h3>
+          {% if row.design %}<div class="fleet-portrait">
+            {{ picture(ship_portrait(row.design, portrait_target(f.id, ship.uid)), ship.name, True) }}
+            <a class="btn sm" href="{{ url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid) }}">{{ _("Change picture") }}</a>
+          </div>{% endif %}
           <div class="body ship-grid">
             {# Clicking the diagram posts one damage edit; the fields below do the same without
                a mouse or a script. #}

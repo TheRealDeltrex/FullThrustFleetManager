@@ -1,0 +1,12 @@
+{% macro picture(art, name, small=False) %}
+  {% if art %}
+    {% if art.upload %}
+      <img class="ship-portrait{% if small %} small{% endif %}" src="{{ art.upload }}"
+           alt="{{ _('Portrait of {name}', name=name) }}" loading="lazy" width="256" height="256" />
+    {% else %}
+      <div class="ship-portrait{% if small %} small{% endif %}" role="img"
+           aria-label="{{ _('Portrait of {name}', name=name) }}"
+           style="background-image:url('{{ art_url(art.file) }}');background-size:400% 400%;background-position:{{ (art.cell % 4) * 100 / 3 }}% {{ (art.cell // 4) * 100 / 3 }}%"></div>
+    {% endif %}
+  {% endif %}
+{% endmacro %}

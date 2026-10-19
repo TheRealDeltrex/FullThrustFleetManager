@@ -7,6 +7,7 @@
     <title>{% block title %}{{ _("Full Thrust Fleet Manager") }}{% endblock %}</title>
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='artwork.css') }}" />
   </head>
   <body>
     <header class="topbar">
@@ -70,6 +71,7 @@
         </div>
       </div>
     </header>
+    <div class="theme-art" aria-hidden="true"></div>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}

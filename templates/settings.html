@@ -70,6 +70,20 @@
     </div>
 
     <div class="panel">
+      <h3>{{ _("Ship pictures") }}</h3>
+      <div class="body stack">
+        <p>{{ _("Ship pictures are shared across all themes. Change a design picture in Design, or an individual ship picture on its fleet card.") }}</p>
+        <a class="btn" href="{{ url_for('portrait_backup') }}">{{ _("Download picture backup") }}</a>
+        <form method="post" action="{{ url_for('portrait_restore') }}" enctype="multipart/form-data" class="stack">
+          <label class="field">{{ _("Restore picture backup") }}
+            <input class="input" type="file" name="pictures" accept="application/json,.json" required />
+          </label>
+          <label><input type="checkbox" name="overwrite" /> {{ _("Replace newer local pictures") }}</label>
+          <button class="btn" type="submit">{{ _("Restore pictures") }}</button>
+        </form>
+      </div>
+    </div>
+    <div class="panel">
       <h3>{{ _("Language") }}</h3>
       <div class="body">
         <select class="input" disabled>
