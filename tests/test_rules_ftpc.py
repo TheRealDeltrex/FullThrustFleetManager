@@ -802,9 +802,11 @@ def test_star_ranger_systems_cost_as_their_pages_say():
         {"uid": "b", "type": "amt"},
         {"uid": "c", "type": "hdc", "class": 2, "arcs": ["F"]},
         {"uid": "d", "type": "age_penalty", "mass": 3},
+        {"uid": "e", "type": "compact_superior_sensors"},
     ])
     rows = {r.key: (r.mass, r.points) for r in PC.design_breakdown(d, {}).rows if r.system_uid}
-    assert rows == {"rocket_cannon": (4, 12), "amt": (2, 8), "hdc": (12, 36), "age_penalty": (3, 0)}
+    assert rows == {"rocket_cannon": (4, 12), "amt": (2, 8), "hdc": (12, 36), "age_penalty": (3, 0),
+                    "compact_superior_sensors": (2, 30)}
     keys = {e.key for e in PC.quickref({"rocket_cannon", "amt", "hdc", "age_penalty"}, {})}
     assert {"rocket_cannon", "amt", "hdc", "age_penalty"} <= keys
 
@@ -814,5 +816,6 @@ def test_star_ranger_designs_convert_their_torpedoes_and_missiles():
 
     by_id = {d["id"]: d for d in store.catalog_designs("ftpc")}
     types = {s["type"] for d in by_id.values() if d["source"]["book"] == "SR" for s in d["systems"]}
-    assert not types & {"lrpt", "mt_missile"}
+    assert not types & {"lrpt", "mt_missile", "superior_sensors"}
+    assert {"ftpc:sr:ijsf-shoya", "ftpc:sr:ni-nitznutz"} <= set(by_id)
     assert len([d for d in by_id.values() if d["source"]["book"] == "SR"]) > 300

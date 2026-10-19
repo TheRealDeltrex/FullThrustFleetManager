@@ -457,6 +457,8 @@ SYSTEM_RULES: dict[str, SystemRule] = {
     # Rocket cannon (Crusty page): "the same mass, cost, arcs and range bands as a beam battery".
     "rocket_cannon": (_beam_mass, _times(3), lambda s: _("Class-{n} rocket cannon", n=_class(s))),
     "amt": _flat(2, 8, lambda: _("Anti-matter torpedo")),  # UNSC page
+    # IJSF Shoya: "Superior Sensors (rated as 2 mass, 30 points)", beside PC's 4 MASS / 16 kind.
+    "compact_superior_sensors": _flat(2, 30, lambda: _("Compact superior sensors")),
     # Hyperspatial distortion cannon (IJSF page): (class x 8) - 4 MASS, 3 a MASS, one arc.
     "hdc": (lambda s, d: 8 * _class(s, 3) - 4, _times(3),
             lambda s: _("Class-{n} hyperspatial distortion cannon", n=_class(s, 3))),
