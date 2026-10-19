@@ -82,7 +82,9 @@ GATE_TRANSFER_PER_MASS = 10
 GATE_TYPES = frozenset({"jump_gate", "portal"})
 
 # A starbase is always thrust 0 (PC p.115).
-HULL_KINDS = ("warship", "merchant", "starbase")
+# A monster ship is built in sections like a starbase, one of them carrying the drives sized for
+# the whole ship (p.116).
+HULL_KINDS = ("warship", "merchant", "starbase", "section")
 
 # PC p.108: four rows is the warship norm, five old or civilian ships, six bulk carriers and the
 # like; an advanced hull (p.108) has three. Points per hull box for each.
