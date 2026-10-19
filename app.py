@@ -347,7 +347,8 @@ def fleet_overview() -> str:
         _remember_ship_list(fleet)
     return render_template("fleet.html", active_tab="fleet_overview",
                            selected=_fleet_context(fleet, request.args.get("view", "cards")),
-                           rulesets=list(RULESETS.values()))
+                           rulesets=list(RULESETS.values()),
+                           last_design_id=session.get("design_id", ""))
 
 
 @app.route("/fleet/<fleet_id>")
@@ -413,6 +414,9 @@ def _remove_squadron(fleet: dict) -> tuple[bool, str]:
 
 @register_action("add_ship")
 def _add_ship(fleet: dict) -> tuple[bool, str]:
+    # The design picker stays on the last pick, so adding several of a kind is one click each.
+    if request.form.get("design_id"):
+        session["design_id"] = request.form["design_id"]
     return store.add_ship(fleet, request.form.get("design_id", ""), request.form.get("name", ""),
                           request.form.get("table_id", ""), request.form.get("squadron", ""))
 
