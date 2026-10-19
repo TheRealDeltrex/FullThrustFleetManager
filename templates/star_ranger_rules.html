@@ -10,7 +10,7 @@
        the site goes away; each entry links to its page. #}
     {% for entry in entries %}
       <div class="panel" id="{{ entry.key }}">
-        <h3>{{ entry.title }}</h3>
+        <h3 class="fold" data-fold="sr-{{ entry.key }}" tabindex="0">{{ entry.title }}</h3>
         <div class="body stack">
           <p>{{ entry.text }}</p>
           <a href="{{ entry.url }}" target="_blank" rel="noopener">{{ entry.url }}</a>

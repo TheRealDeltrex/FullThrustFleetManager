@@ -11,7 +11,7 @@
     </div>
 
     <form method="post" action="{{ url_for('print_pdf') }}" target="_blank" class="panel">
-      <h3>{{ _("Sections") }}</h3>
+      <h3 class="fold" data-fold="print-sections" tabindex="0">{{ _("Sections") }}</h3>
       <div class="body options">
         {% for key, label in (("roster", _("Roster")), ("sheets", _("Record sheets")),
                               ("orders", _("Orders chart")), ("tracker", _("Fighters and ordnance")),
@@ -20,7 +20,7 @@
         {% endfor %}
       </div>
 
-      <h3 class="sep">{{ _("Options") }}</h3>
+      <h3 class="sep fold" data-fold="print-options" tabindex="0">{{ _("Options") }}</h3>
       <div class="body stack">
         <label>{{ _("Paper") }}
           <select class="input" name="paper">
@@ -36,7 +36,7 @@
           {{ _("Blank Phalon pulser icons (write L/M/C on the sheet)") }}</label>
       </div>
 
-      <h3 class="sep">{{ _("Battle pack") }}</h3>
+      <h3 class="sep fold" data-fold="print-pack" tabindex="0">{{ _("Battle pack") }}</h3>
       <div class="body stack">
         <label>{{ _("Second fleet") }}
           <select class="input" name="second_fleet">
