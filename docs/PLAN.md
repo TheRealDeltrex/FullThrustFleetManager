@@ -479,8 +479,11 @@ a class-2 beam on a broadside pair of arcs is 1 MASS (pp.36, 120); rows past the
 checking on 4+ (p.32); multi-arc weapons need not be contiguous (p.45); advanced FTL is paid x3
 whenever it is chosen (p.108); dummy bogeys are not behind an option (p.95). Under PC the FB1
 Tibet costs 159, not 162, because PC screens have no minimum MASS (p.56). The quick reference quotes PC section by section. Turrets, gunboat squadrons (racks and boat bays), fighter racks, light and robot fighters
-followed. Still to come: monster
-ships and the Imperial tech base (pp.125-127).
+followed, then the Imperial tech base as a fleet option (pp.125-127: the fleet's technologies
+with their prerequisites, ten choices at most, no gunboats beside fighters) and monster ship
+sections whose drives are sized for the whole ship (p.116). **FTPC is complete** (October 2026).
+Not modelled: FTL gunboat squadrons flying without a carrier, mixed gunboat squadrons, and
+the play rules PC leaves to the table (terrain, planets, ramming, special moves).
 
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
@@ -786,8 +789,9 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    **all done** (6.4): human tech with the loadout extras, the FB2 races under CD's p.21
    changes, battle riders and motherships, system defence ships, jump gates and portals,
    starbase sections, dummy bogeys, the tournament composition limits and fleet morale.
-2. FTPC ruleset (incl. the 2017 errata) - design system, catalog and fleet rules done (6.4);
-   quick reference, turrets, gunboats and fighter racks done; the Imperial tech base to come
+2. FTPC ruleset (incl. the 2017 errata) - **all done** (6.4): design system, catalog, fleet
+   rules, quick reference, turrets, gunboats, fighter racks, the Imperial tech base and monster
+   ship sections
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37
    Phalon one = 379. Races are additive tech modules inside a ruleset (decision 3), not new

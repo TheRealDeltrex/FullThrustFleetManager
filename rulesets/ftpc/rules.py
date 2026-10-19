@@ -65,6 +65,17 @@ def stationary(design: dict) -> bool:
     return design.get("hull_kind") == "starbase" or transfer_mass(design) > 0
 
 
+def is_section(design: dict) -> bool:
+    return design.get("hull_kind") == "section"
+
+
+def drive_basis(design: dict) -> int:
+    """The MASS drives and FTL are a percentage of: the whole ship for a monster ship section
+    (PC p.116: "calculated for the entire ship, not just the section"), else the ship's own."""
+    tmf = _tmf(design)
+    return max(tmf, _int(design.get("ship_mass"))) if is_section(design) else tmf
+
+
 def has_afc(design: dict) -> bool:
     return any(s.get("type") == "advanced_fire_control" for s in _systems(design))
 
@@ -559,8 +570,9 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
     advanced_hull = _advanced_hull(design)
     advanced_drive = design.get("drive_advanced") is True
     advanced_ftl = design.get("ftl_advanced") is True and design.get("ftl") is True
-    ftl_mass = pct(tmf, 100) if design.get("ftl") is True and tmf > 0 else 0
-    drive_mass = pct(tmf, 50 * thrust) if thrust > 0 and tmf > 0 else 0
+    basis = drive_basis(design)
+    ftl_mass = pct(basis, 100) if design.get("ftl") is True and tmf > 0 else 0
+    drive_mass = pct(basis, 50 * thrust) if thrust > 0 and tmf > 0 else 0
     stream_pct = STREAMLINING_PERCENT.get(design.get("streamlining"), 0)
     stream_mass = pct(tmf, 10 * stream_pct) if stream_pct and tmf > 0 else 0
     layers = shell_layers(design)
@@ -643,6 +655,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "advanced_drive": advanced_drive,
         "advanced_ftl": advanced_ftl,
         "transfer_mass": transfer_mass(design),
+        "drive_basis": basis,
         # Weapons a turret may hold, for the Design tab's turret checkboxes (PC p.46).
         "turret_weapons": [s["uid"] for s in _systems(design) if isinstance(s.get("uid"), str)
                            and s.get("type") in ARCED_TYPES and s.get("type") not in UNTURRETED],
@@ -811,6 +824,8 @@ def suggest_type(design: dict) -> tuple[str, str]:
         return _("Jump gate"), "JG"
     if design.get("hull_kind") == "starbase":
         return _("Starbase section"), "SB"
+    if is_section(design):
+        return _("Monster ship section"), "MS"
     if _bays(design) >= data.CARRIER_MIN_BAYS and tmf >= data.CARRIER_CLASSES[0][2]:
         return common.pick_class(tmf, data.CARRIER_CLASSES)
     return common.pick_class(tmf, data.SHIP_CLASSES)
@@ -848,7 +863,7 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     boxes = _int(design.get("hull_boxes"))
     if tmf <= 0:
         violation("bad_tmf", _("Total MASS must be at least 1."))
-    if tmf > data.MAX_MASS and design.get("hull_kind") != "starbase":
+    if tmf > data.MAX_MASS and design.get("hull_kind") not in ("starbase", "section"):
         info("mass_over_300", _("PC suggests MASS {n} at most; bigger ships are better built "
                                 "as monster ship sections.", n=data.MAX_MASS))
     b = design_breakdown(design, options)
@@ -904,7 +919,7 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
 
     if not any(s.get("type") in ("fire_control", "advanced_fire_control") for s in systems):
         info("no_fire_control", _("No fire control: weapons that need one cannot fire."))
-    if design.get("ftl") is not True and not stationary(design):
+    if design.get("ftl") is not True and not stationary(design) and not is_section(design):
         info("no_ftl", _("No FTL drive: a battle rider (MASS {n} at most) needs a mothership; "
                          "a system defence ship needs the fleet's agreement.", n=data.RIDER_MAX_MASS))
     for s in systems:

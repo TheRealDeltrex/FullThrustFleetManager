@@ -628,6 +628,8 @@ def _apply_form(design: dict) -> dict:
     design["type_code"] = form.get("type_code", "").strip()[:8]
     kinds = getattr(RULESETS.get(design["ruleset"]), "hull_kinds", ("warship",))
     design["hull_kind"] = form.get("hull_kind") if form.get("hull_kind") in kinds else "warship"
+    if form.get("ship_mass", "").isdigit():
+        design["ship_mass"] = int(form["ship_mass"])
     faction, _msg = _chosen_faction(form, design.get("race") or "human")
     if faction != NEW_FACTION:  # "New faction" with no name keeps the faction it had
         design["faction"] = faction

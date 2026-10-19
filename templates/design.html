@@ -219,12 +219,16 @@
             </label>
             <label>{{ _("Hull kind") }}
               <select class="input" name="hull_kind">
-                {% set kind_names = {"warship": _("Warship"), "merchant": _("Merchant"), "starbase": _("Starbase section")} %}
+                {% set kind_names = {"warship": _("Warship"), "merchant": _("Merchant"), "starbase": _("Starbase section"), "section": _("Monster ship section")} %}
                 {% for kind in selected.ruleset.hull_kinds %}
                   <option value="{{ kind }}" {% if d.hull_kind == kind %}selected{% endif %}>{{ kind_names[kind] }}</option>
                 {% endfor %}
               </select>
             </label>
+            {% if d.hull_kind == 'section' %}
+              <label>{{ _("Whole ship MASS") }}
+                <input class="input sm" type="number" min="0" name="ship_mass" value="{{ d.ship_mass or d.tmf }}" /></label>
+            {% endif %}
             <label class="check"><input type="checkbox" name="ftl" {% if d.ftl %}checked{% endif %} /> {{ _("FTL drive") }}</label>
             {% if advanced %}
               <label class="check"><input type="checkbox" name="ftl_advanced" {% if d.ftl_advanced %}checked{% endif %} />
