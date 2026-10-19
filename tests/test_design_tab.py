@@ -126,8 +126,16 @@ def test_the_add_system_picker_keeps_the_last_pick(client):
     client.post(f"/design/{design_id}",
                 data=fields(store.get_design(design_id), action="add_system", system_type="sm_rack"))
     page = client.get(f"/design/{design_id}").get_data(as_text=True)
-    assert re.search(r'<option value="sm_rack"\s+selected>', page)
-    assert not re.search(r'<option value="beam"\s+selected>', page)
+    assert re.search(r'<option value="sm_rack"[^>]*\sselected>', page)
+    assert not re.search(r'<option value="beam"[^>]*\sselected>', page)
+
+
+def test_the_add_system_picker_is_grouped_and_filterable(client):
+    design_id = make(client, ruleset="ftcd")
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert '<optgroup label="Weapons">' in page and '<optgroup label="Defences">' in page
+    assert 'data-search="weapons beam battery"' in page
+    assert 'class="input system-filter"' in page and "syspicker.js" in page
 
 
 def test_arcs_are_edited_as_checkboxes(client):
