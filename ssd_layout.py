@@ -722,7 +722,7 @@ _FB_ICONS = dict(_SHARED_ICONS) | {
 ICON_SETS: dict[str, dict] = {
     "fb": _FB_ICONS,
     "ftcd": _CD_ICONS,
-    "ftpc": _PC_ICONS,
+    "ftpc": _PC_ICONS | {k: _FB_ICONS[k] for k in ("rocket_cannon", "hdc", "amt", "age_penalty")},
     "ft2": dict(_SHARED_ICONS),
     "fb_kravak": _KRAVAK_ICONS,
     "fb_savasku": _SAVASKU_ICONS,
