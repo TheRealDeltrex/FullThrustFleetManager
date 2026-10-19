@@ -403,6 +403,9 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   x4, x3 without reroll); `hdc` {class, one arc}; `lrpt` {arcs}; `amt`, `superior_sensors`;
   `age_penalty` {mass} is MASS lost to age at 0 points. FB designs may also carry `hull_rows`
   3/4/5/6 (boxes x3/x2/x1.5/x1; Star Ranger; a hull of 3 boxes or fewer always costs 2 a box) and `stealth_hull` 1-2 (+2/+4 a hull and armour box).
+  **The Fleet Books are closed (owner's ruling; CD too, only PC takes additions):** these are
+  costed only so the gate can check the Star Ranger pages, and `FBRuleset.validate_design`
+  flags each as `not_in_books`, a violation.
 - Rules code treats designs as semi-untrusted: bad numbers read as defaults (`_int`), unknown
   types cost nothing and raise a violation. Nothing in a ruleset raises on a malformed design.
 - Labels and issue messages are translated at call time (`system_defs()` is a function for that
@@ -563,8 +566,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   stats: the FB1/FB2 powers plus ten human factions IJSF to OUDF; book "SR", page 0,
   `source.url` the page; `npv_book` 0 where the page prints none, then the gate checks only
   legality). Written by `tools/extract_catalog_starranger.py`, whose tables put counts first as
-  the pages do. CD and PC adopt a Star Ranger design only where it is legal unchanged
-  (`store._adoptable`); the Design tab groups them as "Star Ranger" and links the NPV chip to the
+  the pages do. FB lists, and CD and PC adopt, a Star Ranger design only where it is legal
+  unchanged under that ruleset (`store._adoptable`; FB 178, CD 232, PC 329 of 337); the Design tab groups them as "Star Ranger" and links the NPV chip to the
   page (`common.WEB_SOURCES`).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
