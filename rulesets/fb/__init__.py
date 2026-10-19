@@ -47,7 +47,8 @@ class FBRuleset:
         return tech.module_for_design(design).design_breakdown(design, options)
 
     def validate_design(self, design: dict, options: dict) -> list[Issue]:
-        return tech.module_for_design(design).validate_design(design, options)
+        issues = tech.module_for_design(design).validate_design(design, options)
+        return issues + _not_in_books(design)
 
     def loadout_points(self, design: dict, loadout: dict | None, options: dict) -> int:
         return tech.module_for_design(design).loadout_points(design, loadout, options)
@@ -156,3 +157,21 @@ def _quickref(ruleset_id: str, systems_present: set[str], keys_always: tuple[str
 
 
 RULESET = FBRuleset()
+
+
+# The Fleet Books are a closed system (owner's ruling): what the rules code knows only to price the
+# Star Ranger pages is costed, so the catalog gate can check those pages, but is never legal here.
+NOT_IN_BOOKS = frozenset({"emp", "rocket_cannon", "graser", "hdc", "lrpt", "amt", "superior_sensors",
+                          "age_penalty"})
+
+
+def _not_in_books(design: dict) -> list[Issue]:
+    issues = [Issue("not_in_books", "violation", _("Not in the Fleet Books: {t}.", t=str(s.get("type"))),
+                    s.get("uid") if isinstance(s.get("uid"), str) else None)
+              for s in common.systems_of(design) if s.get("type") in NOT_IN_BOOKS]
+    if common.as_int(design.get("hull_rows"), 4) != 4:
+        issues.append(Issue("not_in_books", "violation", _("Not in the Fleet Books: hull rows.")))
+    if common.as_int(design.get("stealth_hull"), 0):
+        issues.append(Issue("not_in_books", "violation", _("Not in the Fleet Books: stealth hull.")))
+    return issues
+
