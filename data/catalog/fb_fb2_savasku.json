@@ -1222,7 +1222,7 @@
    "faction": "SV",
    "name": "Vas'Sa'Teth",
    "type_label": "Heavy Fighter Carrier",
-   "type_code": "CVH",
+   "type_code": "CVA",
    "hull_kind": "warship",
    "tmf": 240,
    "hull_boxes": 80,

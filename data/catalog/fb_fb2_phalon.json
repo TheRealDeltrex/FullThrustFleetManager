@@ -1401,7 +1401,7 @@
    "faction": "PH",
    "name": "Draath",
    "type_label": "Heavy Carrier",
-   "type_code": "CVH",
+   "type_code": "CVA",
    "hull_kind": "warship",
    "tmf": 250,
    "hull_boxes": 40,
