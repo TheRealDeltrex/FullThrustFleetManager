@@ -489,7 +489,8 @@ def test_standard_or_special_hull():
     [
         (design(tmf=14), ("Destroyer", "DD")),
         (design(tmf=36), ("Heavy Cruiser", "CH")),
-        (design(tmf=98, systems=[sys_(f"g{i}", "fighter_group") for i in range(6)]), ("Fleet Carrier", "CV")),
+        (design(tmf=98, systems=[sys_(f"g{i}", "fighter_group") for i in range(6)]),
+         ("Attack Carrier", "CVA")),
         (design(tmf=60, hull_kind="merchant"), ("Heavy Freighter", "M")),
     ],
 )

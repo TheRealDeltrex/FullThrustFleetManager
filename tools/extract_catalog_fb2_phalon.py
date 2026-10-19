@@ -60,7 +60,7 @@ SHIPS = [
      f"PU:{ALL}*7 PU:{PORT}*2 PU:{STBD}*2 PBL6 PBL3*2 VS FC*5"),
     (44, "Taanis",  'Light Carrier',    'CVL', 170,  641, 30, (8, 4, 4),       4,
      f"PU:{PORT}*2 PU:{STBD}*2 PU:{ALL} PBL2 VS FC*2 HB*4"),
-    (45, "Draath",  'Heavy Carrier',    'CVH', 250, 1002, 40, (12, 8, 6, 4),   2,
+    (45, "Draath",  'Heavy Carrier',    'CVA', 250, 1002, 40, (12, 8, 6, 4),   2,
      f"PU:{PORT}*2 PU:{STBD}*2 PU:{ALL}*4 PBL3 VS FC*2 HB*8"),
 ]
 # fmt: on
