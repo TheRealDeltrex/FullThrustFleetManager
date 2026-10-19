@@ -16,7 +16,7 @@ from i18n import _
 from rulesets import Breakdown, Issue, QuickRefEntry, Race, SystemDef, common, fleet_common
 from rulesets.fb import _load_quickref, _quickref
 from rulesets.fb import tech as fb_tech
-from rulesets.ftpc import data, rules
+from rulesets.ftpc import data, rules, techbase
 
 ALIEN_RACES = ("kravak", "savasku", "phalon")
 
@@ -30,7 +30,7 @@ class FTPCRuleset:
     max_stages = data.MAX_STAGES
     # What the fleet may field, then how points are counted, then play rules.
     option_keys = (
-        "pc_optional_systems", "cd_multistage", "cd_system_defence", "pc_adfc_no_mass",
+        "pc_optional_systems", "cd_multistage", "cd_system_defence", "pc_tech_base", "pc_adfc_no_mass",
         "pc_hangar_criticals", "pc_overload_torpedoes", "cd_cpv", "cd_patrol_battle",
         "cd_capital_limit", "core_systems", "fighter_endurance", "vector_movement",
     )
@@ -68,9 +68,13 @@ class FTPCRuleset:
         def points(ship: dict, design: dict) -> int:
             return (self.design_breakdown(design, options).points
                     + self.loadout_points(design, ship.get("loadout"), options))
-        return fleet_common.fleet_issues(
-            fleet_doc, ships, options, ship_class=rules.ship_class, stationary=rules.stationary,
-            ship_points=points)
+        issues = fleet_common.fleet_issues(
+            fleet_doc, ships, options, ship_class=rules.ship_class,
+            # A monster ship section without drives is part of a ship, not a battle rider.
+            stationary=lambda d: rules.stationary(d) or rules.is_section(d), ship_points=points)
+        if options.get("pc_tech_base"):
+            issues += _tech_base_issues(ships, options)
+        return issues
 
     def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
         return fleet_common.morale_mass(ships)
@@ -189,6 +193,31 @@ ALIEN_ENTRIES = (
     ("phalon", "ph_", {"ph_shell", "ph_pds"}),
     ("savasku", "sv_", {"sv_power", "sv_thrust", "sv_biomass", "sv_repair"}),
 )
+
+
+def _tech_base_issues(ships: list[tuple[dict, dict]], options: dict) -> list[Issue]:
+    """PC pp.125-127: the technologies the fleet's live human designs use, prerequisites
+    included, against the book's recommended ten choices; gunboats exclude fighters."""
+    used: set[str] = set()
+    for ship, design in ships:
+        if ship.get("status") in ("destroyed", "hulk") or _alien(design):
+            continue
+        used |= techbase.design_techs(design, ship.get("loadout"), options)
+    used = techbase.with_prerequisites(used)
+    if not used:
+        return []
+    n = techbase.choices(used)
+    names = ", ".join(sorted(techbase.label(t) for t in used if techbase.TECH[t][1]))
+    issues = [Issue("tech_base", "info", _("Tech base: {n} technology choices ({names}).",
+                                           n=n, names=names))]
+    if n > techbase.LIMIT:
+        issues.append(Issue("tech_base_over", "violation", _(
+            "The tech base takes {n} technology choices; the limit is {limit}.",
+            n=n, limit=techbase.LIMIT)))
+    if used & techbase.GUNBOAT_TECHS and used & techbase.FIGHTER_TECHS:
+        issues.append(Issue("gunboats_and_fighters", "violation",
+                            _("An empire fielding gunboats may not also field fighters.")))
+    return issues
 
 
 def gunboat_label(key: str) -> str:

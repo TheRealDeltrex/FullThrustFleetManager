@@ -22,8 +22,7 @@ four rules engines (FB with the FB2 races, FT2 + More Thrust, FTCD, Cross Dimens
 FTPC, Project Continuum; the last two also field every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
 layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
 rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
-Cross Dimensions is complete. Project Continuum's design system, quick reference, turrets, gunboats and
-fighter racks are in; the Imperial tech base and monster ships are next. Releases follow
+Cross Dimensions is complete. Project Continuum is complete. Releases follow
 `.claude/skills/shipping-a-release/SKILL.md`.
 
 What exists:
@@ -501,6 +500,12 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   squadron of six per `gunboat_rack` or `boat_bay` (`common.GUNBOAT_CARRIER_TYPES`); a ruleset's
   `gunboat_types` / `gunboat_extras` properties drive the editor. Ruling: a squadron in a boat bay
   takes 24 craft MASS (MASS 4 a boat, p.80). FTL gunboat squadrons flying alone are not modelled.
+- The Imperial tech base (`techbase.py`, PC pp.125-127) is the fleet option `pc_tech_base`:
+  `design_techs()` maps systems, hull options and loadouts to technologies,
+  `with_prerequisites()` closes them, and `fleet_issues` reports the choices as an info and over
+  `LIMIT` (10, the book's recommendation) or gunboats beside fighters as violations.
+- A monster ship section is `hull_kind` "section" with `ship_mass` (the whole ship): its drives
+  and FTL are sized on that (`drive_basis`, p.116), and fleet rules don't treat it as a rider.
 - Options: `pc_optional_systems` (catapults, flawed design), `pc_adfc_no_mass`,
   `pc_hangar_criticals`, `pc_overload_torpedoes`, plus CD's. Fleet rules are CD's through
   `fleet_common.fleet_issues()`, except dummy bogeys need no option. The catalog is FB's adopted

@@ -595,3 +595,67 @@ def test_gunboats_survive_normalisation_on_a_design_and_a_ship():
                "gunboats": [{"carrier": "g", "type": "ads", "extras": ["heavy"], "ecm": 1}]}
     d = store.normalize_design(design(systems=[sys_("g", "gunboat_rack")], default_loadout=loadout))
     assert d["default_loadout"]["gunboats"] == loadout["gunboats"]
+
+
+# ---- The Imperial tech base (PC pp.125-127) ----------------------------------------------------
+
+
+def _tech_fleet(*designs_, options=None):
+    from test_fleet_rules import fleet, ship
+
+    ships = [ship(uid=f"s{i}", design_id=f"d{i}", table_id=f"T-{i}") for i in range(len(designs_))]
+    f = fleet(ruleset="ftpc", ships=ships, points_limit=0,
+              options={"pc_tech_base": True, **(options or {})})
+    report = fleet_rules.fleet_report(f, {f"d{i}": d for i, d in enumerate(designs_)})
+    return {i.code: i for i in report.fleet_issues}
+
+
+def nac_example() -> dict:
+    """PC p.127's New Anglian Confederation: twelve technology choices."""
+    return design(
+        tmf=200, hull_boxes=20, ftl=True, systems=[
+            sys_("b1", "beam", **{"class": 4, "arcs": ["F"]}),
+            sys_("g", "graser", **{"class": 1, "arcs": SIX}),
+            sys_("p", "pds"), sys_("s", "advanced_screen"), sys_("l", "sm_launcher", arcs=FRONT3),
+            sys_("m", "sm_magazine", capacity=2, feeds=["l"]), sys_("t", "pulse_torpedo", arcs=["F"]),
+            sys_("u", "submunition", arcs=FRONT3), sys_("h", "hangar_bay"), sys_("h2", "hangar_bay"),
+            sys_("lt", "launch_tube")],
+        default_loadout={"magazines": [{"magazine": "m", "salvos": ["std"]}], "fighters": [
+            {"hangar": "h", "type": "standard"}, {"hangar": "h2", "type": "torpedo"}]})
+
+
+def test_the_nac_example_takes_twelve_choices():
+    from rulesets.ftpc import techbase
+
+    used = techbase.with_prerequisites(techbase.design_techs(nac_example(), None, {}))
+    assert techbase.choices(used) == 12
+    issues = _tech_fleet(nac_example())
+    assert "12 technology choices" in issues["tech_base"].message
+    assert "tech_base_over" in issues
+
+
+def test_the_tech_base_is_a_fleet_option_and_free_systems_cost_nothing():
+    plain = design(tmf=50, hull_boxes=5, systems=[sys_("f", "fire_control"), sys_("a", "adfc"),
+                                                  sys_("h", "hold", mass=5)])
+    assert "tech_base" not in _tech_fleet(plain)
+    assert "tech_base" not in _tech_fleet(nac_example(), options={"pc_tech_base": False})
+    heavy = design(systems=[sys_("p", "phaser", **{"class": 1, "arcs": SIX})])
+    assert "3 technology choices" in _tech_fleet(heavy)["tech_base"].message   # beams, grasers
+
+
+def test_gunboats_and_fighters_do_not_mix_in_a_tech_base():
+    carrier = design(systems=[sys_("h", "hangar_bay"), sys_("t", "launch_tube"), sys_("g", "gunboat_rack")],
+                     default_loadout={"fighters": [{"hangar": "h", "type": "attack"}],
+                                      "gunboats": [{"carrier": "g", "type": "beam"}]})
+    assert "gunboats_and_fighters" in _tech_fleet(carrier)
+
+
+def test_a_monster_ship_section_sizes_its_drives_for_the_whole_ship():
+    # PC p.116: "the FTL Drive and main drive masses must be calculated for the entire ship".
+    drives = design(tmf=200, hull_boxes=20, thrust=2, ftl=True, hull_kind="section", ship_mass=600)
+    r = rows(drives)
+    assert (r["ftl"].mass, r["main_drive"].mass) == (60, 60)
+    rest = design(tmf=200, hull_boxes=20, hull_kind="section", ship_mass=600)
+    assert "no_ftl" not in infos(rest) and "mass_over_300" not in infos(rest)
+    assert PC.suggest_type(rest)[1] == "MS"
+    assert "riders_without_mothership" not in _tech_fleet(rest, options={"pc_tech_base": False})
