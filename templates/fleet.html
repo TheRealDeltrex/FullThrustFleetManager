@@ -291,7 +291,7 @@
             {% for g in selected.library_groups %}
               {% if selected.library_groups|length > 1 %}<optgroup label="{{ g.name }}">{% endif %}
               {% for d in g.designs %}
-                <option value="{{ d.id }}">{{ d.name }}{% if d.type_code %} ({{ d.type_code }}){% endif %} · {{ d.points }} {{ _("pts") }}</option>
+                <option value="{{ d.id }}"{% if d.id == last_design_id %} selected{% endif %}>{{ d.name }}{% if d.type_code %} ({{ d.type_code }}){% endif %} · {{ d.points }} {{ _("pts") }}</option>
               {% endfor %}
               {% if selected.library_groups|length > 1 %}</optgroup>{% endif %}
             {% endfor %}
