@@ -57,7 +57,9 @@ def test_the_web_build_boots_and_saves_a_fleet(site_url):
         form.locator('[name="name"]').fill("Web boot check")
         form.locator('[name="ruleset"]').select_option("ftpc")
         form.locator("button").last.click()
-        frame.locator("text=Web boot check").first.wait_for(timeout=60_000)
+        # The new fleet becomes the current one in the top bar's fleet selector.
+        frame.locator("option[selected]", has_text="Web boot check").first.wait_for(
+            state="attached", timeout=60_000)
         page.wait_for_function(
             "() => (localStorage.getItem('ftfm_library_v1') || '').includes('Web boot check')",
             timeout=30_000)
