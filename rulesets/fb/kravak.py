@@ -25,11 +25,13 @@ from rulesets.fb import data
 from rulesets.fb.rules import (
     _arcs,
     _hangar_label,
+    _hull_label,
     _int,
     _systems,
     cf_positions,
     crew_factors,
     damage_track,
+    hull_integrity_points,
     suggest_type,
     threshold_numbers,
 )
@@ -190,7 +192,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
 
     rows = [
         BreakdownRow("hull", _("Basic hull (MASS {n})", n=tmf), 0, tmf),
-        BreakdownRow("hull_integrity", _("Hull integrity ({n} boxes)", n=boxes), boxes, 2 * boxes),
+        BreakdownRow("hull_integrity", _hull_label(design, boxes), boxes, hull_integrity_points(design)),
     ]
     if armour:
         rows.append(BreakdownRow("armour", _("Armour ({n} boxes)", n=armour), armour, 2 * armour))
@@ -228,7 +230,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         # FB2 p.9: Kra'Vak may use up to ALL their thrust for course changes, not half.
         "turn_thrust": thrust,
         "hull_descriptor": _hull_descriptor(boxes, tmf),
-        "damage_track": split_rows(boxes, 4),
+        "damage_track": damage_track(design),
         "crew_factors": crew_factors(design),
         "cf_positions": cf_positions(design),
         "thresholds": threshold_numbers(design),

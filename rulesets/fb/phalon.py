@@ -28,11 +28,13 @@ from rulesets.fb import data
 from rulesets.fb.rules import (
     _arcs,
     _hangar_label,
+    _hull_label,
     _int,
     _systems,
     cf_positions,
     crew_factors,
     damage_track,
+    hull_integrity_points,
     suggest_type,
     threshold_numbers,
 )
@@ -267,7 +269,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
 
     rows = [
         BreakdownRow("hull", _("Basic hull (MASS {n})", n=tmf), 0, tmf),
-        BreakdownRow("hull_integrity", _("Hull integrity ({n} boxes)", n=boxes), boxes, 2 * boxes),
+        BreakdownRow("hull_integrity", _hull_label(design, boxes), boxes, hull_integrity_points(design)),
     ]
     if shell_mass:
         label = (
@@ -305,7 +307,7 @@ def design_breakdown(design: dict, options: dict) -> Breakdown:
         "drive_mass": drive_mass,
         "turn_thrust": thrust // 2 if thrust != 1 else 1,
         "hull_descriptor": _hull_descriptor(boxes, tmf),
-        "damage_track": split_rows(boxes, 4),
+        "damage_track": damage_track(design),
         "crew_factors": crew_factors(design),
         "cf_positions": cf_positions(design),
         "thresholds": threshold_numbers(design),
