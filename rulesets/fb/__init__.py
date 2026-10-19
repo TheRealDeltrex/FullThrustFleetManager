@@ -108,7 +108,8 @@ class FBRuleset:
             # every Sa'Vasku sheet whatever nodes the ship carries.
             always |= {"sv_power", "sv_thrust", "sv_biomass", "sv_repair"}
             wanted |= {f"sv_{t}" for t in systems_present}
-        return _quickref("fb", wanted, tuple(sorted(always)), options)
+        return (_quickref("fb", wanted, tuple(sorted(always)), options)
+                + star_ranger_quickref(systems_present, SR_KEYS))
 
 
 def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:
@@ -120,9 +121,26 @@ def _load_quickref(ruleset_id: str) -> list[QuickRefEntry]:
     except (OSError, ValueError):
         return []
     return [
-        QuickRefEntry(key=e["key"], title=e["title"], text=e["text"], book=e["book"], page=e["page"])
+        QuickRefEntry(key=e["key"], title=e["title"], text=e["text"], book=e["book"], page=e["page"],
+                      url=e.get("url", ""))
         for e in doc.get("entries", []) if isinstance(e, dict)
     ]
+
+
+def load_star_ranger_rules() -> list[QuickRefEntry]:
+    """Every Star Ranger rule the app keeps, for the in-app rules page."""
+    return _load_quickref("sr")
+
+
+def star_ranger_quickref(systems_present: set[str], keys: frozenset[str]) -> list[QuickRefEntry]:
+    """The Star Ranger rules (data/quickref/sr.json) for the `keys` among the systems present."""
+    wanted = set(systems_present) & keys
+    return [e for e in _load_quickref("sr") if e.key in wanted]
+
+
+# The Star Ranger entries each ruleset shows: FB has none of these systems in its books; PC
+# has its own long-range torpedo and heavy missiles.
+SR_KEYS = frozenset({"rocket_cannon", "amt", "hdc", "lrpt", "age_penalty", "sr_hull_rows"})
 
 
 def _quickref(ruleset_id: str, systems_present: set[str], keys_always: tuple[str, ...],

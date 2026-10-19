@@ -508,7 +508,15 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   option reprices their basic hull as it does a human one (PC p.140).
 - A holofield and a cloaking device each stand alone among `SCREENS_AND_FIELDS` (PC pp.60, 62);
   ECM is not in that set. A PC bay is one bay: `bays` is ignored in cost and capacity alike.
-- New design fields `hull_rows` (4/5/6: hull boxes x2/x1.5/x1; an advanced hull is three rows
+- Star Ranger systems PC lacks are in its picker as a "Star Ranger" group (`book="SR"`):
+  `rocket_cannon` (as a beam), `amt` (2/8), `hdc` ((class x 8) - 4, x3, one arc), `age_penalty`;
+  hull rows also offer 3 (x3; a hull of 3 boxes or fewer costs 2 a box). Adopted Star Ranger
+  designs swap `lrpt` for the long-range torpedo and `mt_missile` for a heavy missile
+  (`common.convert_star_ranger`; CD gets a class-2 torpedo). Their rules text is
+  `data/quickref/sr.json` (hand-kept from the site, `url` per entry, `QuickRefEntry.url`): FB and
+  PC quick references add it (`star_ranger_quickref`), `/rules/star-ranger` shows it all, and the
+  Design tab links a system to it.
+- New design fields `hull_rows` (3/4/5/6: hull boxes x3/x2/x1.5/x1; an advanced hull is three rows
   at x3 and ignores it), `stealth_hull` (0-2, +2/+4 a hull and armour box), `armour_regen`
   (+2 a box). Normalised in `store`; the Design tab draws them when `derived["pc_hull_options"]`.
   Rows past the third threshold on 4+.

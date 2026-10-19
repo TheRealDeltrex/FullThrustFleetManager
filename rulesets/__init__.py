@@ -85,6 +85,7 @@ class QuickRefEntry:
     text: str  # original rulebook wording, trimmed (PLAN 2.5)
     book: str
     page: int
+    url: str = ""  # where a web source (Star Ranger) prints it
 
 
 @runtime_checkable
