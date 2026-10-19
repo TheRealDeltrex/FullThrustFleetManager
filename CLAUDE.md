@@ -592,6 +592,8 @@ instance there); stop it by PID from the port, never by process name. The sessio
 `ftfm-dev-scratch` (in the parent folder's `.claude/launch.json`, outside the repo) does this
 on port 5123. Reach the server as `127.0.0.1`/`localhost`; other Host headers get 403.
 `FTFM_DEBUG=1` enables the Werkzeug debugger.
+`Start-Dev-Version.bat` is the owner's double-click launcher: it runs `app.py` on `PORT` (default
+5000) and opens the browser unless `FTFM_NO_BROWSER` is set.
 
 ## Rules sources
 
