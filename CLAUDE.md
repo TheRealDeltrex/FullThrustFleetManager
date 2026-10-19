@@ -22,7 +22,7 @@ four rules engines (FB with the FB2 races, FT2 + More Thrust, FTCD, Cross Dimens
 FTPC, Project Continuum; the last two also field every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
 layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
 rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
-Cross Dimensions is complete. Project Continuum's design system is in; its quick reference,
+Cross Dimensions is complete. Project Continuum's design system and quick reference are in;
 turrets, gunboats, fighter racks and the Imperial tech base are next. Releases follow
 `.claude/skills/shipping-a-release/SKILL.md`.
 
@@ -496,8 +496,11 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - Options: `pc_optional_systems` (catapults, flawed design), `pc_adfc_no_mass`,
   `pc_hangar_criticals`, `pc_overload_torpedoes`, plus CD's. Fleet rules are CD's through
   `fleet_common.fleet_issues()`, except dummy bogeys need no option. The catalog is FB's adopted
-  as `ftpc:` ids. `data/quickref/ftpc.json` does not exist yet, so the sheet only gets the FB2
-  race entries.
+  as `ftpc:` ids.
+- Quick reference: `PC_ENTRIES` in `tools/extract_quickref.py` name a PC **bookmark**; the text
+  runs to the next bookmark, on the pages the two point at (`PC_SPLIT_HEADINGS` for headings the
+  page breaks over two lines). `SHARED_ENTRIES` in `rulesets/ftpc/__init__.py` maps systems
+  described together; `pdf_export` adds `armour_regen` and `stealth_hull` for those hull options.
 
 ## Catalog
 

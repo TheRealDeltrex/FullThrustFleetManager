@@ -167,9 +167,14 @@ def quickref_entries():
                                        # Cross Dimensions only
                                        "graser", "advanced_screen", "shell_armour", "scattergun",
                                        "heavy_missile", "superior_sensors", "weasel_capital",
-                                       "area_ecm", "minelayer", "minesweeper"},
+                                       "area_ecm", "minelayer", "minesweeper",
+                                       # Project Continuum: every system, and the hull options
+                                       *(d.type for d in ruleset.system_types("human", {})),
+                                       "armour_regen", "stealth_hull", "no_ftl", "starbase",
+                                       "dummy_bogeys"},
                                       {"core_systems": True, "rerolls": True,
-                                       "vector_movement": True}):
+                                       "vector_movement": True, "fighter_endurance": True,
+                                       "pc_hangar_criticals": True}):
             yield ruleset.id, entry
         # Each race brings its own entries, from its own pages (FB2's Kra'Vak section repeats
         # FB1's headings, so a wrong page reference here is a real risk).
