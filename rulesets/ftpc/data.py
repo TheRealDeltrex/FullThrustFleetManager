@@ -88,7 +88,7 @@ HULL_KINDS = ("warship", "merchant", "starbase", "section")
 
 # PC p.108: four rows is the warship norm, five old or civilian ships, six bulk carriers and the
 # like; an advanced hull (p.108) has three. Points per hull box for each.
-HULL_ROW_CHOICES = (4, 5, 6)
+HULL_ROW_CHOICES = (3, 4, 5, 6)  # 3: Star Ranger (UNSC page)
 
 # PC p.106: escorts up to MASS 44, cruisers up to 90, capitals above; 300 suggested at most.
 ESCORT_MAX, CRUISER_MAX, MAX_MASS = 44, 90, 300
@@ -146,6 +146,7 @@ def system_defs() -> list[SystemDef]:
             _("Crew and boarding"),
             _("Holds and special systems"),
         )
+    star_ranger = _("Star Ranger")
     six = ["F", "FS", "AS", "A", "AP", "FP"]
     arcs_1 = ParamDef("arcs", "arcs", _("Arcs"), ["F"], 1, 1)
     arcs_3 = ParamDef("arcs", "arcs", _("Arcs"), ["FP", "F", "FS"], 1, 3)
@@ -287,4 +288,14 @@ def system_defs() -> list[SystemDef]:
         SystemDef("ortillery", _("Ortillery system"), other, **ref(113)),
         SystemDef("shipyard", _("Shipyard"), other, (mass(_("MASS"), 50),), **ref(111)),
         SystemDef("flawed_design", _("Flawed design"), other, **ref(113)),
+        # Star Ranger's published systems PC lacks (fullthrust.star-ranger.com); their rules
+        # are in data/quickref/sr.json and on the in-app Star Ranger rules page.
+        SystemDef("rocket_cannon", _("Rocket cannon"), star_ranger, (cls(6), arcs_six), book="SR"),
+        SystemDef("amt", _("Anti-matter torpedo"), star_ranger, book="SR"),
+        SystemDef("compact_superior_sensors", _("Compact superior sensors"), star_ranger,
+                  book="SR"),
+        SystemDef("hdc", _("Hyperspatial distortion cannon"), star_ranger, (cls(3), arcs_1),
+                  book="SR"),
+        SystemDef("age_penalty", _("MASS lost to age"), star_ranger, (mass(_("MASS"), 1),),
+                  book="SR"),
     ]

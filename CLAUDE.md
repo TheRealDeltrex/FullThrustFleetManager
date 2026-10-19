@@ -406,6 +406,14 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `tender_bay` {capacity = MASS carried}, `minelayer` {mines}, `tug_drive` {tow_mass}, `hold`
   {kind cargo|passenger|troop|lab, mass}; no params: `pds`, `fire_control`, `adfc`,
   `mt_missile`, `ortillery`, `minesweeper`, `reflex_field`, `cloak`.
+- FB types only the Star Ranger catalog uses (not in the picker; `rules.SYSTEM_RULES`): `emp` and
+  `rocket_cannon` {class, arcs} cost as a beam; `graser` {class, arcs, no_reroll} (CD mass table,
+  x4, x3 without reroll); `hdc` {class, one arc}; `lrpt` {arcs}; `amt`, `superior_sensors`;
+  `age_penalty` {mass} is MASS lost to age at 0 points. FB designs may also carry `hull_rows`
+  3/4/5/6 (boxes x3/x2/x1.5/x1; Star Ranger; a hull of 3 boxes or fewer always costs 2 a box) and `stealth_hull` 1-2 (+2/+4 a hull and armour box).
+  **The Fleet Books are closed (owner's ruling; CD too, only PC takes additions):** these are
+  costed only so the gate can check the Star Ranger pages, and `FBRuleset.validate_design`
+  flags each as `not_in_books`, a violation.
 - Rules code treats designs as semi-untrusted: bad numbers read as defaults (`_int`), unknown
   types cost nothing and raise a violation. Nothing in a ruleset raises on a malformed design.
 - Labels and issue messages are translated at call time (`system_defs()` is a function for that
@@ -511,7 +519,17 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   option reprices their basic hull as it does a human one (PC p.140).
 - A holofield and a cloaking device each stand alone among `SCREENS_AND_FIELDS` (PC pp.60, 62);
   ECM is not in that set. A PC bay is one bay: `bays` is ignored in cost and capacity alike.
-- New design fields `hull_rows` (4/5/6: hull boxes x2/x1.5/x1; an advanced hull is three rows
+- Star Ranger systems PC lacks are in its picker as a "Star Ranger" group (`book="SR"`),
+  `compact_superior_sensors` (2/30, beside PC's 4/16 superior sensors; owner's call) among them:
+  `rocket_cannon` (as a beam), `amt` (2/8), `hdc` ((class x 8) - 4, x3, one arc), `age_penalty`;
+  hull rows also offer 3 (x3; a hull of 3 boxes or fewer costs 2 a box). Adopted Star Ranger
+  designs swap `lrpt` for the long-range torpedo, `mt_missile` for a heavy missile and superior
+  sensors for the compact kind
+  (`common.convert_star_ranger`; CD gets a class-2 torpedo). Their rules text is
+  `data/quickref/sr.json` (hand-kept from the site, `url` per entry, `QuickRefEntry.url`): FB and
+  PC quick references add it (`star_ranger_quickref`), `/rules/star-ranger` shows it all, and the
+  Design tab links a system to it.
+- New design fields `hull_rows` (3/4/5/6: hull boxes x3/x2/x1.5/x1; an advanced hull is three rows
   at x3 and ignores it), `stealth_hull` (0-2, +2/+4 a hull and armour box), `armour_regen`
   (+2 a box). Normalised in `store`; the Design tab draws them when `derived["pc_hull_options"]`.
   Rows past the third threshold on 4+.
@@ -551,7 +569,14 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   vessels), `fb_fb2_kravak.json` (FB2 pp.12-19, 15 Kra'Vak warships and 1 merchant),
   `fb_fb2_savasku.json` (FB2 pp.26-32, 14 Sa'Vasku constructs),
   `fb_fb2_phalon.json` (FB2 pp.38-45, 15 Phalon classes),
-  `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs).
+  `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs),
+  `fb_starranger.json` (337 designs from fullthrust.star-ranger.com, GZG-sanctioned interim
+  stats: the FB1/FB2 powers plus ten human factions IJSF to OUDF; book "SR", page 0,
+  `source.url` the page; `npv_book` 0 where the page prints none, then the gate checks only
+  legality). Written by `tools/extract_catalog_starranger.py`, whose tables put counts first as
+  the pages do. FB lists, and CD and PC adopt, a Star Ranger design only where it is legal
+  unchanged under that ruleset (`store._adoptable`; FB 178, CD 232, PC 329 of 337); the Design tab groups them as "Star Ranger" and links the NPV chip to the
+  page (`common.WEB_SOURCES`).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
   hold the curated ship tables and write the JSON; fix a ship there and re-run. The notation is
@@ -563,8 +588,10 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   facing, submunitions, merchants, all of FT and MT) from rendered page images. FT2 beam pointers:
   up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
 - `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
-  139 of the 141 match their printed NPV; the two errata entries are the FT p.31 design example
-  and the FB2 p.18 Do'San.
+  139 of the 141 book designs match their printed NPV; the two errata entries are the FT p.31
+  design example and the FB2 p.18 Do'San. 49 Star Ranger designs are in errata too: 28 small
+  hulls the pages price at 3 a box, the rest page misprints or systems the page leaves out (two
+  IF pulse torpedoes break FB1's three-arc limit).
 - **Sa'Vasku and Phalon arcs come off the vector SSDs**, unlike Kra'Vak's. `ssd_arcs.py` has one
   reader per icon shape: `rings()` (human beams and Sa'Vasku stinger nodes), `pies()` (SM
   launchers and racks), `arrows()` (a Sa'Vasku pod launcher's arrowhead beside its cogged disc)

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "note": "Built-in factions per ruleset. Names from the FB1 fleet chapters (pp.13, 20, 27, 34); FB1 prints 'Federal Stats Europa', a typo for States. FB2's alien races have no factions of their own, so each race gets the one its ship pages are headed with (FB2 pp.12-19). Cross Dimensions (CD p.58) names the same four powers, so ftcd repeats FB1's human factions, and FB2's alien ones since CD p.21 takes the FB2 races over. Project Continuum's examples are the same powers (PC p.127), so ftpc repeats the ftcd list. Each faction names its race, so a faction picker can leave out other races' factions.",
+  "note": "Built-in factions per ruleset. Names from the FB1 fleet chapters (pp.13, 20, 27, 34); FB1 prints 'Federal Stats Europa', a typo for States. FB2's alien races have no factions of their own, so each race gets the one its ship pages are headed with (FB2 pp.12-19). Cross Dimensions (CD p.58) names the same four powers, so ftcd repeats FB1's human factions, and FB2's alien ones since CD p.21 takes the FB2 races over. Project Continuum's examples are the same powers (PC p.127), so ftpc repeats the ftcd list. Each faction names its race, so a faction picker can leave out other races' factions. The other human factions (IJSF to OUDF) come from the Star Ranger pages (fullthrust.star-ranger.com), which GZG sanctioned; their Fleet Book designs carry over to ftcd and ftpc like FB1's.",
   "factions": {
     "fb": [
       {
@@ -21,6 +21,56 @@
       {
         "id": "ESU",
         "name": "Eurasian Solar Union",
+        "race": "human"
+      },
+      {
+        "id": "IJSF",
+        "name": "Imperial Japanese Star Fleet",
+        "race": "human"
+      },
+      {
+        "id": "NI",
+        "name": "New Israel",
+        "race": "human"
+      },
+      {
+        "id": "UNSC",
+        "name": "United Nations Space Command",
+        "race": "human"
+      },
+      {
+        "id": "ORC",
+        "name": "Outer Rim Coalition",
+        "race": "human"
+      },
+      {
+        "id": "ScanFed",
+        "name": "Scandinavian Federation",
+        "race": "human"
+      },
+      {
+        "id": "FCT",
+        "name": "Free Cal-Tex",
+        "race": "human"
+      },
+      {
+        "id": "RAV",
+        "name": "Ravagers (Rim Pirates)",
+        "race": "human"
+      },
+      {
+        "id": "CR",
+        "name": "Crusty",
+        "race": "human"
+      },
+      {
+        "id": "IF",
+        "name": "Islamic Federation",
+        "race": "human"
+      },
+      {
+        "id": "OUDF",
+        "name": "Oceanic Union Defence Force",
         "race": "human"
       },
       {
@@ -83,6 +133,56 @@
         "race": "human"
       },
       {
+        "id": "IJSF",
+        "name": "Imperial Japanese Star Fleet",
+        "race": "human"
+      },
+      {
+        "id": "NI",
+        "name": "New Israel",
+        "race": "human"
+      },
+      {
+        "id": "UNSC",
+        "name": "United Nations Space Command",
+        "race": "human"
+      },
+      {
+        "id": "ORC",
+        "name": "Outer Rim Coalition",
+        "race": "human"
+      },
+      {
+        "id": "ScanFed",
+        "name": "Scandinavian Federation",
+        "race": "human"
+      },
+      {
+        "id": "FCT",
+        "name": "Free Cal-Tex",
+        "race": "human"
+      },
+      {
+        "id": "RAV",
+        "name": "Ravagers (Rim Pirates)",
+        "race": "human"
+      },
+      {
+        "id": "CR",
+        "name": "Crusty",
+        "race": "human"
+      },
+      {
+        "id": "IF",
+        "name": "Islamic Federation",
+        "race": "human"
+      },
+      {
+        "id": "OUDF",
+        "name": "Oceanic Union Defence Force",
+        "race": "human"
+      },
+      {
         "id": "KV",
         "name": "Kra'Vak Dominion Star Forces",
         "race": "kravak"
@@ -117,6 +217,56 @@
       {
         "id": "ESU",
         "name": "Eurasian Solar Union",
+        "race": "human"
+      },
+      {
+        "id": "IJSF",
+        "name": "Imperial Japanese Star Fleet",
+        "race": "human"
+      },
+      {
+        "id": "NI",
+        "name": "New Israel",
+        "race": "human"
+      },
+      {
+        "id": "UNSC",
+        "name": "United Nations Space Command",
+        "race": "human"
+      },
+      {
+        "id": "ORC",
+        "name": "Outer Rim Coalition",
+        "race": "human"
+      },
+      {
+        "id": "ScanFed",
+        "name": "Scandinavian Federation",
+        "race": "human"
+      },
+      {
+        "id": "FCT",
+        "name": "Free Cal-Tex",
+        "race": "human"
+      },
+      {
+        "id": "RAV",
+        "name": "Ravagers (Rim Pirates)",
+        "race": "human"
+      },
+      {
+        "id": "CR",
+        "name": "Crusty",
+        "race": "human"
+      },
+      {
+        "id": "IF",
+        "name": "Islamic Federation",
+        "race": "human"
+      },
+      {
+        "id": "OUDF",
+        "name": "Oceanic Union Defence Force",
         "race": "human"
       },
       {

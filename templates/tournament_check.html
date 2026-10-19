@@ -11,7 +11,7 @@
     </div>
 
     <div class="panel">
-      <h3>{{ _("Fleet") }}</h3>
+      <h3 class="fold" data-fold="tournament-fleet" tabindex="0">{{ _("Fleet") }}</h3>
       <div class="body">
         <p>{{ _("{used} points", used=report.points) }}{% if fleet.points_limit %} / {{ fleet.points_limit }}{% endif %}</p>
         {% if report.fleet_issues %}
@@ -26,7 +26,7 @@
 
     {% for ship_report in report.ships %}
       <div class="panel">
-        <h3>{{ ship_report.ship.table_id }} · {{ ship_report.ship.name }}
+        <h3 class="fold" data-fold="tournament-ship-{{ ship_report.ship.uid }}" tabindex="0">{{ ship_report.ship.table_id }} · {{ ship_report.ship.name }}
           {% if not ship_report.conforming %}<span class="chip bad">{{ _("Non-conforming") }}</span>{% endif %}</h3>
         <div class="body">
           {% if ship_report.design %}

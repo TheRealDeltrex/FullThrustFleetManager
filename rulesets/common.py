@@ -78,6 +78,41 @@ def cf_positions(boxes: int, crew_factors: int) -> list[int]:
     return [min(i * step, boxes) for i in range(1, crew_factors)] + [boxes]
 
 
+# Catalog sources that are not rulebooks: web pages a design links to by its source url.
+WEB_SOURCES = {"SR": "Star Ranger"}
+
+
+def source_ref(source: dict) -> str:
+    """Where a catalog design is printed: "FB1 p.16", or a web source's name."""
+    book = str(source.get("book") or "")
+    if book in WEB_SOURCES:
+        return WEB_SOURCES[book]
+    return f"{book} p.{source.get('page')}"
+
+
+def convert_star_ranger(design: dict, long_torpedo: dict, superior_sensors: str = "") -> list[str]:
+    """A Star Ranger design's systems in the CD and PC terms that equal them; the notes it adds.
+    The long-range pulse torpedo (MASS 8 +2 an arc, 3 a MASS) is CD's class-2 torpedo and PC's
+    long-range one (`long_torpedo` holds the fields), the IF heavy missile rack (2 MASS, 6
+    points, one shot) their standard heavy missile. Star Ranger's superior sensors (2 MASS, 30)
+    become `superior_sensors` where the ruleset has that compact kind beside its own."""
+    if (design.get("source") or {}).get("book") != "SR":
+        return []
+    changes = []
+    for s in systems_of(design):
+        if s.get("type") == "lrpt":
+            s.update({"type": "pulse_torpedo", **long_torpedo})
+            if "torpedo" not in changes:
+                changes.append("torpedo")
+        elif s.get("type") == "superior_sensors" and superior_sensors:
+            s["type"] = superior_sensors
+        elif s.get("type") == "mt_missile":
+            s.update({"type": "heavy_missile", "load": "std", "arcs": ["FP", "F", "FS"]})
+            if "missile" not in changes:
+                changes.append("missile")
+    return changes
+
+
 # ---- Reading stored designs ---------------------------------------------------------------------
 
 

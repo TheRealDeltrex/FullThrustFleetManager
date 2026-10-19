@@ -23,11 +23,14 @@ def png():
 
 
 def test_every_official_design_has_unique_art_and_adoptions_share_it():
-    originals = []
+    originals, not_yet_drawn = [], []
     for file in (paths.bundle_dir() / "data/catalog").glob("*.json"):
-        originals.extend(json.loads(file.read_text(encoding="utf-8"))["designs"])
+        designs = json.loads(file.read_text(encoding="utf-8"))["designs"]
+        # Star Ranger designs have no art of their own yet and fall back to their class picture.
+        (not_yet_drawn if file.name == "fb_starranger.json" else originals).extend(designs)
     resolved = [portraits.resolve(d, {}) for d in originals]
     assert len({(a["file"], a["cell"]) for a in resolved}) == len(originals) == 141
+    assert all(portraits.resolve(d, {}) for d in not_yet_drawn)
     for d in originals:
         if d["ruleset"] == "fb":
             for rs in ("ftcd", "ftpc"):

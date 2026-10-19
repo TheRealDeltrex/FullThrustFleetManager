@@ -1,0 +1,70 @@
+{
+ "schema_version": 1,
+ "note": "Rules from the Star Ranger pages (fullthrust.star-ranger.com) for the systems the catalog's Star Ranger designs use, kept here in case the site goes away. Page wording, trimmed; the HDC entry is condensed from the IJSF page, whose text could not be copied whole.",
+ "entries": [
+  {
+   "key": "rocket_cannon",
+   "title": "Rocket cannon",
+   "url": "https://fullthrust.star-ranger.com/CRstats.htm",
+   "text": "Rocket Cannons are a family of weapon systems firing semi-guided rocket-propelled explosive projectiles. Their shots are small enough to bypass point defense fire and at closer ranges unused fuel adds to their damage, but their low speed (compared to a beam or hypervelocity K-Gun round) makes hitting rapidly-maneuvering targets difficult. Cannons come in variety of graded classes just like beams do with the same mass, cost, arcs and range bands as a beam battery of the same size. Level 1 Rocket Cannons can target fighters the same way a beam battery does. Rocket cannons roll to attack the same way the beam batteries do and are not effected by screens, but the die rolls are modified by the amount of thrust the target ship used during that turn: Target's thrust 0-2: +1 results (1-2: 0 dmg, 3-5: 1 dmg, 6: 2 dmg + reroll). 3-4: none (1-3: 0 dmg, 4-5: 1 dmg, 6: 2 dmg + reroll). 5-6: same as Lvl 1 screens (1-4: 0 dmg, 5: 1 dmg, 6: 2 dmg + reroll). 7+: same as Lvl 2 screens (1-4: 0 dmg, 5: 1 dmg, 6: 1 dmg + reroll). Any roll of 6 results in a reroll with the same modifications, representing a lucky hit with the potential to do more damage. \"Target's Thrust\" refers to the amount of thrust used by the the target in the current turn's movement plot, which may be less than the ship's current main drive thrust rating. Ships with Advanced Drives treat their effective thrust as being 1 point higher for purposes of cannon fire, making them noticeably harder to hit. Damage is scored against armor first, then hull, but (as with beams) any damage resulting from a reroll penetrates armor and strikes the hull instead (or the next layer of a Phalon shell, if any).",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "amt",
+   "title": "Anti-matter torpedo (AMT)",
+   "url": "https://fullthrust.star-ranger.com/UNSCstats.htm",
+   "text": "A one turn missile armed with an anti-matter warhead. The Anti-Matter Torpedo is a single shot weapon of Mass 2 and Cost 8. It is a placed-marker weapon (fired in missile phase) like Salvo Missiles with a Range of 18mu. AMTs can be fired in a 180 arc centered on the direction that the icon faces. After the ship movement phase, the AMT moves up to 6mu (3mu in vector) from the marker towards nearest target before detonating. On detonation, all ships within 1mu of marker take 3D6 damage, within 2mu 2D6, within 3mu 1D6. Non-penetrating, ie: damage comes off armour first. PDS on ships in area effect may attempt to attack the AMT, succeeding on a 6 which reduces the radius, minus 1mu and dice damage, minus a D6 rolled for damage, for each 6 rolled (for example: A PDS rolls a 6 verses a AMT, this reduces the effect to 2D6 within 1mu of the marker, 1D6 within 2mu and there is now no effect from 2mu to 3mu). Any fighters within the range of effect are destroyed. A scattergun fired at an AMT removes 1D3-1 \"levels\". Fighters may wish to attack the AMT and to do this they must close to contact with the AMT and roll as per PDS. AMTs have the same effects as Plasma Bolts vs Screens, Vapour Shrouds etc (level-1 screens negate any rolls of 6, level-2 screens and Vapour Shrouds negate all rolls of 5 or 6).",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "compact_superior_sensors",
+   "title": "Compact superior sensors",
+   "url": "https://fullthrust.star-ranger.com/IJSFstats.htm",
+   "text": "Shoya class Sensor Picket: \"Superior Sensors (rated as 2 mass, 30 points)\". The New Israeli Nitznutz Spyship carries the same rating. Played as superior sensors.",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "hdc",
+   "title": "Hyperspatial distortion cannon (HDC)",
+   "url": "https://fullthrust.star-ranger.com/IJSFstats.htm",
+   "text": "A spinal-mount weapon; it can fire within the 30-degree arc centred on the line along which it's mounted (almost always forward). Mass = 4 for class 1, 12 for class 2, 20 for class 3; in general, (class x 8)-4. Cost = mass x 3. Firing must be plotted in the movement orders and, once plotted, carried out; it fires during the ship's activation in the normal fire phase. On a turn it fires, the ship's fire directors and sensors shut down: no point defence or anything needing target identification (fire control, missiles); it may manoeuvre and launch fighters but not recover them. The HDC needs no fire control, and several may fire in one turn. A player may keep systems running while firing, but the outward-facing systems used are then damaged after the shot (a desperation tactic). Its power requirement lets it fire only every other turn. If the HDC is damaged, it immediately does damage equal to twice its class number directly to the hull. Wavefront: on the turn of firing, a triangle from the firing ship with a total length of 24MU, and a width of 2MU at its wide end; each later turn it moves 24MU further out and widens by 2MU, the same for every class. Units entering it from its front, or that it passes over during the Ships Fire phase, are hit; units moving through it from behind are not. Initial damage level of the wavefront is (class x 2) dice, 2 dice fewer each turn after firing, affected by screens and armour as a Phalon PB. Fighters and missiles in the template are destroyed automatically.",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "lrpt",
+   "title": "Long-range pulse torpedo (LRPT)",
+   "url": "https://fullthrust.star-ranger.com/NIstats.htm",
+   "text": "Identical to a standard pulse torpedo in weapon mechanics, but with longer range. This heavy weapon is currently experimental in several fleets. The Long range Pulse Torp has Mass 8 and Cost 24. Extra arcs are Mass 2 and Cost 6 each. It is fired just like a standard pulse torp, but its Range bands are 9mu each.",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "sr_heavy_missile",
+   "title": "Heavy missiles (IF)",
+   "url": "https://fullthrust.star-ranger.com/IFstats.htm",
+   "text": "These missiles are larger than individual Salvo Missiles, and have either longer endurance or a more powerful warhead. Heavy Missiles have a primary movement range, like fighters, except that it is always 18mu for HMs. HMs have an endurance factor of 1 to 5 (depending on type), similar to the combat endurance factor of fighters. Unlike fighters, HMs must burn 1 point of endurance to make a primary move. HMs are launched during Phase 4) LAUNCH ORDNANCE. After their first turn of flight, HMs are moved at the BEGINNING of Phase 3) MOVE FIGHTER GROUPS, i.e. before the fighters move. This means that fighters will be able to use their free primary movement to intercept heavy missiles, except on the turn the missile is launched. HM attacks are allocated during Phase 6) ALLOCATE ORDNANCE AND FIGHTER ATTACKS. Any HM may expend one endurance point to make a secondary move of 6mu (3 in vector)--typically this is done to get more range, or to move so that the \"closest target\" is the one the player wants his HM to attack. After completing any secondary movement, a HM within 6mu (3mu in vector) of an enemy target will attack the nearest enemy target, just like a salvo missile. A fighter group may attempt to intercept a HM as if it were a salvo missile salvo with only 1 missile (see Fleet Book 1, p. 6). Heavy Missiles can be defended against using point defense fire during Phase 7) POINT DEFENCE FIRE. A single PDS can destroy 1 HM a roll of 4+ on 1D6. A Kra'Vak Scattergun or Sa'Vas'Ku Interceptor Pod will automatically kill 1 HM. Screening fighters or Class-1 Beam Batteries or K-guns will kill 1 missile on a roll of 5+. Any HMs that survive phase 7 now attack their targets, inflicting damage that depends upon the missile type. Half of the damage is scored on ARMOUR (round up), while the remainder is scored on HULL (or the next armour layer in, for layered shells). After the attacks have been resolved, any HMs that have exhausted their endurance factors and are out of attack range of any viable targets are removed from play. Missile type / endurance / damage: Long Lance 5, 1d6; Standard 3, 2d6; Misercorde 1, 3d6; EMP 1, see notes. EMP missiles do not cause hull damage but can temporarily disable ship systems. For each HM-EMP that attacks, roll 1d6, subtract the target's screen level, and divide by two (round down). The result is the number of \"EMP hits\" done by that missile. The maximum effect for any number of HM-EMP attacks on one target in one turn is three EMP hits. If HMLs are used, the launcher itself takes 2 MASS and costs 6 points. For either of the reusable launcher options (SML with HMs or HML), each HM carried in the internal magazine takes up 1 MASS and costs 3 points. An external HMR takes 2 MASS for the complete rack plus missile, and costs 6 points.",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "age_penalty",
+   "title": "MASS lost to age",
+   "url": "https://fullthrust.star-ranger.com/NACfbr.htm",
+   "text": "Older and outdated classes may have a mass penalty in the ship designs to account for older less efficient systems compared the to the current tech level of 'modern' ships in that fleet.",
+   "book": "SR",
+   "page": 0
+  },
+  {
+   "key": "sr_hull_rows",
+   "title": "Variable hull rows",
+   "url": "https://fullthrust.star-ranger.com/UNSCstats.htm",
+   "text": "Not all ships have the same hull integrity, not just with regard to how much mass they put into their hull, but also how well this stands up in a fight before systems start being effected. To simulate this you can arrange hull boxes in more/fewer than the standard 4 rows. 3 hull rows - Hull costs 3xMass; takes only the 6+ and 5+ thresholds before dying. 4 hull rows - Hull costs 2xMass (Fleet Book standard); takes the 6+, 5+ and 4+ threshold checks. 5 hull rows - Hull costs 1.5xMass; takes the 6+, 5+, 4+ and 3+ thresholds. 6 hull rows - Hull costs 1xMass; takes the 6+, 5+, 4+, 3+ and 2+ threshold checks.",
+   "book": "SR",
+   "page": 0
+  }
+ ]
+}

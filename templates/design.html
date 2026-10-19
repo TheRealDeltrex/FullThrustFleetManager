@@ -121,7 +121,9 @@
         <span class="muted">{{ d.type_label }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</span>
         {% if selected.npv_book %}
           <span class="chip info">{{ _("Book NPV {n}", n=selected.npv_book) }}
-            {% if d.source.book %}
+            {% if d.source.url %}
+              · <a href="{{ d.source.url }}" target="_blank" rel="noopener">{{ selected.source_name or d.source.book }}</a>
+            {% elif d.source.book %}
               {# The page reference opens the bundled rulebook at that page (PLAN 12). #}
               · <a href="{{ book_url(d.source.book|upper, d.source.page) }}"
                    >{{ d.source.book|upper }} p.{{ d.source.page }}</a>
@@ -157,7 +159,7 @@
       <form method="post" action="{{ url_for('design_update', design_id=d.id) }}" class="workbench"
             data-autosave="autosave" {% if selected.read_only %}inert{% endif %}>
         <div class="panel">
-          <h3>{{ _("Hull and drives") }}</h3>
+          <h3 class="fold" data-fold="design-hull" tabindex="0">{{ _("Hull and drives") }}</h3>
           <div class="body grid-fields">
             <label>{{ _("Name") }}<input class="input" name="name" value="{{ d.name }}" /></label>
             <label>{{ _("Type") }}<input class="input" name="type_label" value="{{ d.type_label }}" /></label>
@@ -248,7 +250,7 @@
         </div>
 
         <div class="panel">
-          <h3>{{ _("Systems") }}</h3>
+          <h3 class="fold" data-fold="design-systems" tabindex="0">{{ _("Systems") }}</h3>
           <table class="tbl">
             <thead>
               <tr><th>{{ _("System") }}</th><th>{{ _("Settings") }}</th><th class="num">{{ _("MASS") }}</th>
@@ -258,7 +260,8 @@
               {% for row in selected.breakdown.rows %}
                 {% set system = (d.systems | selectattr('uid', 'equalto', row.system_uid) | list | first) if row.system_uid else None %}
                 <tr>
-                  <td>{{ row.label }}</td>
+                  <td>{{ row.label }}{% if system and system.type in selected.sr_rules %}
+                    <a class="muted" href="{{ url_for('star_ranger_rules') }}#{{ system.type }}">SR</a>{% endif %}</td>
                   <td class="arcs">
                     {% if system %}
                       {# Settings (a beam's class, a rack's load) first, then the arcs: a weapon
@@ -367,7 +370,7 @@
         {% set gunboat_carriers = (d.systems | selectattr('type', 'in', GUNBOAT_CARRIER_TYPES) | list) if selected.gunboat_types else [] %}
         {% if carriers or magazines or pulsers or gunboat_carriers %}
           <div class="panel">
-            <h3>{{ _("Default loadout") }}</h3>
+            <h3 class="fold" data-fold="design-loadout" tabindex="0">{{ _("Default loadout") }}</h3>
             <div class="body stack">
               {% if selected.breakdown.derived.rich_loadout %}
                 {# Cross Dimensions: a row per fighter group (CD p.30 extras and swing roles), light
@@ -509,7 +512,7 @@
         {% endif %}
 
         <div class="panel">
-          <h3>{{ _("Notes") }}</h3>
+          <h3 class="fold" data-fold="design-notes" tabindex="0">{{ _("Notes") }}</h3>
           <div class="body"><textarea class="input wide" name="notes" rows="3">{{ d.notes }}</textarea></div>
         </div>
 
@@ -542,11 +545,11 @@
   {# ---- Right: SSD, budget, issues ---- #}
   <aside class="side-col">
     <div class="panel">
-      <h3>{{ _("Ship diagram") }}</h3>
+      <h3 class="fold" data-fold="design-diagram" tabindex="0">{{ _("Ship diagram") }}</h3>
       <div class="body ssd-wrap">{% if selected %}{{ selected.svg }}{% else %}<span class="muted">&ndash;</span>{% endif %}</div>
     </div>
     <div class="panel">
-      <h3>{{ _("Budget") }}</h3>
+      <h3 class="fold" data-fold="design-budget" tabindex="0">{{ _("Budget") }}</h3>
       <div class="body">
         {% if selected %}
           <div class="meter light">
@@ -562,7 +565,7 @@
       </div>
     </div>
     <div class="panel">
-      <h3>{{ _("Issues") }}</h3>
+      <h3 class="fold" data-fold="design-issues" tabindex="0">{{ _("Issues") }}</h3>
       <div class="body">
         {% if selected and selected.issues %}
           <ul class="issues">
