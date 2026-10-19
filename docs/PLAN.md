@@ -75,7 +75,7 @@ Two builds of the same code:
 | 3 | v1 races | Human only in v1. Tech-module structure in place so each alien race is additive; after v1 the FB ruleset gained Kra'Vak this way (`rulesets/fb/tech.py`) |
 | 4 | Rulesets | Selectable **FT2, FB, FTCD, FTPC** |
 | 5 | Ruleset scope | Per fleet, fixed at creation; designs belong to one ruleset; very visible everywhere |
-| 6 | v1 rulesets | **FB + FT2**. FTCD and FTPC after v1 works; FTCD (human tech) is done |
+| 6 | v1 rulesets | **FB + FT2**. FTCD and FTPC after v1 works; FTCD is done, FTPC's design system is built |
 | 7 | Stack | New repo; copy and adapt Frostgrave infrastructure; Frostgrave's 4-layer architecture |
 | 8 | Design storage | Global library per ruleset; fleets reference designs; catalog designs read-only (editing makes a variant); editing a used design asks "refit all N ships" or "save as variant" |
 | 9 | Campaign | v1 = fleet-level bookkeeping; data shaped to grow into a full optional campaign module (map, invented rules allowed, random campaign generator) |
@@ -469,6 +469,19 @@ lost against half the fleet's MASS (CD p.40); and quick-reference entries for th
 What CD leaves to the table (movement, terrain, planets, ramming, hyperspace battles) needs no
 data and is not modelled.
 
+**FTPC's design system is built** (`rulesets/ftpc/`, October 2026): the PC section 13 costing
+(summary pp.118-124) for about 80 systems with the 2017 errata folded in, the FB2 races unchanged
+(the errata: nothing in PC invalidates FB1 or FB2), the Fleet Book catalog adopted as CD does,
+and CD's fleet-level rules shared through `rulesets/fleet_common.py`. Golden test: the PC
+pp.113-114 heavy cruiser, MASS 86 = **294 points**. Judgment calls, recorded in
+`rulesets/ftpc/rules.py`: streamlining costs 2 a MASS (p.109's text; the p.118 table says 0);
+a class-2 beam on a broadside pair of arcs is 1 MASS (pp.36, 120); rows past the third keep
+checking on 4+ (p.32); multi-arc weapons need not be contiguous (p.45); advanced FTL is paid x3
+whenever it is chosen (p.108); dummy bogeys are not behind an option (p.95). Under PC the FB1
+Tibet costs 159, not 162, because PC screens have no minimum MASS (p.56). Still to come: the PC
+quick reference, turrets, gunboats and fighter racks, the remaining fighter kinds, monster
+ships and the Imperial tech base (pp.125-127).
+
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
 errata of 26 April 2017; text layers present). Both need the rulebook treatment first
@@ -773,7 +786,8 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    **all done** (6.4): human tech with the loadout extras, the FB2 races under CD's p.21
    changes, battle riders and motherships, system defence ships, jump gates and portals,
    starbase sections, dummy bogeys, the tournament composition limits and fleet morale.
-2. FTPC ruleset (incl. the 2017 errata)
+2. FTPC ruleset (incl. the 2017 errata) - design system, catalog and fleet rules done (6.4);
+   quick reference, turrets, gunboats, fighter racks and the Imperial tech base to come
 3. Alien races per ruleset: FB Kra'Vak (FB2 pp.7-20), Sa'Vasku (pp.21-33) and Phalon
    (pp.35-46) - **all done**. Golden tests: the FB2 p.11 Kra'Vak example = 384 and the p.37
    Phalon one = 379. Races are additive tech modules inside a ruleset (decision 3), not new

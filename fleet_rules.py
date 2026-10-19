@@ -21,6 +21,7 @@ FLEET_OPTION_KEYS = (
     "mt_systems", "mt_superships", "mt_fighters",
     "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence", "cd_cpv",
     "cd_advanced_ftl", "cd_patrol_battle", "cd_capital_limit",
+    "pc_optional_systems", "pc_adfc_no_mass", "pc_hangar_criticals", "pc_overload_torpedoes",
 )
 
 
@@ -42,6 +43,10 @@ def option_label(key: str) -> str:
         "cd_capital_limit": _("At most half the points on capital ships"),
         "cd_cpv": _("Combat Points Value (CPV) hull cost"),
         "cd_advanced_ftl": _("Pay for advanced FTL"),
+        "pc_optional_systems": _("Launch catapults and flawed designs"),
+        "pc_adfc_no_mass": _("ADFC takes no MASS on ships over MASS 20"),
+        "pc_hangar_criticals": _("Critical hits to hangar bays (bays 2 points a MASS)"),
+        "pc_overload_torpedoes": _("Overloadable pulse torpedoes"),
     }.get(key, key)
 
 

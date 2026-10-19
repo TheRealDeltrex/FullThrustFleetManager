@@ -25,6 +25,7 @@ from rulesets import RULESETS, common
 from rulesets.fb import data as fb_data
 from rulesets.ft2 import data as ft2_data
 from rulesets.ftcd import data as ftcd_data
+from rulesets.ftpc import data as ftpc_data
 
 
 @dataclass(frozen=True)
@@ -86,8 +87,8 @@ def _merchant(label_of, tmf: int, hull_share: int) -> ClassPreset:
 
 def class_presets(ruleset_id: str) -> list[ClassPreset]:
     """The classes a new design of this ruleset may start from, smallest first."""
-    if ruleset_id in ("fb", "ftcd"):
-        data = fb_data if ruleset_id == "fb" else ftcd_data
+    if ruleset_id in ("fb", "ftcd", "ftpc"):
+        data = {"fb": fb_data, "ftcd": ftcd_data, "ftpc": ftpc_data}[ruleset_id]
         share = _average_hull(data.HULL_DESCRIPTORS)
         label_of = common.class_label
         return (_banded(data.SHIP_CLASSES, share, label_of)
@@ -150,6 +151,8 @@ def _tables(ruleset_id: str) -> tuple:
         return fb_data.SHIP_CLASSES, fb_data.CARRIER_CLASSES
     if ruleset_id == "ftcd":
         return ftcd_data.SHIP_CLASSES, ftcd_data.CARRIER_CLASSES
+    if ruleset_id == "ftpc":
+        return ftpc_data.SHIP_CLASSES, ftpc_data.CARRIER_CLASSES
     return ()
 
 

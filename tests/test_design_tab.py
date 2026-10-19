@@ -732,3 +732,28 @@ def test_a_class_code_typed_in_fills_the_type(client):
     client.post(f"/design/{design_id}", data=fields(store.get_draft(design_id), type_code="ZZ",
                                                     action="apply"))
     assert store.get_draft(design_id)["type_label"] == "Picket"
+
+
+# ---- Project Continuum --------------------------------------------------------------------------
+
+
+def test_a_project_continuum_design_takes_every_system_and_its_hull_options(client):
+    design_id = make(client, "Continuum", ruleset="ftpc")
+    import rulesets
+    for definition in rulesets.get_ruleset("ftpc").system_types("human", {}):
+        draft, _dirty = store.working_design(design_id)
+        client.post(f"/design/{design_id}",
+                    data=fields(draft, action="add_system", system_type=definition.type))
+    draft, _dirty = store.working_design(design_id)
+    assert len(draft["systems"]) == len(rulesets.get_ruleset("ftpc").system_types("human", {}))
+    page = client.post(f"/design/{design_id}", data=fields(
+        draft, action="apply", **{"pc-hull-present": "1", "hull_rows": "6", "stealth_hull": "1",
+                                  "armour_regen": "on"}), follow_redirects=True)
+    assert page.status_code == 200
+    draft, _dirty = store.working_design(design_id)
+    assert (draft["hull_rows"], draft["stealth_hull"], draft["armour_regen"]) == (6, 1, True)
+    # An advanced hull disables the rows select; the stored choice survives it.
+    client.post(f"/design/{design_id}", data=fields(
+        draft, action="apply", **{"pc-hull-present": "1", "advanced-present": "1",
+                                  "hull_advanced": "on"}))
+    assert store.working_design(design_id)[0]["hull_rows"] == 6
