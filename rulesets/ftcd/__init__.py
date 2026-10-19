@@ -117,6 +117,7 @@ class FTCDRuleset:
         out["id"] = "ftcd:" + str(design.get("id", "")).split(":", 1)[-1]
         out["ruleset"] = self.id
         changes = aliens.adopt(out) if _alien(out) else []
+        common.convert_star_ranger(out, {"class": 2})
         source = out.get("source") if isinstance(out.get("source"), dict) else {}
         printed = source.get("npv_book")
         points = self.design_breakdown(out, {}).points
