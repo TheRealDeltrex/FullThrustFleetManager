@@ -167,6 +167,17 @@ def test_create_and_list_fleets():
     assert store.create_fleet("nope", "x")[0] is None
 
 
+def test_new_fleet_option_defaults():
+    on = {k for k, v in store.create_fleet("ftcd", "x")[0]["options"].items() if v}
+    assert on == {"cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence",
+                  "core_systems", "fighter_endurance"}
+    on = {k for k, v in store.create_fleet("ftpc", "x")[0]["options"].items() if v}
+    assert {"pc_tech_base", "cd_patrol_battle", "cd_capital_limit", "vector_movement",
+            "cd_cpv", "pc_adfc_no_mass"}.isdisjoint(on) and "cd_multistage" in on
+    assert store.create_fleet("ft2", "x")[0]["options"]["mt_superships"]
+    assert not any(store.create_fleet("fb", "x", options={})[0]["options"].values())
+
+
 def test_squadrons():
     f = a_fleet()
     assert store.add_squadron(f, "Escort")[0]
