@@ -199,6 +199,11 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .card header { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .card .mini svg { width: 100%; height: auto; max-height: 220px; background: #fff; }
 .card.st-destroyed, tr.st-destroyed { opacity: .55; }
+.drag-handle { border: 0; background: none; color: var(--muted); cursor: grab; padding: 0 2px;
+  font: inherit; line-height: 1; touch-action: none; }
+.drag-handle:hover, .drag-handle:focus-visible { color: var(--accent); }
+.card.dragging { opacity: .4; outline: 2px dashed var(--accent); }
+.cards:has(.card) > .empty { display: none; }
 .chip.st-ready { background: var(--ok-soft); color: var(--ok); }
 .chip.st-damaged { background: var(--warn-soft); color: var(--warn); }
 .chip.st-docked { background: var(--accent-soft); color: var(--accent); }

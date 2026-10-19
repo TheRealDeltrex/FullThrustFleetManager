@@ -186,11 +186,19 @@
         {% for squadron in f.squadrons %}
           <div class="panel">
             <h3>{{ squadron.name }}</h3>
-            <div class="body cards">
+            {# Ships are dragged by their handle to reorder or move them (static/reorder.js). #}
+            <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" hidden
+                  class="ship-order" data-autosave="order_ships">
+              <input type="hidden" name="squadron" value="{{ squadron.id }}" />
+              <input type="hidden" name="order" value="" />
+            </form>
+            <div class="body cards" data-squadron="{{ squadron.id }}">
               {% for ship in f.ships if ship.squadron == squadron.id %}
                 {% set d = selected.designs.get(ship.design_id) %}
-                <article class="card st-{{ ship.status }}">
+                <article class="card st-{{ ship.status }}" data-uid="{{ ship.uid }}">
                   <header>
+                    <button type="button" class="drag-handle" title="{{ _('Drag to reorder') }}"
+                            aria-label="{{ _('Move ship') }}">&#x283F;</button>
                     <b>{{ ship.table_id }}</b> {{ ship.name }}
                     <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
                   </header>
@@ -225,7 +233,7 @@
                   </form>
                 </article>
               {% else %}
-                <p class="muted">{{ _("No ships in this squadron.") }}</p>
+                <p class="muted empty">{{ _("No ships in this squadron.") }}</p>
               {% endfor %}
             </div>
           </div>

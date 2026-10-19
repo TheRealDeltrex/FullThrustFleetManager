@@ -873,6 +873,27 @@ def add_ship(fleet: dict, design_id: str, name: str = "", table_id: str = "", sq
     return True, _("{name} added.", name=fleet["ships"][-1]["name"])
 
 
+def order_squadron(fleet: dict, squadron_id: str, uids: list[str]) -> tuple[bool, str]:
+    """Puts the listed ships in this squadron in that order; a ship dragged in from another
+    squadron joins it. Ships not listed keep their places."""
+    if squadron_id not in {q["id"] for q in fleet["squadrons"]}:
+        return False, _("Squadron not found.")
+    by_uid = {s["uid"]: s for s in fleet["ships"]}
+    picked = [by_uid[u] for u in dict.fromkeys(uids) if u in by_uid]
+    if not picked:
+        return False, _("Ship not found.")
+    moved = {s["uid"] for s in picked}
+    ships = fleet["ships"]
+    # The squadron's block starts where its first ship (listed or not) stood.
+    first = next(i for i, s in enumerate(ships) if s["uid"] in moved or s["squadron"] == squadron_id)
+    rest = [s for s in ships if s["uid"] not in moved]
+    at = sum(1 for s in ships[:first] if s["uid"] not in moved)
+    for s in picked:
+        s["squadron"] = squadron_id
+    fleet["ships"] = rest[:at] + picked + rest[at:]
+    return True, ""
+
+
 def _ship(fleet: dict, uid: str) -> dict | None:
     return next((s for s in fleet["ships"] if s["uid"] == uid), None)
 
