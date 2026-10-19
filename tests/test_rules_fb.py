@@ -508,3 +508,13 @@ def test_races_and_books():
     assert [r.id for r in FB.races()][0] == "human"
     assert {b.code for b in FB.books} == {"FB1", "FB2"}
     assert all(b.page_offset == 0 for b in FB.books)
+
+
+def test_hull_rows_reprice_the_hull_but_not_a_small_one():
+    # Star Ranger rows: x3 / x1.5 / x1 a box on three / five / six rows; a hull of three boxes
+    # or fewer still costs 2 a box (owner's ruling: a ship is not dearer for being small).
+    from rulesets.fb.rules import hull_integrity_points
+
+    costs = [hull_integrity_points({"hull_boxes": 12, "hull_rows": r}) for r in (3, 4, 5, 6)]
+    assert costs == [36, 24, 18, 12]
+    assert hull_integrity_points({"hull_boxes": 3, "hull_rows": 3}) == 6

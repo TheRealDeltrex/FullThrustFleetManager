@@ -402,7 +402,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `rocket_cannon` {class, arcs} cost as a beam; `graser` {class, arcs, no_reroll} (CD mass table,
   x4, x3 without reroll); `hdc` {class, one arc}; `lrpt` {arcs}; `amt`, `superior_sensors`;
   `age_penalty` {mass} is MASS lost to age at 0 points. FB designs may also carry `hull_rows`
-  3/4/5/6 (boxes x3/x2/x1.5/x1; Star Ranger) and `stealth_hull` 1-2 (+2/+4 a hull and armour box).
+  3/4/5/6 (boxes x3/x2/x1.5/x1; Star Ranger; a hull of 3 boxes or fewer always costs 2 a box) and `stealth_hull` 1-2 (+2/+4 a hull and armour box).
 - Rules code treats designs as semi-untrusted: bad numbers read as defaults (`_int`), unknown
   types cost nothing and raise a violation. Nothing in a ruleset raises on a malformed design.
 - Labels and issue messages are translated at call time (`system_defs()` is a function for that
@@ -568,8 +568,9 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
 - `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
   139 of the 141 book designs match their printed NPV; the two errata entries are the FT p.31
-  design example and the FB2 p.18 Do'San. 21 Star Ranger designs are in errata too (page
-  misprints or systems the page leaves out; two IF pulse torpedoes break FB1's three-arc limit).
+  design example and the FB2 p.18 Do'San. 49 Star Ranger designs are in errata too: 28 small
+  hulls the pages price at 3 a box, the rest page misprints or systems the page leaves out (two
+  IF pulse torpedoes break FB1's three-arc limit).
 - **Sa'Vasku and Phalon arcs come off the vector SSDs**, unlike Kra'Vak's. `ssd_arcs.py` has one
   reader per icon shape: `rings()` (human beams and Sa'Vasku stinger nodes), `pies()` (SM
   launchers and racks), `arrows()` (a Sa'Vasku pod launcher's arrowhead beside its cogged disc)
