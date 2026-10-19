@@ -420,6 +420,10 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add("armour")
             if design and sum(1 for n in design.get("armour_layers", []) if n) > 1:
                 present.add("shell_armour")  # layered armour has its own entry (CD p.20)
+            if design and design.get("armour_regen"):
+                present.add("armour_regen")  # PC p.57
+            if design and design.get("stealth_hull"):
+                present.add("stealth_hull")  # PC p.56
             if design and design["streamlining"] != "none":
                 present.add("streamlining")
             # Rules a ship brings without a system (the FTCD quick reference reads these).
