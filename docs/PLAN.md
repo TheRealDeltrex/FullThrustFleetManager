@@ -579,12 +579,10 @@ ruleset label.
 - Left pane: fleets list grouped by ruleset; squadrons of the current fleet (add, rename,
   reorder, move ships between squadrons).
 - Header: fleet name, ruleset badge, race, faction, admiral, option chips, badges (section 7),
-  **view switch Cards / Record sheet / Roster**, "+ Add ship", "Tournament check".
+  **view switch Cards / Roster**, "+ Add ship", "Tournament check".
 - Stat tiles: points (with bar), ships by status, hull damage awaiting repair, fighters/ordnance.
 - **Cards:** per squadron, one card per ship (table id, status chip, name, class, mini SSD with
   damage, TMF / thrust / points). Destroyed ships greyed.
-- **Record sheet:** the fleet exactly as PDF page 2 renders it (same layout engine), with ships
-  that are not printed listed underneath.
 - **Roster:** the PDF page 1 table.
 - Clicking a ship anywhere opens its design in the Design tab, with that ship's damage selectable
   in the SSD preview.

@@ -193,7 +193,7 @@ def home() -> Response:
 
 # ---- Fleet overview tab (PLAN 9.3) -------------------------------------------------------------
 
-VIEWS = ("cards", "sheet", "roster")
+VIEWS = ("cards", "roster")
 
 
 def current_fleet() -> dict | None:
