@@ -162,7 +162,11 @@ def _ship_report(fleet: dict, ship: dict, design: dict | None, options: dict) ->
     if design is None:
         missing = Issue("missing_design", "violation", _("This ship's design is missing."))
         return ShipReport(ship, None, [missing])
-    issues = list(design_issues(design, options))
+    # The ship's own loadout, when it has one, is what it carries (and what it costs), so that
+    # is what is checked: rulesets read the loadout from `default_loadout`.
+    loadout = ship.get("loadout")
+    issues = list(design_issues(design if loadout is None else {**design, "default_loadout": loadout},
+                                options))
     if design.get("ruleset") != fleet.get("ruleset"):
         issues.append(Issue("wrong_ruleset", "violation", _("This design belongs to another ruleset.")))
     if design.get("race") != fleet.get("race") and not fleet.get("allow_race_mixing"):
@@ -275,22 +279,23 @@ def repair_plan(design: dict | None, damage: dict | None, hull_rolled: int,
                 system_uids: list[str], successes: dict[str, int]) -> dict:
     """What a week at a repair facility does (FT p.35), given rolls the player made or typed.
 
-    hull_rolled: damage points repaired (1D6 at a base). system_uids: up to three systems the
-    player rolled for; successes maps a uid to how many successful rolls it got. A drive needs
-    two (`drive_hits` counts down by one per success)."""
+    hull_rolled: damage points repaired (1D6 at a base). system_uids: the systems the player
+    rolled for; successes maps a uid to how many successful rolls it got. A drive needs two
+    (`drive_hits` counts down by one per success). Ruling: the drive is a system too, so each
+    drive roll takes one of the three a week; two of them can go to the drive."""
     hull_done = int((damage or {}).get("hull") or 0)
-    repaired_hull = max(0, min(hull_done, int(hull_rolled or 0)))
+    repaired_hull = max(0, min(hull_done, 6, int(hull_rolled or 0)))
     chosen = [uid for uid in system_uids[:REPAIR_SYSTEMS_PER_WEEK]
               if uid in repairable_systems(design, damage)]
     fixed = [uid for uid in chosen if int(successes.get(uid, 0)) >= 1]
     drive_hits = int((damage or {}).get("drive_hits") or 0)
-    drive_success = int(successes.get("drive", 0))
+    drive_success = max(0, int(successes.get("drive", 0)))
     drive_repaired = min(drive_hits, drive_success)
     return {
         "hull": repaired_hull,
         "systems": fixed,
         "drive_hits": drive_repaired,
-        "too_many": len(system_uids) > REPAIR_SYSTEMS_PER_WEEK,
+        "too_many": len(system_uids) + drive_success > REPAIR_SYSTEMS_PER_WEEK,
     }
 
 

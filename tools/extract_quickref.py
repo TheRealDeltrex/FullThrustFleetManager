@@ -264,7 +264,8 @@ PC_ENTRIES = [
 # straight out of the page text. Check the page image before editing one.
 # fmt: off
 OVERRIDES = {
-    # PC p.60: the section runs on into a list the reader cannot end at a sentence.
+    # PC p.60: the section runs on into a list the reader cannot end at a sentence. The
+    # exceptions after the effect are kept: they limit it (the cost line is left out).
     ("ftpc", "holofield"):
         "Holofields are high-tech devices that use field generators and powerful ECM systems to "
         "create a complex pattern of sensor ghosts around a ship. This confuses enemy FireCon "
@@ -273,7 +274,12 @@ OVERRIDES = {
         "if applicable. The Holofield will affect all re-rolls as well. Weapons that do not use "
         "beam dice add 12mu to the range. If this modifies the range beyond the weapons maximum "
         "range the shot automatically misses. Needle Beams and similar weapons, are ineffective "
-        "against a ship protected by Holofields.",
+        "against a ship protected by Holofields. Graviton Beams and any area effect type weapons "
+        "(i.e. Spinal Mounts, PBLs etc.) ignore Holofields. Any ships firing at 6 MU or less will "
+        "ignore Holofields. Holofields also confuse the miniature FireCon systems used by "
+        "missiles, fighters and ordnance. Their attack range is reduced by 1 MU. Holofields "
+        "cannot be combined with other screen or field technology. Holofields can be combined "
+        "with up to 3 levels ECM; this would reduce fighter/missile lock-on range to 2 MU.",
     ("ft2", "turn_sequence"):
         "The game is played as a series of GAME TURNS, each Turn consisting of both (or all) "
         "players having the opportunity to move and fire their ships. Each Game Turn starts with "

@@ -15,15 +15,32 @@
   });
 
   // Optional dice: the server rolls, so the result is one honest source (results can be typed).
+  // The online version has no server to ask (data-local), so the page rolls there.
+  function rollHere(sides) {
+    var value = new Uint32Array(1);
+    window.crypto.getRandomValues(value);
+    return 1 + (value[0] % sides);
+  }
   document.querySelectorAll("button[data-roll]").forEach(function (button) {
     button.addEventListener("click", function () {
       var field = button.form && button.form.querySelector(
         'input[name="' + button.getAttribute("data-target") + '"]'
       );
-      if (!field) return;
-      fetch("/dice/" + button.getAttribute("data-roll"))
-        .then(function (response) { return response.text(); })
-        .then(function (value) { field.value = value.trim(); })
+      var sides = parseInt(button.getAttribute("data-roll"), 10);
+      if (!field || !(sides > 0)) return;
+      if (button.hasAttribute("data-local")) {
+        field.value = rollHere(sides);
+        return;
+      }
+      fetch("/dice/" + sides)
+        .then(function (response) {
+          if (!response.ok) throw new Error(String(response.status));
+          return response.text();
+        })
+        .then(function (value) {
+          var n = parseInt(value, 10);
+          if (n >= 1 && n <= sides) field.value = n;
+        })
         .catch(function () { /* offline or blocked: type the result instead */ });
     });
   });

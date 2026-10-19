@@ -394,6 +394,60 @@ def test_backup_import_keeps_newer_local_copies():
     assert store.get_design(d["id"])["name"] == "Newer here"
 
 
+def zip_of(entries: dict) -> bytes:
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        for name, text in entries.items():
+            z.writestr(name, text)
+    return buf.getvalue()
+
+
+def test_a_nested_document_from_a_newer_app_is_refused_cleanly():
+    d = a_design()
+    doc = {"schema_version": 1, "kind": "FTDesign", "design": dict(d, schema_version=999)}
+    ok, msg, conflicts = store.import_file("x.FTDesign", json.dumps(doc).encode())
+    assert not ok and "newer version" in msg and conflicts == []
+
+
+def test_a_refused_import_writes_nothing():
+    """The faction list comes before the fleet in the file; a fleet that is refused must not
+    leave its factions behind."""
+    f = a_fleet()
+    doc = {"schema_version": 1, "kind": "FTFleet",
+           "fleet": dict(f, ships=[dict(id="s", uid="s", design_id="gone")]),
+           "designs": [], "factions": [{"id": "cfnew", "name": "Stowaways"}]}
+    ok, _msg, _c = store.import_file("x.FTFleet", json.dumps(doc).encode())
+    assert not ok
+    assert store.custom_factions() == []
+
+
+def test_a_backup_entry_with_a_bad_id_is_skipped_not_a_crash():
+    d = dict(a_design(), id="../bad")
+    good = a_design()
+    blob = zip_of({"designs/valid.json": json.dumps(d), "designs/good.json": json.dumps(good)})
+    ok, msg, _c = store.import_file("x.FTBackup", blob)
+    assert ok and "skipped" in msg
+    assert "../bad" not in {x["id"] for x in store.list_designs()}
+    assert not store.import_file("x.FTBackup", zip_of({"designs/valid.json": json.dumps(d)}))[0]
+
+
+def test_normalisation_survives_junk_that_once_crashed_pages():
+    import ssd_layout
+
+    assert store.normalize_design({"id": "a", "ruleset": []}) is None
+    assert store.normalize_fleet({"id": "a", "ruleset": {}}) is None
+    d = a_design()
+    d["systems"] = [{"uid": "s", "type": "pds"}, {"uid": "t", "type": "pds"}]
+    d["layout_hints"] = {"s": {"x": "oops", "y": 10}, "t": {"x": 20.5, "y": 30},
+                         "u": {"x": float("nan"), "y": 1}, "v": 3}
+    clean = store.normalize_design(d)
+    assert clean["layout_hints"] == {"t": {"x": 20.5, "y": 30}}
+    assert ssd_layout.layout(clean).primitives
+
+
 # ---- Settings ---------------------------------------------------------------------------------
 
 
@@ -464,3 +518,12 @@ def test_old_carrier_codes_load_as_cva():
     for old in ("CV", "CVH"):
         assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": old})["type_code"] == "CVA"
     assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": "CVL"})["type_code"] == "CVL"
+
+
+def test_a_legal_more_thrust_design_saves_in_strict_mode():
+    """A design alone has no fleet, so its More Thrust content is a note, not a block; the fleet
+    that fields it decides (MT p.3)."""
+    d, _msg = store.new_design("ft2", name="Missile boat")
+    d.update(tmf=20, thrust=2, ftl=True, systems=[{"uid": "m", "type": "mt_missile", "arcs": ["F"]}])
+    ok, msg, _id = store.save_design(d)
+    assert ok, msg

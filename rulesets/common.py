@@ -222,21 +222,28 @@ def validate_missiles(design: dict, systems: list[dict], by_uid: dict, violation
         elif len(feeders) > 1:
             violation("launcher_fed_twice", _("A launcher may be fed from one magazine only."), s.get("uid"))
 
+    loaded: dict[str, int] = {}  # magazine uid -> MASS its loads take, over every entry for it
+    seen: set[str] = set()
     for entry in loadout_entries(design.get("default_loadout"), "magazines"):
         mag = by_uid.get(entry.get("magazine"))
         if not mag or mag.get("type") != "sm_magazine":
             violation("salvos_without_magazine", _("Salvo load for a magazine this design does not have."))
             continue
+        if mag["uid"] in seen:
+            # One load per magazine, so its stage count is one too (CD p.25, PC p.52).
+            violation("magazine_loaded_twice", _("A magazine has one salvo load."), mag["uid"])
+        seen.add(mag["uid"])
         salvos = entry.get("salvos") if isinstance(entry.get("salvos"), list) else []
         spaces = [salvo_space(entry, x) for x in salvos]
         if any(space is None for space in spaces):
             violation("unknown_salvo_type", _("Unknown salvo type."), mag.get("uid"))
             continue
-        used = sum(spaces)
-        capacity = as_int(mag.get("capacity"))
+        loaded[mag["uid"]] = loaded.get(mag["uid"], 0) + sum(spaces)
+    for uid, used in loaded.items():
+        capacity = as_int(by_uid[uid].get("capacity"))
         if used > capacity:
             violation(
                 "magazine_overloaded",
                 _("Salvo load needs {used} MASS but the magazine holds {cap}.", used=used, cap=capacity),
-                mag.get("uid"),
+                uid,
             )
