@@ -33,3 +33,23 @@ jobs:
 
       - name: Pytest (full suite)
         run: python -m pytest -q
+
+  web-build:
+    # The Pyodide build boots in headless Chromium and saves a fleet (tests/test_web_boot.py).
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt pytest playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Boot the web build
+        env:
+          FTFM_WEB_BOOT: "1"
+        run: python -m pytest -q tests/test_web_boot.py
