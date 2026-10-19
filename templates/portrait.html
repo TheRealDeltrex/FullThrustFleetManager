@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_portraits.html" import picture with context %}
+{% block title %}{{ _("Ship picture") }} · {{ name }}{% endblock %}
+{% block work_class %}cols-1{% endblock %}
+{% block content %}
+<section class="panel body portrait-editor">
+  <div class="row"><h2>{{ _("Ship picture") }} · {{ name }}</h2><a class="btn" href="{{ back }}">{{ _("Back") }}</a></div>
+  <div class="portrait-summary">
+    {{ picture(ship_portrait(design, target), name) }}
+    <div class="stack">
+      <p>{{ _("This picture applies only to this ship in this fleet.") if is_ship else _("This picture applies to this design wherever it appears. An individual ship can override it.") }}</p>
+      <p class="muted">{{ _("Artwork is decorative. It does not change ship statistics or record-sheet symbols.") }}</p>
+      <form method="post" action="{{ request.path }}" enctype="multipart/form-data" class="stack">
+        <label class="field">{{ _("Upload your own picture") }}
+          <input class="input" type="file" name="picture" accept="image/png,image/jpeg,image/webp" required />
+        </label>
+        <span class="muted">{{ _("PNG, JPEG or WebP; up to 5 MB and 16 megapixels. Saved as a compact 512-pixel image.") }}</span>
+        <button class="btn primary" name="action" value="upload">{{ _("Upload picture") }}</button>
+      </form>
+      <form method="post" action="{{ request.path }}"><button class="btn" name="action" value="reset">{{ _("Use design picture") if is_ship else _("Restore default picture") }}</button></form>
+    </div>
+  </div>
+  <h3>{{ _("Default picture gallery") }}</h3>
+  <p class="muted">{{ _("Generated artwork inspired by faction and class styles; not official miniature photographs.") }}</p>
+  <form method="post" action="{{ request.path }}" class="stack">
+    <fieldset class="portrait-gallery"><legend>{{ _("Pictures for this class") }} · {{ class_code }}</legend>
+    {% for art in choices if art.code == class_code %}
+      <label class="portrait-choice"><input type="radio" name="art" value="{{ art.id }}" required />
+        {{ picture(art, art.label, True) }}<span>{{ art.code }} · {{ art.variant }}</span></label>
+    {% endfor %}
+    </fieldset>
+    <details><summary>{{ _("Browse all classes") }}</summary>
+      <div class="portrait-gallery">
+      {% for art in choices if art.code != class_code %}
+        <label class="portrait-choice"><input type="radio" name="art" value="{{ art.id }}" />
+          {{ picture(art, art.label, True) }}<span>{{ art.code }} · {{ art.variant }}</span></label>
+      {% endfor %}
+      </div>
+    </details>
+    <button class="btn primary" name="action" value="choose">{{ _("Use selected picture") }}</button>
+  </form>
+</section>
+{% endblock %}
