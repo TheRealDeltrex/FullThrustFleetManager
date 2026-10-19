@@ -242,7 +242,17 @@ What exists:
   `.FTDesign`, `.FTBackup` (a zip of the library). `import_file()` returns
   `(ok, msg, conflicts)`; a *newer local copy* is kept and named in `conflicts`, and the caller
   re-calls with `overwrite_newer=True` after the player confirms. `modified` is an ISO string at
-  second resolution, so tests that need "strictly newer" backdate the local copy.
+  second resolution, so tests that need "strictly newer" backdate the local copy. The whole file
+  is read and checked (`_read_document` / `_read_backup`, raising `_Refused` or `TooNewError`)
+  before anything is written; a backup entry that is not a usable design or fleet is skipped
+  and counted.
+- In the app: Settings > Files (`POST /backup`, `POST /import`), and an Export button on the
+  Fleet tab and on a saved custom design (`/export/fleet/<id>`, `/export/design/<id>`). An
+  import with conflicts is held in `pending_import.json` (`store.hold_import`) until the player
+  answers Replace / Keep mine (`POST /import/held`). Downloads are plain `attachment` responses
+  and links without a `download` attribute, so the web shell intercepts them. The web build
+  shows a backup reminder (`BACKUP_DUE`, `store.backup_due()`: 14 days since the last backup
+  or "Later").
 - `migrations.py`: `CURRENT`, `STEPS[kind][from_version]`, `upgrade()`. A missing or malformed
   `schema_version` counts as 1; anything above `CURRENT` raises `TooNewError` and is refused
   rather than guessed at. Write the step and its test in the commit that bumps `CURRENT`.

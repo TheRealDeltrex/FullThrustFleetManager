@@ -81,6 +81,15 @@
       {% endif %}
     {% endwith %}
 
+    {% if BACKUP_DUE %}
+      <form class="notice backup-due row" method="post" action="{{ url_for('export_backup') }}">
+        <span>{{ _("Your library is kept in this browser only.") }}</span>
+        <button class="btn sm primary" type="submit">{{ _("Back up library") }}</button>
+        <button class="btn sm ghost" type="submit" formaction="{{ url_for('backup_later') }}"
+                name="next" value="{{ request.full_path if request.query_string else request.path }}">{{ _("Later") }}</button>
+      </form>
+    {% endif %}
+
     <main class="work {% block work_class %}{% endblock %}">
       {% block content %}{% endblock %}
     </main>
