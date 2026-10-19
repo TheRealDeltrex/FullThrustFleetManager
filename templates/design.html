@@ -252,7 +252,8 @@
               {% for row in selected.breakdown.rows %}
                 {% set system = (d.systems | selectattr('uid', 'equalto', row.system_uid) | list | first) if row.system_uid else None %}
                 <tr>
-                  <td>{{ row.label }}</td>
+                  <td>{{ row.label }}{% if system and system.type in selected.sr_rules %}
+                    <a class="muted" href="{{ url_for('star_ranger_rules') }}#{{ system.type }}">SR</a>{% endif %}</td>
                   <td class="arcs">
                     {% if system %}
                       {# Settings (a beam's class, a rack's load) first, then the arcs: a weapon

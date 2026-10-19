@@ -793,3 +793,26 @@ def test_the_holofield_reference_keeps_its_exceptions():
     text = next(e.text for e in PC.quickref({"holofield"}, {}) if e.key == "holofield")
     assert "6 MU or less" in text and "Graviton Beams" in text
     assert "cannot be combined with other screen or field technology" in text
+
+
+def test_star_ranger_systems_cost_as_their_pages_say():
+    # fullthrust.star-ranger.com: rocket cannon as a beam, AMT 2/8, HDC (class x 8) - 4 at x3.
+    d = design(tmf=100, hull_boxes=30, systems=[
+        {"uid": "a", "type": "rocket_cannon", "class": 3, "arcs": ["F"]},
+        {"uid": "b", "type": "amt"},
+        {"uid": "c", "type": "hdc", "class": 2, "arcs": ["F"]},
+        {"uid": "d", "type": "age_penalty", "mass": 3},
+    ])
+    rows = {r.key: (r.mass, r.points) for r in PC.design_breakdown(d, {}).rows if r.system_uid}
+    assert rows == {"rocket_cannon": (4, 12), "amt": (2, 8), "hdc": (12, 36), "age_penalty": (3, 0)}
+    keys = {e.key for e in PC.quickref({"rocket_cannon", "amt", "hdc", "age_penalty"}, {})}
+    assert {"rocket_cannon", "amt", "hdc", "age_penalty"} <= keys
+
+
+def test_star_ranger_designs_convert_their_torpedoes_and_missiles():
+    import store
+
+    by_id = {d["id"]: d for d in store.catalog_designs("ftpc")}
+    types = {s["type"] for d in by_id.values() if d["source"]["book"] == "SR" for s in d["systems"]}
+    assert not types & {"lrpt", "mt_missile"}
+    assert len([d for d in by_id.values() if d["source"]["book"] == "SR"]) > 300

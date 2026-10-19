@@ -90,6 +90,26 @@ def source_ref(source: dict) -> str:
     return f"{book} p.{source.get('page')}"
 
 
+def convert_star_ranger(design: dict, long_torpedo: dict) -> list[str]:
+    """A Star Ranger design's systems in the CD and PC terms that equal them; the notes it adds.
+    The long-range pulse torpedo (MASS 8 +2 an arc, 3 a MASS) is CD's class-2 torpedo and PC's
+    long-range one (`long_torpedo` holds the fields), the IF heavy missile rack (2 MASS, 6
+    points, one shot) their standard heavy missile."""
+    if (design.get("source") or {}).get("book") != "SR":
+        return []
+    changes = []
+    for s in systems_of(design):
+        if s.get("type") == "lrpt":
+            s.update({"type": "pulse_torpedo", **long_torpedo})
+            if "torpedo" not in changes:
+                changes.append("torpedo")
+        elif s.get("type") == "mt_missile":
+            s.update({"type": "heavy_missile", "load": "std", "arcs": ["FP", "F", "FS"]})
+            if "missile" not in changes:
+                changes.append("missile")
+    return changes
+
+
 # ---- Reading stored designs ---------------------------------------------------------------------
 
 

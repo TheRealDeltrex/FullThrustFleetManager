@@ -210,6 +210,8 @@ def test_quickref_pages_point_at_the_right_page():
     books = {b.code: b for rs in RULESETS.values() for b in rs.books}
     checked = 0
     for ruleset_id, entry in quickref_entries():
+        if entry.url:
+            continue  # a Star Ranger web page, not a bundled book
         book = books[entry.book]
         with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:
             page = doc[entry.page + book.page_offset - 1]        # printed -> 0-based PDF index

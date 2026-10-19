@@ -40,6 +40,7 @@ from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
 from rulesets import REFERENCE_BOOKS, RULESETS, book_sort_key, common, presets
 from rulesets.fb import data as fb_data
+from rulesets.fb import load_star_ranger_rules
 
 logger = logging.getLogger(__name__)
 
@@ -577,6 +578,8 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
         "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
         "source_name": common.WEB_SOURCES.get(design["source"].get("book") or ""),
+        # Systems whose rules come from the Star Ranger pages link to them on the rules page.
+        "sr_rules": {e.key for e in load_star_ranger_rules()},
     }
 
 
@@ -1056,6 +1059,13 @@ def rulebook(code: str) -> str | Response:
         return redirect(url_for("rulebook_file", code=code) + f"#page={pdf_page}")
     return render_template("rulebook.html", active_tab="settings", book=book, page=page,
                            pdf_page=pdf_page, books=books_in_order())
+
+
+@app.route("/rules/star-ranger")
+def star_ranger_rules() -> str:
+    """The Star Ranger pages' rules for the systems their designs use, kept in the app."""
+    return render_template("star_ranger_rules.html", active_tab="settings",
+                           entries=load_star_ranger_rules())
 
 
 @app.route("/rulebook/<code>/file")

@@ -460,6 +460,8 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
                 present.add("armour_regen")  # PC p.57
             if design and design.get("stealth_hull"):
                 present.add("stealth_hull")  # PC p.56
+            if design and design.get("hull_rows") == 3 and design.get("hull_boxes", 0) > 3:
+                present.add("sr_hull_rows")  # Star Ranger's three-row hulls
             if design and design["streamlining"] != "none":
                 present.add("streamlining")
             # Rules a ship brings without a system (the FTCD quick reference reads these).
@@ -487,7 +489,8 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
     pdf.cell(0, 7, _("Quick reference"), new_x="LMARGIN", new_y="NEXT")
     for entry in entries:
         pdf.set_font("plex", "B", 9)
-        pdf.cell(0, 5.5, f"{entry.title}  ({entry.book} p.{entry.page})",
+        where = entry.url or f"{entry.book} p.{entry.page}"
+        pdf.cell(0, 5.5, f"{entry.title}  ({where})",
                  new_x="LMARGIN", new_y="NEXT")
         pdf.set_font("plex", "", 8)
         pdf.multi_cell(0, 4, entry.text)
