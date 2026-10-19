@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import io
 import json
+import math
 import re
 import uuid
 import zipfile
@@ -177,6 +178,20 @@ def _fighter_extras(f: dict) -> dict:
     return out
 
 
+def _norm_layout_hints(v: object) -> dict:
+    """uid -> {"x", "y"}: a pinned system's place on the sheet, in points. Anything that is not
+    a pair of finite numbers in a sane range is dropped, so a hint can never break a drawing."""
+    out: dict = {}
+    for uid, hint in (v.items() if isinstance(v, dict) else ()):
+        if not isinstance(uid, str) or not isinstance(hint, dict):
+            continue
+        xy = [hint.get("x"), hint.get("y")]
+        if all(isinstance(n, (int, float)) and not isinstance(n, bool) and math.isfinite(n)
+               and -10000 <= n <= 10000 for n in xy):
+            out[uid[:120]] = {"x": xy[0], "y": xy[1]}
+    return out
+
+
 # Carrier codes folded into CVA (CVE < CVL < CVA); designs saved earlier still carry them.
 _RENAMED_CLASSES = {"CV": "CVA", "CVH": "CVA"}
 
@@ -186,7 +201,8 @@ def normalize_design(doc: object) -> dict | None:
     if not isinstance(doc, dict):
         return None
     doc = migrations.upgrade("design", dict(doc))
-    if doc.get("ruleset") not in RULESETS or not isinstance(doc.get("id"), str) or not doc["id"]:
+    if (not isinstance(doc.get("ruleset"), str) or doc["ruleset"] not in RULESETS
+            or not isinstance(doc.get("id"), str) or not doc["id"]):
         return None
     source = doc.get("source") if isinstance(doc.get("source"), dict) else {}
     streamlining = doc.get("streamlining")
@@ -240,7 +256,7 @@ def normalize_design(doc: object) -> dict | None:
         "default_loadout": _norm_loadout(doc.get("default_loadout"))
         or {"fighters": [], "magazines": [], "pulsers": []},
         "allow_rule_breaking": doc.get("allow_rule_breaking") is True,
-        "layout_hints": doc.get("layout_hints") if isinstance(doc.get("layout_hints"), dict) else {},
+        "layout_hints": _norm_layout_hints(doc.get("layout_hints")),
         "source": clean_source,
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
@@ -283,7 +299,8 @@ def normalize_fleet(doc: object) -> dict | None:
     if not isinstance(doc, dict):
         return None
     doc = migrations.upgrade("fleet", dict(doc))
-    if doc.get("ruleset") not in RULESETS or not _safe_id(doc.get("id")):
+    if (not isinstance(doc.get("ruleset"), str) or doc["ruleset"] not in RULESETS
+            or not _safe_id(doc.get("id"))):
         return None
     squadrons = [
         {"id": q["id"], "name": _as_str(q.get("name"), limit=60)}
@@ -1058,111 +1075,146 @@ def _newer(local: dict | None, incoming: dict) -> bool:
     return bool(local) and (local.get("modified") or "") > (incoming.get("modified") or "")
 
 
+# A backup is a few hundred KB of JSON; anything far bigger unpacked is not one of ours.
+MAX_BACKUP_BYTES = 64 * 1024 * 1024
+
+
+class _Refused(Exception):
+    """An import that writes nothing; the message says why."""
+
+
+def _import_factions(raw: object) -> list[dict]:
+    out = []
+    for f in raw if isinstance(raw, list) else []:
+        if isinstance(f, dict) and _safe_id(f.get("id")) and isinstance(f.get("name"), str):
+            out.append(f)
+    return out
+
+
+def _import_design(raw: object) -> dict | None:
+    design = normalize_design(raw)
+    if not design or is_catalog(design["id"]) or not _safe_id(design["id"]):
+        return None
+    return design
+
+
 def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tuple[bool, str, list[str]]:
     """Import an .FTFleet / .FTDesign / .FTBackup. Returns (ok, msg, conflicts): conflicts are
     names of items skipped because the local copy is newer; call again with overwrite_newer=True
-    after the player confirms (PLAN 5.6)."""
-    if data[:2] == b"PK":
-        return _import_backup(data, overwrite_newer)
+    after the player confirms (PLAN 5.6). The whole file is read and checked before anything is
+    written, so a refused file leaves the library as it was."""
     try:
-        doc = json.loads(data.decode("utf-8-sig"))
-    except (UnicodeDecodeError, ValueError):
-        return False, _("Not a Fleet Manager file."), []
-    if not isinstance(doc, dict):
-        return False, _("Not a Fleet Manager file."), []
-    try:
-        migrations.upgrade("fleet", {"schema_version": doc.get("schema_version")})
+        if data[:2] == b"PK":
+            factions, designs, fleets, skipped = _read_backup(data)
+        else:
+            factions, designs, fleets = _read_document(data)
+            skipped = 0
+    except _Refused as refusal:
+        return False, str(refusal), []
     except migrations.TooNewError:
         return False, _("This file comes from a newer version of the app."), []
-    for f in doc.get("factions", []) if isinstance(doc.get("factions"), list) else []:
-        if isinstance(f, dict) and _safe_id(f.get("id")) and isinstance(f.get("name"), str):
-            if not any(c["id"] == f["id"] for c in custom_factions()):
-                add_custom_faction(f["name"], f["id"], f.get("race"))
-    kind = doc.get("kind")
-    if kind == "FTDesign":
-        design = normalize_design(doc.get("design"))
-        if not design or is_catalog(design["id"]) or not _safe_id(design["id"]):
-            return False, _("The file holds no usable design."), []
-        return _import_designs([design], overwrite_newer)
-    if kind == "FTFleet":
-        fleet = normalize_fleet(doc.get("fleet"))
-        if not fleet:
-            return False, _("The file holds no usable fleet."), []
-        raw = doc.get("designs") if isinstance(doc.get("designs"), list) else []
-        designs = [d for d in (normalize_design(x) for x in raw) if d]
-        designs = [d for d in designs if _safe_id(d["id"]) and not is_catalog(d["id"])]
-        known = {d["id"] for d in designs} | set(_catalog()) | {d["id"] for d in list_designs()}
-        missing = {s["design_id"] for s in fleet["ships"]} - known
-        if missing:
-            names = ", ".join(sorted(missing))
-            return False, _("The fleet uses designs that are not in the file: {ids}.", ids=names), []
-        if any(d["ruleset"] != fleet["ruleset"] for d in designs):
-            return False, _("The file mixes designs of another ruleset into the fleet."), []
-        ok, msg, conflicts = _import_designs(designs, overwrite_newer, quiet=True)
-        local = get_fleet(fleet["id"])
-        if _newer(local, fleet) and not overwrite_newer:
-            conflicts.append(fleet["name"])
-        else:
-            _write_json(_fleet_path(fleet["id"]), fleet)
+
+    for f in factions:
+        if not any(c["id"] == f["id"] for c in custom_factions()):
+            add_custom_faction(f["name"], f["id"], f.get("race"))
+    conflicts: list[str] = []
+    written = 0
+    for doc, local, path in ([(d, get_design(d["id"]), _design_path(d["id"])) for d in designs]
+                             + [(f, get_fleet(f["id"]), _fleet_path(f["id"])) for f in fleets]):
+        if _newer(local, doc) and not overwrite_newer:
+            conflicts.append(doc["name"])
+            continue
+        _write_json(path, doc)
+        written += 1
+
+    if data[:2] == b"PK":
+        msg = _("{n} items restored from the backup.", n=written)
+        if skipped:
+            msg += " " + _("{n} unreadable entries skipped.", n=skipped)
+        return True, msg, conflicts
+    if fleets:
         if conflicts:
             return True, _("Imported; {n} newer local copies kept.", n=len(conflicts)), conflicts
-        return True, _("Fleet {name} imported.", name=fleet["name"]), []
-    return False, _("Not a Fleet Manager file."), []
-
-
-def _import_designs(designs: list[dict], overwrite_newer: bool,
-                    quiet: bool = False) -> tuple[bool, str, list[str]]:
-    conflicts = []
-    for d in designs:
-        if _newer(get_design(d["id"]), d) and not overwrite_newer:
-            conflicts.append(d["name"])
-            continue
-        _write_json(_design_path(d["id"]), d)
-    if quiet or len(designs) != 1:
-        return True, _("{n} designs imported.", n=len(designs) - len(conflicts)), conflicts
+        return True, _("Fleet {name} imported.", name=fleets[0]["name"]), []
     if conflicts:
         return True, _("Kept the newer local copy of {name}.", name=conflicts[0]), conflicts
     return True, _("Design {name} imported.", name=designs[0]["name"]), []
 
 
-def _import_backup(data: bytes, overwrite_newer: bool) -> tuple[bool, str, list[str]]:
+def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict]]:
+    """(factions, designs, fleets) of an .FTDesign or .FTFleet, all checked; raises _Refused."""
+    try:
+        doc = json.loads(data.decode("utf-8-sig"))
+    except (UnicodeDecodeError, ValueError):
+        raise _Refused(_("Not a Fleet Manager file.")) from None
+    if not isinstance(doc, dict):
+        raise _Refused(_("Not a Fleet Manager file."))
+    migrations.upgrade("fleet", {"schema_version": doc.get("schema_version")})
+    factions = _import_factions(doc.get("factions"))
+    kind = doc.get("kind")
+    if kind == "FTDesign":
+        design = _import_design(doc.get("design"))
+        if not design:
+            raise _Refused(_("The file holds no usable design."))
+        return factions, [design], []
+    if kind == "FTFleet":
+        fleet = normalize_fleet(doc.get("fleet"))
+        if not fleet:
+            raise _Refused(_("The file holds no usable fleet."))
+        raw = doc.get("designs") if isinstance(doc.get("designs"), list) else []
+        designs = [d for d in (_import_design(x) for x in raw) if d]
+        known = {d["id"] for d in designs} | set(_catalog()) | {d["id"] for d in list_designs()}
+        missing = {s["design_id"] for s in fleet["ships"]} - known
+        if missing:
+            names = ", ".join(sorted(missing))
+            raise _Refused(_("The fleet uses designs that are not in the file: {ids}.", ids=names))
+        if any(d["ruleset"] != fleet["ruleset"] for d in designs):
+            raise _Refused(_("The file mixes designs of another ruleset into the fleet."))
+        return factions, designs, [fleet]
+    raise _Refused(_("Not a Fleet Manager file."))
+
+
+def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], int]:
+    """(factions, designs, fleets, entries skipped) of an .FTBackup; raises _Refused. An entry
+    that cannot be read as a design or fleet of this app is skipped and counted, not guessed at;
+    one from a newer app refuses the whole backup."""
     try:
         z = zipfile.ZipFile(io.BytesIO(data))
     except zipfile.BadZipFile:
-        return False, _("Not a Fleet Manager backup."), []
-    conflicts: list[str] = []
-    n = 0
+        raise _Refused(_("Not a Fleet Manager backup.")) from None
+    designs: list[dict] = []
+    fleets: list[dict] = []
+    factions: list[dict] = []
+    skipped = 0
     with z:
+        if sum(info.file_size for info in z.infolist()) > MAX_BACKUP_BYTES:
+            raise _Refused(_("Not a Fleet Manager backup."))
         names = z.namelist()
-        if "factions.json" in names:
-            doc = json.loads(z.read("factions.json").decode("utf-8"))
-            for f in doc.get("factions", []) if isinstance(doc, dict) else []:
-                if isinstance(f, dict) and _safe_id(f.get("id")) and isinstance(f.get("name"), str):
-                    if not any(c["id"] == f["id"] for c in custom_factions()):
-                        add_custom_faction(f["name"], f["id"], f.get("race"))
-        for name in names:
-            m = re.fullmatch(r"(designs|fleets)/([A-Za-z0-9_-]{1,64})\.json", name)
-            if not m:
-                continue
-            try:
-                raw = json.loads(z.read(name).decode("utf-8"))
-            except ValueError:
-                continue
-            if m.group(1) == "designs":
-                doc = normalize_design(raw)
-                if not doc or is_catalog(doc["id"]):
+        try:
+            if "factions.json" in names:
+                doc = json.loads(z.read("factions.json").decode("utf-8"))
+                factions = _import_factions(doc.get("factions") if isinstance(doc, dict) else None)
+            for name in names:
+                m = re.fullmatch(r"(designs|fleets)/([A-Za-z0-9_-]{1,64})\.json", name)
+                if not m:
                     continue
-                local, path = get_design(doc["id"]), _design_path(doc["id"])
-            else:
-                doc = normalize_fleet(raw)
+                try:
+                    raw = json.loads(z.read(name).decode("utf-8"))
+                except (UnicodeDecodeError, ValueError):
+                    skipped += 1
+                    continue
+                if m.group(1) == "designs":
+                    doc = _import_design(raw)
+                else:
+                    doc = normalize_fleet(raw)
                 if not doc:
+                    skipped += 1
                     continue
-                local, path = get_fleet(doc["id"]), _fleet_path(doc["id"])
-            if _newer(local, doc) and not overwrite_newer:
-                conflicts.append(doc["name"])
-                continue
-            _write_json(path, doc)
-            n += 1
-    if n == 0 and not conflicts:
-        return False, _("The backup is empty."), []
-    return True, _("{n} items restored from the backup.", n=n), conflicts
+                (designs if m.group(1) == "designs" else fleets).append(doc)
+        except (zipfile.BadZipFile, OSError, RuntimeError, ValueError) as error:
+            if isinstance(error, migrations.TooNewError):
+                raise
+            raise _Refused(_("Not a Fleet Manager backup.")) from None
+    if not designs and not fleets:
+        raise _Refused(_("The backup is empty."))
+    return factions, designs, fleets, skipped
