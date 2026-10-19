@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_factions.html" import faction_picker with context %}
+{% from "_portraits.html" import picture with context %}
 {% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-3{% endblock %}
 {% block content %}
@@ -141,6 +142,13 @@
         {% endif %}
       </div>
 
+      <div class="panel body portrait-summary">
+        {{ picture(ship_portrait(d), d.name) }}
+        <div><h3>{{ _("Ship picture") }}</h3>
+          <p class="muted">{{ _("Artwork is decorative. It does not change ship statistics or record-sheet symbols.") }}</p>
+          <a class="btn" href="{{ url_for('design_portrait', design_id=d.id) }}">{{ _("Change picture") }}</a>
+        </div>
+      </div>
       {% if selected.read_only %}
         <div class="panel body muted">{{ _("This is a catalog design and cannot be edited.") }}</div>
       {% endif %}

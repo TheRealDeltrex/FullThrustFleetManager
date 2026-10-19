@@ -6,6 +6,8 @@ No rules maths here (PLAN 2.7).
 
 from __future__ import annotations
 
+import io
+import json
 import logging
 import os
 import re
@@ -34,6 +36,7 @@ import fleet_rules
 import i18n
 import paths
 import pdf_export
+import portraits
 import ssd_layout
 import store
 from i18n import _
@@ -77,7 +80,12 @@ APP_VERSION = paths.app_version()
 @app.context_processor
 def _inject_globals() -> dict:
     settings = store.load_settings()
+    artwork = portraits.load()
     return {
+        "ship_portrait": lambda design, target="": portraits.resolve(design, artwork, target),
+        "portrait_target": portraits.ship_target,
+        "art_url": lambda filename: ("static/" + filename if BROWSER_MODE
+                                     else url_for("static", filename=filename)),
         "BROWSER_MODE": BROWSER_MODE,
         "IS_FROZEN": paths.is_frozen(),
         "APP_VERSION": APP_VERSION,
@@ -189,6 +197,75 @@ def dispatch_action(target: dict) -> bool:
 @app.route("/")
 def home() -> Response:
     return redirect(url_for("fleet_overview"))
+
+
+@app.route("/portrait/design/<design_id>", methods=["GET", "POST"])
+def design_portrait(design_id: str) -> str | Response:
+    design = store.get_design(design_id)
+    if not design:
+        abort(404)
+    return _portrait_editor(design, portraits.design_target(design),
+                            url_for("design_detail", design_id=design_id), design["name"])
+
+
+@app.get("/portraits/backup")
+def portrait_backup() -> Response:
+    data = json.dumps({"kind": "FTPictures", "portraits": portraits.load()}).encode("utf-8")
+    return send_file(io.BytesIO(data), mimetype="application/json", as_attachment=True,
+                     download_name="FleetManager-pictures.json")
+
+
+@app.post("/portraits/restore")
+def portrait_restore() -> Response:
+    file = request.files.get("pictures")
+    try:
+        doc = json.load(file) if file else None
+        if not isinstance(doc, dict) or doc.get("kind") != "FTPictures":
+            raise ValueError("file")
+        count, conflicts = portraits.merge(doc.get("portraits"), request.form.get("overwrite") == "on")
+        flash(_("{n} pictures restored; {k} newer local pictures kept.",
+                n=count, k=len(conflicts)), "success")
+    except (ValueError, UnicodeDecodeError):
+        flash(_("Not a ship-picture backup."), "error")
+    return redirect(url_for("settings"))
+
+
+@app.route("/portrait/ship/<fleet_id>/<uid>", methods=["GET", "POST"])
+def fleet_ship_portrait(fleet_id: str, uid: str) -> str | Response:
+    fleet = store.get_fleet(fleet_id)
+    ship = next((s for s in fleet["ships"] if s["uid"] == uid), None) if fleet else None
+    design = store.get_design(ship["design_id"]) if ship else None
+    if not ship or not design:
+        abort(404)
+    return _portrait_editor(design, portraits.ship_target(fleet_id, uid),
+                            url_for("fleet_select", fleet_id=fleet_id), ship["name"])
+
+
+def _portrait_editor(design: dict, target: str, back: str, name: str) -> str | Response:
+    if request.method == "POST":
+        action = request.form.get("action")
+        try:
+            if action == "upload":
+                file = request.files.get("picture")
+                portraits.save(target, data=file.read(portraits.MAX_UPLOAD + 1) if file else b"")
+            elif action == "choose":
+                art = request.form.get("art", "")
+                if not art:
+                    raise ValueError("art")
+                portraits.save(target, art=art)
+            elif action == "reset":
+                portraits.save(target)
+            else:
+                abort(400)
+        except ValueError:
+            flash(_("Choose a gallery picture or upload a valid PNG, JPEG or WebP "
+                    "(up to 5 MB and 16 megapixels)."), "error")
+        else:
+            flash(_("Ship picture updated."), "success")
+        return redirect(request.path)
+    return render_template("portrait.html", design=design, target=target, back=back, name=name,
+                           choices=portraits.gallery(design), class_code=portraits.class_code(design),
+                           is_ship=target.startswith("ship:"))
 
 
 # ---- Fleet overview tab (PLAN 9.3) -------------------------------------------------------------

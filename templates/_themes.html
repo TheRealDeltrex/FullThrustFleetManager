@@ -6,9 +6,11 @@
        ("aurora", _("Aurora"), _("Aurora: northern lights, green")),
        ("bridge", _("Bridge"), _("Bridge: tactical console, dark")),
        ("carbon-armor", _("Carbon Armor"), _("Carbon Armor: graphite and amber, dark")),
+       ("celestial-archive", _("Celestial Archive"), _("Celestial Archive: illustrated star atlas, light")),
        ("lunar", _("Lunar"), _("Lunar: pale full-moon grey and teal, light")),
        ("nebula", _("Nebula"), _("Nebula: violet, pink and teal, colourful")),
-       ("night-sky", _("Night Sky"), _("Night Sky: starfield and gold, dark"))) %}
+       ("night-sky", _("Night Sky"), _("Night Sky: starfield and gold, dark")),
+       ("orbital-foundry", _("Orbital Foundry"), _("Orbital Foundry: illustrated orbital shipyard, dark"))) %}
     <option value="{{ value }}" {% if selected == value %}selected{% endif %}>{{ name if short else label }}</option>
   {% endfor %}
 {% endmacro %}

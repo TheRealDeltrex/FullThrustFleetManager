@@ -25,6 +25,7 @@ from pathlib import Path
 import fleet_rules
 import migrations
 import paths
+import portraits
 from i18n import _
 from rulesets import RULESETS, presets
 
@@ -38,7 +39,8 @@ DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "l
                     # other races' (Kra'Vak while designing a human ship) are not, until ticked.
                     "show_custom_factions": True, "show_other_race_factions": False}
 # Appearance choices, keyed on <html data-theme> in static/style.css.
-THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid")
+THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid",
+          "orbital-foundry", "celestial-archive")
 
 
 def new_id() -> str:
@@ -1067,7 +1069,8 @@ def export_fleet(fleet_id: str) -> tuple[str, str] | None:
         return None
     designs = [d for d in designs_for_fleet(fleet).values() if not is_catalog(d["id"])]
     doc = {"schema_version": migrations.CURRENT, "kind": "FTFleet", "fleet": fleet,
-           "designs": designs, "factions": _factions_used(designs, fleet)}
+           "designs": designs, "factions": _factions_used(designs, fleet),
+           "portraits": portraits.subset(list(designs_for_fleet(fleet).values()), fleet)}
     return _filename(fleet["name"], EXTENSIONS["fleet"]), json.dumps(doc, indent=1, ensure_ascii=False)
 
 
@@ -1076,7 +1079,7 @@ def export_design(design_id: str) -> tuple[str, str] | None:
     if not design:
         return None
     doc = {"schema_version": migrations.CURRENT, "kind": "FTDesign", "design": design,
-           "factions": _factions_used([design])}
+           "factions": _factions_used([design]), "portraits": portraits.subset([design])}
     return _filename(design["name"], EXTENSIONS["design"]), json.dumps(doc, indent=1, ensure_ascii=False)
 
 
@@ -1088,7 +1091,7 @@ def export_backup() -> tuple[str, bytes]:
         for sub in ("designs", "fleets"):
             for p in sorted(_dir(sub).glob("*.json")):
                 z.write(p, f"{sub}/{p.name}")
-        for name in ("factions.json", "settings.json"):
+        for name in ("factions.json", "settings.json", "portraits.json"):
             if (root / name).is_file():
                 z.write(root / name, name)
     save_settings(last_backup=now())
@@ -1180,9 +1183,9 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     written, so a refused file leaves the library as it was."""
     try:
         if data[:2] == b"PK":
-            factions, designs, fleets, skipped = _read_backup(data)
+            factions, designs, fleets, art, skipped = _read_backup(data)
         else:
-            factions, designs, fleets = _read_document(data)
+            factions, designs, fleets, art = _read_document(data)
             skipped = 0
     except _Refused as refusal:
         return False, str(refusal), []
@@ -1201,8 +1204,11 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
             continue
         _write_json(path, doc)
         written += 1
+    art_written, art_conflicts = portraits.merge(art, overwrite_newer)
+    conflicts.extend(art_conflicts)
 
     if data[:2] == b"PK":
+        written += art_written
         msg = _("{n} items restored from the backup.", n=written)
         if skipped:
             msg += " " + _("{n} unreadable entries skipped.", n=skipped)
@@ -1216,8 +1222,9 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     return True, _("Design {name} imported.", name=designs[0]["name"]), []
 
 
-def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict]]:
-    """(factions, designs, fleets) of an .FTDesign or .FTFleet, all checked; raises _Refused."""
+def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict]:
+    """(factions, designs, fleets, ship pictures) of an .FTDesign or .FTFleet, all checked;
+    raises _Refused. Pictures are kept only for the designs and ships the file carries."""
     try:
         doc = json.loads(data.decode("utf-8-sig"))
     except (UnicodeDecodeError, ValueError):
@@ -1231,7 +1238,7 @@ def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict]]:
         design = _import_design(doc.get("design"))
         if not design:
             raise _Refused(_("The file holds no usable design."))
-        return factions, [design], []
+        return factions, [design], [], portraits.subset([design], doc=doc.get("portraits"))
     if kind == "FTFleet":
         fleet = normalize_fleet(doc.get("fleet"))
         if not fleet:
@@ -1245,12 +1252,14 @@ def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict]]:
             raise _Refused(_("The fleet uses designs that are not in the file: {ids}.", ids=names))
         if any(d["ruleset"] != fleet["ruleset"] for d in designs):
             raise _Refused(_("The file mixes designs of another ruleset into the fleet."))
-        return factions, designs, [fleet]
+        used = designs + [{"id": s["design_id"]} for s in fleet["ships"]]
+        return factions, designs, [fleet], portraits.subset(used, fleet, doc.get("portraits"))
     raise _Refused(_("Not a Fleet Manager file."))
 
 
-def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], int]:
-    """(factions, designs, fleets, entries skipped) of an .FTBackup; raises _Refused. An entry
+def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict, int]:
+    """(factions, designs, fleets, ship pictures, entries skipped) of an .FTBackup; raises
+    _Refused. An entry
     that cannot be read as a design or fleet of this app is skipped and counted, not guessed at;
     one from a newer app refuses the whole backup."""
     try:
@@ -1260,6 +1269,7 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], int]:
     designs: list[dict] = []
     fleets: list[dict] = []
     factions: list[dict] = []
+    art: dict = {}
     skipped = 0
     with z:
         if sum(info.file_size for info in z.infolist()) > MAX_BACKUP_BYTES:
@@ -1269,6 +1279,8 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], int]:
             if "factions.json" in names:
                 doc = json.loads(z.read("factions.json").decode("utf-8"))
                 factions = _import_factions(doc.get("factions") if isinstance(doc, dict) else None)
+            if "portraits.json" in names:
+                art = portraits.normalize(json.loads(z.read("portraits.json").decode("utf-8")))
             for name in names:
                 m = re.fullmatch(r"(designs|fleets)/([A-Za-z0-9_-]{1,64})\.json", name)
                 if not m:
@@ -1292,4 +1304,4 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], int]:
             raise _Refused(_("Not a Fleet Manager backup.")) from None
     if not designs and not fleets:
         raise _Refused(_("The backup is empty."))
-    return factions, designs, fleets, skipped
+    return factions, designs, fleets, art, skipped
