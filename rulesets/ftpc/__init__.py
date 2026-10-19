@@ -129,15 +129,49 @@ class FTPCRuleset:
     def quickref(self, systems_present: set[str], options: dict,
                  races: frozenset[str] = frozenset({"human"})) -> list[QuickRefEntry]:
         races = frozenset(races)
-        always = {"turn_sequence", "arcs", "hull_track", "threshold", "fleet_morale"}
+        always = {"turn_sequence", "arcs", "hull_track", "threshold", "rerolls", "fleet_morale"}
         if any(r == "human" or fb_tech.module_for(r).CREWED for r in races):
-            always |= {"crew", "fire_control"}
+            always |= {"crew", "fire_control"}  # a Sa'Vasku construct has neither (FB2 p.22)
+        wanted = set(systems_present)
+        for system, entries in SHARED_ENTRIES.items():
+            if system in wanted:
+                wanted |= entries
+        if options.get("pc_hangar_criticals") and wanted & set(common.FIGHTER_BAY_TYPES):
+            wanted.add("hangar_criticals")
+        if options.get("fighter_endurance"):
+            wanted.add("fighter_endurance")
         alien: set[str] = set()
         for race, prefix, base in ALIEN_ENTRIES:
             if race in races:
                 alien |= base | {f"{prefix}{t}" for t in systems_present}
         fb = [e for e in _load_quickref("fb") if e.key in alien]
-        return _quickref("ftpc", set(systems_present), tuple(sorted(always)), options) + fb
+        return _quickref("ftpc", wanted, tuple(sorted(always)), options) + fb
+
+
+# Systems the book describes together share one entry; the keys after the comment are not
+# systems but what the fleet sheet adds for a design (pdf_export.quickref_page).
+SHARED_ENTRIES = {
+    "hangar_bay": {"hangar", "launch_tube"},
+    "launch_tube": {"hangar"},
+    "boarding_torpedoes": {"boarding_torpedo_launcher", "boarding"},
+    "boarding_torpedo_launcher": {"boarding"},
+    "transporter": {"boarding"},
+    "marines": {"boarding"},
+    "sm_rack": {"sm_launcher", "missile_damage", "sm_magazine"},
+    "sm_launcher": {"missile_damage", "sm_magazine"},
+    "heavy_missile": {"sm_launcher", "missile_damage", "sm_magazine"},
+    "advanced_area_screen": {"area_screen"},
+    "superior_sensors": {"enhanced_sensors"},
+    "weasel_cruiser": {"dummy_bogeys"},
+    "weasel_capital": {"dummy_bogeys"},
+    "area_ecm": {"ecm"},
+    "tender_bay": {"tug_drive", "battle_riders"},
+    "portal": {"jump_gate"},
+    "troop_berthing": {"boarding"},
+    # Not systems.
+    "no_ftl": {"battle_riders", "system_defence"},
+    "troop_hold": {"boarding"},
+}
 
 
 # (race, FB2 entry prefix, the FB2 entries every sheet of that race carries), as the FB ruleset.

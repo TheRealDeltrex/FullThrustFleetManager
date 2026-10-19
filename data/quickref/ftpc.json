@@ -1,0 +1,544 @@
+{
+ "schema_version": 1,
+ "entries": [
+  {
+   "key": "turn_sequence",
+   "title": "Sequence of play",
+   "text": "A game turn consists of phases. Each phase represents a different kind of action (move, shoot, etc.) carried out by all the ships on the board. Each turn, all players move and fire their ships in the sequence given below. For the Introductory Scenario you will need only phases 1, 2, 5, 11, and 13. The game turn sequence is not as complex as it may appear at first sight, and performing actions in the correct order will soon become second nature. 1. Write orders Phase. Each game turn starts with both players simultaneously (and secretly) writing the movement orders for all the ships they control. Announce ships entering by FTL and place markers at each designated entry point.",
+   "book": "PC",
+   "page": 17
+  },
+  {
+   "key": "vector_movement",
+   "title": "Vector movement",
+   "text": "This is a completely OPTIONAL alternative movement system, which players may use instead of the standard FT movement rules described in the basic rulebook. The Vector movement rules give a much more accurate portrayal of how objects really maneuver in space; they are also a little more complicated than standard FT movement, though far less so than certain other rules' attempts at the same thing! Whether you choose to use them or not will depend entirely on personal taste and whether they fit the particular background you are using - if you are recreating a film or TV series where the ships clearly do NOT move in a true vector fashion, then you will obviously not want to use these rules.",
+   "book": "PC",
+   "page": 99
+  },
+  {
+   "key": "arcs",
+   "title": "Fire arcs",
+   "text": "The 360 degree space around each ship is divided into six arcs, each of 60 degrees. The arcs are indicated in Figure 9, and are designated Fore (FWD), Fore Starboard (FS), Aft Starboard (AS), Aft (AFT), Aft Port (AP), and Fore Port (FP). Each fire arc covers the angle between two of the course facings used in movement, and can be judged by eye from hexagonal ship bases. These fire arcs determine which of a ship's weapons may be brought to bear on a particular target, as some will be Fore, Aft, Fore Starboard, Aft Starboard, Fore Port, Aft, etc. Some weapons will be unable to fire through certain arcs. A given target ship may only be in one fire arc of the firing ship.",
+   "book": "PC",
+   "page": 27
+  },
+  {
+   "key": "fire_control",
+   "title": "Fire control systems",
+   "text": "The fire control systems (FireCon or FCS) of a ship are some of its most important fittings. Each FireCon represents a suite of sensor systems and computer facilities to direct the fire of the ship's offensive weaponry. Without these, ships are unable to locate and track an enemy with the precision required to fire at it. Each FireCon system permits the ship to engage one target during the firing portion of a turn.",
+   "book": "PC",
+   "page": 29
+  },
+  {
+   "key": "beam",
+   "title": "Beam fire",
+   "text": "A beam weapon rolls a number of dice equal to the class, minus 1 die for each range band beyond the closest. Example: A class 3 beam rolls 3 D6 at less than 12 MU, 2 at 12-24 MU, and 1 only at 24-36 MU. At ranges greater than 36 MU the weapon is out of range. A class 1 beam rolls 1 D6 at ranges 0-12 MU, and is out of range beyond 12 MU. For every die rolled, damage is inflicted on an unscreened target ship as follows: • Every 1, 2, or 3 rolled = no effect. (A miss or insignificant surface damage). • Every 4 or 5 rolled = 1 damage point to the target. • Every 6 rolled = 2 damage points to the target.",
+   "book": "PC",
+   "page": 29
+  },
+  {
+   "key": "rerolls",
+   "title": "Re-rolls",
+   "text": "Most beam weapons are capable of penetrating damage. Such weapons will be designated as BD* or (P). If a beam type weapon does not cause re-rolls it will be designated simply BD. Any roll of six inflicts the usual damage and allows a re-roll: roll an extra D6, and apply any further damage that is indicated by the result. The re-rolls ignore any defensive screens or armor and damage is applied directly to the hull. If a re-roll is also a six, then apply the damage and roll again. There is no limit to the number of re-rolls you can make if you keep throwing sixes. Re-rolls are made for a natural (unmodified) 6 only.",
+   "book": "PC",
+   "page": 29
+  },
+  {
+   "key": "screen",
+   "title": "Defensive screens",
+   "text": "Screens are the primary defense against beam weapons. Screens are force fields or magnetic fields that deflect or defocus beam energy, but also include materials that reflect energy or interfere with beam targeting. Screens can be burnt through, but quickly rebuild or recharge themselves. The actual degree of protection given depends on the level of screens that the target ship is carrying. Each level is represented on the SSD by a screen generator symbol, so a ship with level-1 screens would have a single screen generator.",
+   "book": "PC",
+   "page": 30
+  },
+  {
+   "key": "hull_track",
+   "title": "Ship damage",
+   "text": "It is important to first distinguish between hits and damage. The hit determines if, and how many times, the gunners have successfully directed their weapons into the target. The damage inflicted by those hits depends on the nature of the weapon used. Some weapons inflict damage that partially bypasses armor. Others do no physical damage to the ship; rather they cause disruption of the electronic systems on board. Damage is normally applied from left to right, starting with the armor. Once all the armor is gone, damage is applied to the first row of hull boxes. If the last box in a row of hull is destroyed, the ship will need to make threshold check rolls for all its systems (see below).",
+   "book": "PC",
+   "page": 31
+  },
+  {
+   "key": "threshold",
+   "title": "Threshold points",
+   "text": "As a ship takes damage from incoming fire, there is a chance that some of the ship's specific systems (drives, weapons, etc.) will be damaged or destroyed. To avoid having to roll for possible 'critical hits' every time damage is inflicted we instead use the idea of threshold points at which the player will check to see if each system on the ship is still functioning. A threshold point occurs each time the accumulated damage points reach (or pass) the end of one row of hull boxes on the ship's damage track. At this point, the player must roll one D6 for each system on the ship not already destroyed.",
+   "book": "PC",
+   "page": 32
+  },
+  {
+   "key": "advanced_fire_control",
+   "title": "Advanced fire control",
+   "text": "Advanced FireCon packs more range and tracking capability into the space of a normal FireCon setup. Advanced FireCon systems can track two separate targets each, acting just like two normal FireCons. Note: some weapon systems require AFCs to function. See individual weapon descriptions. Advanced FireCon can also track and scan enemy ships out to a range of 72 MU for detection purposes. Advanced FireCon cost 5 per mass.",
+   "book": "PC",
+   "page": 36
+  },
+  {
+   "key": "emp",
+   "title": "EMP projectors",
+   "text": "These are a type of beam projector which fires small packets of super-energized ions at enemy ships. These can cause overloads in some electronic systems, disabling systems. EMP projectors are the same size and mass as beam weapons, and generate a similar number of BD* in each range bracket. Their hits do not damage the hull and armor of target ship, rather they make that ship take threshold tests against some systems. They also ignore Standard screens and armor. The difficulty of the threshold tests depends on how many EMP hits the target ship has suffered that turn and how many rows of hull boxes were destroyed.",
+   "book": "PC",
+   "page": 36
+  },
+  {
+   "key": "plasma_cannon",
+   "title": "Plasma cannon",
+   "text": "Plasma Cannon are powerful weapons that send dense streams of plasma at their targets. These weapons can inflict massive amounts of damage very quickly, reducing even a heavily armored battleship to scrap. Plasma Cannon roll on the Beam Hit Probability Table in a similar way to beams but with some differences. Plasma Cannon inflict 1d6-2 (plus an additional -1 per level of screen) hits, with each hit inflicting 1 damage. So, on a roll of 3 it inflicts 1 hit, on a 4 it inflicts 2 hits, on a 5 it inflicts 3 hits, and on a 6 it inflicts 4 hits, penetrates, and gets a reroll!",
+   "book": "PC",
+   "page": 37
+  },
+  {
+   "key": "graser",
+   "title": "Grasers",
+   "text": "Grasers are gamma-ray lasers, a very potent laser weapon system. Functionally Grasers have two key differences from beams. First, they do 1d3 damage per hit, not the 1 damage per hit of conventional beams. Second, Grasers are Semi-Armor piercing weapons. As with beams Grasers hit with BD* and so they cause penetrating damage and get rerolls on a natural 6. Grasers inflict a number of BD* hits in the closest 12 MU range bracket as the size of the Graser. So a Graser-3 would inflict 3 BD* to 12 MU, 2 BD* to 24 MU, and 1 BD* to 36 MU, with each hit doing 1d3 damage semi-AP. Grasers cost 3 per mass.",
+   "book": "PC",
+   "page": 37
+  },
+  {
+   "key": "heavy_graser",
+   "title": "Heavy grasers",
+   "text": "Heavy Grasers are a more advanced and especially destructive beam weapon. Like beams, Heavy Grasers have numeric classes, although the increasing cost means that class 3 and above Heavy Grasers are less common. The range bands for Heavy Grasers are 18 MU, not 12, so a class 2 Heavy Graser rolls 2D6 at 0-18 MU, 1D6 at up to 36 MU. Heavy Grasers score hits as beam weapons: against unscreened targets rolls of 4 or 5 inflict 1 hit; rolls of 6 inflict 2. Against level-1 screens rolls of 4 do no damage, and against level-2 screens rolls of 5 or 6 inflict only 1 hit. Heavy Grasers are not penetrating weapons and do not re-roll on a 6.",
+   "book": "PC",
+   "page": 38
+  },
+  {
+   "key": "phaser",
+   "title": "Phasers",
+   "text": "Phasers are highly focused weapons combining lasers and particle beams together. Phasers have several key differences from beams or other energy weapons. First, they do 1d3 damage per hit, not the 1 damage per hit of conventional beams. Secondly, Phasers are Semi-Armor piercing weapons. Like beams, Phasers hit with BD*, so they can cause Penetrating damage and get rerolls on a natural 6. Phasers inflict a number of BD* hits in the closest 12 MU range bracket as the size of the Phaser. So a Phaser-3 would inflict 3 BD* to 12 MU, 2 BD* to 24 MU, and 1 BD* to 36 MU, with each hit doing 1d3 damage semi-AP. Phasers also have other targeting modes.",
+   "book": "PC",
+   "page": 38
+  },
+  {
+   "key": "transporter",
+   "title": "Transporter beams",
+   "text": "Transporters are an arcane technology that, though careful atomic manipulation and quantum calculation, can create a macroscopic \"tunneling\" event. The real-world effect is that it allows troops to be sent in an instant onto the deck of an enemy ship, where they can then fight to take control of that ship. Weapons of Mass Destruction (ex: Nuclear Bombs) cannot be sent via the transporter, as the probability junction cannot transport high-Z materials, so the uranium or plutonium of a bomb would be left behind. Transporter Beams generate a BD hits (no rerolls) against targets within range. Their number of BD at range is the same as any other beam mount.",
+   "book": "PC",
+   "page": 39
+  },
+  {
+   "key": "gatling",
+   "title": "Gatling battery",
+   "text": "The Gatling battery is a specialist short-range beam mount capable of delivering a rapid burst of fire. The more advanced aiming and control systems of the battery can also be used very effectively in point defense fire. A Gatling Battery used in anti-ship fire generates 6 beam dice (BD*) out to a range of 12 MU. These dice must all be directed at the same target. The Gatling Battery may also be used as a PDS, at which point it fully follows the rules for PDS. The one exception is that the Gatling Battery may have limited fire arcs, and if the ordnance or fighter is attacking from outside its arc, the Gatling Battery cannot fire in PDS mode.",
+   "book": "PC",
+   "page": 39
+  },
+  {
+   "key": "twin_particle_array",
+   "title": "Twin particle array",
+   "text": "The Twin Particle Array is a more developed version of the conventional beam weapon. By careful focusing and control of the particle stream a more consistent beam can be maintained. The TPA generates 2 beam dice (BD*) to a range of 24 MU. The TPA can also be used in PDS mode very effectively. In this mode it acts just as a PDS, with the exception that if the TPA has limited arcs, then the point defense coverage is also limited to those arcs, like the Gatling Battery above. Twin Particle Arrays cost 4 per mass. Twin Particle Array mass 2 1 arc Twin Particle Array mass 3 3 arcs Twin Particle Array mass 4 6 arcs Broadside Twin Particle Arrays may be purchased for 5 mass for two batteries.",
+   "book": "PC",
+   "page": 40
+  },
+  {
+   "key": "meson",
+   "title": "Meson projector",
+   "text": "Meson Projectors are a further refinement of the particle technologies in the Twin Particle Array, allowing a narrow beam of energetic mesons to be projected to great distances. The Meson Projector generates 1 BD* out to a range of 48 MU. Like the Gatling Battery, the Meson Projector can also be used as a PDS, limited only by the arc of the projector. Meson Projectors cost 4 per mass.",
+   "book": "PC",
+   "page": 40
+  },
+  {
+   "key": "needle_beam",
+   "title": "Needle beams",
+   "text": "Needle Beams are a specialist weapon system that uses a high intensity, super-focused particle beam to punch a small hole deep into an enemy warship to cripple key systems. The accuracy of the targeting depends on good intelligence. The more you know about the enemy ship, the more accurately you can target the intended system. With basic sensors you know what types of weapons the opponent has, but not the particulars of the mounts (size, arc). So for example, with that limited information you could target \"a beam mount\", and if a hit was scored, a random beam mount would be destroyed. Better information from improved sensors allows for more exact targeting.",
+   "book": "PC",
+   "page": 40
+  },
+  {
+   "key": "pulse_torpedo",
+   "title": "Pulse torpedoes",
+   "text": "Pulse Torpedoes are one of the most common projectile weapons in use. At short range they are very accurate, and a lucky hit can deliver a large amount of damage. Pulse Torpedoes are Semi-Armor piercing weapons. As a projectile weapon, Pulse Torpedoes ignore Standard Screens. If a Pulse Torpedo hits, it inflicts 1d6 point of damage, Semi-Armor piercing (SAP). The chance of a hit decreases with range. Pulse Torpedoes use the Projectile Weapon Hit Probability Table (page 153). Pulse Torpedoes also come in standard, long range (LR), and short range (SR) versions. All Pulse Torpedoes cost 3 per mass.",
+   "book": "PC",
+   "page": 41
+  },
+  {
+   "key": "submunition",
+   "title": "Turreted submunition pack",
+   "text": "Submunitions are one-shot weapons designed to deliver heavy damage at close range. The power and intensity of Submunition Packs means that they ignore the effects of Standard Screens. Once a Submunition Pack has been fired, it is crossed off the ship SSD and cannot be used again. The number of BD a Submunition Pack generates is based on the range. They inflict 3 BD hits to 6 MU, 2 BD to 12 MU, and 1 BD to 18 MU, and re-roll 6s. Submunition Packs cost 3 per mass.",
+   "book": "PC",
+   "page": 42
+  },
+  {
+   "key": "kgun",
+   "title": "K-guns",
+   "text": "Kinetic guns (K-Guns) are slugguns that use Gravitic technology to throw solid projectiles at very high speeds, making them accurate at the ranges of typical space combat, and capable on inflicting massive damage. K-Guns are projectile weapons, and as such their chance of hitting decreases with range, but they are unaffected by screens. All K-Guns are Armor Piercing (AP) weapons, as the hypervelocity slugs easily punch through most armor. Long range and short range versions of the K-Gun are available, though these are sometimes referred to as high velocity and low-velocity versions. The damage inflicted by a K-Gun depends on its size/class.",
+   "book": "PC",
+   "page": 43
+  },
+  {
+   "key": "mkp",
+   "title": "Multiple kinetic penetrators",
+   "text": "The Multiple Kinetic Penetrator is derived from research into hyper-kinetic penetrators and K-Guns. They are one shot weapons that launch a projectile at very high speed towards the target, inflicting great damage if they hit. As projectiles, MKPs ignore screens; furthermore they are armor piercing weapons. An MKP has a range of 12 MU, and hits on a roll of 4+. On a roll of a 6 it hits twice. Each hit inflicts 4 points of damage (AP). MKPs cost 4 per mass.",
+   "book": "PC",
+   "page": 44
+  },
+  {
+   "key": "boarding_torpedo_launcher",
+   "title": "Boarding torpedoes",
+   "text": "The Boarding Torpedo is a specialist projectile weapon designed to deliver boarding parties onto an enemy ship. These boarding parties could be stasis-protected Space Marines, killer Warbots, nano-technological swarms, or blood thirsty Reavers, depending on the particular flavor of your game universe. The Boarding Torpedo is different from other projectiles in one key respect - it is a magazine fed weapon. Every time it fires, hit or miss, it expends one of the Boarding Torpedoes in the magazine. When all the Boarding Torpedoes are used up the weapon can no longer fire.",
+   "book": "PC",
+   "page": 44
+  },
+  {
+   "key": "fusion_array",
+   "title": "Fusion array",
+   "text": "The Fusion Array is a somewhat complex weapon that fires and hits as a modified projectile weapon, yet does damage in BD*. It is possible for a fusion projectile to hit, and yet do no damage. The Fusion Array may be set in one of two modes, either as a Fusion Flare launcher, or as a Fusion Torpedo Launcher. The array must be configured before combat begins. It can be changed during a game by taking the weapon 'off line' for one turn. Switching modes must be written on the ship orders or noted on the SSD. Because the Fusion Array hits as a projectile, it ignores Standard Screens. Advanced Screens will prevent damage the same way they would against beam weapons.",
+   "book": "PC",
+   "page": 44
+  },
+  {
+   "key": "grav_gun",
+   "title": "Gravitic guns",
+   "text": "The Gravitic Gun is an application of drive technology that creates a propagating wave of gravitational disturbances and eddies. While this does not affect normal space very much, it can have profound effects on ships and other small craft using reactionless drives. Gravitic Guns generate beam dice, and hit like a normal beam weapon. The damage inflicted by the hits depends on the speed of the target, as a quick moving object in a reactionless drive field can experience sudden tidal surges that can cause severe internal damage (which is why the weapon is sometimes known as a \"Gravy Gun\" for the effect it can have on a crew).",
+   "book": "PC",
+   "page": 45
+  },
+  {
+   "key": "pulser",
+   "title": "Pulsers",
+   "text": "Pulsers represent the pinnacle of beam technology. The Pulser is an adaptable weapon system that can be configured before a battle to optimize it for long, short or medium range combat. A captain who chooses his Pulser settings wisely before a battle will have a decisive advantage. Also, because the Pulsers can be reset between battles, a single design of ship is capable of carrying out a variety of battlefield roles. The Pulser, in any mode, can also be used as a PDS. In PDS mode the Pulser is limited to the fire arcs of the weapon mount, but if the arcs permit it may fire into the aft arc of the ship. In PDS mode the Pulser delivers a single dice of point defense fire.",
+   "book": "PC",
+   "page": 45
+  },
+  {
+   "key": "spinal_mount",
+   "title": "Spinal mounts",
+   "text": "Spinal Mounts are weapons so immense and powerful that the gun forms the central core around which the rest of the ship is assembled. The devastating firepower of Spinal Mounts comes with some considerable tactical costs and limitations. --A ship may only mount up to 16 mass of Spinal Mount weapon per 50 mass of ship. So a battleship (mass 101-150) could mount up to three Medium Spinal Mounts. --Spinal Mounts must face forward, cannot be turret mounted, and have a fire arc that is half the normal width (30 degrees). --The turn after a Spinal Mount if fired a ship cannot maneuver at all, apply thrust, nor can it charge its FTL drive.",
+   "book": "PC",
+   "page": 46
+  },
+  {
+   "key": "sm_launcher",
+   "title": "Launching missiles",
+   "text": "Ships launch missiles in phase 3 of the turn. The firing player selects a ship, announces the launch of a missile or salvo, and places a Salvo Missile marker at the intended point of aim. This may be anywhere up to a maximum range of 24 MU from the firing ship, or 36 MU for extended range missiles, but must be within the boundaries of the fire arcs through which the launcher system may bear. (And not obstructed by any asteroids, planets, or similar obstacles.) The missile salvo marker is left in place while all ships are moved. An operational FireCon is necessary to launch Heavy Missiles, Salvo Missile Racks, or Salvo Missile Launchers (Section 6).",
+   "book": "PC",
+   "page": 49
+  },
+  {
+   "key": "missile_damage",
+   "title": "Missile damage",
+   "text": "Each Heavy Missile inflicts 3D6 of damage on the target. (As usual, half rounded up can be taken on armor, the remainder on the hull.) Each missile in a salvo that hits the target ship inflicts 1D6 of SAP damage. Standard Screens have no effect on missiles. Advanced level-1 Screens subtract 1 from each damage roll, Advanced level-2 Screens subtract 2. If using the optional rear arc attack rule (section 4), missiles do not do ignore armor. Example: Two missile salvoes are fired at a single target ship. The ship has the following systems that can defend against missile fire: one Point Defense System (PDS) and two Beam-1 batteries that can function in a defensive role.",
+   "book": "PC",
+   "page": 51
+  },
+  {
+   "key": "sm_magazine",
+   "title": "Mountings and magazines",
+   "text": "Heavy Missiles and Salvo Missile Racks (SMR) have individual symbols on the ship SSD. Once fired, it is crossed off and cannot be used again. Each counts as one system for threshold point checks. A Salvo Missile Launcher (SML) may fire one salvo per turn provided ammunition is left in the magazine. The magazine symbol is a box linked by lines to the SML(s) it feeds. Each magazine has a mass rating, which determines the number of Salvo Missile loads carried: mass 2 for a standard salvo, mass 3 for ER. Salvo Missile loads are indicated by small arrowhead symbols within the box which are crossed off as they are fired.",
+   "book": "PC",
+   "page": 51
+  },
+  {
+   "key": "rocket_pod",
+   "title": "Rocket pods",
+   "text": "Rocket Pods are short-range direct attack ordnance weapons. They are most effective in high-speed close-in maneuvering battles, a place where other types of ordnance often has trouble tracking and attacking enemy ships. Rocket Pods are one-shot weapons that are crossed off the SSD once fired. They are fired during ordnance launch, but they use a different attack mechanic. Select an enemy ship within range and firing arc of the rocket pod. The Rocket Pod fires TWO rockets at the target ship. Roll 1D6 for each rocket to see if its hits.",
+   "book": "PC",
+   "page": 53
+  },
+  {
+   "key": "plasma_bolt",
+   "title": "Plasma bolt launchers",
+   "text": "While not technically ordnance, in that PBLs have no expendable ammunition, they follow similar mechanics to missiles and are thus listed here. The Plasma Bolt Launcher (PBL) loads and fires bombs which then explode at range, bathing a huge area of space in superheated plasma. These plasma bombs are very difficult to destroy because they move quickly, have a small signature, and just tend to explode anyways if not destroyed quickly and completely. Plasma Bolt Launchers have two significant restrictions. Firstly, a ship can mount only one 1 launcher per 50 mass of ship. So a mass 101-150 ship could mount 3 launchers, while a mass 1-50 ship could only mount 1.",
+   "book": "PC",
+   "page": 54
+  },
+  {
+   "key": "minelayer",
+   "title": "Minelaying",
+   "text": "Ships equipped with minelaying systems may deposit mine markers on the table during the Ship Movement Phase. The player must note in the order for that ship that it will deploy mines in that turn by writing \"mine\" in the order box. Individual mines are carried as loads within a magazine. Each minelayer system fitted may deploy one mine per turn, so a ship with two mine systems may drop two markers during its movement, either both at the same spot, or at different points. The mines may be placed anywhere along the ship's course during that movement.",
+   "book": "PC",
+   "page": 55
+  },
+  {
+   "key": "advanced_screen",
+   "title": "Advanced screens",
+   "text": "Advanced Screens not only protect against beam weapons, but also against Pulse Torpedoes, missiles, and other weapons that normally ignore screens. Beams, Grasers, fighters, and other weapons that are affected by Standard Screens are affected in the same way when attacking a ship with Advanced Screens. SMPs and similar weapons that ignore Standard Screens and roll a combined hit and damage D6 are affected by Advanced Screens as if they were beams. Against level-1 Advanced Screens a roll of 5 inflicts 1 damage point, and a roll of 6 inflicts 2. Against level-2 Advanced Screens a roll of 5 or 6 inflicts 1 damage point.",
+   "book": "PC",
+   "page": 56
+  },
+  {
+   "key": "stealth_hull",
+   "title": "Stealth hull",
+   "text": "Stealth technology reduces the emission signature of the ship, making it more difficult for weapons systems to lock-on to the ship. This is represented by reducing the range bands of opponent's weapons. Level 1 Stealth reduces the size of range brackets by one-sixth. Level 2 Stealth reduces the size of range brackets by one-third. Example: A class 3 beam normally has a range of 36 MU. Against a Stealth-1 target it would have a range of 30 MU; against a Stealth-2 target it would have a range of 24 MU. The reduction of effective range also applies to missile lock-on range.",
+   "book": "PC",
+   "page": 56
+  },
+  {
+   "key": "stealth_field",
+   "title": "Stealth fields",
+   "text": "The Stealth Field is a powerful yet subtle ECM system that seeks to masks the emissions of a ship, making it more difficult to target and attack. In practice, the effects of Stealth Fields are identical to a Stealth Hull of the same level (see above). Stealth Fields are systems that require mass, however, and have an icon on the SSD that can be damaged by threshold tests, and can be targeted by Needle Beam fire (unlike Stealth Hulls which are only disabled by loss of complete rows of hull boxes). Like a Stealth Hull, a ship with level 2 Stealth fields cannot target enemy ships beyond a range of 24 MU without negating the effectiveness of the Stealth systems.",
+   "book": "PC",
+   "page": 57
+  },
+  {
+   "key": "armour",
+   "title": "Armour",
+   "text": "Armor requires 1 mass per box of protection. The total number of armor boxes is called the grade. The points cost of standard armor is twice the grade; 2 points per box.",
+   "book": "PC",
+   "page": 57
+  },
+  {
+   "key": "shell_armour",
+   "title": "Shell armour",
+   "text": "Armor can be configured in multiple layers, making it better able to stop Penetrating damage. Armoring a ship under multiple shells is difficult and expensive, but it can prove decisive by countering armor-piercing weapons. An Armor-Piercing weapon that strikes Shell Armor does one point of damage to each shell, and then deposits the remained of its damage into the hull. Semi-Armor Piercing weapons do half their damage to the outermost layer of Shell Armor (rounded up), and the remaining half of their damage to the next shell layer. Shell Armor and Regenerative Armor can be combined, simply add +2 to the cost of the Shell Armor to make it Regenerative Shell.",
+   "book": "PC",
+   "page": 57
+  },
+  {
+   "key": "armour_regen",
+   "title": "Regenerative armour",
+   "text": "A more advanced form of armor is available that has a limited capacity for self-repair. This can take the form of an organic carapace that seals over its wounds, or nanotech selfassemblers that quickly repair and reassemble broken components. During the End Phase roll a d6 for each point of Regenerative Armor that has been damaged. On a 5 or 6 the armor box is repaired. On a 1 the armor has sustained too much damage and it cannot regenerate further this battle. Ships with large amounts of Regenerative Armor can be very difficult to kill. Regenerative and non-Regenerative Armor can be combined on one ship. Regenerative Armor requires one mass per point.",
+   "book": "PC",
+   "page": 57
+  },
+  {
+   "key": "amsc",
+   "title": "Antimatter suicide charge",
+   "text": "Some species and civilizations have developed a rather fatalistic attitude towards combat that can be summarized as \"we die - I win!\" For these people, there is the Antimatter Suicide Charge. This is a system mounted deep within the hull of the ship that can be detonated, destroying the ship and damaging any unit within 3 MU. As the Antimatter Suicide Charge is buried deep within the hull of the ship, even if the warhead is broken apart by battle damage there is plenty of matter around (the remains of the ship) for the antimatter to annihilate and generate a satisfactory explosion. So the loss of an Antimatter Suicide Charge may result in a detonation.",
+   "book": "PC",
+   "page": 58
+  },
+  {
+   "key": "adfc",
+   "title": "ADFC",
+   "text": "Area Defense Fire Control (ADFC) is a high speed computer controlled tracking and data assimilation system designed to allow point-defense weapons (PDS, ADS and weapons that can fire as a PDS - Pulsers, Gatling Batteries, Twin Particle Arrays and Meson Projectors) to engage fighters and missiles making attacking runs against allied ships within 6 MU. A ship with ADFC may support ONE allied ship within 6 MU, with each PDS/ADS etc., only firing once per turn. An ADFC may not be used if the ship launched or recovered any fighters (section 8) during the turn. ADFC has a mass of 2, and costs 4 per mass.",
+   "book": "PC",
+   "page": 58
+  },
+  {
+   "key": "aadfc",
+   "title": "Advanced ADFC",
+   "text": "Advanced Area Defense Fire Control (AADFC) is an advanced version of the standard ADFC. It allows FireCon system designed to allow pointdefense weapons (as described above) to engage fighters and missiles making attacking runs against allied ships within 6 MU. A ship with AADFC may support ANY number of allied ships within 6 MU, though each PDS/ADS etc., may still only fire once a turn. AADFC has a mass of 2, and costs 5 per mass.",
+   "book": "PC",
+   "page": 59
+  },
+  {
+   "key": "pds",
+   "title": "Point defense systems",
+   "text": "Point Defense Systems are designed for shooting down incoming missiles or fighters. See sections 7 and 8 for details. Point Defense fire does not require a FireCon. Point Defense Systems (PDS) include light beams, auto cannon, or counter missile launchers with a large number of reloads. The more PDS symbols a ship has, the stronger the point defense. Beam-1 systems, K-1 guns and other small weapons are dual purpose and can also be used for point defense as noted in their descriptions. In this role they do not require a FireCon. Point Defense Systems can be fired through any arc, including the rear arc even if the ship has used the main drive in this turn.",
+   "book": "PC",
+   "page": 59
+  },
+  {
+   "key": "ads",
+   "title": "Area defense system",
+   "text": "The Area Defense System (ADS) is a modified version of the PDS that is capable of engaging enemy units out to a range of 12 MU. This is very useful when coupled with ADFC, as a central \"Aegis Cruiser\" which can cover a ship up to 12mu away. The ADS system fires like a PDS. It can fire once to a range of 12 MU, or twice to a range of 6 MU. Inside 6 MU the two PDS dice may be targeted at different enemy units. ADS can also be used to target enemy ships; like a PDS it inflicts one hit on a roll of 6. The ADS system is mass 2, and has 3 arcs of fire. For +1 mass the system can be made to fire into all 6 arcs. Like PDS, the ADS may fire into the ships aft arc, if its arcs extend there.",
+   "book": "PC",
+   "page": 59
+  },
+  {
+   "key": "scattergun",
+   "title": "Scatterguns",
+   "text": "Scatterguns (also known as Scatterpacks) are a one-shot weapon derived from Gravitic/kinetic weapon technologies. Small semi-guided projectiles are launched at the target at very high speed. The spray of pellets is very effective at ripping apart attacking fighters and missiles. The Scattergun has its own miniature integral FireCon system, and does not require data from the ships own FireCon. Furthermore, Scatterguns have an in-built ADFC capability, and they can be used to support allied ships within 6 MU. Scatterguns may fire into the aft arc behind the ship, like PDS. The range of a Scattergun is 6 MU.",
+   "book": "PC",
+   "page": 59
+  },
+  {
+   "key": "grapeshot",
+   "title": "Grapeshot",
+   "text": "Grapeshot Launchers are similar in function to a Kra'Vak Scattergun but not quite as effective. When fired the player rolls 4 PDS dice for each launcher. Mass: 1, cost 4 each and is one-shot only.",
+   "book": "PC",
+   "page": 60
+  },
+  {
+   "key": "area_screen",
+   "title": "Area screens",
+   "text": "Area Screens represent huge screen projectors that create an umbrella to provide protection for ships under it An area screen counts as one additional level of screen for the generating ship and any ship inside it's 6mu 'bubble' and will 'stack' with any screens those ships have up to a maximum of three. Example: a frigate with a level one screen is being protected by a ship generating an area screen. The frigate would count as having a level two screen against any incoming fire. Note the 'bubble' will not affect any fire coming from inside the 6mu radius.",
+   "book": "PC",
+   "page": 60
+  },
+  {
+   "key": "holofield",
+   "title": "Holofield",
+   "text": "Holofields are high-tech devices that use field generators and powerful ECM systems to create a complex pattern of sensor ghosts around a ship. This confuses enemy FireCon systems, making the ship more difficult to hit. Shooting at a ship with direct fire weapons that use beam dice will only score one hit on a 5 or 6 with a re-roll for the 6 if applicable. The Holofield will affect all re-rolls as well. Weapons that do not use beam dice add 12mu to the range. If this modifies the range beyond the weapons maximum range the shot automatically misses. Needle Beams and similar weapons, are ineffective against a ship protected by Holofields.",
+   "book": "PC",
+   "page": 60
+  },
+  {
+   "key": "ecm",
+   "title": "ECM",
+   "text": "Electronic Counter Measures (ECM) use powerful broad-band electromagnetic noise generators, along with chaff and multispectrum flares, to confuse enemy targeting sensors. ECM suites come in different sizes (levels); the larger the ECM suite the more effective it is. ECM has two effects in game. First, it confuses enemy sensors, making it difficult to gain accurate information about your ship. For every level of ECM your ship has subtracts 6 MU from the \"de-blip\" range of enemy sensors. This will also decrease the effective information range of the more advanced sensors by a similar amount.",
+   "book": "PC",
+   "page": 60
+  },
+  {
+   "key": "area_ecm",
+   "title": "Area ECM",
+   "text": "Area Electronic Counter Measures use even larger and more powerful electronic \"noise\" generators than standard ECM, and can cover an area around the ship. Area ECM is usually mounted into specialist electronic warfare ships in support of a fleet. Area ECM functions like conventional ECM, however it covers the ship mounting the system and all allied ships within 6 MU. The aggregate ECM level of a ship (its own plus any Area ECM) cannot exceed 3. Area ECM has one major side-effect. The jamming systems are so powerful they also blind the carrying ships own sensor systems to some degree. When Area ECM is turned on, the carrying ship cannot use its own FireCon systems.",
+   "book": "PC",
+   "page": 61
+  },
+  {
+   "key": "cloaking_device",
+   "title": "Cloaking device",
+   "text": "Cloaking Devices uses an energy field and a space distorting ability to bend light and other energies around the ship. The basic Cloaking Device listed here is a fairly primitive early generation version that provides only limited invisibility. When orders are written, the player must note if the ship will cloak or not. When a ship wishes to 'cloak' the player must note this in orders for that turn, and the number of turns the ship is to remain cloaked, e.g. 3 turns. Ships will cloak and uncloak at the end of the Ship Movement Phase. Note: The player does not remove the ship model from the table and moves it in the Ship Movement Phase as normal. Place a 'Cloak Marker\" on the ships base.",
+   "book": "PC",
+   "page": 61
+  },
+  {
+   "key": "cloaking_field",
+   "title": "Cloaking field",
+   "text": "Cloaking Fields are systems that render ships totally invisible and undetectable on all forms of sensors and visual scanning. They are thus very useful under certain circumstances, but they have one big disadvantage as well: though the cloaked ship cannot be seen, it also cannot see out. While the Cloaking Field is active it is in its own little world, with no interface to outside reality. The cloaked ship is thus reduced to navigating inertially, based on the data it had when entering cloaking mode – it has no idea what is going on around it until it decloaks again.",
+   "book": "PC",
+   "page": 62
+  },
+  {
+   "key": "cloak",
+   "title": "The Tuffley cloak",
+   "text": "The Tuffley Cloak (named after its creator Jon Tuffley) works exactly as the Cloaking Field but does not have a 'damaged level'. If the Tuffley Cloak is damaged it ceases to function. The mass of the Tuffley Cloak is 10% of the ships mass and cost 10 points per mass. Note: This version of the Cloaking Device is included here for those players wishing to use the original rules. It is possible for a player group to use both versions but should do so with caution. While it shouldn't create any balance problems this hasn't been fully play tested.",
+   "book": "PC",
+   "page": 62
+  },
+  {
+   "key": "nova_cannon",
+   "title": "Spinal mount nova cannon",
+   "text": "This is probably the single most deadly system available; however it does have its disadvantages as well – by all means experiment with fitting one to your largest ships. But don't say we didn't warn you! The Nova Cannon is a massive weapon that can only be mounted in the spinal core of a capital ship, and fires only directly forward – not just through the fore arc, but actually on the center line of the ship only. In other words, the weapon fires in whatever direction the ship's bow is pointing. Firing a Nova Cannon draws a massive amount of power from the ship's power plant.",
+   "book": "PC",
+   "page": 63
+  },
+  {
+   "key": "wave_gun",
+   "title": "Wave gun",
+   "text": "The Wave Gun is a smaller and slightly less over-the-top variant of the Nova Cannon. The system fires a plasma charge that expands as it travels along its line of flight, causing damage to any vessels in its path. As with the Nova Cannon, the Wave Gun may fire only along the main axis of the carrying ship, i.e. in a straight line bearing directly forward along the ship's current course. The ship may not fire any other weaponry in the turn that it fires the Wave Gun, and also counts as being unscreened through its entire frontal arc while the weapon is being fired. The Wave Gun needs to be charged prior to firing.",
+   "book": "PC",
+   "page": 63
+  },
+  {
+   "key": "reflex_field",
+   "title": "Reflex field",
+   "text": "The reflex Field is a variation on conventional screen technology in that it protects its carrying ship (partially) against attack from energy weapons such as standard beam batteries. The interesting aspect of the Reflex Field is that it has the capability to actually 'return' some or all of the attacking beam energy back to its source, causing damage to the firing vessel! 'Energy weapon' includes beams, Grasers, fighters, and any other weapon affected by Standard Screens. This nasty little device may be activated in any desired turn, but it must be written in the carrying ship's orders that the field device is to be activated.",
+   "book": "PC",
+   "page": 64
+  },
+  {
+   "key": "hangar",
+   "title": "Fighter launch and recovery",
+   "text": "Fighter groups may be launched from a carrier in any turn. A ship that is launching fighters cannot use the main drive to perform any velocity, course, or facing changes, so you need only write \"Launch\" as the movement order for that turn. Recovery ('landing') of fighters back on their carrier is similar to launching: The carrier must move at a constant course and velocity for that turn. The fighter group moves into contact with the carrier in the Fighter Movement Phase. Launching fighters move before all others in that game turn. The launching group may immediately form a screen for the carrier, attack other fighters or ships, or carry out any other normal action.",
+   "book": "PC",
+   "page": 66
+  },
+  {
+   "key": "launch_tube",
+   "title": "Launch tubes",
+   "text": "Launch tubes are connected to hangar bays and are used to launch and recover fighters. A single launch tube may serve multiple hangar bays. These are included in the game to allow players to design ships from certain TV shows whose fighter maintenance and re-arming areas are distinctly different than its launch areas. Note: if the ship applied thrust that turn it may not launch any fighters unless the tube/flight deck has been upgraded with catapults (see sect.",
+   "book": "PC",
+   "page": 66
+  },
+  {
+   "key": "fighter_endurance",
+   "title": "Fighter endurance",
+   "text": "A group will use up 1 CEF each turn it engages in combat, whether attacking a ship, another fighter group, or missiles. A fighter group also uses 1 CEF every time it makes a secondary move or evade. Normal movement during the first Fighter Movement Phase does not consume combat endurance factors. When all combat endurance is exhausted, the group may still move normally (though it may make no secondary moves) but may not make any attacks. There is no time limit on a group returning to its carrier after exhausting its CEF. A group that is engaged in a dogfight by an enemy group after exhausting its CEF may return fire, but only scores one kill on rolls of 6.",
+   "book": "PC",
+   "page": 71
+  },
+  {
+   "key": "hangar_criticals",
+   "title": "Critical hits on hangar bays",
+   "text": "When a hangar bay takes a critical hit the fuel and ordnance stored there can explode, causing collateral damage. The situation can become even more dangerous if the hangar bay has loaded fighters present. Threshold checks for hangar bays should be conducted before any other systems are rolled for. If an empty hangar bay suffers a critical hit due to a threshold check, roll a die. On a roll of 1-2 secondary explosions occur. This roll is modified by +1 for every row of hull boxes destroyed that turn (the same way normal threshold checks work). If an explosion occurs the ship takes an additional 1D3 points of damage.",
+   "book": "PC",
+   "page": 83
+  },
+  {
+   "key": "core_systems",
+   "title": "Core systems",
+   "text": "Core Systems are optional but recommended. While weapons, fire control sensors, and screen emitters are all surface features and thus are very vulnerable to incoming fire, there are certain vital systems that are usually buried deep within the ship's hull. These are the Core Systems and consist of the Command Bridge (which also includes computer systems, electronics, etc.), the Power Core, and the Life Support system. These three systems are grouped together on the ship system status display, with a box drawn around them.",
+   "book": "PC",
+   "page": 83
+  },
+  {
+   "key": "crew",
+   "title": "Damage control parties",
+   "text": "The number of Damage Control Parties (DCP) a ship has is proportional to its crew size, which is in turn a function of ship mass. This assumes that a certain percentage of the crew is allocated to form Damage Control Parties during combat. Military ships have one crew factor (CF) for every 20 mass or part thereof, and one DCP per crew factor. Thus a mass 1-20 ship has one CF and hence 1 DCP, a mass 21-40 ship 2 CFs and 2 DCPs, a mass 81-100 ship 5 CFs and 5 DCPs, and so on. For merchant and civilian vessels, which usually have much smaller crews than warships there will be one CF per 50 mass (or part thereof) of ship size.",
+   "book": "PC",
+   "page": 85
+  },
+  {
+   "key": "hold",
+   "title": "Cargo and passenger space",
+   "text": "The holds and passenger space are arranged on the ship SSD as a row of boxes, containing an H, P or T identifier as appropriate and a number that represents the actual capacity of the space. Example SSD of a repair ship with a lot of cargo Holds and passenger areas are lost by threshold checks like any other system. When a hold or passenger space box is crossed off, any cargo stored in it is assumed lost and any non-evacuated passengers in that area are killed.",
+   "book": "PC",
+   "page": 86
+  },
+  {
+   "key": "tug_drive",
+   "title": "FTL tugs and tenders",
+   "text": "There are times when ships are unable to travel in FTL Drive under their own power, but still must be moved between star systems. Obvious examples are System Defense Ships being transferred between duty stations, and starships that have suffered drive damage and loss of FTL capability which can only be repaired at a major naval facility. For jobs such as these, most forces use FTL tugs or tenders. A tug is normally a ship designed to recover other large vessels, while a tender is more commonly a transport for several smaller ships such as light System Defense Ships. In game terms tugs and tenders operate, and are built, in the same fashion.",
+   "book": "PC",
+   "page": 89
+  },
+  {
+   "key": "battle_riders",
+   "title": "Battleriders and motherships",
+   "text": "Some warships are designed as battleriders without an FTL Drive of their own, transported into battle like giant fighters by Motherships. The battleriders are designed in exactly the same way as other warships, except that they do not pay mass or points cost for an FTL Drive. The Mothership is treated as an FTL tug or tender, paying extra mass and points for internal bays or an oversized FTL Drive. A fleet with battleriders must deploy the Motherships as well. If the Mothership makes an FTL entry, the battleriders cannot detach and move independently until the next turn. The battleriders start with the velocity and course of the Mothership.",
+   "book": "PC",
+   "page": 90
+  },
+  {
+   "key": "system_defence",
+   "title": "System defense ships",
+   "text": "Although most ships in the game are considered capable of FTL travel between star systems, there are many possible classes of non-FTL capable vessels which operate entirely within a single star system. Typical examples are in-system freighters, System Defense Ships, and monitors (large, low thrust weapon platforms designed for close orbital defense). Non-FTL ships – other than battleriders with a Mothership – cannot be part of fleets for one-off battles unless specifically permitted by player agreement or scenario design.",
+   "book": "PC",
+   "page": 90
+  },
+  {
+   "key": "jump_gate",
+   "title": "Jump gates and portals",
+   "text": "Artificial gates must be activated before used. The player writes a \"Gate Activate\" order at the beginning of the turn and announces the activation when ships are moved. The gate may be used for transfers on the following turn until deactivated again. If the gate is under control of the player, usually the case when the gate is part of the infrastructure for a home system being defended, activation is automatic. If the gate is not under control and an attacker wishes to activate it to transfer forces into the system the defender rolls a D6 in the Ship Movement Phase: • On a roll of 1, 2, or 3 the activation is delayed that many turns.",
+   "book": "PC",
+   "page": 91
+  },
+  {
+   "key": "enhanced_sensors",
+   "title": "Advanced sensors",
+   "text": "If not playing an open book game, these optional rules for more advanced sensors can be used for disclosing information about ship capabilities and status to opponents. Advanced sensor suites are classified as Enhanced or Superior grade. Basic sensors immediately 'illuminate' the ship using them and the scanned ship, so models for both are placed on the table. If Enhanced or Superior active sensors are used, the scanning player also rolls 1 D6. If the ship is using Enhanced sensors use the die score as rolled; for Superior sensors add 2 to the score.",
+   "book": "PC",
+   "page": 94
+  },
+  {
+   "key": "dummy_bogeys",
+   "title": "Dummy bogeys and weasel boats",
+   "text": "These are optional rules for adding extra confusion and uncertainty to the game. With the agreement of both players, each side may deploy a number of 'dummy' Bogey Markers alongside the real ones, representing drones equipped to output the signature of an actual ship and thereby confuse the enemy as to the actual strength and disposition of the fleet. Each dummy bogey costs 20 points from the owner's fleet budget, and emits the drive signature of an escort class ship. It can be moved on the table with the maneuvering ability of any main drive strength the owner chooses. The dummy is removed from play as soon as it is scanned with active or passive sensors.",
+   "book": "PC",
+   "page": 95
+  },
+  {
+   "key": "minesweeper",
+   "title": "Minesweeping",
+   "text": "Just as certain ships may be equipped to lay mines, so others may be provided with systems to clear enemy mines safely. To attempt to dispose of a mine marker, the minesweeping ship must have its minesweeper system activated by noting this in its orders for that turn. It must then pass within 3 MU of the mine during the course of its movement, and at that point 1D6 is rolled. On a score of 1, the mine immediately attacks the minesweeper, detonating and causing damage as normal. On a roll of 2, the mine does not attack, but is also not disabled; it remains in position and can attack other ships as normal.",
+   "book": "PC",
+   "page": 96
+  },
+  {
+   "key": "ortillery",
+   "title": "Ortillery",
+   "text": "This is orbital artillery or a planetary bombardment system used for ground support fire from orbiting starships. It has no function in space combat, and cannot be used as an anti-ship weapon (Unless a ship has landed in the target area). Effects should be determined by players according to the ground combat system rules in use.",
+   "book": "PC",
+   "page": 96
+  },
+  {
+   "key": "boarding",
+   "title": "Boarding enemy ships",
+   "text": "It is possible to deliver Boarding Parties or Marines onto enemy ships, either by use of Boarding Torpedoes, moving along side, by using Transporter Beams (pg 39), or with Assault Shuttles (chapter8)\u0001 Once on board, the Boarding Parties try to disable key systems, disrupt the ship's internal communication, kill the crew, and knock out power systems. A ship's Damage Control Parties may be used in a Boarding Party role. Marines (troops with special shipboard combat training) may be purchased separately. In the following rules the term DCPs and Boarding Parties are used interchangeably.",
+   "book": "PC",
+   "page": 96
+  },
+  {
+   "key": "marines",
+   "title": "Marines",
+   "text": "Marines are highly specialized troops equipped and trained specifically for seizing enemy ships and space stations. A ship with embarked Marines may use them to destroy attacking enemy Boarding Parties or Marines. They are much more effective at this role than the ship's own crew, as they have the training and equipment for close combat. One Marine will kill another Boarding Party or Marine unit on a 4+. Attacking Marines may target defending Marines or attempt to do damage to the ship's hull boxes. They hit and kill defending Marines on a die roll of 4+. Combat between defending Marine units and attacking Marine/Boarding Parties is simultaneous. Resolve Boarding Combat during phase 12.",
+   "book": "PC",
+   "page": 97
+  },
+  {
+   "key": "fleet_morale",
+   "title": "Fleet morale",
+   "text": "The question of morale in naval games, whether science fiction or historical, is always a bit of a problem. Will a fleet fight to the last ship, or will it turn tail and run (or even surrender) after relatively few losses? The answer to this really depends on the kind of scenario being played, as the reactions of the fleet and its overall commander will be heavily influenced by what is at stake. If a force is defending a colony world against an invading fleet, it may well fight 'to the death' in a desperate attempt to protect the colony.",
+   "book": "PC",
+   "page": 98
+  },
+  {
+   "key": "starbase",
+   "title": "Movement and starbases",
+   "text": "The mass of a starbase represents only that used for ship equivalent systems. The true mass would be many times higher: you cannot use a tow ship or FTL tug to steal a starbase or sections thereof! While a ship is docked to a starbase the ship may be fired on as normal unless it is actually docked internally. (Some very large stations will have bays large enough to take smaller vessels.) An externally docked ship is, however, protected by any screen systems that the starbase has while docked. Whether a ship docked externally to a starbase can fire any of its own weaponry is up to the players or scenario designer.",
+   "book": "PC",
+   "page": 116
+  }
+ ]
+}
