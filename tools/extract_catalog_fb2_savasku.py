@@ -57,7 +57,7 @@ SHIPS = [
     (32, "Vas'Sa'Rosh",  'Superdreadnought',                 'SDN', 220, 724, 60, 16,
      f"PG:40 ST:{PORT} ST:{FORE} ST:{FORE} ST:{STBD} ST:{PORT} ST:{AFT} ST:{AFT} ST:{STBD} "
      "PL:F PL:FP PL:FS SN*2 SP*6 CX*4 DW"),
-    (32, "Vas'Sa'Teth",  'Heavy Fighter Carrier',            'CVH', 240, 779, 80, 12,
+    (32, "Vas'Sa'Teth",  'Heavy Fighter Carrier',            'CVA', 240, 779, 80, 12,
      f"PG:44 ST:{PORT} ST:{FORE} ST:{AFT} ST:{STBD} PL:F SN*2 SP*6 CX*3 DW*4"),
 ]
 # fmt: on

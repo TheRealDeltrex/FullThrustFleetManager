@@ -479,7 +479,7 @@ _WARSHIP_ORDER = tuple(code for _, code, _, _ in fb_data.SHIP_CLASSES)
 _AFTER_CH = _WARSHIP_ORDER.index("CH") + 1
 _CLASS_ORDER = {code: i for i, code in enumerate(
     _WARSHIP_ORDER[:_AFTER_CH] + ("CA",) + _WARSHIP_ORDER[_AFTER_CH:]
-    + ("CVE", "CVL", "CV", "CVH", "CVA", "M"))}
+    + ("CVE", "CVL", "CVA", "M"))}
 
 
 def _class_rank(design: dict) -> int:

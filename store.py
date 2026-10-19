@@ -166,6 +166,10 @@ def _fighter_extras(f: dict) -> dict:
     return out
 
 
+# Carrier codes folded into CVA (CVE < CVL < CVA); designs saved earlier still carry them.
+_RENAMED_CLASSES = {"CV": "CVA", "CVH": "CVA"}
+
+
 def normalize_design(doc: object) -> dict | None:
     """A clean design dict, or None when the document is not a usable design at all."""
     if not isinstance(doc, dict):
@@ -196,7 +200,7 @@ def normalize_design(doc: object) -> dict | None:
         "faction": _as_opt_str(doc.get("faction")),
         "name": _as_str(doc.get("name"), _("Unnamed design"), 80),
         "type_label": _as_str(doc.get("type_label"), limit=60),
-        "type_code": _as_str(doc.get("type_code"), limit=8),
+        "type_code": _RENAMED_CLASSES.get(code := _as_str(doc.get("type_code"), limit=8), code),
         # A ruleset that knows no starbases reads one as a warship (only FTCD offers it).
         "hull_kind": doc["hull_kind"] if doc.get("hull_kind") in ("merchant", "starbase") else "warship",
         "tmf": _as_int(doc.get("tmf"), 10, 0, 10000),
