@@ -643,6 +643,93 @@ def test_the_tech_base_is_a_fleet_option_and_free_systems_cost_nothing():
     assert "3 technology choices" in _tech_fleet(heavy)["tech_base"].message   # beams, grasers
 
 
+def _techs(**fields) -> set[str]:
+    from rulesets.ftpc import techbase
+
+    return techbase.design_techs(design(**fields), None, {})
+
+
+@pytest.mark.parametrize("fields, tech", [
+    ({"hull_advanced": True, "hull_boxes": 10}, "advanced_hull"),
+    ({"drive_advanced": True, "thrust": 4}, "advanced_drive"),
+    ({"ftl_advanced": True, "ftl": True}, "advanced_ftl"),
+    ({"armour": 4}, "armour"),
+    ({"armour": 6, "armour_layers": [4, 2]}, "shell_armour"),
+    ({"armour": 4, "armour_regen": True}, "regen_armour"),
+    ({"stealth_hull": 1}, "stealth_hull"),
+])
+def test_hull_options_map_to_their_technology(fields, tech):
+    assert tech in _techs(**fields)
+
+
+def test_hull_options_left_unused_cost_no_choice():
+    # An advanced flag on a part the ship does not have, or a single shell layer, is no tech.
+    techs = _techs(hull_advanced=True, hull_boxes=3, drive_advanced=True, thrust=0,
+                   ftl_advanced=True, ftl=False, armour=4, armour_layers=[4])
+    assert not techs & {"advanced_hull", "advanced_drive", "advanced_ftl", "shell_armour"}
+
+
+@pytest.mark.parametrize("system, tech", [
+    ({"type": "beam", "class": 3}, "beams"),
+    ({"type": "beam", "class": 4}, "heavy_beams"),
+    ({"type": "pulse_torpedo", "range": "short"}, "torpedoes"),
+    ({"type": "pulse_torpedo", "range": "long"}, "lr_torpedoes"),
+    ({"type": "pulse_torpedo", "range": "variable"}, "vs_torpedoes"),
+    ({"type": "kgun", "range": "standard"}, "kguns"),
+    ({"type": "kgun", "range": "long"}, "lr_kguns"),
+    ({"type": "kgun", "flak": "yes"}, "flak"),
+    ({"type": "spinal_mount", "kind": "psp"}, "spinal_psp"),
+    ({"type": "spinal_mount", "kind": "plasma"}, "spinal_plasma"),
+    ({"type": "spinal_mount", "kind": "beam"}, "spinal_beam"),
+    ({"type": "meson"}, "gatling"),
+    ({"type": "launch_tube", "catapult": "yes"}, "catapult"),
+    ({"type": "sm_rack", "load": "er"}, "er_missiles"),
+    ({"type": "heavy_missile", "load": "er"}, "er_missiles"),
+    ({"type": "superior_sensors"}, "superior_sensors"),   # p.127: 1 choice, unlike enhanced
+    ({"type": "minesweeper"}, "minesweeper"),             # p.127: 1 choice
+])
+def test_systems_map_to_their_technology(system, tech):
+    assert tech in _techs(systems=[{"uid": "s", **system}])
+
+
+def test_free_systems_take_no_technology():
+    # p.127: enhanced sensors, boat bays, holds, ortillery and weasels are 0 choices.
+    free = ["enhanced_sensors", "boat_bay", "hold", "ortillery", "weasel_cruiser", "launch_tube"]
+    assert _techs(systems=[{"uid": t, "type": t} for t in free]) == set()
+
+
+def test_a_meson_beside_a_twin_particle_array_takes_no_gatling():
+    techs = _techs(systems=[sys_("m", "meson"), sys_("t", "twin_particle_array")])
+    assert "tpa" in techs and "gatling" not in techs
+
+
+def test_loadouts_map_to_their_technology():
+    loadout = {
+        "magazines": [{"magazine": "m", "salvos": ["std", "er"]}],
+        "fighters": [{"hangar": "h", "type": "heavy", "extras": ["ftl"]},
+                     {"hangar": "h2", "type": "standard"}],
+        "gunboats": [{"carrier": "g", "type": "graser", "extras": ["ftl", "heavy"], "ecm": 1}],
+    }
+    techs = _techs(systems=[sys_("b", "beam")], default_loadout=loadout)
+    assert techs >= {"er_missiles", "heavy_fighters", "ftl_fighters", "beam_fighter", "gunboats",
+                     "grasers", "ftl_gunboats", "heavy_gunboats", "ecm"}
+
+
+def test_standard_fighters_on_a_kgun_ship_are_gun_fighters():
+    loadout = {"fighters": [{"hangar": "h", "type": "interceptor"}]}
+    assert "gun_fighter" in _techs(systems=[sys_("k", "kgun")], default_loadout=loadout)
+    assert "beam_fighter" in _techs(systems=[sys_("k", "kgun"), sys_("b", "beam")],
+                                    default_loadout=loadout)
+
+
+def test_overloaded_torpedoes_count_only_with_the_option():
+    from rulesets.ftpc import techbase
+
+    d = design(systems=[sys_("t", "pulse_torpedo")])
+    assert "overloaded_torpedoes" not in techbase.design_techs(d, None, {})
+    assert "overloaded_torpedoes" in techbase.design_techs(d, None, {"pc_overload_torpedoes": True})
+
+
 def test_gunboats_and_fighters_do_not_mix_in_a_tech_base():
     carrier = design(systems=[sys_("h", "hangar_bay"), sys_("t", "launch_tube"), sys_("g", "gunboat_rack")],
                      default_loadout={"fighters": [{"hangar": "h", "type": "attack"}],

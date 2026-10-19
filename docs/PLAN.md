@@ -487,9 +487,9 @@ the play rules PC leaves to the table (terrain, planets, ramming, special moves)
 
 **FTCD** (`Full Thrust Cross Dimensions.pdf`, 64 pages, text layer present) and **FTPC**
 (`project-continuum-full-thrust-version-1-1-4-april-20171.pdf`, 156 pages, plus the 8-page
-errata of 26 April 2017; text layers present). Both need the rulebook treatment first
-(bookmarks via `tools/tocs.py`, overprint check), and the errata folded into the FTPC ruleset.
-Source folder: the local folder holding the bought PDFs (set in `tools/build_rulebooks.py`).
+errata of 26 April 2017; text layers present). Both have had the rulebook treatment
+(bookmarks via `tools/tocs.py`, overprint check), and the errata are folded into the FTPC
+ruleset. Source folder: the local folder holding the bought PDFs (set in `tools/build_rulebooks.py`).
 
 ---
 

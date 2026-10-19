@@ -425,7 +425,7 @@
 
         setMsg("Loading the fleet manager…");
         // build_browser_bundle.py stamps a content hash here on every build.
-        var resp = await fetch("bundle.json?v=241b2d3cecca");
+        var resp = await fetch("bundle.json?v=__BUNDLE_VERSION__");
         if (!resp.ok) throw new Error("Could not fetch bundle.json (" + resp.status + ")");
         var bundle = await resp.json();
         Object.keys(bundle.files).forEach(function (k) {
