@@ -45,7 +45,8 @@ python -m venv .venv
 .venv/Scripts/python.exe app.py
 ```
 
-Then open <http://127.0.0.1:5000/>. Data is kept in `userdata/` next to the checkout; set
+Then open <http://127.0.0.1:5000/>. On Windows, once `.venv` is set up, double-click
+`Start-Dev-Version.bat` to start the app and open the browser. Data is kept in `userdata/` next to the checkout; set
 `FTFM_DATA_DIR` to put it elsewhere.
 
 **Start with [CLAUDE.md](CLAUDE.md)** before changing anything: it is the operating manual and
