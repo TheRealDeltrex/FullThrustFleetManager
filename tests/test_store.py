@@ -182,6 +182,24 @@ def test_squadrons():
     assert not store.remove_squadron(f, "sq1")[0]  # at least one squadron remains
 
 
+def test_order_squadron_reorders_and_moves_ships():
+    f = a_fleet()
+    store.add_squadron(f, "Escort")
+    d = a_design()
+    for sq in ("sq1", "sq1", "sq2", "sq1"):
+        store.add_ship(f, d["id"], squadron=sq)
+    assert [s["uid"] for s in f["ships"]] == ["sh1", "sh2", "sh3", "sh4"]
+    assert store.order_squadron(f, "sq1", ["sh4", "sh1", "sh2"])[0]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq1"] == ["sh4", "sh1", "sh2"]
+    # Dragged into Escort ahead of its ship.
+    assert store.order_squadron(f, "sq2", ["sh1", "sh3"])[0]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq2"] == ["sh1", "sh3"]
+    assert [s["uid"] for s in f["ships"] if s["squadron"] == "sq1"] == ["sh4", "sh2"]
+    assert len(f["ships"]) == 4
+    assert not store.order_squadron(f, "nope", ["sh1"])[0]
+    assert not store.order_squadron(f, "sq1", ["nope", ""])[0]
+
+
 def test_add_ship_names_and_numbers_by_type_code():
     d = a_design()
     f = a_fleet()

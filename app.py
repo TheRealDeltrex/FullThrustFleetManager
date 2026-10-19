@@ -422,6 +422,12 @@ def _remove_ship(fleet: dict) -> tuple[bool, str]:
     return store.remove_ship(fleet, request.form.get("uid", ""))
 
 
+@register_action("order_ships")
+def _order_ships(fleet: dict) -> tuple[bool, str]:
+    return store.order_squadron(fleet, request.form.get("squadron", ""),
+                                request.form.get("order", "").split(","))
+
+
 @register_action("update_ship")
 def _update_ship(fleet: dict) -> tuple[bool, str]:
     form = request.form
