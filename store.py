@@ -730,7 +730,8 @@ def create_fleet(ruleset: str, name: str, race: str = "human", faction: str | No
     fleet = normalize_fleet({
         "id": new_id(), "ruleset": ruleset, "race": race, "faction": faction or None,
         "name": name.strip() or _("New fleet"), "admiral": admiral, "points_limit": points_limit,
-        "allow_race_mixing": allow_race_mixing, "options": options or {},
+        "allow_race_mixing": allow_race_mixing,
+        "options": fleet_rules.default_options(ruleset) if options is None else options,
         "squadrons": [{"id": "sq1", "name": _("Main body")}],
     })
     save_fleet(fleet)

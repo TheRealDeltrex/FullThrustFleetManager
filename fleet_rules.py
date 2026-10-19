@@ -24,6 +24,15 @@ FLEET_OPTION_KEYS = (
     "pc_optional_systems", "pc_tech_base", "pc_adfc_no_mass", "pc_hangar_criticals",
     "pc_overload_torpedoes",
 )
+# What a new fleet starts with: options that add gear or mechanics are on; options that limit
+# fleet selection (patrol battle, capital limit, tech base) and alternative core rules (vector
+# movement, CPV hulls, paid advanced FTL, massless ADFC) are off. Saved fleets keep their own.
+DEFAULT_ON_OPTIONS = frozenset({
+    "core_systems", "rerolls", "fighter_endurance",
+    "mt_systems", "mt_superships", "mt_fighters",
+    "cd_optional_systems", "cd_multistage", "cd_super_weapons", "cd_system_defence",
+    "pc_optional_systems", "pc_hangar_criticals", "pc_overload_torpedoes",
+})
 
 
 def option_label(key: str) -> str:
@@ -56,6 +65,11 @@ def ruleset_option_keys(ruleset_id: str) -> tuple[str, ...]:
     """The options a fleet of this ruleset can switch, in the ruleset's display order."""
     rs = RULESETS.get(ruleset_id)
     return tuple(getattr(rs, "option_keys", FLEET_OPTION_KEYS)) if rs else ()
+
+
+def default_options(ruleset_id: str) -> dict:
+    """The options a new fleet of this ruleset starts with."""
+    return {k: k in DEFAULT_ON_OPTIONS for k in ruleset_option_keys(ruleset_id)}
 
 
 def ruleset_of(fleet: dict):
