@@ -190,6 +190,7 @@ SHARED_ENTRIES = {
     # Not systems.
     "no_ftl": {"battle_riders", "system_defence"},
     "troop_hold": {"boarding"},
+    "gunboats": {"gunboat_rack"},
 }
 
 

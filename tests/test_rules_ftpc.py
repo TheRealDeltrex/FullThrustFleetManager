@@ -785,3 +785,10 @@ def test_cpv_prices_every_race_hull(race, tmf, hull):
     d = design(race=race, tmf=tmf)
     assert rows(d, {"cd_cpv": True})["hull"].points == hull
     assert rows(d)["hull"].points == tmf
+
+
+def test_the_holofield_reference_keeps_its_exceptions():
+    """PC p.60: the paragraphs after the effect limit it, so the sheet must carry them."""
+    text = next(e.text for e in PC.quickref({"holofield"}, {}) if e.key == "holofield")
+    assert "6 MU or less" in text and "Graviton Beams" in text
+    assert "cannot be combined with other screen or field technology" in text
