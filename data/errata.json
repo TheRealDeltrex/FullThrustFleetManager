@@ -32,7 +32,7 @@
   {
     "id": "fb:sr:nsl-falke-s",
     "book_value": 60,
-    "rules_value": 30,
+    "rules_value": 28,
     "reason": "Star Ranger NSL page: the Falke/S (MASS 8, hull 2, no armour, thrust 6, FTL, 1 fire control, 1 class-1, 1 submunition pack) costs 30; the printed NPV 60 repeats the Nibelung beside it and cannot be right for an 8-MASS scout."
   },
   {
@@ -136,5 +136,173 @@
     "book_value": 392,
     "rules_value": 389,
     "reason": "Star Ranger Oceanic Union page: the conjectural Brisbane's listed hull and systems plus four 8-MASS modules use MASS 143 of 144 and cost 389 against the printed 392."
+  },
+  {
+    "id": "fb:sr:nac-arrow",
+    "book_value": 26,
+    "rules_value": 24,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nac-gladius",
+    "book_value": 37,
+    "rules_value": 35,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nac-comanche",
+    "book_value": 51,
+    "rules_value": 48,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:esu-zheng-he",
+    "book_value": 28,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:esu-cossack",
+    "book_value": 51,
+    "rules_value": 50,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:fse-requin",
+    "book_value": 36,
+    "rules_value": 35,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:fse-cygne",
+    "book_value": 29,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nsl-gepard",
+    "book_value": 40,
+    "rules_value": 37,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:nsl-nymphe",
+    "book_value": 36,
+    "rules_value": 33,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-ninja",
+    "book_value": 36,
+    "rules_value": 34,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-naginata",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-naginata-s",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ijsf-bakemono",
+    "book_value": 58,
+    "rules_value": 55,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ni-sheir",
+    "book_value": 29,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ni-nitznutz",
+    "book_value": 70,
+    "rules_value": 68,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:unsc-hermes",
+    "book_value": 30,
+    "rules_value": 28,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:unsc-hermes-sc",
+    "book_value": 33,
+    "rules_value": 31,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:scanfed-thorson",
+    "book_value": 30,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:rav-attacker",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:rav-attacker-missile",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-alpha",
+    "book_value": 42,
+    "rules_value": 39,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-beta",
+    "book_value": 42,
+    "rules_value": 39,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:kv-kelt-charlie",
+    "book_value": 44,
+    "rules_value": 41,
+    "reason": "Star Ranger prices this 3-box hull on three rows at 3 points a box (9); the app charges a hull of three boxes or fewer the usual 2 a box (6), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-ch-ka-tk",
+    "book_value": 28,
+    "rules_value": 27,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-sss-tk-vk",
+    "book_value": 32,
+    "rules_value": 31,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:cr-k-knn-tk",
+    "book_value": 55,
+    "rules_value": 53,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:if-al-shaulah",
+    "book_value": 37,
+    "rules_value": 36,
+    "reason": "Star Ranger prices this 1-box hull on three rows at 3 points a box (3); the app charges a hull of three boxes or fewer the usual 2 a box (2), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:if-khabar",
+    "book_value": 50,
+    "rules_value": 48,
+    "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
   }
 ]
