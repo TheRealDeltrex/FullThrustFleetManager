@@ -213,7 +213,8 @@ def normalize_design(doc: object) -> dict | None:
         "type_label": _as_str(doc.get("type_label"), limit=60),
         "type_code": _RENAMED_CLASSES.get(code := _as_str(doc.get("type_code"), limit=8), code),
         # A ruleset that knows no starbases reads one as a warship (FTCD and FTPC offer it).
-        "hull_kind": doc["hull_kind"] if doc.get("hull_kind") in ("merchant", "starbase") else "warship",
+        "hull_kind": (doc["hull_kind"] if doc.get("hull_kind") in ("merchant", "starbase", "section")
+                      else "warship"),
         "tmf": _as_int(doc.get("tmf"), 10, 0, 10000),
         "hull_boxes": _as_int(doc.get("hull_boxes"), 0, 0, 10000),
         "armour": _as_int(doc.get("armour"), 0, 0, 10000),
@@ -231,6 +232,8 @@ def normalize_design(doc: object) -> dict | None:
         # level and regenerative armour. Other rulesets ignore them.
         "hull_rows": doc["hull_rows"] if doc.get("hull_rows") in (5, 6) else 4,
         "stealth_hull": doc["stealth_hull"] if doc.get("stealth_hull") in (1, 2) else 0,
+        # A PC monster ship section's whole-ship MASS, which its drives are sized for (PC p.116).
+        "ship_mass": _as_int(doc.get("ship_mass"), 0, 0, 100000),
         "armour_regen": doc.get("armour_regen") is True,
         "streamlining": streamlining,
         "systems": systems,
