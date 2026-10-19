@@ -134,7 +134,7 @@ class FTPCRuleset:
         out = copy.deepcopy(design)
         out["id"] = "ftpc:" + str(design.get("id", "")).split(":", 1)[-1]
         out["ruleset"] = self.id
-        common.convert_star_ranger(out, {"range": "long"})
+        common.convert_star_ranger(out, {"range": "long"}, superior_sensors="compact_superior_sensors")
         source = out.get("source") if isinstance(out.get("source"), dict) else {}
         printed = source.get("npv_book")
         points = self.design_breakdown(out, {}).points
@@ -170,7 +170,8 @@ class FTPCRuleset:
 
 
 # Star Ranger's rules for the systems PC lacks (data/quickref/sr.json).
-SR_KEYS = frozenset({"rocket_cannon", "amt", "hdc", "age_penalty", "sr_hull_rows"})
+SR_KEYS = frozenset({"rocket_cannon", "amt", "hdc", "age_penalty", "sr_hull_rows",
+                     "compact_superior_sensors"})
 
 # Systems the book describes together share one entry; the keys after the comment are not
 # systems but what the fleet sheet adds for a design (pdf_export.quickref_page).
@@ -186,6 +187,7 @@ SHARED_ENTRIES = {
     "heavy_missile": {"sm_launcher", "missile_damage", "sm_magazine"},
     "advanced_area_screen": {"area_screen"},
     "superior_sensors": {"enhanced_sensors"},
+    "compact_superior_sensors": {"superior_sensors", "enhanced_sensors"},
     "weasel_cruiser": {"dummy_bogeys"},
     "weasel_capital": {"dummy_bogeys"},
     "area_ecm": {"ecm"},
