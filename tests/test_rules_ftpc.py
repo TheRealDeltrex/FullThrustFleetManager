@@ -460,8 +460,9 @@ def test_the_fleet_book_catalog_is_adopted():
     import store
 
     adopted = store.catalog_designs("ftpc")
-    assert len(adopted) == len(store.catalog_designs("fb"))
-    changed = {d["id"] for d in adopted if not d["source"].get("npv_book")}
+    rulebook = [d for d in store.catalog_designs("fb") if d["source"]["book"] != "SR"]
+    assert len([d for d in adopted if d["source"]["book"] != "SR"]) == len(rulebook)
+    changed = {d["id"] for d in adopted if not d["source"].get("npv_book") and d["source"]["book"] != "SR"}
     # The Tibet's level-1 screen is 3 MASS under the FB minimum and 2 under PC's 5% (PC p.56);
     # the Do'San is the FB2 misprint in data/errata.json.
     assert changed == {"ftpc:fb1:esu-tibet", "ftpc:fb2:kv-do-san"}

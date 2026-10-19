@@ -122,7 +122,7 @@ class FTCDRuleset:
         points = self.design_breakdown(out, {}).points
         if printed and printed != points:
             source["npv_book"] = 0
-            changes.append(f"{source.get('book')} p.{source.get('page')} prints NPV {printed}; "
+            changes.append(f"{common.source_ref(source)} prints NPV {printed}; "
                            f"under Cross Dimensions the design costs {points}.")
         if changes:
             out["notes"] = " ".join(["Cross Dimensions:", *changes, out.get("notes") or ""]).strip()

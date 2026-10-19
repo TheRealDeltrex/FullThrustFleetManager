@@ -140,7 +140,7 @@ class FTPCRuleset:
         if printed and printed != points:
             source["npv_book"] = 0
             out["notes"] = " ".join([
-                f"Project Continuum: {source.get('book')} p.{source.get('page')} prints NPV "
+                f"Project Continuum: {common.source_ref(source)} prints NPV "
                 f"{printed}; under Project Continuum the design costs {points}.",
                 out.get("notes") or ""]).strip()
         return out

@@ -471,7 +471,8 @@ def fleet_check(fleet_id: str) -> str:
 
 
 def _catalog_group(design: dict) -> str:
-    book = design["source"].get("book") or design["ruleset"]
+    code = design["source"].get("book") or design["ruleset"]
+    book = common.WEB_SOURCES.get(code, code)
     race = design.get("race") or "human"
     rs = RULESETS.get(design["ruleset"])
     group = book
@@ -480,7 +481,9 @@ def _catalog_group(design: dict) -> str:
         group = f"{book} · {name}"
     # A ruleset may adopt another's book (Cross Dimensions takes the Fleet Book ships), so the
     # adopted copies get their own group, named for the ruleset they are costed under.
-    if rs and book not in {b.code for b in rs.books}:
+    # Web sources (Star Ranger) belong to the Fleet Books.
+    own = {b.code for b in rs.books} | (set(common.WEB_SOURCES) if rs.id == "fb" else set()) if rs else set()
+    if rs and code not in own:
         group = f"{group} ({rs.short_label})"
     return group
 
@@ -502,7 +505,8 @@ def _class_rank(design: dict) -> int:
 def _catalog_key(design: dict) -> tuple:
     """Book and race (the group), then faction (factionless last), class size, mass and name."""
     faction = design.get("faction") or ""
-    return (design["ruleset"], design.get("race") or "human", not faction, faction,
+    return (design["ruleset"], book_sort_key(design["source"].get("book") or ""),
+            design.get("race") or "human", not faction, faction,
             _class_rank(design), design.get("tmf", 0), design["name"].lower())
 
 
@@ -572,6 +576,7 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "max_stages": getattr(rs, "max_stages", 1),
         "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
         "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
+        "source_name": common.WEB_SOURCES.get(design["source"].get("book") or ""),
     }
 
 
