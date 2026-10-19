@@ -165,6 +165,24 @@
               <label class="check"><input type="checkbox" name="hull_advanced" {% if d.hull_advanced %}checked{% endif %} />
                 {{ _("Advanced hull (3 rows)") }}</label>
             {% endif %}
+            {% if selected.breakdown.derived.pc_hull_options %}
+              {# Project Continuum: four, five or six rows (PC p.108), stealth hulls (p.57). #}
+              <input type="hidden" name="pc-hull-present" value="1" />
+              <label>{{ _("Hull rows") }}
+                <select class="input" name="hull_rows" {% if d.hull_advanced %}disabled{% endif %}>
+                  {% for n in selected.breakdown.derived.hull_row_choices %}
+                    <option value="{{ n }}" {% if (d.hull_rows or 4) == n %}selected{% endif %}>{{ n }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <label>{{ _("Stealth hull") }}
+                <select class="input" name="stealth_hull">
+                  {% for n, text in ((0, _("None")), (1, _("Level 1")), (2, _("Level 2"))) %}
+                    <option value="{{ n }}" {% if (d.stealth_hull or 0) == n %}selected{% endif %}>{{ text }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+            {% endif %}
             <label>{{ _("Armour") }}<input class="input" type="number" min="0" name="armour" value="{{ d.armour }}" /></label>
             {% if selected.breakdown.derived.shell_layers is defined %}
               {# A Phalon shell (FB2 p.35) or CD shell armour (CD p.20) stacks in layers whose
@@ -173,6 +191,10 @@
                 <input class="input" type="text" name="armour_layers"
                        placeholder="{{ _('e.g. 8, 4, 4') }}"
                        value="{{ d.armour_layers | join(', ') }}" /></label>
+            {% endif %}
+            {% if selected.breakdown.derived.pc_hull_options %}
+              <label class="check"><input type="checkbox" name="armour_regen" {% if d.armour_regen %}checked{% endif %} />
+                {{ _("Regenerative armour") }}</label>
             {% endif %}
             {% if selected.breakdown.derived.thrust_table is defined %}
               {# The race buys thrust with power each turn and has no rating to edit; the sheet
@@ -317,7 +339,7 @@
           </div>
         </div>
 
-        {% set carriers = d.systems | selectattr('type', 'in', ('hangar', 'fighter_group', 'drone_womb')) | list %}
+        {% set carriers = d.systems | selectattr('type', 'in', FIGHTER_BAY_TYPES) | list %}
         {% set magazines = d.systems | selectattr('type', 'equalto', 'sm_magazine') | list %}
         {% set pulsers = d.systems | selectattr('type', 'equalto', 'pulser') | list %}
         {% if carriers or magazines or pulsers %}
@@ -347,10 +369,10 @@
                             {% endfor %}
                           </select>
                         </label>
-                        <label class="check"><input type="checkbox" name="{{ prefix }}ftl"
-                          {% if group and 'ftl' in (group.extras or []) %}checked{% endif %} /> {{ _("FTL") }}</label>
-                        <label class="check"><input type="checkbox" name="{{ prefix }}kinetic"
-                          {% if group and 'kinetic' in (group.extras or []) %}checked{% endif %} /> {{ _("Kinetic") }}</label>
+                        {% for key, text in selected.fighter_extras %}
+                          <label class="check"><input type="checkbox" name="{{ prefix }}{{ key }}"
+                            {% if group and key in (group.extras or []) %}checked{% endif %} /> {{ text }}</label>
+                        {% endfor %}
                         <details class="swing">
                           <summary>{{ _("Swing role") }}:
                             {% for t in swing %}{{ label(t) }}{% if not loop.last %}, {% endif %}{% else %}{{ _("none") }}{% endfor %}</summary>

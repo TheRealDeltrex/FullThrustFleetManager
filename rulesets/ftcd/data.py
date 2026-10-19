@@ -8,7 +8,7 @@ p.47), plus the optional systems of chapters 6, 9, 10 and 14. Page numbers are p
 from __future__ import annotations
 
 from i18n import _
-from rulesets import BookRef, ParamDef, SystemDef
+from rulesets import BookRef, ParamDef, SystemDef, fleet_common
 
 BOOKS = (BookRef("CD", "Full Thrust: Cross Dimensions", "Full Thrust Cross Dimensions.pdf", 1),)
 
@@ -40,7 +40,7 @@ MAX_STAGES = 3
 
 # CD p.35: "the maximum mass for any battle rider is 60"; CD p.37: "each dummy bogey costs 20
 # points from the owner's fleet budget".
-RIDER_MAX_MASS = 60
+RIDER_MAX_MASS = fleet_common.RIDER_MAX_MASS
 DUMMY_BOGEY_POINTS = 20
 
 # CD p.35: an artificial jump gate's FTL drive moves 10 transfer MASS per MASS of drive; a

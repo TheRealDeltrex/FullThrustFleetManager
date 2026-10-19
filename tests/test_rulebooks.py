@@ -29,37 +29,35 @@ def test_every_book_a_ruleset_names_is_bundled():
             assert (paths.bundle_dir() / "rulebooks" / book.file).is_file(), book.file
 
 
-# ---- Reference-only books (Project Continuum) and Cross Dimensions ------------------------------
+# ---- Reference-only books, Cross Dimensions and Project Continuum ------------------------------
 #
-# Project Continuum is shipped to read; no ruleset implements its rules, so it hangs off
-# REFERENCE_BOOKS rather than off a ruleset whose page links would then resolve into the wrong
-# book. Cross Dimensions started there and moved to the FTCD ruleset's own books.
+# A book shipped only to be read hangs off REFERENCE_BOOKS rather than off a ruleset whose page
+# links would then resolve into the wrong book. Cross Dimensions and Project Continuum both
+# started there and moved to their rulesets' own books.
 
 
 def test_every_reference_book_is_bundled_too():
     from rulesets import REFERENCE_BOOKS
 
-    assert REFERENCE_BOOKS, "the reference-only books went missing"
     for book in REFERENCE_BOOKS:
         assert (paths.bundle_dir() / "rulebooks" / book.file).is_file(), book.file
 
 
-def test_reference_books_are_offered_beside_the_rules_books(client):
+def test_every_book_is_offered_and_listed(client):
     import app as app_module
-    from rulesets import REFERENCE_BOOKS
 
     shipped = app_module.books()
-    for book in REFERENCE_BOOKS:
-        assert shipped[book.code] is book
-    assert {"FB1", "FB2", "FT", "MT"} <= set(shipped)          # and the rules books still there
-    assert book.title in text(client.get("/settings"))          # listed where a reader finds them
+    assert {"FT", "MT", "FB1", "FB2", "CD", "PC", "PCE"} <= set(shipped)
+    page = text(client.get("/settings"))
+    assert all(book.title in page for book in shipped.values())   # listed where a reader finds them
 
 
-def test_cross_dimensions_is_the_ftcd_rules_source_not_a_reference_book():
+def test_cd_and_pc_are_rules_sources_not_reference_books():
     from rulesets import REFERENCE_BOOKS
 
-    assert "CD" not in {b.code for b in REFERENCE_BOOKS}
+    assert not {"CD", "PC", "PCE"} & {b.code for b in REFERENCE_BOOKS}
     assert [b.code for b in RULESETS["ftcd"].books] == ["CD"]
+    assert [b.code for b in RULESETS["ftpc"].books] == ["PC", "PCE"]
 
 
 def test_a_reference_book_opens_and_serves_its_file(client):
@@ -74,7 +72,7 @@ def test_the_reference_book_offsets_match_the_printed_folios():
 
     from rulesets import REFERENCE_BOOKS
 
-    for book in REFERENCE_BOOKS + RULESETS["ftcd"].books:
+    for book in REFERENCE_BOOKS + RULESETS["ftcd"].books + RULESETS["ftpc"].books:
         if book.code == "PCE":
             continue                                   # 8-page errata, no printed folios
         with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:

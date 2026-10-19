@@ -1,18 +1,23 @@
-"""FTCD fleet-level rules: battle riders, motherships and system defence ships (CD pp.34-35),
-and dummy bogeys (CD p.37).
+"""Fleet-level rules Cross Dimensions and Project Continuum share: battle riders, motherships and
+system defence ships (CD pp.34-35, PC pp.89-90), dummy bogeys (CD p.37, PC p.95), the fleet
+composition limits (CD p.57, PC p.139) and fleet morale (CD p.40).
 
 These judge a fleet as a whole, so they take the fleet's ships with their designs. Ships marked
-destroyed take no part, as in the fleet's points.
+destroyed take no part, as in the fleet's points. The ruleset hands in what differs: how it
+classes a ship, what it counts as stationary and which option, if any, dummy bogeys need.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from i18n import _
 from rulesets import Issue, common
-from rulesets.ftcd import rules as cd_rules
-from rulesets.ftcd.data import RIDER_MAX_MASS
 
 _int = common.as_int
+
+# CD p.35, PC p.90: "the maximum mass for any battle rider is 60".
+RIDER_MAX_MASS = 60
 
 
 def _carriers(design: dict) -> list[tuple[int, bool]]:
@@ -51,7 +56,8 @@ def _fits(riders: list[int], bins: list[int]) -> bool:
     return False
 
 
-def _composition(live: list[tuple[dict, dict]], options: dict, ship_points) -> list[Issue]:
+def _composition(live: list[tuple[dict, dict]], options: dict, ship_points,
+                 ship_class: Callable[[int], str]) -> list[Issue]:
     """CD p.57's fleet composition limits, each a fleet option: a patrol battle has no capitals
     and at most half its points on cruisers; a larger battle at most half on capitals, "including
     their fighters", so a ship's points are its loadout's too."""
@@ -59,7 +65,7 @@ def _composition(live: list[tuple[dict, dict]], options: dict, ship_points) -> l
         return []
     by_class: dict[str, int] = {}
     for s, d in live:
-        cls = cd_rules.ship_class(_int(d.get("tmf")))
+        cls = ship_class(_int(d.get("tmf")))
         by_class[cls] = by_class.get(cls, 0) + ship_points(s, d)
     total = sum(by_class.values())
     issues = []
@@ -85,18 +91,20 @@ def morale_mass(ships: list[tuple[dict, dict]]) -> tuple[int, int]:
     return lost, (total + 1) // 2
 
 
-def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict,
-                 ship_points=lambda ship, design: 0) -> list[Issue]:
+def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict, *,
+                 ship_class: Callable[[int], str], stationary: Callable[[dict], bool],
+                 ship_points=lambda ship, design: 0,
+                 dummy_option: tuple[str, str] | None = None) -> list[Issue]:
+    """`dummy_option` is (option key, its name) where dummy bogeys need a fleet option."""
     issues: list[Issue] = []
     live = [(s, d) for s, d in ships if s.get("status") != "destroyed"]
-    issues += _composition(live, options, ship_points)
+    issues += _composition(live, options, ship_points, ship_class)
 
     dummies = max(0, _int(fleet.get("dummy_bogeys"), 0))
     if dummies:
-        if options.get("cd_optional_systems") is False:
+        if dummy_option and options.get(dummy_option[0]) is False:
             issues.append(Issue("option_off", "violation", _(
-                "Dummy bogeys need the fleet option: {name}.",
-                name=_("Sensors, ECM, mines and ortillery"))))
+                "Dummy bogeys need the fleet option: {name}.", name=dummy_option[1])))
         if dummies > len(live):
             issues.append(Issue("too_many_dummies", "violation", _(
                 "At most one dummy bogey per real ship: {n} bogeys for {m} ships.",
@@ -105,7 +113,7 @@ def fleet_issues(fleet: dict, ships: list[tuple[dict, dict]], options: dict,
     if options.get("cd_system_defence"):
         return issues
     # Starbase sections and gates are terrain, not battle riders: they never move.
-    riders = [(s, d) for s, d in live if d.get("ftl") is not True and not cd_rules.stationary(d)]
+    riders = [(s, d) for s, d in live if d.get("ftl") is not True and not stationary(d)]
     if not riders:
         return issues
     for s, d in riders:

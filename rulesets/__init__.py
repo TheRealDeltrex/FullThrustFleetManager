@@ -177,11 +177,9 @@ def get_ruleset(ruleset_id: str) -> Ruleset:
 # are its rules sources: the things a "FB1 p.16" link in the UI points into, and the things the
 # quick reference quotes. These are neither, so they are kept apart rather than hung off a
 # ruleset they do not belong to. The viewer and the Settings list show both (see app.books()).
-REFERENCE_BOOKS: tuple[BookRef, ...] = (
-    BookRef("PC", "Full Thrust: Project Continuum", "Full Thrust - Project Continuum.pdf", 0),
-    BookRef("PCE", "Project Continuum Errata",
-            "Full Thrust - Project Continuum Errata.pdf", 0),
-)
+# Cross Dimensions and Project Continuum both started here and moved to their rulesets' books;
+# the list is empty until the app ships another book only to be read.
+REFERENCE_BOOKS: tuple[BookRef, ...] = ()
 
 
 # Book codes in publication order, for every list of rulebooks the player sees. A code missing
@@ -194,11 +192,12 @@ def book_sort_key(code: str) -> tuple[int, str]:
 
 
 # Registration imports come last: the packages import the dataclasses above.
-from rulesets import fb, ft2, ftcd  # noqa: E402
+from rulesets import fb, ft2, ftcd, ftpc  # noqa: E402
 
 # In publication order: FT2 with More Thrust (1992/1994), the Fleet Books (1998/2000), Cross
-# Dimensions (2006), then Project Continuum once it exists. Pickers list rulesets in this order
-# and the New fleet form numbers them from it, so core Full Thrust is 1.
+# Dimensions (2006), then Project Continuum (2014). Pickers list rulesets in this order and the
+# New fleet form numbers them from it, so core Full Thrust is 1.
 register(ft2.RULESET)
 register(fb.RULESET)
 register(ftcd.RULESET)
+register(ftpc.RULESET)

@@ -121,6 +121,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .badge.rs-fb { background: var(--rs-fb); }
 .badge.rs-ft2 { background: var(--rs-ft2); }
 .badge.rs-ftcd { background: var(--rs-ftcd); }
+.badge.rs-ftpc { background: var(--rs-ftpc); }
 .lib .body { padding: 10px 12px; }
 .lib-group { margin-bottom: 8px; }
 .lib-group summary { cursor: pointer; font-size: 12px; font-weight: 600; }
@@ -182,6 +183,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .ruleset-strip.rs-fb { background: var(--rs-fb); }
 .ruleset-strip.rs-ft2 { background: var(--rs-ft2); }
 .ruleset-strip.rs-ftcd { background: var(--rs-ftcd); }
+.ruleset-strip.rs-ftpc { background: var(--rs-ftpc); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .views { display: flex; gap: 4px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
@@ -244,6 +246,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="bridge"] .ruleset-strip.rs-fb { box-shadow: 0 0 12px var(--rs-fb); }
 [data-theme="bridge"] .ruleset-strip.rs-ft2 { box-shadow: 0 0 12px var(--rs-ft2); }
 [data-theme="bridge"] .ruleset-strip.rs-ftcd { box-shadow: 0 0 12px var(--rs-ftcd); }
+[data-theme="bridge"] .ruleset-strip.rs-ftpc { box-shadow: 0 0 12px var(--rs-ftpc); }
 [data-theme="bridge"] .brand { text-transform: uppercase; letter-spacing: 2.5px; font-size: 13px; }
 [data-theme="bridge"] .brand small { color: var(--accent); letter-spacing: 1px; }
 [data-theme="bridge"] .chrome-field { --chrome-field: #0e1726; border-color: #22324a; }

@@ -18,11 +18,12 @@ lines in place; delete anything that stops being true. When a milestone lands, m
 ## Current state
 
 M1-M14 are done and released (versions are tagged on `devversion`). The app has the Layout C shell,
-three rules engines (FB with the FB2 races, FT2 + More Thrust, and FTCD, Cross Dimensions, which
-also fields every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
+four rules engines (FB with the FB2 races, FT2 + More Thrust, FTCD, Cross Dimensions, and
+FTPC, Project Continuum; the last two also field every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
 layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
 rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
-Cross Dimensions is complete. Next on the roadmap: Project Continuum (FTPC). Releases follow
+Cross Dimensions is complete. Project Continuum's design system is in; its quick reference,
+turrets, gunboats, fighter racks and the Imperial tech base are next. Releases follow
 `.claude/skills/shipping-a-release/SKILL.md`.
 
 What exists:
@@ -448,7 +449,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   Sa'Vasku and Phalon cost as in FB2. The rest of p.21 is play (screens, penetration) and is in
   the quick reference as `cd_kravak`, `cd_savasku`, `cd_phalon` beside the race's FB2 entries;
   `kv_scattergun` is left out because CD's scattergun rules replace it.
-- Fleet-level rules (`fleet.py`, the protocol's `fleet_issues`): a non-FTL ship is a battle
+- Fleet-level rules (`rulesets/fleet_common.py`, shared with FTPC; the protocol's `fleet_issues`): a non-FTL ship is a battle
   rider (MASS 60 at most) and the fleet's live FTL ships must carry every rider, each in one
   tender bay or tug drive (an exact search, not first-fit; advanced-FTL tugs pool their transfer
   MASS, CD p.34). Over 60 it is a system defence ship and needs `cd_system_defence`, which also
@@ -473,6 +474,30 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   cost moves (the Kra'Vak, for their scatterguns) loses `npv_book` and says why in `notes`; the
   Si'Tek swaps one K-1 gun for an ADFC as p.21 says. The Design tab groups the copies as
   "FB1 (FTCD)" etc., and the landing page's class count leaves them out.
+
+## FTPC ruleset (`rulesets/ftpc/`)
+
+- Project Continuum section 13 (summary pp.118-124), human tech, errata (PCE) folded in.
+  `data.py` (books, picker of ~80 systems in groups, fighter points, class table p.106),
+  `rules.py` (`SYSTEM_RULES` type -> (mass_fn(s, design), points_fn(s, mass, design), label_fn)),
+  `__init__.py`. Golden: the PC pp.113-114 heavy cruiser is 294. The FB2 races dispatch to their
+  FB2 tech modules unchanged (errata: PC invalidates nothing in FB1/FB2).
+- New design fields `hull_rows` (4/5/6: hull boxes x2/x1.5/x1; an advanced hull is three rows
+  at x3 and ignores it), `stealth_hull` (0-2, +2/+4 a hull and armour box), `armour_regen`
+  (+2 a box). Normalised in `store`; the Design tab draws them when `derived["pc_hull_options"]`.
+  Rows past the third threshold on 4+.
+- Shell armour costs 2 x layer as Phalon; screens are 5% a level with **no minimum**, which is
+  why the FB1 Tibet costs 159 here. Broadside pairs (gatling/meson/pulser/TPA, SR K-1) are
+  priced per pair (`_paired`); arcs need not be contiguous (p.45).
+- PC hangars: a `hangar_bay` (6 MASS) needs a `launch_tube`; the combined `hangar` (9) still
+  exists. `common.FIGHTER_BAY_TYPES` lists every fighter-holding type for the loadout editor,
+  the loadout reader and the PDF tracker. A ruleset's `fighter_extras` property names the
+  per-group extras the loadout editor offers (FTCD ftl/kinetic, FTPC ftl/fast/long_range/heavy).
+- Options: `pc_optional_systems` (catapults, flawed design), `pc_adfc_no_mass`,
+  `pc_hangar_criticals`, `pc_overload_torpedoes`, plus CD's. Fleet rules are CD's through
+  `fleet_common.fleet_issues()`, except dummy bogeys need no option. The catalog is FB's adopted
+  as `ftpc:` ids. `data/quickref/ftpc.json` does not exist yet, so the sheet only gets the FB2
+  race entries.
 
 ## Catalog
 
@@ -562,8 +587,8 @@ image (`page.get_pixmap(dpi=200)`).
 - A ruleset's `books` are its **rules sources**: what a `book_url()` link points into and what
   the quick reference quotes. Books the app ships only to be read go in `REFERENCE_BOOKS`
   (`rulesets/__init__.py`) instead, so a code can never resolve a page reference into a book
-  whose rules nothing implements. Project Continuum (`PC`, errata `PCE`) is there; Cross
-  Dimensions (`CD`) was too until the FTCD ruleset made it a rules source. Both are free
+  whose rules nothing implements. It is empty now: Cross Dimensions (`CD`) and Project
+  Continuum (`PC`, errata `PCE`) were there until their rulesets made them rules sources. Both are free
   non-commercial publications distributed with GZG's agreement, credited in `NOTICE.md`.
   `app.books()` merges the two, rulesets winning a clash.
 - A new PDF needs no spec or workflow change: `fleetmanager.spec` and `deploy-pages.yml` both
