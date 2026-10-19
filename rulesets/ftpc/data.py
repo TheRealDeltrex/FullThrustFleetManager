@@ -292,6 +292,8 @@ def system_defs() -> list[SystemDef]:
         # are in data/quickref/sr.json and on the in-app Star Ranger rules page.
         SystemDef("rocket_cannon", _("Rocket cannon"), star_ranger, (cls(6), arcs_six), book="SR"),
         SystemDef("amt", _("Anti-matter torpedo"), star_ranger, book="SR"),
+        SystemDef("compact_superior_sensors", _("Compact superior sensors"), star_ranger,
+                  book="SR"),
         SystemDef("hdc", _("Hyperspatial distortion cannon"), star_ranger, (cls(3), arcs_1),
                   book="SR"),
         SystemDef("age_penalty", _("MASS lost to age"), star_ranger, (mass(_("MASS"), 1),),

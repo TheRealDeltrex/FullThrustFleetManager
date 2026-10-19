@@ -508,10 +508,12 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   option reprices their basic hull as it does a human one (PC p.140).
 - A holofield and a cloaking device each stand alone among `SCREENS_AND_FIELDS` (PC pp.60, 62);
   ECM is not in that set. A PC bay is one bay: `bays` is ignored in cost and capacity alike.
-- Star Ranger systems PC lacks are in its picker as a "Star Ranger" group (`book="SR"`):
+- Star Ranger systems PC lacks are in its picker as a "Star Ranger" group (`book="SR"`),
+  `compact_superior_sensors` (2/30, beside PC's 4/16 superior sensors; owner's call) among them:
   `rocket_cannon` (as a beam), `amt` (2/8), `hdc` ((class x 8) - 4, x3, one arc), `age_penalty`;
   hull rows also offer 3 (x3; a hull of 3 boxes or fewer costs 2 a box). Adopted Star Ranger
-  designs swap `lrpt` for the long-range torpedo and `mt_missile` for a heavy missile
+  designs swap `lrpt` for the long-range torpedo, `mt_missile` for a heavy missile and superior
+  sensors for the compact kind
   (`common.convert_star_ranger`; CD gets a class-2 torpedo). Their rules text is
   `data/quickref/sr.json` (hand-kept from the site, `url` per entry, `QuickRefEntry.url`): FB and
   PC quick references add it (`star_ranger_quickref`), `/rules/star-ranger` shows it all, and the
