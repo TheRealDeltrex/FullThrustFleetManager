@@ -26,6 +26,7 @@ BOOKS = {
     "FB1": ("Fleet Book 1.pdf", 0, 1),
     "FB2": ("Fleet Book 2.pdf", 0, 1),
     "CD": ("Full Thrust Cross Dimensions.pdf", 1, 3),
+    "PC": ("Full Thrust - Project Continuum.pdf", 0, 10),
 }
 
 # (ruleset, key, title, book, heading). `key` is the system type, or a rule the sheet needs.
@@ -167,6 +168,92 @@ CD_ENTRIES = [
 ]
 # fmt: on
 
+# Project Continuum carries a bookmark for every section, so each entry names one and its text
+# runs to the next bookmark: (ruleset, key, title, bookmark title). The window is the pages the
+# two bookmarks point at.
+# fmt: off
+PC_ENTRIES = [
+    ("ftpc", "turn_sequence", "Sequence of play", "2.6 Sequence of play"),
+    ("ftpc", "vector_movement", "Vector movement", "Excerpt from Fleet Book 1"),
+    ("ftpc", "arcs", "Fire arcs", "4.2 Fire arcs"),
+    ("ftpc", "fire_control", "Fire control systems", "4.4 Fire control systems"),
+    ("ftpc", "beam", "Beam fire", "4.5 Beam fire"),
+    ("ftpc", "rerolls", "Re-rolls", "4.6 Re-rolls"),
+    ("ftpc", "screen", "Defensive screens", "4.7 Defensive screens"),
+    ("ftpc", "hull_track", "Ship damage", "4.9 Ship damage and how weapons inflict damage"),
+    ("ftpc", "threshold", "Threshold points", "4.11 Threshold points"),
+    ("ftpc", "advanced_fire_control", "Advanced fire control", "Advanced Fire Control"),
+    ("ftpc", "emp", "EMP projectors", "5.4 EMP Projectors (Ion Cannons)"),
+    ("ftpc", "plasma_cannon", "Plasma cannon", "5.5 Plasma Cannon"),
+    ("ftpc", "graser", "Grasers", "5.6 Standard Grasers (SAP)"),
+    ("ftpc", "heavy_graser", "Heavy grasers", "5.7 Heavy Grasers (SAP)"),
+    ("ftpc", "phaser", "Phasers", "5.8 Phasers (SAP)"),
+    ("ftpc", "transporter", "Transporter beams", "5.9 Transporter Beams"),
+    ("ftpc", "gatling", "Gatling battery", "5.10 Gatling Battery (P)"),
+    ("ftpc", "twin_particle_array", "Twin particle array", "5.11 Twin Particle Array (P)"),
+    ("ftpc", "meson", "Meson projector", "5.12 Meson Projector (P)"),
+    ("ftpc", "needle_beam", "Needle beams", "5.13 Needle Beams"),
+    ("ftpc", "pulse_torpedo", "Pulse torpedoes", "5.14 Pulse Torpedoes (SAP)"),
+    ("ftpc", "submunition", "Turreted submunition pack", "5.15 Turreted Submunition Pack (P)"),
+    ("ftpc", "kgun", "K-guns", "5.16 K-Guns (AP)"),
+    ("ftpc", "mkp", "Multiple kinetic penetrators", "5.17 Multiple Kinetic Penetrators"),
+    ("ftpc", "boarding_torpedo_launcher", "Boarding torpedoes", "5.18 Boarding Torpedoes"),
+    ("ftpc", "fusion_array", "Fusion array", "5.19 Fusion Array"),
+    ("ftpc", "grav_gun", "Gravitic guns", "5.20 Gravitic Guns"),
+    ("ftpc", "pulser", "Pulsers", "5.21 Pulsers (P)"),
+    ("ftpc", "spinal_mount", "Spinal mounts", "5.23 Spinal Mounts"),
+    ("ftpc", "sm_launcher", "Launching missiles", "6.3 Launching missiles"),
+    ("ftpc", "missile_damage", "Missile damage", "6.5 Damage (SAP)"),
+    ("ftpc", "sm_magazine", "Mountings and magazines", "6.6 Mountings and magazines"),
+    ("ftpc", "rocket_pod", "Rocket pods", "6.7 Rocket Pods"),
+    ("ftpc", "plasma_bolt", "Plasma bolt launchers", "6.8 Plasma Bolt Launchers"),
+    ("ftpc", "minelayer", "Minelaying", "6.10 Minelaying"),
+    ("ftpc", "advanced_screen", "Advanced screens", "7.3 Advanced Screens"),
+    ("ftpc", "stealth_hull", "Stealth hull", "7.4 Stealth Hull"),
+    ("ftpc", "stealth_field", "Stealth fields", "7.5 Stealth Fields"),
+    ("ftpc", "armour", "Armour", "7.6 Armor"),
+    ("ftpc", "shell_armour", "Shell armour", "7.7 Shell or Layered armor"),
+    ("ftpc", "armour_regen", "Regenerative armour", "7.8 Regenerative Armor"),
+    ("ftpc", "amsc", "Antimatter suicide charge", "7.9 Antimatter Suicide Charge"),
+    ("ftpc", "adfc", "ADFC", "7.10 ADFC"),
+    ("ftpc", "aadfc", "Advanced ADFC", "7.11 Advanced ADFC"),
+    ("ftpc", "pds", "Point defense systems", "7.12 Point Defense Systems"),
+    ("ftpc", "ads", "Area defense system", "7.13 Area Defense System"),
+    ("ftpc", "scattergun", "Scatterguns", "7.14 Scattergun"),
+    ("ftpc", "grapeshot", "Grapeshot", "7.15 Grapeshot"),
+    ("ftpc", "area_screen", "Area screens", "7.16 Area Screens"),
+    ("ftpc", "holofield", "Holofield", "7.17 Holofield"),
+    ("ftpc", "ecm", "ECM", "7.18 ECM"),
+    ("ftpc", "area_ecm", "Area ECM", "7.19 Area ECM"),
+    ("ftpc", "cloaking_device", "Cloaking device", "7.20 Cloaking Device"),
+    ("ftpc", "cloaking_field", "Cloaking field", "7.21 Cloaking Field"),
+    ("ftpc", "cloak", "The Tuffley cloak", "7.22 The Tuffley Cloak"),
+    ("ftpc", "nova_cannon", "Spinal mount nova cannon", "7.23 Spinal Mount Nova Cannon"),
+    ("ftpc", "wave_gun", "Wave gun", "7.24 Wave Gun"),
+    ("ftpc", "reflex_field", "Reflex field", "7.25 Reflex Field"),
+    ("ftpc", "hangar", "Fighter launch and recovery", "8.1 Launch and recovery"),
+    ("ftpc", "launch_tube", "Launch tubes", "8.2 Launch tubes / flight deck"),
+    ("ftpc", "fighter_endurance", "Fighter endurance", "8.13 Endurance"),
+    ("ftpc", "hangar_criticals", "Critical hits on hangar bays",
+     "10.2 Critical hits on hangar bays (optional)"),
+    ("ftpc", "core_systems", "Core systems", "10.3 Core Systems"),
+    ("ftpc", "crew", "Damage control parties", "10.4 Damage Control Parties"),
+    ("ftpc", "hold", "Cargo and passenger space", "10.6 Cargo and passenger space"),
+    ("ftpc", "tug_drive", "FTL tugs and tenders", "11.6 FTL tugs and tenders"),
+    ("ftpc", "battle_riders", "Battleriders and motherships", "11.7 Battleriders and Motherships"),
+    ("ftpc", "system_defence", "System defense ships", "11.8 System Defense Ships"),
+    ("ftpc", "jump_gate", "Jump gates and portals", "Operation"),
+    ("ftpc", "enhanced_sensors", "Advanced sensors", "12.2 Advanced sensors"),
+    ("ftpc", "dummy_bogeys", "Dummy bogeys and weasel boats", "12.3 Dummy bogeys and weasel boats"),
+    ("ftpc", "minesweeper", "Minesweeping", "12.5 Minesweeping"),
+    ("ftpc", "ortillery", "Ortillery", "12.6 Ortillery"),
+    ("ftpc", "boarding", "Boarding enemy ships", "12.7 Boarding enemy ships"),
+    ("ftpc", "marines", "Marines", "Marines"),
+    ("ftpc", "fleet_morale", "Fleet morale", "12.8 Fleet morale"),
+    ("ftpc", "starbase", "Movement and starbases", "Movement and starbases"),
+]
+# fmt: on
+
 # Entries the page layout defeats: a two-column page with a figure caption or a spec panel in
 # the middle gives the reader's line order, not the sentence order, and a section that breaks
 # across a column ends mid-sentence. These were transcribed from the page images by hand, in
@@ -174,6 +261,16 @@ CD_ENTRIES = [
 # straight out of the page text. Check the page image before editing one.
 # fmt: off
 OVERRIDES = {
+    # PC p.60: the section runs on into a list the reader cannot end at a sentence.
+    ("ftpc", "holofield"):
+        "Holofields are high-tech devices that use field generators and powerful ECM systems to "
+        "create a complex pattern of sensor ghosts around a ship. This confuses enemy FireCon "
+        "systems, making the ship more difficult to hit. Shooting at a ship with direct fire "
+        "weapons that use beam dice will only score one hit on a 5 or 6 with a re-roll for the 6 "
+        "if applicable. The Holofield will affect all re-rolls as well. Weapons that do not use "
+        "beam dice add 12mu to the range. If this modifies the range beyond the weapons maximum "
+        "range the shot automatically misses. Needle Beams and similar weapons, are ineffective "
+        "against a ship protected by Holofields.",
     ("ft2", "turn_sequence"):
         "The game is played as a series of GAME TURNS, each Turn consisting of both (or all) "
         "players having the opportunity to move and fire their ships. Each Game Turn starts with "
@@ -488,14 +585,16 @@ NOISE = re.compile(r"^(\d+(\.\d+)*|Figure \d+:.*)$")
 
 
 def body_between(pages: list[str], heading: str, end: str | None,
-                 window: tuple[int, int]) -> tuple[str, int] | None:
+                 window: tuple[int, int], keep_first: bool = False) -> tuple[str, int] | None:
     """The text from `heading` up to `end` (or the end of the window), across the window's
     pages. A later page loses its running header; section numbers, page numbers and figure
     captions are dropped wherever they fall."""
     lines: list[tuple[str, int]] = []
     for index in range(window[0], window[1] + 1):
         page_lines = pages[index].splitlines()
-        lines += [(line, index) for line in (page_lines[1:] if index > window[0] else page_lines)]
+        if index > window[0] and not keep_first:
+            page_lines = page_lines[1:]
+        lines += [(line, index) for line in page_lines]
     start = next((i for i, (line, _page) in enumerate(lines) if _norm(line) == _norm(heading)), None)
     if start is None:
         return None
@@ -511,6 +610,25 @@ def body_between(pages: list[str], heading: str, end: str | None,
     text = re.sub(r"(?<=[0-9a-z])-\s+(?=[0-9])", "-", text)
     text = re.sub(r"\s+\)", ")", text)
     return text, lines[start][1]
+
+
+# Headings the page breaks over two lines: the first line is what the text layer matches.
+PC_SPLIT_HEADINGS = {
+    "4.9 Ship damage and how weapons inflict damage": "4.9 Ship damage and how weapons",
+    "10.2 Critical hits on hangar bays (optional)": "10.2 Critical hits on hangar bays",
+}
+PC_HEADER = re.compile(r"^(Full Thrust: Project Continuum|\d+)$")
+
+
+def bookmark_window(toc: list, title: str) -> tuple[str, int, int] | None:
+    """(next bookmark's title, first page index, last page index) of a PC bookmark."""
+    for i, (_level, name, page) in enumerate(toc):
+        if name.strip() == title:
+            following = toc[i + 1] if i + 1 < len(toc) else None
+            if following is None:
+                return None
+            return following[1].strip(), page - 1, max(page - 1, following[2] - 1)
+    return None
 
 
 def main() -> int:
@@ -547,6 +665,32 @@ def main() -> int:
         out.setdefault(ruleset, []).append({
             "key": key, "title": title, "text": OVERRIDES.get((ruleset, key)) or trim(body),
             "book": "CD", "page": index + 1 - offset,
+        })
+    with fitz.open(ROOT / "rulebooks" / BOOKS["PC"][0]) as doc:
+        toc = doc.get_toc()
+    pages, offset, _first = texts["PC"]
+    # The running header goes, and the double space PC sets after a section number.
+    pc_pages = ["\n".join(re.sub(r"\s{2,}", " ", line) for line in page.splitlines()
+                          if not PC_HEADER.fullmatch(line.strip()))
+                for page in pages]
+    for ruleset, key, title, bookmark in PC_ENTRIES:
+        where = bookmark_window(toc, bookmark)
+        heading = PC_SPLIT_HEADINGS.get(bookmark, bookmark)
+        end = where and PC_SPLIT_HEADINGS.get(where[0], where[0])
+        found = where and body_between(pc_pages, heading, end, where[1:], keep_first=True)
+        if not found or len(found[0]) < 60:
+            missing.append(f"{ruleset}/{key} (PC: {bookmark})")
+            continue
+        body, index = found
+        # The second line of a split heading, then a cost line or the next chapter's title
+        # left after the last sentence.
+        body = body.removeprefix(bookmark[len(heading):].strip()).strip()
+        text = trim(body)
+        if text[-1] not in ".!?":
+            text = text[:max(text.rfind(". "), text.rfind("! "), text.rfind("? ")) + 1]
+        out.setdefault(ruleset, []).append({
+            "key": key, "title": title, "text": OVERRIDES.get((ruleset, key)) or text,
+            "book": "PC", "page": index + 1 - offset,
         })
     for (ruleset, key), (book, title, page) in OVERRIDE_PAGES.items():
         out.setdefault(ruleset, []).append({

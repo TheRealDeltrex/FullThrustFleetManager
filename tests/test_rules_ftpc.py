@@ -477,3 +477,14 @@ def test_fleet_rules_are_the_cross_dimensions_ones():
     codes_ = {i.code for i in fleet_rules.fleet_report(f, {"r": rider}).fleet_issues}
     assert codes_ == {"riders_without_mothership"}
     assert PC.dummy_bogey_points == 20
+
+
+def test_the_quick_reference_quotes_project_continuum():
+    entries = {e.key: e for e in PC.quickref({"hangar_bay", "kgun", "heavy_missile"},
+                                             {"pc_hangar_criticals": True})}
+    assert {"turn_sequence", "rerolls", "kgun", "hangar", "launch_tube", "sm_launcher",
+            "missile_damage", "sm_magazine", "hangar_criticals"} <= set(entries)
+    assert entries["kgun"].book == "PC" and entries["kgun"].page == 43
+    assert "hangar_criticals" not in {e.key for e in PC.quickref({"hangar_bay"}, {})}
+    kravak = {e.key for e in PC.quickref({"kgun"}, {}, frozenset({"kravak"}))}
+    assert {"kv_kgun", "kv_thrust", "kgun"} <= kravak
