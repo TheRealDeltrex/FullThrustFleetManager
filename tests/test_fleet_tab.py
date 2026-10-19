@@ -207,32 +207,20 @@ def test_an_unknown_action_is_refused(client):
 # ---- Views ------------------------------------------------------------------------------------------
 
 
-def test_the_three_views_render(client):
+def test_the_two_views_render(client):
     fleet_id = make_fleet(client)
     add_ship(client, fleet_id)
     cards = text(client.get("/fleet?view=cards"))
-    assert "Main body" in cards
+    assert "Main body" in cards and "<svg viewBox=" in cards
 
     roster = text(client.get("/fleet?view=roster"))
     assert "Roster" in roster and "CE-1" in roster and "Furious" in roster
-
-    sheet = text(client.get("/fleet?view=sheet"))
-    assert "Record sheets" in sheet and "<svg viewBox=" in sheet
-
-
-def test_docked_and_destroyed_ships_are_left_off_the_record_sheets(client):
-    fleet_id = make_fleet(client)
-    add_ship(client, fleet_id)
-    uid = store.get_fleet(fleet_id)["ships"][0]["uid"]
-    client.post(f"/fleet/{fleet_id}/action",
-                data={"action": "update_ship", "uid": uid, "status": "docked", "squadron": "sq1"})
-    page = text(client.get("/fleet?view=sheet"))
-    assert "Not printed:" in page and "CE-1" in page
 
 
 def test_an_unknown_view_falls_back_to_cards(client):
     make_fleet(client)
     assert "Main body" in text(client.get("/fleet?view=nonsense"))
+    assert "Main body" in text(client.get("/fleet?view=sheet"))    # the retired record-sheet view
 
 
 # ---- Badges and the tournament check --------------------------------------------------------------

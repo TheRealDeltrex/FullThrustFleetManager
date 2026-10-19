@@ -104,7 +104,7 @@
         {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ selected.option_label(key) }}</span>{% endfor %}
         <div class="spacer"></div>
         <nav class="views" aria-label="{{ _('View') }}">
-          {% for value, label in (("cards", _("Cards")), ("sheet", _("Record sheet")), ("roster", _("Roster"))) %}
+          {% for value, label in (("cards", _("Cards")), ("roster", _("Roster"))) %}
             <a class="btn sm {% if selected.view == value %}primary{% endif %}"
                href="{{ url_for('fleet_overview', view=value) }}">{{ label }}</a>
           {% endfor %}
@@ -163,24 +163,6 @@
               {% endfor %}
             </tbody>
           </table>
-        </div>
-      {% elif selected.view == "sheet" %}
-        <div class="panel">
-          <h3>{{ _("Record sheets") }}</h3>
-          <div class="body sheets">
-            {% for ship in f.ships if ship.status not in ("docked", "hulk", "destroyed") %}
-              <figure class="sheet">
-                <figcaption>{{ ship.table_id }} · {{ ship.name }}</figcaption>
-                {{ selected.sheets[ship.uid] }}
-              </figure>
-            {% endfor %}
-          </div>
-          {% set left_off = f.ships | selectattr('status', 'in', ('docked', 'hulk', 'destroyed')) | list %}
-          {% if left_off %}
-            <div class="body muted">{{ _("Not printed:") }}
-              {% for ship in left_off %}{{ ship.table_id }} ({{ ship.status }}){% if not loop.last %}, {% endif %}{% endfor %}
-            </div>
-          {% endif %}
         </div>
       {% else %}
         {% for squadron in f.squadrons %}

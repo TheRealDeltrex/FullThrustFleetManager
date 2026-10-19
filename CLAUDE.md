@@ -97,7 +97,7 @@ What exists:
 
 ## Fleet overview tab
 
-- Routes: `GET /fleet` (the current fleet, `?view=cards|sheet|roster`), `GET /fleet/<id>`
+- Routes: `GET /fleet` (the current fleet, `?view=cards|roster`), `GET /fleet/<id>`
   (select and redirect), `POST /fleet/new`, `POST /fleet/<id>/action`, `GET /fleet/<id>/check`
   (the tournament check of PLAN 7, which blocks nothing).
 - **The current fleet lives in the Flask session** (`session["fleet_id"]`, falling back to the
