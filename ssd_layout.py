@@ -693,6 +693,9 @@ _PC_ICONS = dict(_CD_ICONS) | {
     "hangar_bay": _hangar,
     "launch_tube": _labelled(lambda: _("LT")),
     "boat_bay": _labelled(lambda: _("BOAT"), wide=True),
+    "fighter_rack": _labelled(lambda: _("RACK"), wide=True),
+    "gunboat_rack": _labelled(lambda: _("GBR"), wide=True),
+    "turret": _pc_weapon(lambda: _("TUR"), classed=False),
     "marines": _pc_counted(lambda: _("MAR")),
     "dcp": _pc_counted(lambda: _("DCP")),
     "troop_berthing": _labelled(lambda: _("TRB")),
@@ -733,7 +736,7 @@ WEAPONS = {
     # Project Continuum
     "emp", "transporter", "grav_gun", "plasma_cannon", "phaser", "heavy_graser", "gatling",
     "twin_particle_array", "meson", "boarding_torpedo_launcher", "fusion_array", "plasma_bolt",
-    "am_missile", "rocket_pod", "spinal_mount", "ads",
+    "am_missile", "rocket_pod", "spinal_mount", "ads", "turret",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
 

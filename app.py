@@ -549,6 +549,9 @@ def _design_context(design: dict, dirty: bool) -> dict:
         "fighter_label": common.fighter_label,
         # The per-group extras a rich loadout row offers as checkboxes (CD p.30, PC p.123).
         "fighter_extras": getattr(rs, "fighter_extras", ()),
+        # Gunboat squadrons for racks and boat bays (PC pp.79-82); empty elsewhere.
+        "gunboat_types": getattr(rs, "gunboat_types", ()),
+        "gunboat_extras": getattr(rs, "gunboat_extras", ()),
         # Field names and choices for each system type's parameters, from the picker.
         "param_defs": {d.type: {p.name: p for p in d.params}
                        for d in rs.system_types(design.get("race", "human"), options)},
@@ -693,6 +696,7 @@ def _read_loadout(design: dict) -> dict:
     fighters: list[dict] = []
     craft: list[dict] = []
     magazines: list[dict] = []
+    gunboats: list[dict] = []
     for system in design["systems"]:
         uid = system["uid"]
         if system["type"] in common.FIGHTER_BAY_TYPES:
@@ -703,6 +707,18 @@ def _read_loadout(design: dict) -> dict:
                     craft.append({"hangar": uid, "mass": mass})
             else:
                 fighters.append({"hangar": uid, "type": form.get(f"loadout-{uid}", "standard")})
+        elif system["type"] in common.GUNBOAT_CARRIER_TYPES:
+            if not form.get(f"gunboat-{uid}-type"):
+                continue
+            # One squadron of six per rack or bay (PC p.79), with its modifications.
+            offered = getattr(RULESETS.get(design["ruleset"]), "gunboat_extras", ())
+            squadron = {"carrier": uid, "type": form[f"gunboat-{uid}-type"]}
+            extras = [key for key, _label in offered if form.get(f"gunboat-{uid}-{key}") == "on"]
+            if extras:
+                squadron["extras"] = extras
+            if _form_count(f"gunboat-{uid}-ecm"):
+                squadron["ecm"] = _form_count(f"gunboat-{uid}-ecm")
+            gunboats.append(squadron)
         elif system["type"] == "sm_magazine":
             if f"salvos-{uid}-std" in form:
                 # Counts and a stage count per magazine (CD p.25: never a mix of regular and
@@ -728,6 +744,8 @@ def _read_loadout(design: dict) -> dict:
     }
     if craft:
         loadout["craft"] = craft
+    if gunboats:
+        loadout["gunboats"] = gunboats
     return loadout
 
 
@@ -1002,6 +1020,7 @@ def book_url(code: str, page: int | None = None) -> str:
 
 app.jinja_env.globals["book_url"] = book_url
 app.jinja_env.globals["FIGHTER_BAY_TYPES"] = common.FIGHTER_BAY_TYPES
+app.jinja_env.globals["GUNBOAT_CARRIER_TYPES"] = common.GUNBOAT_CARRIER_TYPES
 
 
 @app.route("/rulebook/<code>")

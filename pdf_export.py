@@ -375,6 +375,11 @@ def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         for system in design["systems"]:
             if system["type"] in common.FIGHTER_BAY_TYPES:
                 rows.append((f"{ship['table_id']} {ship['name']}", _("Fighter group"), 6, "fighters"))
+            elif system["type"] == "gunboat_rack" or (system["type"] == "boat_bay" and any(
+                    g.get("carrier") == system["uid"]
+                    for g in (ship.get("loadout") or design["default_loadout"]).get("gunboats", []))):
+                # PC p.79: six gunboats, six points of combat endurance.
+                rows.append((f"{ship['table_id']} {ship['name']}", _("Gunboat squadron"), 6, "fighters"))
             elif system["type"] in ("sm_magazine", "sm_rack"):
                 salvos = max(1, int(system.get("capacity", 2) or 2) // 2)
                 rows.append((f"{ship['table_id']} {ship['name']}", _("Salvos"), salvos, "salvos"))

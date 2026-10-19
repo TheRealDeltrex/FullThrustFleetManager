@@ -22,8 +22,8 @@ four rules engines (FB with the FB2 races, FT2 + More Thrust, FTCD, Cross Dimens
 FTPC, Project Continuum; the last two also field every Fleet Book ship), the catalog behind the NPV gate, the storage layer, the SSD
 layout engine, the Design, Fleet overview, Campaign and Settings tabs, the fleet PDF, the
 rulebook viewer, the signed Windows exe (M12) and the Pyodide build on GitHub Pages (M13).
-Cross Dimensions is complete. Project Continuum's design system and quick reference are in;
-turrets, gunboats, fighter racks and the Imperial tech base are next. Releases follow
+Cross Dimensions is complete. Project Continuum's design system, quick reference, turrets, gunboats and
+fighter racks are in; the Imperial tech base and monster ships are next. Releases follow
 `.claude/skills/shipping-a-release/SKILL.md`.
 
 What exists:
@@ -493,6 +493,14 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   exists. `common.FIGHTER_BAY_TYPES` lists every fighter-holding type for the loadout editor,
   the loadout reader and the PDF tracker. A ruleset's `fighter_extras` property names the
   per-group extras the loadout editor offers (FTCD ftl/kinetic, FTPC ftl/fast/long_range/heavy).
+- A `turret` {arcs 2-6, mounts [weapon uids]} costs by the MASS it holds (`turret_mass`, PC p.46),
+  edited as checkboxes like a magazine's feeds (`derived["turret_weapons"]`); removing a system
+  drops it from every `feeds` and `mounts` list. A `fighter_rack` holds one wing that must carry
+  the `robot` extra; `light` is an extra too (eight for the price of six, some types only).
+- Gunboats (PC pp.79-82) are a loadout key `gunboats`: [{carrier, type, extras, ecm}], one
+  squadron of six per `gunboat_rack` or `boat_bay` (`common.GUNBOAT_CARRIER_TYPES`); a ruleset's
+  `gunboat_types` / `gunboat_extras` properties drive the editor. Ruling: a squadron in a boat bay
+  takes 24 craft MASS (MASS 4 a boat, p.80). FTL gunboat squadrons flying alone are not modelled.
 - Options: `pc_optional_systems` (catapults, flawed design), `pc_adfc_no_mass`,
   `pc_hangar_criticals`, `pc_overload_torpedoes`, plus CD's. Fleet rules are CD's through
   `fleet_common.fleet_issues()`, except dummy bogeys need no option. The catalog is FB's adopted

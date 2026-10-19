@@ -107,7 +107,7 @@ def _norm_system(s: object) -> dict | None:
     for key, value in s.items():
         if key in out:
             continue
-        if key in ("arcs", "feeds"):
+        if key in ("arcs", "feeds", "mounts"):
             out[key] = _as_str_list(value)
         elif key == "class":
             out[key] = value if isinstance(value, str) and len(value) == 1 else _as_int(value, 1, 1, 9)
@@ -149,9 +149,20 @@ def _norm_loadout(v: object) -> dict | None:
         if isinstance(x, dict) and isinstance(x.get("pulser"), str)
         and isinstance(x.get("mode"), str) and x["mode"][:1].upper() in ("L", "M", "C")
     ] if isinstance(v.get("pulsers"), list) else []
+    # Project Continuum gunboat squadrons (PC pp.79-82) on a rack or in a boat bay.
+    gunboats = [
+        {"carrier": g["carrier"], "type": g["type"][:20],
+         **({"extras": [x[:20] for x in _as_str_list(g["extras"])]}
+            if _as_str_list(g.get("extras")) else {}),
+         **({"ecm": _as_int(g["ecm"], 0, 0, 9)} if isinstance(g.get("ecm"), int) and g["ecm"] > 0 else {})}
+        for g in v.get("gunboats", [])
+        if isinstance(g, dict) and isinstance(g.get("carrier"), str) and isinstance(g.get("type"), str)
+    ] if isinstance(v.get("gunboats"), list) else []
     out = {"fighters": fighters, "magazines": magazines, "pulsers": pulsers}
     if craft:
         out["craft"] = craft
+    if gunboats:
+        out["gunboats"] = gunboats
     return out
 
 
@@ -498,9 +509,10 @@ def remove_system(design: dict, uid: str) -> tuple[bool, str]:
     if not any(s["uid"] == uid for s in design["systems"]):
         return False, _("System not found.")
     design["systems"] = [s for s in design["systems"] if s["uid"] != uid]
-    for s in design["systems"]:  # a magazine may feed the launcher just removed
-        if isinstance(s.get("feeds"), list):
-            s["feeds"] = [u for u in s["feeds"] if u != uid]
+    for s in design["systems"]:  # a magazine may feed, a turret hold, the system just removed
+        for key in ("feeds", "mounts"):
+            if isinstance(s.get(key), list):
+                s[key] = [u for u in s[key] if u != uid]
     return True, _("System removed.")
 
 

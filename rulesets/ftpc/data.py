@@ -32,8 +32,35 @@ FIGHTER_POINTS = {
     "multi_role": 30,
     "assault_shuttle": 6,
 }
-# PC p.123: "+mod" upgrades bought per wing on top of the type.
-FIGHTER_EXTRAS = {"ftl": 6, "fast": 6, "long_range": 6, "heavy": 18}
+# PC p.123: "+mod" upgrades bought per wing on top of the type. A light wing is eight fighters
+# for the price of six (p.75); robot fighters are 6 less a wing (p.76).
+FIGHTER_EXTRAS = {"ftl": 6, "fast": 6, "long_range": 6, "heavy": 18, "light": 0, "robot": -6}
+# PC p.75: what a light wing may be, and the modifications it may not take.
+LIGHT_TYPES = frozenset({"standard", "interceptor", "attack", "fast", "missile"})
+LIGHT_FORBIDDEN = frozenset({"heavy", "long_range"})
+# PC p.110: a fighter rack holds one wing of robot fighters, 6 MASS at 1 point a MASS.
+FIGHTER_RACK_MASS = 6
+
+# PC pp.80-82, 123-124: points per gunboat; they fly in squadrons of six (p.79).
+GUNBOAT_POINTS = {
+    "beam": 9, "plasma": 9, "graser": 9, "gatling": 15, "needle": 9, "pulse_torpedo": 12,
+    "submunition": 12, "mkp": 15, "kgun": 12, "missile": 12, "rocket": 12, "pds": 9, "ads": 12,
+    "scatterpack": 15, "plasma_bomber": 15,
+}
+GUNBOAT_SQUADRON = 6
+# Squadron modifications (p.124): FTL +6, heavy or screened +12; electronic warfare +3 a
+# gunboat per ECM level, three levels at most.
+GUNBOAT_EXTRAS = {"ftl": 6, "heavy": 12}
+GUNBOAT_ECM_POINTS = 3
+GUNBOAT_ECM_MAX = 3
+# PC p.79: a gunboat rack is 18 MASS for a squadron, its cost in the gunboats'. FTL gunboats
+# cannot ride racks and count as MASS 4 in a boat bay (p.80), so a squadron needs 24 craft MASS.
+GUNBOAT_RACK_MASS = 18
+GUNBOAT_BOAT_MASS = 4
+GUNBOAT_CARRIERS = ("gunboat_rack", "boat_bay")
+
+# PC p.46: how much weapon MASS one MASS of turret holds, by the arcs the turret bears into.
+TURRET_HOLDS = {6: 2, 5: 3, 4: 4, 3: 5, 2: 6}
 
 # PC p.109: a hangar bay holds one wing of six fighters; a combined bay (the older rules, p.110)
 # is 9 MASS and holds the same.
@@ -156,6 +183,9 @@ def system_defs() -> list[SystemDef]:
         SystemDef("needle_beam", _("Needle beam"), beams, (cls(4), arcs_3), **ref(41)),
         SystemDef("grav_gun", _("Gravitic gun"), beams, (cls(4), arcs_six), **ref(45)),
         SystemDef("pulser", _("Pulser"), beams, (arcs_any,), **ref(45)),
+        SystemDef("turret", _("Turret"), beams,
+                  (ParamDef("arcs", "arcs", _("Arcs"), ["FP", "F", "FS"], 2, 6),
+                   ParamDef("mounts", "uids", _("Weapons"), [])), **ref(46)),
         SystemDef("pulse_torpedo", _("Pulse torpedo"), projectiles,
                   (ParamDef("range", "choice", _("Kind"), "standard",
                             choices=(("standard", _("Standard")), ("short", _("Short range")),
@@ -225,6 +255,8 @@ def system_defs() -> list[SystemDef]:
                             choices=(("no", _("No")), ("yes", _("Yes")))),), **ref(109)),
         SystemDef("hangar", _("Combined hangar bay"), craft, **ref(110)),
         SystemDef("boat_bay", _("Boat bay"), craft, (mass(_("Craft MASS carried"), 4),), **ref(110)),
+        SystemDef("fighter_rack", _("Fighter rack"), craft, **ref(110)),
+        SystemDef("gunboat_rack", _("Gunboat rack"), craft, **ref(79)),
         SystemDef("tender_bay", _("Tender bay"), craft,
                   (ParamDef("capacity", "int", _("Craft MASS carried"), 10, 1, None),), **ref(89)),
         SystemDef("tug_drive", _("Tug jump drive"), craft,

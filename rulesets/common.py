@@ -26,9 +26,11 @@ def fighter_label(fighter_type: str) -> str:
 ARCS = ("F", "FS", "AS", "A", "AP", "FP")
 
 # Systems that hold fighter groups, in every ruleset: a hangar (FB, CD; PC's combined bay), a PC
-# hangar bay, an FT2 fighter group and a Sa'Vasku drone womb. The loadout editor, the loadout
-# reader and the PDF tracker all list fighters by these.
-FIGHTER_BAY_TYPES = ("hangar", "hangar_bay", "fighter_group", "drone_womb")
+# hangar bay or fighter rack, an FT2 fighter group and a Sa'Vasku drone womb. The loadout
+# editor, the loadout reader and the PDF tracker all list fighters by these.
+FIGHTER_BAY_TYPES = ("hangar", "hangar_bay", "fighter_rack", "fighter_group", "drone_womb")
+# Systems that carry a PC gunboat squadron (PC pp.79-80).
+GUNBOAT_CARRIER_TYPES = ("gunboat_rack", "boat_bay")
 
 
 def round_half_up(numerator: int, denominator: int = 1) -> int:
