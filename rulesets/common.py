@@ -78,6 +78,18 @@ def cf_positions(boxes: int, crew_factors: int) -> list[int]:
     return [min(i * step, boxes) for i in range(1, crew_factors)] + [boxes]
 
 
+# Catalog sources that are not rulebooks: web pages a design links to by its source url.
+WEB_SOURCES = {"SR": "Star Ranger"}
+
+
+def source_ref(source: dict) -> str:
+    """Where a catalog design is printed: "FB1 p.16", or a web source's name."""
+    book = str(source.get("book") or "")
+    if book in WEB_SOURCES:
+        return WEB_SOURCES[book]
+    return f"{book} p.{source.get('page')}"
+
+
 # ---- Reading stored designs ---------------------------------------------------------------------
 
 

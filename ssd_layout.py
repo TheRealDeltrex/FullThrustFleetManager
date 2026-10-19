@@ -705,8 +705,22 @@ _PC_ICONS = dict(_CD_ICONS) | {
 }
 
 
+# Systems from the Star Ranger designs (fullthrust.star-ranger.com) on Fleet Book sheets, drawn
+# like their Cross Dimensions and Project Continuum namesakes.
+_FB_ICONS = dict(_SHARED_ICONS) | {
+    "graser": _graser,
+    "emp": _pc_weapon(lambda: _("EMP")),
+    "rocket_cannon": _pc_weapon(lambda: _("RC")),
+    "hdc": _pc_weapon(lambda: _("HDC")),
+    "lrpt": _pc_weapon(lambda: _("LRT"), classed=False),
+    "amt": _pc_weapon(lambda: _("AMT"), classed=False),
+    "superior_sensors": _labelled(lambda: _("SUP")),
+    "age_penalty": _labelled(lambda: _("AGE")),
+}
+
+
 ICON_SETS: dict[str, dict] = {
-    "fb": dict(_SHARED_ICONS),
+    "fb": _FB_ICONS,
     "ftcd": _CD_ICONS,
     "ftpc": _PC_ICONS,
     "ft2": dict(_SHARED_ICONS),
@@ -737,6 +751,8 @@ WEAPONS = {
     "emp", "transporter", "grav_gun", "plasma_cannon", "phaser", "heavy_graser", "gatling",
     "twin_particle_array", "meson", "boarding_torpedo_launcher", "fusion_array", "plasma_bolt",
     "am_missile", "rocket_pod", "spinal_mount", "ads", "turret",
+    # Star Ranger designs on Fleet Book sheets
+    "rocket_cannon", "hdc", "lrpt", "amt",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
 
@@ -914,8 +930,12 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     layers = derived.get("shell_layers") or ([armour] if armour else [])
     box_index = 0
     for row_len in reversed(layers):
+        # A row that would run off the box's right edge is centred on its own width instead.
+        armour_left = left
+        if left + min(row_len, per) * cell > width - 12:
+            armour_left = width / 2 - min(row_len, per) * cell / 2
         for i in range(row_len):
-            ccx = left + (i % per) * cell + cell / 2
+            ccx = armour_left + (i % per) * cell + cell / 2
             ccy = y + (i // per) * cell + cell / 2
             box_index += 1
             prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9,

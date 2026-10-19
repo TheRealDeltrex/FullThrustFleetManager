@@ -21,7 +21,7 @@ def _options(ruleset, design) -> dict:
 
 
 def test_catalog_files_present():
-    assert {p.name for p in CATALOG} >= {"fb_fb1.json", "ft2_core.json", "ft2_mt.json"}
+    assert {p.name for p in CATALOG} >= {"fb_fb1.json", "fb_starranger.json", "ft2_core.json", "ft2_mt.json"}
 
 
 def test_ids_unique():
@@ -41,7 +41,9 @@ def test_npv_gate(design):
         assert erratum["rules_value"] == b.points, "errata rules_value is stale"
         assert len(erratum["reason"]) > 20
         return
-    assert b.points == design["source"]["npv_book"]
+    # A Star Ranger variant often prints no NPV (0); it still has to be legal.
+    if design["source"]["npv_book"] or design["source"].get("book") != "SR":
+        assert b.points == design["source"]["npv_book"]
     assert violations == []
 
 
