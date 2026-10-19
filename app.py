@@ -962,7 +962,7 @@ def _repair(fleet: dict) -> tuple[bool, str]:
     plan = fleet_rules.repair_plan(design, ship["damage"], int(form.get("hull_repaired") or 0),
                                    chosen, successes)
     if plan["too_many"]:
-        return False, _("Only {n} systems may be repaired in a week.",
+        return False, _("Only {n} systems may be repaired in a week, the drive included.",
                         n=fleet_rules.REPAIR_SYSTEMS_PER_WEEK)
     return store.repair_ship(fleet, ship["uid"], plan)
 

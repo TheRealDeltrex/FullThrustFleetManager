@@ -69,6 +69,13 @@ def test_repair_plan_follows_ft_p35():
     assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 1})["drive_hits"] == 1
     assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 2})["drive_hits"] == 2
 
+    # The drive is one of the three systems a week: each drive roll takes a place.
+    assert fleet_rules.repair_plan(design, damage, 0, out[:3], {"drive": 2})["too_many"]
+    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 1})["too_many"] is False
+    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 2})["too_many"]
+    # 1D6 of hull a week.
+    assert fleet_rules.repair_plan(design, {"hull": 20}, 9, [], {})["hull"] == 6
+
 
 def test_repair_ignores_systems_the_ship_does_not_have():
     design = store.get_design(FURIOUS)

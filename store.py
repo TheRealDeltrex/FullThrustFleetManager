@@ -421,7 +421,7 @@ def make_variant(design_id: str) -> tuple[dict | None, str]:
 
 
 def design_save_issues(design: dict) -> list:
-    """Violations that block saving in strict mode (checked with no MT options)."""
+    """Violations that block saving in strict mode (the design alone, without a fleet's options)."""
     return [i for i in fleet_rules.design_issues(design, {}) if i.severity == "violation"]
 
 

@@ -275,12 +275,21 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
     def violation(code: str, message: str, uid: str | None = None) -> None:
         issues.append(Issue(code, "violation", message, uid))
 
+    def needs(key: str, code: str, message: str, uid: str | None = None) -> None:
+        # Like FTCD's fleet options: a design alone (no fleet) only notes the More Thrust option
+        # it needs; a fleet that has the option off makes it a violation.
+        if options.get(key) is False:
+            violation(code, message, uid)
+        elif key not in options:
+            issues.append(Issue("option_needed", "info", message, uid))
+
     options = options if isinstance(options, dict) else {}
     m, merchant = _mass(design), _is_merchant(design)
     if m < (data.MERCHANT_MIN if merchant else 1):
         violation("bad_tmf", _("MASS must be at least {n}.", n=data.MERCHANT_MIN if merchant else 1))
     if mt.is_supership(m) and not options.get("mt_superships"):
-        violation("mass_over_100", _("Ships over MASS 100 need the More Thrust superships option."))
+        needs("mt_superships", "mass_over_100",
+              _("Ships over MASS 100 need the More Thrust superships option."))
     thrust = _int(design.get("thrust"))
     if thrust > data.MAX_THRUST:
         violation("thrust_over_max", _("Thrust cannot exceed {n}.", n=data.MAX_THRUST))
@@ -309,9 +318,8 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
             violation("unknown_system", _("Unknown system type: {t}.", t=str(stype)), uid)
             continue
         if stype in mt.SYSTEMS and not options.get("mt_systems"):
-            violation(
-                "mt_toggle_off", _("This More Thrust system needs the More Thrust systems option."), uid
-            )
+            needs("mt_systems", "mt_toggle_off",
+                  _("This More Thrust system needs the More Thrust systems option."), uid)
         if stype == "beam" and s.get("class") not in data.BEAMS:
             violation("beam_class", _("Beam batteries are class A, B or C."), uid)
         if stype == "screen" and not 1 <= _int(s.get("level"), 1) <= data.MAX_SCREEN_LEVEL:
@@ -346,9 +354,8 @@ def validate_design(design: dict, options: dict) -> list[Issue]:
         if entry.get("type") not in mt.FIGHTER_SURCHARGE:
             violation("unknown_fighter_type", _("Unknown fighter type."), group["uid"])
         elif mt.fighter_requires_toggle(entry.get("type")) and not options.get("mt_fighters"):
-            violation(
-                "mt_toggle_off", _("Specialised fighters need the More Thrust fighters option."), group["uid"]
-            )
+            needs("mt_fighters", "mt_toggle_off",
+                  _("Specialised fighters need the More Thrust fighters option."), group["uid"])
     if _loadout_entries(design.get("default_loadout"), "magazines"):
         violation("salvos_without_magazine", _("FT2 ships have no salvo missile magazines."))
 

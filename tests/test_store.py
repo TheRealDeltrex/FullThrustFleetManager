@@ -464,3 +464,12 @@ def test_old_carrier_codes_load_as_cva():
     for old in ("CV", "CVH"):
         assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": old})["type_code"] == "CVA"
     assert store.normalize_design({"id": "x", "ruleset": "fb", "type_code": "CVL"})["type_code"] == "CVL"
+
+
+def test_a_legal_more_thrust_design_saves_in_strict_mode():
+    """A design alone has no fleet, so its More Thrust content is a note, not a block; the fleet
+    that fields it decides (MT p.3)."""
+    d, _msg = store.new_design("ft2", name="Missile boat")
+    d.update(tmf=20, thrust=2, ftl=True, systems=[{"uid": "m", "type": "mt_missile", "arcs": ["F"]}])
+    ok, msg, _id = store.save_design(d)
+    assert ok, msg

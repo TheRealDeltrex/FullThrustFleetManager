@@ -150,7 +150,8 @@ What exists:
 - `GET /campaign` (the current fleet), `POST /campaign/<id>/action`, `GET /dice/6`.
 - Campaign maths is pure and lives in `fleet_rules`: `hull_boxes`, `crew_factors_left`,
   `ship_is_crippled`, `repairable_systems`, `repair_plan` (FT p.35: 1D6 hull a week at a base,
-  up to three systems on 3+, a disabled drive needs two successes). `store` applies it:
+  up to three systems on 3+, a disabled drive needs two successes; ruling: each drive roll takes
+  one of the three places). `store` applies it:
   `set_ship_damage` (clamped to what the design has), `toggle_system_out`, `repair_ship`,
   `replenish_ship` (fighters, salvos and one-shot systems in one week).
 - **Clicking the diagram**: every primitive carries a `ref` (`hull:7`, `armour:2`,
@@ -308,7 +309,10 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   exactly TMF, FT2 at most the system capacity (hull and drives take no MASS in FT2).
 - `validate_design(design, options)` also flags More Thrust content whose fleet toggle is off in
   `options` (`mt_toggle_off`, `mass_over_100`), so fleet conformance is just validation with the
-  fleet's options.
+  fleet's options. As with FTCD's options, a key absent from `options` (a design alone, as the
+  Design tab and `save_design` judge it) is only an `option_needed` info; `False` is the violation.
+- The tournament check validates the ship's own loadout when it has one (`ship["loadout"]` in
+  place of `default_loadout`), since that is what it carries and costs.
 - `rulesets/common.py`: what more than one ruleset needs. Integer rounding (`round_half_up`,
   `pct_mass`: .5 up, never 0 MASS), arcs (`ARCS`, `arcs_valid`, `arcs_contiguous`),
   `split_rows`, `cf_positions`, the semi-untrusted readers (`as_int`, `systems_of`, `arcs_of`,
@@ -480,7 +484,10 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `data.py` (books, picker of ~80 systems in groups, fighter points, class table p.106),
   `rules.py` (`SYSTEM_RULES` type -> (mass_fn(s, design), points_fn(s, mass, design), label_fn)),
   `__init__.py`. Golden: the PC pp.113-114 heavy cruiser is 294. The FB2 races dispatch to their
-  FB2 tech modules unchanged (errata: PC invalidates nothing in FB1/FB2).
+  FB2 tech modules unchanged (errata: PC invalidates nothing in FB1/FB2), except that the CPV
+  option reprices their basic hull as it does a human one (PC p.140).
+- A holofield and a cloaking device each stand alone among `SCREENS_AND_FIELDS` (PC pp.60, 62);
+  ECM is not in that set. A PC bay is one bay: `bays` is ignored in cost and capacity alike.
 - New design fields `hull_rows` (4/5/6: hull boxes x2/x1.5/x1; an advanced hull is three rows
   at x3 and ignores it), `stealth_hull` (0-2, +2/+4 a hull and armour box), `armour_regen`
   (+2 a box). Normalised in `store`; the Design tab draws them when `derived["pc_hull_options"]`.
