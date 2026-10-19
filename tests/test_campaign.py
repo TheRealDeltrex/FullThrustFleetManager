@@ -229,6 +229,18 @@ def test_the_dice_route_rolls_one_die(client):
     assert client.get("/dice/20").status_code == 404
 
 
+def test_the_online_version_rolls_in_the_page(client, monkeypatch):
+    """GitHub Pages has no server for /dice/6, so the browser build marks the button to roll
+    locally (static/campaign.js)."""
+    import app as app_module
+
+    a_fleet()
+    assert 'data-roll="6"' in text(client.get("/campaign"))
+    assert "data-local" not in text(client.get("/campaign"))
+    monkeypatch.setattr(app_module, "BROWSER_MODE", True)
+    assert 'data-local="1"' in text(client.get("/campaign"))
+
+
 def test_unknown_fleet_and_action(client):
     fleet, _uid = a_fleet()
     assert client.post("/campaign/nope/action", data={"action": "replenish"}).status_code == 404

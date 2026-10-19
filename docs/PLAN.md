@@ -6,7 +6,7 @@ something turns out to be impossible or clearly wrong while building, stop and a
 do not silently re-decide.
 
 - **Repo:** `TheRealDeltrex/FullThrustFleetManager` (public, GPL-3.0)
-- **Branches:** work on `devversion`, releases on `main`
+- **Branches:** work and releases on `devversion` (tagged there); `main` carries only the README, licence and workflows
 - **Milestones:** GitHub issues labelled `milestone`, one per section 16 entry
 - **Agent manual:** `CLAUDE.md` at the repo root (keep it current as you build)
 - **Mockups:** `docs/mockups/` (serve the folder over HTTP; the pages load `ssd.js`/`mockup.css`)
