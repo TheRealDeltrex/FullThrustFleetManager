@@ -142,7 +142,7 @@
       {# ---- Views ---- #}
       {% if selected.view == "roster" %}
         <div class="panel">
-          <h3>{{ _("Roster") }}</h3>
+          <h3 class="fold" data-fold="fleet-roster" tabindex="0">{{ _("Roster") }}</h3>
           <table class="tbl">
             <thead><tr><th>{{ _("ID") }}</th><th>{{ _("Name") }}</th><th>{{ _("Class") }}</th>
               <th>{{ _("TMF") }}</th><th>{{ _("Thrust") }}</th><th>{{ _("Status") }}</th>
@@ -167,7 +167,7 @@
       {% else %}
         {% for squadron in f.squadrons %}
           <div class="panel">
-            <h3>{{ squadron.name }}</h3>
+            <h3 class="fold" data-fold="fleet-sq-{{ f.id }}-{{ squadron.id }}" tabindex="0">{{ squadron.name }}</h3>
             {# Ships are dragged by their handle to reorder or move them (static/reorder.js). #}
             <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" hidden
                   class="ship-order" data-autosave="order_ships">
@@ -224,7 +224,7 @@
 
       {# ---- Add ship (filters are opt-in, PLAN 9.3) ---- #}
       <div class="panel">
-        <h3>{{ _("Add ship") }}</h3>
+        <h3 class="fold" data-fold="fleet-add" tabindex="0">{{ _("Add ship") }}</h3>
         {# A ruleset with no published ships (Cross Dimensions) starts with an empty list:
            say where designs come from instead of offering a picker with nothing in it. #}
         {% if not selected.library_total %}
@@ -291,7 +291,7 @@
 
       {# ---- Fleet details ---- #}
       <div class="panel" id="fleet-details">
-        <h3>{{ _("Fleet details") }}</h3>
+        <h3 class="fold" data-fold="fleet-details" tabindex="0">{{ _("Fleet details") }}</h3>
         <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="body stack"
               data-autosave="update_details">
           <div class="grid-fields">

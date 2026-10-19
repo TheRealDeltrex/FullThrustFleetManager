@@ -8,7 +8,7 @@
       <h2>{{ _("Settings") }}</h2>
     </div>
     <div class="panel">
-      <h3>{{ _("Rulebooks") }}</h3>
+      <h3 class="fold" data-fold="settings-rulebooks" tabindex="0">{{ _("Rulebooks") }}</h3>
       <div class="body stack">
         <form method="post" action="{{ url_for('settings_save') }}" class="row" data-autosave="save">
           <label>{{ _("Open page references in") }}
@@ -36,7 +36,7 @@
     </div>
 
     <div class="panel" id="files">
-      <h3>{{ _("Files") }}</h3>
+      <h3 class="fold" data-fold="settings-files" tabindex="0">{{ _("Files") }}</h3>
       <div class="body stack">
         <form method="post" action="{{ url_for('export_backup') }}" class="row">
           <button class="btn" type="submit">{{ _("Back up library") }}</button>
@@ -57,7 +57,7 @@
     </div>
 
     <div class="panel">
-      <h3>{{ _("Appearance") }}</h3>
+      <h3 class="fold" data-fold="settings-appearance" tabindex="0">{{ _("Appearance") }}</h3>
       <div class="body">
         <form method="post" action="{{ url_for('settings_save') }}" class="row" data-autosave="save">
           <label>{{ _("Look") }}
@@ -71,7 +71,7 @@
     </div>
 
     <div class="panel">
-      <h3>{{ _("Language") }}</h3>
+      <h3 class="fold" data-fold="settings-language" tabindex="0">{{ _("Language") }}</h3>
       <div class="body">
         <select class="input" disabled>
           {% for code, name in languages.items() %}
@@ -81,7 +81,7 @@
       </div>
     </div>
     <div class="panel">
-      <h3>{{ _("About") }}</h3>
+      <h3 class="fold" data-fold="settings-about" tabindex="0">{{ _("About") }}</h3>
       <div class="body">
         <p>{{ _("Full Thrust Fleet Manager") }}{% if APP_VERSION %} v{{ APP_VERSION }}{% endif %}. {{ _("Licensed under the GNU General Public License v3.0.") }}</p>
         <p>{{ _("Full Thrust, More Thrust and the Fleet Books, their rules text, ship designs and diagrams are © Jon Tuffley and Ground Zero Games. This is an unofficial fan project, not affiliated with or endorsed by Ground Zero Games.") }}</p>

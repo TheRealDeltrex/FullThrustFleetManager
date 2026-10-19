@@ -82,6 +82,16 @@ def test_the_left_pane_sections_fold_on_fleet_and_design(client):
     assert "collapse.js" in fleet and "collapse.js" in design
 
 
+def test_the_main_pane_sections_fold_too(client):
+    client.post("/fleet/new", data={"ruleset": "fb", "name": "Home Fleet"})
+    fleet = text(client.get("/fleet", follow_redirects=True))
+    for key in ('data-fold="fleet-sq-', 'data-fold="fleet-add"', 'data-fold="fleet-details"'):
+        assert key in fleet
+    settings = text(client.get("/settings"))
+    for key in ("rulebooks", "files", "appearance", "language", "about"):
+        assert f'data-fold="settings-{key}"' in settings
+
+
 def test_fleets_are_listed_with_their_ruleset_and_can_be_switched(client):
     fb = make_fleet(client, "Home Fleet")
     ft2 = make_fleet(client, "Task Force", ruleset="ft2")
