@@ -28,7 +28,8 @@ See https://github.com/adobe-type-tools/cmap-resources
     <title>PDF.js viewer</title>
 
 <!-- This snippet is used in production (included from viewer.html) -->
-<link rel="resource" type="application/l10n" href="locale/locale.json">
+<!-- No locale link: the trimmed build ships no locale/, and without the link pdf.js uses its
+     built-in English strings instead of requesting a missing locale.json. -->
 <script src="../build/pdf.mjs" type="module"></script>
 
     <link rel="stylesheet" href="viewer.css">

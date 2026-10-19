@@ -14,21 +14,21 @@ the description, the licence and the workflow files, and nothing else.
 
 A local fleet manager for the *Full Thrust* starship wargame (Ground Zero Games): design ships,
 build fleets to a points limit, track campaign damage, and print a fleet PDF for the table.
-Supports the Full Thrust 2nd edition and Fleet Book rulesets, including the Fleet Book 2 alien
-races. Everything runs locally: no account, no server, plain JSON files you can back up and share.
+Supports Full Thrust 2nd edition with More Thrust, the Fleet Books (with the Fleet Book 2 alien
+races), Cross Dimensions and Project Continuum.
+Everything runs locally: no account, no server, plain JSON files you can back up and share.
 
 Not affiliated with Ground Zero Games.
 
 ## What it does
 
-- **Design ships** to the Fleet Book or Full Thrust 2nd edition rules, with live MASS and NPV,
+- **Design ships** to any of the four rulesets, with live MASS and NPV,
   an arc picker and a rules check. Break the rules deliberately if you want to; the design is
   then marked non-conforming.
 - **Build fleets** to a points limit, in squadrons, from your own designs or the ship classes of
   the books, with a tournament check that lists every violation.
 - **Field the alien races**: Kra'Vak, Sa'Vasku and Phalon, each an additive tech module inside
-  the Fleet Book ruleset with its own systems, record-sheet icons, validation and quick
-  reference.
+  a ruleset with its own systems, record-sheet icons, validation and quick reference.
 - **Track a campaign**: damage marked by clicking the ship diagram, crew factors, repairs and
   replenishment, a fleet log.
 - **Print** a fleet pack or a two-fleet battle pack: roster, record sheets, orders chart,
@@ -87,10 +87,7 @@ class under each fleet's "Ship Designs" entry.
 
 Three more books are bundled, given the same treatment: *Cross Dimensions*, and *Project
 Continuum* with its errata, both free non-commercial publications distributed with Ground Zero
-Games' agreement. Cross Dimensions is the rules source of the FTCD ruleset. Project Continuum
-is there to read: no ruleset implements its rules yet, so it is registered as a
-`REFERENCE_BOOKS` entry rather than against a ruleset, and appears in the viewer and the
-Settings list beside the rest.
+Games' agreement. They are the rules sources of the FTCD and FTPC rulesets.
 
 The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
 `tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and

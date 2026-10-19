@@ -95,6 +95,8 @@ TECH: dict[str, tuple] = {
     "gunboats": (lambda: _("Gunboats and gunboat racks"), 1, ()),
     "ftl_gunboats": (lambda: _("FTL gunboats"), 1, ("gunboats",)),
     "heavy_gunboats": (lambda: _("Heavy or screened gunboats"), 1, ("gunboats",)),
+    "superior_sensors": (lambda: _("Superior sensors"), 1, ()),
+    "minesweeper": (lambda: _("Minesweeper"), 1, ()),
 }
 
 # A system type and the technology it takes; types missing here are free (p.125 marks them 0).
@@ -114,6 +116,7 @@ SYSTEM_TECH = {
     "am_missile": "am_missile", "sm_launcher": "sml", "sm_rack": "sml", "rocket_pod": "rocket_pods",
     "heavy_missile": "heavy_missiles", "minelayer": "mines", "mkp": "mkp",
     "plasma_bolt": "plasma_bolt", "fighter_rack": "robot_fighters", "gunboat_rack": "gunboats",
+    "superior_sensors": "superior_sensors", "minesweeper": "minesweeper",
 }
 FIGHTER_TECH = {
     "heavy": "heavy_fighters", "fast": "fast_fighters", "long_range": "long_range_fighters",
