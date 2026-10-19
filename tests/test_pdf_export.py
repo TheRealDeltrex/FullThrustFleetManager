@@ -262,3 +262,45 @@ def test_the_tracker_names_one_shot_systems():
     pages = render([a_fleet(ships=["fb:fb1:fse-athena"])])[1]
     tracker = next(p for p in pages if "Fighters and ordnance" in p)
     assert "Submunition" in tracker and "submunition" not in tracker
+
+
+# ---- What the tracker and the quick reference read: the loadout carried -------------------------
+
+
+def pc_design(systems, loadout) -> dict:
+    return {"uid": "x", "systems": systems,
+            "default_loadout": {"fighters": [], "magazines": [], **loadout}}
+
+
+def test_tracker_rows_follow_the_loadout():
+    hangar = [{"uid": "h", "type": "hangar"}]
+    # An empty bay carries nothing to track.
+    assert pdf_export._tracker_rows({"loadout": None}, pc_design(hangar, {})) == []
+    # A light wing is eight fighters with four endurance (PC p.75).
+    light = {"fighters": [{"hangar": "h", "type": "standard", "extras": ["light"]}]}
+    assert [r[1:3] for r in pdf_export._tracker_rows({"loadout": None}, pc_design(hangar, light))] == [(8, 4)]
+    # A ship's own loadout wins over the design's.
+    standard = {"fighters": [{"hangar": "h", "type": "standard"}], "magazines": []}
+    own = pdf_export._tracker_rows({"loadout": standard}, pc_design(hangar, light))
+    assert [r[1:3] for r in own] == [(6, 6)]
+    # A magazine shows the salvos it holds: two ER salvos in 6 MASS are two boxes, not three.
+    magazine = [{"uid": "m", "type": "sm_magazine", "capacity": 6, "feeds": []}]
+    er = {"magazines": [{"magazine": "m", "salvos": ["er", "er"]}]}
+    assert [r[1] for r in pdf_export._tracker_rows({"loadout": None}, pc_design(magazine, er))] == [2]
+
+
+def test_gunboats_in_a_boat_bay_get_the_gunboat_reference():
+    """PC p.80: a boat bay carries gunboats too; the gunboat entry must come with them."""
+    pc = RULESETS["ftpc"]
+    design, _msg = store.new_design("ftpc", name="Boat carrier")
+    design.update(tmf=100, systems=[{"uid": "b", "type": "boat_bay", "mass": 24}],
+                  default_loadout={"fighters": [], "magazines": [],
+                                   "gunboats": [{"carrier": "b", "type": "standard"}]})
+    design["allow_rule_breaking"] = True
+    ok, msg, design_id = store.save_design(design)
+    assert ok, msg
+    fleet = a_fleet(ruleset="ftpc", ships=[design_id])
+    pages = render([fleet])[1]
+    reference = "".join(p for p in pages if "Quick reference" in p)
+    gunboat = next(e for e in pc.quickref({"gunboat_rack"}, {}) if e.key == "gunboat_rack")
+    assert gunboat.title in reference
