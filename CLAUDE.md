@@ -14,6 +14,7 @@ Update it in the same commit as any change that makes it wrong, or that adds a p
 gotcha a future session would re-derive. **Current state only**, not a changelog. Edit affected
 lines in place; delete anything that stops being true. When a milestone lands, move its
 "planned" notes below into real descriptions of the code.
+`AGENTS.md` points Codex here and adds only the Codex/Claude PR workflow; keep it short.
 
 ## Current state
 
