@@ -1058,7 +1058,9 @@ def _repair(fleet: dict) -> tuple[bool, str]:
     successes = {uid: 1 for uid in form.getlist("repair_success")}
     successes["drive"] = int(form.get("drive_successes") or 0)
     plan = fleet_rules.repair_plan(design, ship["damage"], int(form.get("hull_repaired") or 0),
-                                   chosen, successes)
+                                   chosen, successes, int(form.get("drive_attempts") or 0))
+    if plan["invalid_drive"]:
+        return False, _("Drive repair successes cannot exceed attempts; both must be non-negative.")
     if plan["too_many"]:
         return False, _("Only {n} systems may be repaired in a week, the drive included.",
                         n=fleet_rules.REPAIR_SYSTEMS_PER_WEEK)
