@@ -23,14 +23,14 @@ def png():
 
 
 def test_every_official_design_has_unique_art_and_adoptions_share_it():
-    originals, not_yet_drawn = [], []
+    originals = []
     for file in (paths.bundle_dir() / "data/catalog").glob("*.json"):
         designs = json.loads(file.read_text(encoding="utf-8"))["designs"]
-        # Star Ranger designs have no art of their own yet and fall back to their class picture.
-        (not_yet_drawn if file.name == "fb_starranger.json" else originals).extend(designs)
+        # Original-book adoption coverage; the expanded source catalog is checked below.
+        if file.name != "fb_starranger.json":
+            originals.extend(designs)
     resolved = [portraits.resolve(d, {}) for d in originals]
     assert len({(a["file"], a["cell"]) for a in resolved}) == len(originals) == 141
-    assert all(portraits.resolve(d, {}) for d in not_yet_drawn)
     for d in originals:
         if d["ruleset"] == "fb":
             for rs in ("ftcd", "ftpc"):
@@ -48,7 +48,7 @@ def test_two_gallery_choices_per_supported_class_and_assets_exist():
         assert path.is_file(), path
         with Image.open(path) as im:
             assert im.width == im.height
-        assert 0 <= art["cell"] < 16
+        assert 0 <= art["cell"] < art.get("columns", 4) * art.get("rows", 4)
 
 
 def test_upload_does_not_mutate_catalog_and_reset_restores_default(client):
@@ -130,3 +130,58 @@ def test_portraits_and_new_themes_render_without_changing_ssd(client):
         svg = page[page.index("<svg"):page.index("</svg>") + 6]
         baseline = baseline or svg
         assert svg == baseline
+
+
+def test_expanded_source_catalog_has_distinct_uniform_view_defaults():
+    originals = [d for file in (paths.bundle_dir() / "data/catalog").glob("*.json")
+                 for d in json.loads(file.read_text(encoding="utf-8"))["designs"]]
+    resolved = [portraits.resolve(d, {}) for d in originals]
+    assert len(originals) == len({(a["file"], a["cell"]) for a in resolved}) == 478
+    assert all(a["view"] == ("fleet-book-bow-lower-right" if a["faction"] == "PH"
+                             else "port-bow-30deg-bow-lower-left") for a in resolved)
+    assert all(a["basis"] in {"miniature", "miniature-variant", "invented-faction-design",
+                             "fleet-book-restored", "fleet-book-style"}
+               for a in resolved)
+    for ruleset in RULESETS:
+        for design in store.catalog_designs(ruleset):
+            art = portraits.resolve(design, {})
+            assert art["view"] == ("fleet-book-bow-lower-right" if art["faction"] == "PH"
+                                   else "port-bow-30deg-bow-lower-left")
+
+
+def test_versioned_defaults_preserve_existing_gallery_choices_and_uploads():
+    design = {"id": "custom-test", "type_code": "SC"}
+    legacy = "custom:SC:1"
+    assert portraits.resolve(design, {})["file"] != portraits.manifest()["portraits"][legacy]["file"]
+    portraits.save(portraits.design_target(design), art=legacy)
+    assert portraits.resolve(design, portraits.load()) == portraits.manifest()["portraits"][legacy]
+    portraits.save(portraits.design_target(design), data=png())
+    assert "upload" in portraits.resolve(design, portraits.load())
+    for code, default in portraits.manifest()["class_defaults"].items():
+        assert default.startswith(f"custom:{code}:")
+        assert default in portraits.manifest()["portraits"]
+        assert f"custom:{code}:v2-1" in portraits.manifest()["portraits"]
+        assert f"custom:{code}:v2-2" in portraits.manifest()["portraits"]
+
+
+def test_phalon_owner_requested_originals_and_fleet_book_extension():
+    for identity, cell in (("fb2:ph-phyaa", 0), ("fb2:ph-vlath", 1), ("fb2:ph-draath", 14)):
+        art = portraits.resolve({"id": "fb:" + identity}, {})
+        assert (art["file"], art["cell"]) == ("ships/ph.webp", cell)
+        assert art["basis"] == "fleet-book-restored"
+    for identity in ("sr:ph-silith", "sr:ph-greeth", "sr:ph-gruuss-b"):
+        art = portraits.resolve({"id": "fb:" + identity}, {})
+        assert art["file"] == "ships/ph-fleetbook-extension-v3.webp"
+        assert art["basis"] == "fleet-book-style"
+
+
+def test_portrait_renderer_uses_atlas_dimensions(client):
+    from flask import render_template_string
+
+    with client.application.test_request_context():
+        page = render_template_string(
+            '{% from "_portraits.html" import picture with context %}{{ picture(art, "Test") }}',
+            art={"file": "ships/test.webp", "cell": 4, "columns": 3, "rows": 3},
+            art_url=lambda file: "/static/" + file)
+    assert "background-size:300% 300%" in page
+    assert "background-position:50.0% 50.0%" in page

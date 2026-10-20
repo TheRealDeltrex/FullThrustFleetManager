@@ -194,5 +194,7 @@ def resolve(design: dict | None, overrides: dict, target: str = "") -> dict | No
         source_id = canonical(design.get("source", {}).get("of", ""))
         art = manifest()["official"].get(identity) or manifest()["official"].get(source_id)
     if not art:
-        art = f"custom:{class_code(design)}:1"
-    return manifest()["portraits"].get(art) or manifest()["portraits"]["custom:GENERIC:1"]
+        art = manifest().get("class_defaults", {}).get(class_code(design),
+                                                        f"custom:{class_code(design)}:1")
+    generic = manifest().get("class_defaults", {}).get("GENERIC", "custom:GENERIC:1")
+    return manifest()["portraits"].get(art) or manifest()["portraits"][generic]

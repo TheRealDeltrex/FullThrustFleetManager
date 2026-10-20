@@ -4,9 +4,11 @@
       <img class="ship-portrait{% if small %} small{% endif %}" src="{{ art.upload }}"
            alt="{{ _('Portrait of {name}', name=name) }}" loading="lazy" width="256" height="256" />
     {% else %}
+      {% set cols = art.columns|default(4) %}
+      {% set rows = art.rows|default(4) %}
       <div class="ship-portrait{% if small %} small{% endif %}" role="img"
            aria-label="{{ _('Portrait of {name}', name=name) }}"
-           style="background-image:url('{{ art_url(art.file) }}');background-size:400% 400%;background-position:{{ (art.cell % 4) * 100 / 3 }}% {{ (art.cell // 4) * 100 / 3 }}%"></div>
+           style="background-image:url('{{ art_url(art.file) }}');background-size:{{ cols * 100 }}% {{ rows * 100 }}%;background-position:{{ (art.cell % cols) * 100 / (cols - 1) if cols > 1 else 0 }}% {{ (art.cell // cols) * 100 / (rows - 1) if rows > 1 else 0 }}%"></div>
     {% endif %}
   {% endif %}
 {% endmacro %}
