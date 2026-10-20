@@ -12,15 +12,27 @@ Implemented 2026-10-19. No release or commit is implied by this working-tree imp
 - Download/restore a picture backup under Settings. The existing library export functions
   also include applicable portrait choices in design/fleet exports and full backups.
 
-The version 2 set gives all 478 source designs distinct default portraits: 141 original
-book designs and 337 Star Ranger designs. Ruleset adoptions share their source design's
-picture. The 37 new 4 by 4 atlases also provide 46 refreshed custom choices, two per class
-code. All 187 legacy portrait records and their atlas files remain available, so saved gallery
-choices keep working. Uploaded pictures and explicit user choices retain priority.
+All 478 source designs have distinct default portraits: 141 original book designs and
+337 Star Ranger designs. Ruleset adoptions share their source design's picture. There are
+46 current custom choices, two per class code, alongside retained legacy gallery choices.
+All 187 original portrait records and all intermediate versioned records remain valid;
+explicit user choices and uploads retain priority over new defaults.
+
+Owner annotations specify one arrow for the actual bow, two arrows for a full hull rebuild,
+and no arrow for no change. Corrections use new portrait IDs and atlas files. Only selected
+cells are remapped, so unmarked ships retain their exact old atlas/cell. The October 20 pass
+changed 70 official defaults and 11 custom choices in 11 new atlases. Four marked civilian
+cells already matched the requested direction and retained their earlier corrected art.
+
+The original 15 Fleet Book Phalon portraits are restored exactly. Six additional Phalon ships
+and ten custom facilities/ships extend that original style in a new atlas; the original spare
+cell supplies the generic choice. At the owner's explicit request these retain the original
+Fleet Book artwork's view (tubular bow lower-right), rather than the other factions' port-bow
+view. This exception is recorded per portrait and regression-tested.
 
 The 23 custom class groups are SC, CT, FF, DD, DH, CL, CE, CH, CA, BC, BB, BDN, DN, SDN,
-CVE, CVL, CVA, M, BASE, SECTION, JG, PT and GENERIC. `class_defaults` selects the versioned
-first choice for each class; both new choices and legacy choices remain in the gallery.
+CVE, CVL, CVA, M, BASE, SECTION, JG, PT and GENERIC. `class_defaults` selects the current
+first choice. Existing class gallery pictures remain available for old selections.
 
 ## Provenance and limits
 
@@ -32,17 +44,23 @@ generation prompts. Civilian and generic FT2/MT art follows each ship's role. Pa
 are artistic choices, not rules or official faction specifications.
 
 The publisher's [Full Thrust miniature range](https://shop.groundzerogames.co.uk/full-thrust-starships.html)
-provided matched photograph references for 240 source designs, including interpreted variants.
-The remaining 238 designs use invented faction-compatible hulls. Every new ship uses the approved
-view 30 degrees above its port bow, bow toward lower-left and stern upper-right. Stations and
-hull sections retain their appropriate geometry. These are generated interpretations, not exact
-engineering reconstructions. Shop photographs are not bundled in the app.
+provided reference photographs. Current defaults comprise 218 miniature-based interpretations
+(including variants), 239 invented faction-compatible hulls, 15 restored original Phalon
+portraits and six Phalon extensions in Fleet Book style. These are generated interpretations,
+not engineering-verified replicas. Shop photos are not bundled.
 
-Descriptively named original PNGs, generation prompts, per-cell source links and checksums are
-saved in `E:\ClaudeOnlineFolder\Full Thrust Pictures\Miniature-Based-Uniform-View-v2`.
-`Picture-Index.md` and `picture-map.json` there record the assignments. Original older pictures
-and earlier drafts are preserved. `ARTWORK-PROMPTS.md` documents the original theme/portrait set;
-the version 2 prompts accompany the new PNGs.
+Do not interpret miniature stands, hexagonal bases, mounting posts, sprues or loose kit parts
+as ship geometry. Where only unassembled parts are pictured (for example KEYSTONE/KEROSENE),
+use assembled faction models for shape language and label the design as invented.
+
+All generated PNGs, including discarded drafts, are preserved under
+`E:\ClaudeOnlineFolder\Full Thrust Pictures`, organized by faction. A faction root holds
+current atlases; `Discarded/` holds rejected/superseded/duplicate versions. `Index.html` links
+per-faction `Current-Ships.html` galleries showing the actual active cells, and `Archive.html`
+shows every PNG. `Picture-Index.md` maps 478 source designs and 46 custom choices to cells;
+`Picture-Inventory.json` records checksums. Older indexes live in
+`Documentation/Previous-Indexes/`. App themes and original custom-gallery art have their own
+folders. A partially used atlas can still contain retired cells; review the current-cell gallery.
 
 The SSD/PDF engine and catalog statistics were not changed. Portraits and theme banners do
 not appear in the printed record sheets.
@@ -55,8 +73,10 @@ not appear in the printed record sheets.
 - Atlas files in `static/ships/` and banners in `static/themes/` are committed as WebP
   (quality 85), not PNG: the generated PNGs are about 3 MB each and would bloat the repo and
   the online build. Convert new art with Pillow before adding it.
-- Atlas files in `static/ships/` have four equal columns and four equal rows. Cells are
-  addressed by CSS, so there are no generated controls, captions or symbols. Assigned cells
+- Atlas files normally have four equal columns and rows. Optional per-portrait `columns`
+  and `rows` metadata supports other square grids (the Valhalla repair atlas is 3 by 3).
+  `_portraits.html` computes background size and position from those dimensions, defaulting
+  to 4 by 4 for every legacy record. Cells are addressed by CSS, so there are no generated controls, captions or symbols. Assigned cells
   are unique; spare cells are not assigned as official ships. Do not rearrange a released
   atlas: existing IDs must keep their meaning. Add a new versioned file and update metadata
   when replacing artwork. A future catalog addition needs one mapping and an art cell, not
