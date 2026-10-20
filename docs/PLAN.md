@@ -13,6 +13,12 @@ do not silently re-decide.
 - **Sister project to copy infrastructure from:** a local checkout of the public repo
   `TheRealDeltrex/FrostgraveWarbandKeeper`
 
+**Ruleset boundaries (owner decision):** FT2/More Thrust, Fleet Books and Cross Dimensions
+are closed systems. An external design is listed only if its systems and configuration are
+legal under the existing ruleset; importing a catalog must not add technologies to those
+rulesets. Equivalent mappings to systems already defined by the target ruleset are allowed.
+Only Project Continuum, the newest supported ruleset, may receive additional systems.
+
 Book abbreviations: **FT** Full Thrust 2nd ed., **MT** More Thrust, **FB1/FB2** Fleet Book 1/2,
 **FTCD** Full Thrust: Cross Dimensions, **FTPC** Full Thrust: Project Continuum. Page numbers
 are **printed** page numbers unless stated otherwise (FT: PDF page = printed + 1; MT/FB1/FB2:

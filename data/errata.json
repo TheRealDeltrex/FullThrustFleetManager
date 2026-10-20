@@ -27,7 +27,10 @@
     "id": "fb:sr:fse-littorio",
     "book_value": 580,
     "rules_value": 586,
-    "reason": "Star Ranger FSE page: the listed systems (3 FC, 6 PDS, ADFC, screen-1, 2 class-1, class-2 on F/FP/AP, F/FS/AS and 2 x all arcs, 2 class-3, 2 SML, mass-8 magazine, a fighter bay) need MASS 172 of 170 and cost 586 against the printed 580."
+    "reason": "Star Ranger FSE page: the listed systems (3 FC, 6 PDS, ADFC, screen-1, 2 class-1, class-2 on F/FP/AP, F/FS/AS and 2 x all arcs, 2 class-3, 2 SML, mass-8 magazine, a fighter bay) need MASS 172 of 170 and cost 586 against the printed 580.",
+    "expected_violations": [
+      "mass_over"
+    ]
   },
   {
     "id": "fb:sr:nsl-falke-s",
@@ -45,13 +48,19 @@
     "id": "fb:sr:ijsf-musashi",
     "book_value": 541,
     "rules_value": 526,
-    "reason": "Star Ranger IJSF page: the stat block lists '4 PDS' and '3 FCS' twice; read once, the systems use MASS 151 of 156 and cost 526 against the printed 541. The missing 5 MASS and 15 points would be five more PDS-sized systems."
+    "reason": "Star Ranger IJSF page: the stat block lists '4 PDS' and '3 FCS' twice; read once, the systems use MASS 151 of 156 and cost 526 against the printed 541. The missing 5 MASS and 15 points would be five more PDS-sized systems.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:ni-sa-ar",
     "book_value": 51,
     "rules_value": 54,
-    "reason": "Star Ranger NI page: the Sa'ar's class-2 battery is listed on all arcs (MASS 3), which needs MASS 15 of 14 and costs 54; priced as a three-arc mount (MASS 2) it closes at 14 and the printed 51."
+    "reason": "Star Ranger NI page: the Sa'ar's class-2 battery is listed on all arcs (MASS 3), which needs MASS 15 of 14 and costs 54; priced as a three-arc mount (MASS 2) it closes at 14 and the printed 51.",
+    "expected_violations": [
+      "mass_over"
+    ]
   },
   {
     "id": "fb:sr:ni-ben-gurion-g",
@@ -63,7 +72,10 @@
     "id": "fb:sr:scanfed-saint-olaf-e",
     "book_value": 220,
     "rules_value": 226,
-    "reason": "Star Ranger ScanFed page: the Saint Olaf-E's two class-2 batteries are listed on all arcs (MASS 3 each), which needs MASS 68 of 66 and costs 226; priced as three-arc mounts they close at 66 and the printed 220."
+    "reason": "Star Ranger ScanFed page: the Saint Olaf-E's two class-2 batteries are listed on all arcs (MASS 3 each), which needs MASS 68 of 66 and costs 226; priced as three-arc mounts they close at 66 and the printed 220.",
+    "expected_violations": [
+      "mass_over"
+    ]
   },
   {
     "id": "fb:sr:kv-kata",
@@ -81,61 +93,93 @@
     "id": "fb:sr:kv-korma",
     "book_value": 309,
     "rules_value": 304,
-    "reason": "Star Ranger Kra'Vak Wave 2 page: the listed systems (2 fire controls, 3 scatterguns, 2 K-2 on two arcs, 3 K-1) with hull 24 on three rows use MASS 72 of 73 and cost 304 against the printed 309."
+    "reason": "Star Ranger Kra'Vak Wave 2 page: the listed systems (2 fire controls, 3 scatterguns, 2 K-2 on two arcs, 3 K-1) with hull 24 on three rows use MASS 72 of 73 and cost 304 against the printed 309.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:kv-ketone-beta",
     "book_value": 399,
     "rules_value": 435,
-    "reason": "Star Ranger Kra'Vak Wave 2 page: the Ketone-Beta's listed three K-4 guns with hull 33 need MASS 104 of 94 and cost 435; the printed 399 sits 4 above the Ketone-Alpha, so the page likely lists one gun or class too many."
+    "reason": "Star Ranger Kra'Vak Wave 2 page: the Ketone-Beta's listed three K-4 guns with hull 33 need MASS 104 of 94 and cost 435; the printed 399 sits 4 above the Ketone-Alpha, so the page likely lists one gun or class too many.",
+    "expected_violations": [
+      "mass_over"
+    ]
   },
   {
     "id": "fb:sr:if-jibrail",
     "book_value": 527,
     "rules_value": 527,
-    "reason": "Star Ranger IF page: the two PTorp(5) torpedoes cover five arcs each; their MASS (4 +1 per extra arc) closes the design at 154 and the printed 527, but FB1 p.7 limits a pulse torpedo to three adjacent arcs."
+    "reason": "Star Ranger IF page: the two PTorp(5) torpedoes cover five arcs each; their MASS (4 +1 per extra arc) closes the design at 154 and the printed 527, but FB1 p.7 limits a pulse torpedo to three adjacent arcs.",
+    "expected_violations": [
+      "torpedo_arcs",
+      "torpedo_arcs"
+    ]
   },
   {
     "id": "fb:sr:if-arabiya",
     "book_value": 694,
     "rules_value": 694,
-    "reason": "Star Ranger IF page: the two PTorp(4) torpedoes cover four arcs each; their MASS (4 +1 per extra arc) closes the design at 204 and the printed 694, but FB1 p.7 limits a pulse torpedo to three adjacent arcs."
+    "reason": "Star Ranger IF page: the two PTorp(4) torpedoes cover four arcs each; their MASS (4 +1 per extra arc) closes the design at 204 and the printed 694, but FB1 p.7 limits a pulse torpedo to three adjacent arcs.",
+    "expected_violations": [
+      "torpedo_arcs",
+      "torpedo_arcs"
+    ]
   },
   {
     "id": "fb:sr:oudf-freemantle",
     "book_value": 99,
     "rules_value": 97,
-    "reason": "Star Ranger Oceanic Union page: hull 16, grade 2 armour, thrust 5, FTL, a class-1 battery and a fire control use MASS 31 of 32 and cost 97; the page prints 99 and names no other system."
+    "reason": "Star Ranger Oceanic Union page: hull 16, grade 2 armour, thrust 5, FTL, a class-1 battery and a fire control use MASS 31 of 32 and cost 97; the page prints 99 and names no other system.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:oudf-numbat",
     "book_value": 184,
     "rules_value": 169,
-    "reason": "Star Ranger Oceanic Union page: the Numbat is listed as both TMF 63 and MASS Factor 62, and its listed hull and systems plus one 8-MASS module use MASS 56 of 62 and cost 169 against the printed 184. Arcs and some counts are not given."
+    "reason": "Star Ranger Oceanic Union page: the Numbat is listed as both TMF 63 and MASS Factor 62, and its listed hull and systems plus one 8-MASS module use MASS 56 of 62 and cost 169 against the printed 184. Arcs and some counts are not given.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:oudf-tuvalu-block-i",
     "book_value": 227,
     "rules_value": 224,
-    "reason": "Star Ranger Oceanic Union page: the listed hull and systems plus two 8-MASS modules use MASS 80 of 81 and cost 224 against the printed 227; one more PDS-sized system would close both."
+    "reason": "Star Ranger Oceanic Union page: the listed hull and systems plus two 8-MASS modules use MASS 80 of 81 and cost 224 against the printed 227; one more PDS-sized system would close both.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:oudf-tuvalu-block-ii",
     "book_value": 246,
     "rules_value": 240,
-    "reason": "Star Ranger Oceanic Union page: the listed hull 32 and systems plus one 8-MASS module use MASS 80 of 81 and cost 240 against the printed 246. Arcs are not given."
+    "reason": "Star Ranger Oceanic Union page: the listed hull 32 and systems plus one 8-MASS module use MASS 80 of 81 and cost 240 against the printed 246. Arcs are not given.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:oudf-waikato",
     "book_value": 322,
     "rules_value": 319,
-    "reason": "Star Ranger Oceanic Union page: the page gives no fighter bay count; with two bays the listed hull and systems plus one module use MASS 101 of 102 and cost 319 against the printed 322."
+    "reason": "Star Ranger Oceanic Union page: the page gives no fighter bay count; with two bays the listed hull and systems plus one module use MASS 101 of 102 and cost 319 against the printed 322.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:oudf-brisbane",
     "book_value": 392,
     "rules_value": 389,
-    "reason": "Star Ranger Oceanic Union page: the conjectural Brisbane's listed hull and systems plus four 8-MASS modules use MASS 143 of 144 and cost 389 against the printed 392."
+    "reason": "Star Ranger Oceanic Union page: the conjectural Brisbane's listed hull and systems plus four 8-MASS modules use MASS 143 of 144 and cost 389 against the printed 392.",
+    "expected_violations": [
+      "mass_under"
+    ]
   },
   {
     "id": "fb:sr:nac-arrow",
