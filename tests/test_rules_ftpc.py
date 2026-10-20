@@ -819,3 +819,26 @@ def test_star_ranger_designs_convert_their_torpedoes_and_missiles():
     assert not types & {"lrpt", "mt_missile", "superior_sensors"}
     assert {"ftpc:sr:ijsf-shoya", "ftpc:sr:ni-nitznutz"} <= set(by_id)
     assert len([d for d in by_id.values() if d["source"]["book"] == "SR"]) > 300
+
+
+@pytest.mark.parametrize("no_reroll,expected_points", [(False, 12), (True, 9)])
+def test_star_ranger_grasers_use_pc_heavy_grasers(no_reroll, expected_points):
+    # SR UNSC table and PC p.38: class 1, three arcs is MASS 3, x4 with rerolls or x3 without.
+    original = design(tmf=24, hull_boxes=6, systems=[
+        {"uid": "g", "type": "graser", "class": 1, "arcs": ["AP", "FP", "F"],
+         "no_reroll": no_reroll}])
+    original.update(id="fb:sr:test-graser", source={"book": "SR", "npv_book": 0})
+    adopted = PC.adopt_design(original)
+    weapon = adopted["systems"][0]
+    assert weapon["type"] == "heavy_graser"
+    assert weapon["intensity"] == ("standard" if no_reroll else "high")
+    row = next(r for r in PC.design_breakdown(adopted, {}).rows if r.system_uid == "g")
+    assert (row.mass, row.points) == (3, expected_points)
+    assert original["systems"][0]["type"] == "graser"
+
+
+def test_hdc_reference_retains_shutdown_timing_and_damage_rules():
+    text = next(e.text for e in PC.quickref({"hdc"}, {}) if e.key == "hdc")
+    assert "Screens normally shut down across the firing arc" in text
+    assert "just before ship fire" in text
+    assert "full D6 totals, not beam-die damage" in text

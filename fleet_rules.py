@@ -290,26 +290,29 @@ def repairable_systems(design: dict | None, damage: dict | None) -> list[str]:
 
 
 def repair_plan(design: dict | None, damage: dict | None, hull_rolled: int,
-                system_uids: list[str], successes: dict[str, int]) -> dict:
+                system_uids: list[str], successes: dict[str, int], drive_attempts: int = 0) -> dict:
     """What a week at a repair facility does (FT p.35), given rolls the player made or typed.
 
     hull_rolled: damage points repaired (1D6 at a base). system_uids: the systems the player
     rolled for; successes maps a uid to how many successful rolls it got. A drive needs two
     (`drive_hits` counts down by one per success). Ruling: the drive is a system too, so each
-    drive roll takes one of the three a week; two of them can go to the drive."""
+    drive roll takes one of the three a week; failed attempts count too. Callers must
+    reject too_many or invalid_drive plans before applying repairs."""
     hull_done = int((damage or {}).get("hull") or 0)
     repaired_hull = max(0, min(hull_done, 6, int(hull_rolled or 0)))
     chosen = [uid for uid in system_uids[:REPAIR_SYSTEMS_PER_WEEK]
               if uid in repairable_systems(design, damage)]
     fixed = [uid for uid in chosen if int(successes.get(uid, 0)) >= 1]
     drive_hits = int((damage or {}).get("drive_hits") or 0)
-    drive_success = max(0, int(successes.get("drive", 0)))
-    drive_repaired = min(drive_hits, drive_success)
+    drive_success = int(successes.get("drive", 0))
+    invalid_drive = not 0 <= drive_success <= drive_attempts
+    drive_repaired = 0 if invalid_drive else min(drive_hits, drive_success)
     return {
         "hull": repaired_hull,
         "systems": fixed,
         "drive_hits": drive_repaired,
-        "too_many": len(system_uids) + drive_success > REPAIR_SYSTEMS_PER_WEEK,
+        "too_many": len(system_uids) + drive_attempts > REPAIR_SYSTEMS_PER_WEEK,
+        "invalid_drive": invalid_drive,
     }
 
 

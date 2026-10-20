@@ -90,6 +90,8 @@
                     <input class="input sm" type="number" min="0" max="6" name="hull_repaired" value="0" /></label>
                   <button class="btn sm ghost" type="button" data-roll="6"{% if BROWSER_MODE %} data-local="1"{% endif %}
                           data-target="hull_repaired">{{ _("Roll") }}</button>
+                  <label class="check">{{ _("Drive repair attempts") }}
+                    <input class="input sm" type="number" min="0" max="3" name="drive_attempts" value="0" /></label>
                   <label class="check">{{ _("Drive repair successes") }}
                     <input class="input sm" type="number" min="0" max="2" name="drive_successes" value="0" /></label>
                 </div>
