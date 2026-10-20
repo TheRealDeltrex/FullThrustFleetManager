@@ -186,8 +186,8 @@
                     <span class="chip st-{{ ship.status }}">{{ ship.status }}</span>
                   </header>
                   {% if d %}<div class="fleet-portrait">
-                    {{ picture(ship_portrait(d, portrait_target(f.id, ship.uid)), ship.name, True) }}
-                    <a class="btn sm" href="{{ url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid) }}">{{ _("Change picture") }}</a>
+                    {{ picture(ship_portrait(d, portrait_target(f.id, ship.uid)), ship.name, True,
+                              url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid)) }}
                   </div>{% endif %}
                   <div class="mini">{{ selected.sheets[ship.uid] if ship.uid in selected.sheets }}</div>
                   <footer class="muted">
