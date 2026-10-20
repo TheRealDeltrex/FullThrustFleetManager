@@ -43,7 +43,7 @@ What exists:
   restyles colour, type and borders only. The unscoped rules are their shared base, not a look
   (Classic was retired; a stored unknown value falls back to the default). Ship diagrams keep a
   light ground in every look.
-- `static/artwork.css` adds the two illustrated palettes and decorative banners from
+- `static/artwork.css` adds the two illustrated palettes and decorative covers for all ten themes from
   `static/themes/`. `portraits.py`, `data/ship_art.json`, `static/ships/` and `_portraits.html`
   provide portraits in every theme. See `docs/SHIP-ARTWORK.md` for extension and storage rules.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
