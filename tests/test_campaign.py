@@ -66,13 +66,13 @@ def test_repair_plan_follows_ft_p35():
     assert fleet_rules.repair_plan(design, damage, 1, out, {})["too_many"]   # only three a week
 
     # A disabled drive needs two successes, like the two hits that disabled it.
-    assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 1})["drive_hits"] == 1
-    assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 2})["drive_hits"] == 2
+    assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 1}, drive_attempts=1)["drive_hits"] == 1
+    assert fleet_rules.repair_plan(design, damage, 0, [], {"drive": 2}, drive_attempts=2)["drive_hits"] == 2
 
     # The drive is one of the three systems a week: each drive roll takes a place.
-    assert fleet_rules.repair_plan(design, damage, 0, out[:3], {"drive": 2})["too_many"]
-    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 1})["too_many"] is False
-    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 2})["too_many"]
+    assert fleet_rules.repair_plan(design, damage, 0, out[:3], {"drive": 2}, drive_attempts=2)["too_many"]
+    assert not fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 1}, drive_attempts=1)["too_many"]
+    assert fleet_rules.repair_plan(design, damage, 0, out[:2], {"drive": 2}, drive_attempts=2)["too_many"]
     # 1D6 of hull a week.
     assert fleet_rules.repair_plan(design, {"hull": 20}, 9, [], {})["hull"] == 6
 
@@ -184,7 +184,7 @@ def test_repairing_through_the_form(client):
     post(client, fleet, action="set_damage", uid=uid, hull="6", drive_hits="2",
          systems_out=system)
     page = text(post(client, fleet, action="repair", uid=uid, hull_repaired="4",
-                     repair_system=system, repair_success=system, drive_successes="1"))
+                     repair_system=system, repair_success=system, drive_successes="1", drive_attempts="1"))
     assert "repaired" in page
     damage = store.get_fleet(fleet["id"])["ships"][0]["damage"]
     assert damage["hull"] == 2 and damage["systems_out"] == [] and damage["drive_hits"] == 1
@@ -251,3 +251,26 @@ def test_systems_knocked_out_are_listed_by_name(client):
     a_fleet()
     page = text(client.get("/campaign"))
     assert "Fire control" in page and "fire_control</label>" not in page
+
+
+def test_failed_drive_attempts_consume_weekly_budget(client):
+    fleet, uid = a_fleet()
+    systems = [s["uid"] for s in store.get_design(FURIOUS)["systems"][:3]]
+    post(client, fleet, action="set_damage", uid=uid, hull="6", drive_hits="2", systems_out=systems)
+    before = store.get_fleet(fleet["id"])["ships"][0]["damage"]
+    page = text(post(client, fleet, action="repair", uid=uid, hull_repaired="4",
+                     repair_system=systems, repair_success=systems,
+                     drive_attempts="1", drive_successes="0"))
+    assert "Only 3 systems" in page
+    assert store.get_fleet(fleet["id"])["ships"][0]["damage"] == before
+
+
+@pytest.mark.parametrize("attempts,successes", [(0, 1), (1, 2), (-1, 0), (1, -1)])
+def test_invalid_drive_results_do_not_apply_repairs(client, attempts, successes):
+    fleet, uid = a_fleet()
+    post(client, fleet, action="set_damage", uid=uid, hull="6", drive_hits="2")
+    before = store.get_fleet(fleet["id"])["ships"][0]["damage"]
+    page = text(post(client, fleet, action="repair", uid=uid, hull_repaired="4",
+                     drive_attempts=str(attempts), drive_successes=str(successes)))
+    assert "Drive repair successes cannot exceed attempts" in page
+    assert store.get_fleet(fleet["id"])["ships"][0]["damage"] == before

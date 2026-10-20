@@ -135,6 +135,13 @@ class FTPCRuleset:
         out["id"] = "ftpc:" + str(design.get("id", "")).split(":", 1)[-1]
         out["ruleset"] = self.id
         common.convert_star_ranger(out, {"range": "long"}, superior_sensors="compact_superior_sensors")
+        if out.get("source", {}).get("book") == "SR":
+            # SR's 18-MU graser uses PC p.38's heavy-graser table, not the smaller
+            # standard graser. The NAC variant omits rerolls; the others are HiGs.
+            for system in out.get("systems", []):
+                if system.get("type") == "graser":
+                    system["type"] = "heavy_graser"
+                    system["intensity"] = "standard" if system.get("no_reroll") else "high"
         source = out.get("source") if isinstance(out.get("source"), dict) else {}
         printed = source.get("npv_book")
         points = self.design_breakdown(out, {}).points

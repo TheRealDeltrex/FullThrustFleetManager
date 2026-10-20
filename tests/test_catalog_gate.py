@@ -35,21 +35,38 @@ def test_npv_gate(design):
     opts = _options(rs, design)
     b = rs.design_breakdown(design, opts)
     violations = [i.code for i in rs.validate_design(design, opts) if i.severity == "violation"]
+    if design["source"].get("book") == "SR":
+        violations = [v for v in violations if v != "not_in_books"]
     erratum = ERRATA.get(design["id"])
     if erratum:
         assert erratum["book_value"] == design["source"]["npv_book"]
         assert erratum["rules_value"] == b.points, "errata rules_value is stale"
         assert len(erratum["reason"]) > 20
+        assert sorted(violations) == sorted(erratum.get("expected_violations", []))
         return
     # A Star Ranger variant often prints no NPV (0); it still has to be legal, bar the systems and
     # hull options the Fleet Books lack (such a design is listed only by Project Continuum).
     if design["source"]["npv_book"] or design["source"].get("book") != "SR":
         assert b.points == design["source"]["npv_book"]
-    if design["source"].get("book") == "SR":
-        violations = [v for v in violations if v != "not_in_books"]
     assert violations == []
 
 
 def test_errata_entries_are_used():
     known = {d["id"] for d in DESIGNS} | {"ft2:ft:super-heavy-cruiser-example"}
     assert set(ERRATA) <= known
+
+
+@pytest.mark.parametrize("ruleset_id", ["ft2", "fb", "ftcd"])
+def test_closed_rulesets_do_not_gain_systems_from_external_designs(ruleset_id):
+    import store
+
+    rs = get_ruleset(ruleset_id)
+    for race in rs.races():
+        assert all(s.book != "SR" for s in rs.system_types(race.id, {}))
+    for design in store.catalog_designs(ruleset_id):
+        if design["source"].get("book") != "SR":
+            continue
+        opts = _options(rs, design)
+        assert not [i for i in rs.validate_design(design, opts) if i.severity == "violation"]
+        supported = {s.type for s in rs.system_types(design["race"], opts)}
+        assert {s["type"] for s in design["systems"]} <= supported

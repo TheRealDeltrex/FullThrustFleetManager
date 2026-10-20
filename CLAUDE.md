@@ -117,8 +117,7 @@ What exists:
   every state-changing form from here on. `delete_fleet` is handled before dispatch because it
   has no fleet left to save.
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
-  record sheets (docked, hulk and destroyed ships are listed but not drawn, PLAN 10.2) and the
-  roster table. All three use the same `ssd_layout` diagrams the PDF will.
+  and the roster table. Both use the same `ssd_layout` diagrams the PDF does.
 - A ship's name and table ID are editable on its card; table IDs are unique per fleet,
   case-insensitive (`store._table_id_taken`, checked on add and on edit).
 - Add ship lists only the fleet's faction's designs when it has one; the "Show all ships" toggle
@@ -164,7 +163,7 @@ What exists:
 - Campaign maths is pure and lives in `fleet_rules`: `hull_boxes`, `crew_factors_left`,
   `ship_is_crippled`, `repairable_systems`, `repair_plan` (FT p.35: 1D6 hull a week at a base,
   up to three systems on 3+, a disabled drive needs two successes; ruling: each drive roll takes
-  one of the three places). `store` applies it:
+  one of the three places; attempts and successes are recorded separately). `store` applies it:
   `set_ship_damage` (clamped to what the design has), `toggle_system_out`, `repair_ship`,
   `replenish_ship` (fighters, salvos and one-shot systems in one week).
 - **Clicking the diagram**: every primitive carries a `ref` (`hull:7`, `armour:2`,
@@ -525,7 +524,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `rocket_cannon` (as a beam), `amt` (2/8), `hdc` ((class x 8) - 4, x3, one arc), `age_penalty`;
   hull rows also offer 3 (x3; a hull of 3 boxes or fewer costs 2 a box). Adopted Star Ranger
   designs swap `lrpt` for the long-range torpedo, `mt_missile` for a heavy missile and superior
-  sensors for the compact kind
+  sensors for the compact kind; their grasers become heavy grasers (high intensity unless
+  the source disables rerolls), retaining the Star Ranger MASS and points table
   (`common.convert_star_ranger`; CD gets a class-2 torpedo). Their rules text is
   `data/quickref/sr.json` (hand-kept from the site, `url` per entry, `QuickRefEntry.url`): FB and
   PC quick references add it (`star_ranger_quickref`), `/rules/star-ranger` shows it all, and the
@@ -696,7 +696,8 @@ image (`page.get_pixmap(dpi=200)`).
 
 - Rules engines are built **test-first**, golden tests from PLAN 6.2/6.3 first.
 - `tests/test_catalog_gate.py` must stay green: every catalog ship's recomputed points equal its
-  printed NPV, or it is listed in `data/errata.json` with a real reason.
+  printed NPV, or it is listed in `data/errata.json` with a real reason. Errata entries still check
+  violations against their explicit `expected_violations` list (empty by default).
 - **Routine work: run only the tests for what you changed.** Full suite before a release and in
   CI. Do not run the whole suite as routine verification.
 - Lint with ruff (`ruff check .`, config in `pyproject.toml`). The three rulebook pipeline files
