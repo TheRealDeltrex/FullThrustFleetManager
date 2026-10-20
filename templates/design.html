@@ -145,10 +145,9 @@
       </div>
 
       <div class="panel body portrait-summary">
-        {{ picture(ship_portrait(d), d.name) }}
+        {{ picture(ship_portrait(d), d.name, href=url_for('design_portrait', design_id=d.id)) }}
         <div><h3>{{ _("Ship picture") }}</h3>
           <p class="muted">{{ _("Artwork is decorative. It does not change ship statistics or record-sheet symbols.") }}</p>
-          <a class="btn" href="{{ url_for('design_portrait', design_id=d.id) }}">{{ _("Change picture") }}</a>
         </div>
       </div>
       {% if selected.read_only %}

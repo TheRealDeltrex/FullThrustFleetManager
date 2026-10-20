@@ -22,8 +22,8 @@
             {% if row.crippled %}<span class="chip bad">{{ _("Crippled") }}</span>{% endif %}
           </h3>
           {% if row.design %}<div class="fleet-portrait">
-            {{ picture(ship_portrait(row.design, portrait_target(f.id, ship.uid)), ship.name, True) }}
-            <a class="btn sm" href="{{ url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid) }}">{{ _("Change picture") }}</a>
+            {{ picture(ship_portrait(row.design, portrait_target(f.id, ship.uid)), ship.name, True,
+                      url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid)) }}
           </div>{% endif %}
           <div class="body ship-grid">
             {# Clicking the diagram posts one damage edit; the fields below do the same without

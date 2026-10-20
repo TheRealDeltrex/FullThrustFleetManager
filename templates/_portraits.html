@@ -1,5 +1,6 @@
-{% macro picture(art, name, small=False) %}
+{% macro picture(art, name, small=False, href=None) %}
   {% if art %}
+    {% if href %}<a class="portrait-link" href="{{ href }}" title="{{ _('Change picture') }}">{% endif %}
     {% if art.upload %}
       <img class="ship-portrait{% if small %} small{% endif %}" src="{{ art.upload }}"
            alt="{{ _('Portrait of {name}', name=name) }}" loading="lazy" width="256" height="256" />
@@ -10,5 +11,6 @@
            aria-label="{{ _('Portrait of {name}', name=name) }}"
            style="background-image:url('{{ art_url(art.file) }}');background-size:{{ cols * 100 }}% {{ rows * 100 }}%;background-position:{{ (art.cell % cols) * 100 / (cols - 1) if cols > 1 else 0 }}% {{ (art.cell // cols) * 100 / (rows - 1) if rows > 1 else 0 }}%"></div>
     {% endif %}
+    {% if href %}</a>{% endif %}
   {% endif %}
 {% endmacro %}

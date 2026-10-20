@@ -132,6 +132,20 @@ def test_portraits_and_new_themes_render_without_changing_ssd(client):
         assert svg == baseline
 
 
+def test_clicking_a_picture_opens_the_picture_changer(client):
+    fleet, message = store.create_fleet("fb", "Click fleet", "human")
+    store.add_ship(fleet, "fb:fb1:nac-harrison")
+    store.save_fleet(fleet)
+    ship = fleet["ships"][0]
+    pages = {"/design/fb:fb1:nac-harrison": '/portrait/design/fb:fb1:nac-harrison"',
+             f'/fleet/{fleet["id"]}': f'/portrait/ship/{fleet["id"]}/{ship["uid"]}"',
+             "/campaign": f'/portrait/ship/{fleet["id"]}/{ship["uid"]}"'}
+    for url, link in pages.items():
+        page = client.get(url, follow_redirects=True).get_data(as_text=True)
+        assert f'<a class="portrait-link" href="{link}' in page, url
+        assert ">Change picture</a>" not in page, url
+
+
 def test_expanded_source_catalog_has_distinct_uniform_view_defaults():
     originals = [d for file in (paths.bundle_dir() / "data/catalog").glob("*.json")
                  for d in json.loads(file.read_text(encoding="utf-8"))["designs"]]
