@@ -40,7 +40,7 @@ DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "l
                     "show_custom_factions": True, "show_other_race_factions": False}
 # Appearance choices, keyed on <html data-theme> in static/style.css.
 THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid",
-          "orbital-foundry", "celestial-archive")
+          "orbital-foundry", "celestial-archive", "full-thrust")
 
 
 def new_id() -> str:

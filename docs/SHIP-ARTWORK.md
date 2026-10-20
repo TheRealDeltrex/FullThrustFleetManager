@@ -4,8 +4,8 @@ Implemented 2026-10-19. No release or commit is implied by this working-tree imp
 
 ## What users can do
 
-- Select any of the ten themes in either existing theme picker; every theme has its own cover.
-- See ship portraits in Design, fleet cards and Campaign in all ten themes.
+- Select any of the eleven themes in either existing theme picker; every theme has its own cover.
+- See ship portraits in Design, fleet cards and Campaign in all eleven themes.
 - Use **Change picture** on a design to set its shared picture, including a read-only catalog
   design. A fleet card's control changes only that particular ship in that fleet.
 - Upload PNG, JPEG or WebP, choose a gallery picture, or reset to the inherited/default image.
@@ -84,7 +84,7 @@ not appear in the printed record sheets.
 - `_portraits.html` is the shared renderer. Theme-independent portrait layout lives at the
   start of `static/artwork.css`; the illustrated theme rules are scoped by `data-theme`.
   Theme banners are decorative HTML siblings of the working interface. Labels, tables,
-  controls, validation and responsive layout remain normal HTML/CSS. All ten covers use
+  controls, validation and responsive layout remain normal HTML/CSS. All eleven covers use
   the same responsive banner rule and a per-theme `--theme-cover` URL. Add or replace
   a cover without redesigning screens. Preserve the `url("themes/` spelling so the
   browser shell can rewrite it. Covers are hidden in print and excluded from SSDs/PDFs.
