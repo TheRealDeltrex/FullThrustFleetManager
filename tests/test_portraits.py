@@ -23,14 +23,14 @@ def png():
 
 
 def test_every_official_design_has_unique_art_and_adoptions_share_it():
-    originals, not_yet_drawn = [], []
+    originals = []
     for file in (paths.bundle_dir() / "data/catalog").glob("*.json"):
         designs = json.loads(file.read_text(encoding="utf-8"))["designs"]
-        # Star Ranger designs have no art of their own yet and fall back to their class picture.
-        (not_yet_drawn if file.name == "fb_starranger.json" else originals).extend(designs)
+        # Original-book adoption coverage; the expanded source catalog is checked below.
+        if file.name != "fb_starranger.json":
+            originals.extend(designs)
     resolved = [portraits.resolve(d, {}) for d in originals]
     assert len({(a["file"], a["cell"]) for a in resolved}) == len(originals) == 141
-    assert all(portraits.resolve(d, {}) for d in not_yet_drawn)
     for d in originals:
         if d["ruleset"] == "fb":
             for rs in ("ftcd", "ftpc"):
@@ -130,3 +130,29 @@ def test_portraits_and_new_themes_render_without_changing_ssd(client):
         svg = page[page.index("<svg"):page.index("</svg>") + 6]
         baseline = baseline or svg
         assert svg == baseline
+
+
+def test_expanded_source_catalog_has_distinct_uniform_view_defaults():
+    originals = [d for file in (paths.bundle_dir() / "data/catalog").glob("*.json")
+                 for d in json.loads(file.read_text(encoding="utf-8"))["designs"]]
+    resolved = [portraits.resolve(d, {}) for d in originals]
+    assert len(originals) == len({(a["file"], a["cell"]) for a in resolved}) == 478
+    assert all(a["view"] == "port-bow-30deg-bow-lower-left" for a in resolved)
+    assert all(a["basis"] in {"miniature", "miniature-variant", "invented-faction-design"}
+               for a in resolved)
+    for ruleset in RULESETS:
+        for design in store.catalog_designs(ruleset):
+            assert portraits.resolve(design, {})["view"] == "port-bow-30deg-bow-lower-left"
+
+
+def test_versioned_defaults_preserve_existing_gallery_choices_and_uploads():
+    design = {"id": "custom-test", "type_code": "SC"}
+    legacy = "custom:SC:1"
+    assert portraits.resolve(design, {})["file"] != portraits.manifest()["portraits"][legacy]["file"]
+    portraits.save(portraits.design_target(design), art=legacy)
+    assert portraits.resolve(design, portraits.load()) == portraits.manifest()["portraits"][legacy]
+    portraits.save(portraits.design_target(design), data=png())
+    assert "upload" in portraits.resolve(design, portraits.load())
+    for code, default in portraits.manifest()["class_defaults"].items():
+        assert default == f"custom:{code}:v2-1"
+        assert f"custom:{code}:v2-2" in portraits.manifest()["portraits"]
