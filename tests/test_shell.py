@@ -82,7 +82,7 @@ def test_vendored_fonts_exist_with_licence():
 def test_the_appearance_setting_themes_every_tab(client):
     import store
     css = (ROOT / "static" / "style.css").read_text(encoding="utf-8")
-    assert 'data-theme="admiralty"' in client.get("/fleet").get_data(as_text=True)  # the default
+    assert 'data-theme="full-thrust"' in client.get("/fleet").get_data(as_text=True)  # the default
     css += (ROOT / "static" / "artwork.css").read_text(encoding="utf-8")
     assert len(store.THEMES) == 11 and "classic" not in store.THEMES  # Classic was retired
     for theme in store.THEMES:
@@ -94,7 +94,23 @@ def test_the_appearance_setting_themes_every_tab(client):
     client.post("/settings", data={"pdf_viewer": "app", "paper": "A4"})
     assert store.load_settings()["theme"] == "nebula"
     client.post("/settings", data={"theme": "classic"})
-    assert store.load_settings()["theme"] == "admiralty"
+    assert store.load_settings()["theme"] == "full-thrust"
+
+
+def test_the_old_default_look_follows_the_new_default_unless_picked(client):
+    import json
+
+    import paths
+    import store
+    path = paths.user_data_dir() / "settings.json"
+    # Before Full Thrust, any save wrote the then-default Admiralty: that is not a choice.
+    path.write_text(json.dumps({"schema_version": 1, "theme": "admiralty", "paper": "Letter"}))
+    assert store.load_settings()["theme"] == "full-thrust"
+    path.write_text(json.dumps({"schema_version": 1, "theme": "nebula"}))
+    assert store.load_settings()["theme"] == "nebula"           # any other stored look stays
+    client.post("/settings", data={"theme": "admiralty"})
+    client.post("/settings", data={"paper": "A4"})
+    assert store.load_settings()["theme"] == "admiralty"        # picked now, so it is kept
 
 
 def test_the_top_bar_look_picker_shares_the_setting(client):
