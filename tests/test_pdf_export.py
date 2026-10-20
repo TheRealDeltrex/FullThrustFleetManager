@@ -304,3 +304,115 @@ def test_gunboats_in_a_boat_bay_get_the_gunboat_reference():
     reference = "".join(p for p in pages if "Quick reference" in p)
     gunboat = next(e for e in pc.quickref({"gunboat_rack"}, {}) if e.key == "gunboat_rack")
     assert gunboat.title in reference
+
+
+# ---- Print design and pagination ---------------------------------------------------------------
+
+
+def _assert_page_bounds(doc):
+    """Body text, headers and footers must stay on the printable page."""
+    for page in doc:
+        for word in page.get_text("words"):
+            x0, y0, x1, y1 = word[:4]
+            assert x0 >= 11 * 72 / 25.4, word
+            assert x1 <= page.rect.width - 11 * 72 / 25.4, word
+            assert y0 >= 5 * 72 / 25.4, word
+            assert y1 <= page.rect.height - 6 * 72 / 25.4, word
+
+
+@pytest.mark.parametrize("paper", ["A4", "Letter"])
+@pytest.mark.parametrize("style", ["mono", "color"])
+def test_print_styles_wrap_long_names_and_repeat_roster_headings(paper, style):
+    fleet = a_fleet(name="Northern Expeditionary Fleet - Outer Approach", ships=[])
+    for n in range(36):
+        store.add_ship(fleet, FB_SHIPS[n % len(FB_SHIPS)])
+        fleet["ships"][-1]["name"] = f"Vessel {n + 1}: The Long Road to the Distant Northern Frontier"
+    options = pdf_export.PrintOptions(paper=paper, style=style, sheets=False, orders=False,
+                                      tracker=False, quickref=False)
+    data, pages = render([fleet], options)
+    assert len(pages) > 1
+    assert "Vessel 36:" in "\n".join(pages)
+    # Every continuation containing ship rows repeats the column labels.
+    for page in pages:
+        if "Vessel" in page:
+            assert "Thrust" in page and "Source" in page
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+        pixels = doc[0].get_pixmap(colorspace=fitz.csRGB, matrix=fitz.Matrix(.5, .5)).samples
+        # MuPDF's RGB rasterisation can round a neutral channel by one level.
+        has_colour = any(max(rgb) - min(rgb) > 2
+                         for rgb in zip(pixels[::3], pixels[1::3], pixels[2::3]))
+        assert has_colour == (style == "color")
+        if style == "mono":
+            for drawing in doc[0].get_drawings():
+                for colour in (drawing["color"], drawing["fill"]):
+                    assert colour is None or max(colour) - min(colour) < .001
+
+
+def test_both_styles_use_identical_ssd_primitives(monkeypatch):
+    fleet = a_fleet()
+    diagrams = []
+    original = pdf_export.draw_diagram
+
+    def capture(pdf, diagram, *args):
+        diagrams.append(diagram)
+        return original(pdf, diagram, *args)
+
+    monkeypatch.setattr(pdf_export, "draw_diagram", capture)
+    for style in ("mono", "color"):
+        render([fleet], pdf_export.PrintOptions(style=style))
+    count = len(fleet["ships"])
+    assert len(diagrams) == count * 2
+    assert diagrams[:count] == diagrams[count:]
+
+
+def test_orders_and_long_tracker_rows_stay_inside_letter_page(monkeypatch):
+    fleet = a_fleet(ships=["fb:fb1:nac-ark-royal"])
+    fleet["ships"][0]["name"] = "Carrier with a deliberately long ship name for the orders grid"
+    monkeypatch.setattr(pdf_export, "_tracker_rows", lambda ship, design: [
+        ("Long reserve magazine", 48, 9, "test-magazine")])
+    data, pages = render([fleet], pdf_export.PrintOptions(paper="Letter", roster=False,
+                                                         sheets=False, quickref=False))
+    assert "Track 1" in "\n".join(pages)
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+        # The capacity is retained across cards, rather than truncated to fit.
+        squares = [item for p in doc for drawing in p.get_drawings() for item in drawing["items"]
+                   if item[0] == "re" and abs(item[1].width - 4.5 * 72 / 25.4) < .05
+                   and abs(item[1].height - 4.5 * 72 / 25.4) < .05]
+        assert len(squares) == 48
+
+
+def test_print_dialog_offers_and_applies_styles(client):
+    a_fleet()
+    page = client.get("/print").get_data(as_text=True)
+    assert 'name="print_style"' in page
+    assert "Black and white (ink-saving)" in page and "Fleet dossier (colour)" in page
+    for style in ("mono", "color", "invalid"):
+        response = client.post("/print", data={"roster": "on", "print_style": style})
+        assert response.mimetype == "application/pdf"
+        with fitz.open("pdf", response.data) as doc:
+            colour = doc[0].get_text("dict")["blocks"][0]["lines"][0]["spans"][0]["color"]
+            assert colour == (0x1C445F if style == "color" else 0x191919)
+
+
+def test_battle_pack_orders_keep_each_fleets_warning():
+    first = a_fleet(name="Over Limit")
+    store.update_fleet_details(first, points_limit=10)
+    second = a_fleet(name="Legal Fleet")
+    _data, pages = render([first, second])
+    orders = [page for page in pages if "Orders chart" in page]
+    assert len(orders) == 2
+    assert "non-conforming ships" in orders[0]
+    assert "non-conforming ships" not in orders[1]
+
+
+def test_long_orders_charts_keep_every_turn_at_a_writable_width():
+    fleet = a_fleet(ships=[FB_SHIPS[0]])
+    data, pages = render([fleet], pdf_export.PrintOptions(roster=False, sheets=False,
+        tracker=False, quickref=False, turns=12))
+    assert len(pages) == 2
+    assert "11" in pages[1] and "12" in pages[1]
+    assert all("Orders chart" in page and "Furious" in page for page in pages)
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
