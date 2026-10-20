@@ -493,3 +493,46 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="asteroid"] .tbl th { color: var(--ember); }
 [data-theme="asteroid"] .card .mini svg, [data-theme="asteroid"] .ssd-wrap svg { background: #f1efec; border-radius: 6px; }
 [data-theme="asteroid"] input[type=checkbox] { accent-color: var(--accent); }
+
+
+/* Full Thrust: the landing logo's blue and crimson nebula, on readable navy panels.
+   These rules affect the shell only; SSD symbols retain their shared renderer. */
+:root[data-theme="full-thrust"] {
+  color-scheme:dark;
+  --bg:#070e1c; --panel:#101e32; --panel-2:#14263e; --ink:#edf4ff;
+  --muted:#b0c1d8; --line:#3c5879; --accent:#79caff; --accent-soft:#183954;
+  --crimson:#ff8196; --chrome:#080f1d; --chrome-ink:#edf4ff; --chrome-muted:#b0c1d8;
+  --ok:#86dfaf; --ok-soft:#16382e; --warn:#ffd58a; --warn-soft:#40321c;
+  --bad:#ffa0ab; --bad-soft:#421f2c;
+  --st-ready:#86dfaf; --st-damaged:#ffd58a; --st-docked:#79caff; --st-lost:#8f9db2;
+  --rs-ft2:#ffbf70; --rs-fb:#79caff; --rs-ftcd:#86dfaf; --rs-ftpc:#c8acff;
+  --rs-current:#3c5879;
+}
+[data-theme="full-thrust"] body {
+  background:radial-gradient(1100px 700px at 0 0,#1475bb26,transparent 72%),
+    radial-gradient(1100px 700px at 100% 20%,#d1234926,transparent 72%),var(--bg);
+  background-attachment:fixed;
+}
+[data-theme="full-thrust"] .topbar {
+  background:linear-gradient(100deg,#102740,#0a1324 55%,#321524);
+  border-bottom:1px solid var(--crimson);
+}
+[data-theme="full-thrust"] .brand small { color:var(--crimson); }
+[data-theme="full-thrust"] .chrome-field { --chrome-field:#102239; border-color:var(--line); }
+[data-theme="full-thrust"] .tabs a { color:var(--chrome-ink); border-radius:6px; }
+[data-theme="full-thrust"] .tabs a.on {
+  background:var(--accent-soft); color:var(--accent); box-shadow:inset 0 -2px var(--crimson);
+}
+[data-theme="full-thrust"] .panel,
+[data-theme="full-thrust"] .tile,
+[data-theme="full-thrust"] .card { border-radius:8px; box-shadow:0 5px 18px #0003; }
+[data-theme="full-thrust"] .panel > h3 { background:var(--panel-2); color:var(--accent); }
+[data-theme="full-thrust"] .tile { border-top:2px solid var(--crimson); }
+[data-theme="full-thrust"] .btn.primary { background:#176499; border-color:#57a6dc; color:#fff; }
+[data-theme="full-thrust"] .btn:hover { border-color:var(--accent); }
+[data-theme="full-thrust"] .input { background:#0b182a; color:var(--ink); border-color:var(--line); }
+[data-theme="full-thrust"] :is(.input,.btn):focus-visible {
+  outline:2px solid var(--accent); outline-offset:2px;
+}
+[data-theme="full-thrust"] .lib-list a.on { color:var(--accent); background:var(--accent-soft); }
+[data-theme="full-thrust"] input[type=checkbox] { accent-color:#358cc9; }
