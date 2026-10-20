@@ -46,6 +46,9 @@ What exists:
 - `static/artwork.css` adds the two illustrated palettes and decorative banners from
   `static/themes/`. `portraits.py`, `data/ship_art.json`, `static/ships/` and `_portraits.html`
   provide portraits in every theme. See `docs/SHIP-ARTWORK.md` for extension and storage rules.
+  Versioned miniature-based atlases cover all 478 source designs plus 46 new custom choices;
+  187 legacy records remain valid. Optional `class_defaults` selects refreshed class pictures.
+  Per-portrait metadata records reference URLs, basis and the approved port-bow view.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
   across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds

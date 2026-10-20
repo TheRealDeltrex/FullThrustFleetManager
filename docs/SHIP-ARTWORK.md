@@ -12,15 +12,15 @@ Implemented 2026-10-19. No release or commit is implied by this working-tree imp
 - Download/restore a picture backup under Settings. The existing library export functions
   also include applicable portrait choices in design/fleet exports and full backups.
 
-There are 141 unique portraits for the current bundled official catalog: 110 Fleet Book
-designs and 31 FT2/More Thrust designs. The 220 CD/PC adoptions reuse their corresponding
-Fleet Book artwork, rather than pretending they are additional hull designs.
+The version 2 set gives all 478 source designs distinct default portraits: 141 original
+book designs and 337 Star Ranger designs. Ruleset adoptions share their source design's
+picture. The 37 new 4 by 4 atlases also provide 46 refreshed custom choices, two per class
+code. All 187 legacy portrait records and their atlas files remain available, so saved gallery
+choices keep working. Uploaded pictures and explicit user choices retain priority.
 
-The custom gallery has 46 portraits: two per class group SC, CT, FF, DD, DH, CL, CE, CH, CA,
-BC, BB, BDN, DN, SDN, CVE, CVL, CVA, M, BASE, SECTION, JG, PT and GENERIC. This covers every
-current class preset plus station/section/gate/patrol/generic choices. Labels that share a
-class code share its gallery (for example merchant subtypes). All gallery classes remain
-available through Browse all classes.
+The 23 custom class groups are SC, CT, FF, DD, DH, CL, CE, CH, CA, BC, BB, BDN, DN, SDN,
+CVE, CVL, CVA, M, BASE, SECTION, JG, PT and GENERIC. `class_defaults` selects the versioned
+first choice for each class; both new choices and legacy choices remain in the gallery.
 
 ## Provenance and limits
 
@@ -32,9 +32,17 @@ generation prompts. Civilian and generic FT2/MT art follows each ship's role. Pa
 are artistic choices, not rules or official faction specifications.
 
 The publisher's [Full Thrust miniature range](https://shop.groundzerogames.co.uk/full-thrust-starships.html)
-and [NSL catalog](https://shop.groundzerogames.co.uk/full-thrust-starships/neu-swabian-league-nsl.html)
-were consulted as reference sources. No shop photographs were bundled. All thirteen atlas
-prompts and reference modes are recorded in ARTWORK-PROMPTS.md.
+provided matched photograph references for 240 source designs, including interpreted variants.
+The remaining 238 designs use invented faction-compatible hulls. Every new ship uses the approved
+view 30 degrees above its port bow, bow toward lower-left and stern upper-right. Stations and
+hull sections retain their appropriate geometry. These are generated interpretations, not exact
+engineering reconstructions. Shop photographs are not bundled in the app.
+
+Descriptively named original PNGs, generation prompts, per-cell source links and checksums are
+saved in `E:\ClaudeOnlineFolder\Full Thrust Pictures\Miniature-Based-Uniform-View-v2`.
+`Picture-Index.md` and `picture-map.json` there record the assignments. Original older pictures
+and earlier drafts are preserved. `ARTWORK-PROMPTS.md` documents the original theme/portrait set;
+the version 2 prompts accompany the new PNGs.
 
 The SSD/PDF engine and catalog statistics were not changed. Portraits and theme banners do
 not appear in the printed record sheets.
