@@ -37,13 +37,15 @@ What exists:
   `rulebook.html` and `tournament_check.html`.
 - `static/style.css` — the mockup's visual language, status and ruleset accent colours as CSS
   variables, panes stack below 1100 px. The Settings "Look" (`settings["theme"]`, one of
-  `store.THEMES`: admiralty (default), lunar, bridge, carbon-armor, night-sky, nebula, aurora, asteroid,
-  orbital-foundry, celestial-archive) sets
+  `store.THEMES`: admiralty, lunar, bridge, carbon-armor, night-sky, nebula, aurora, asteroid,
+  orbital-foundry, celestial-archive, full-thrust (default)) sets
   `<html data-theme>`; each look is a block at the end of the file that redefines the variables and
   restyles colour, type and borders only. The unscoped rules are their shared base, not a look
-  (Classic was retired; a stored unknown value falls back to the default). Ship diagrams keep a
-  light ground in every look.
-- `static/artwork.css` adds the two illustrated palettes and decorative covers for all ten themes from
+  (Classic was retired; a stored unknown value falls back to the default). `theme_chosen` marks
+  a picked look: a stored `admiralty` without it is the old default and follows the new one. Ship diagrams keep a
+  light ground in every look. Full Thrust matches the landing logo with navy panels,
+  blue controls and crimson accents; its cover is `static/themes/full-thrust.webp`.
+- `static/artwork.css` adds the two illustrated palettes and decorative covers for all eleven themes from
   `static/themes/`. `portraits.py`, `data/ship_art.json`, `static/ships/` and `_portraits.html`
   provide portraits in every theme. See `docs/SHIP-ARTWORK.md` for extension and storage rules.
   Versioned miniature-based atlases cover all 478 source designs plus 46 new custom choices;

@@ -31,7 +31,9 @@ from rulesets import RULESETS, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
-DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "language": "en",
+DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "full-thrust", "language": "en",
+                    # True once the player picks a look; see load_settings.
+                    "theme_chosen": False,
                     "last_backup": None,
                     # The web build's backup reminder, put off for a while by "Later" (PLAN 5.7).
                     "backup_snoozed": None,
@@ -40,7 +42,7 @@ DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "admiralty", "l
                     "show_custom_factions": True, "show_other_race_factions": False}
 # Appearance choices, keyed on <html data-theme> in static/style.css.
 THEMES = ("admiralty", "lunar", "bridge", "carbon-armor", "night-sky", "nebula", "aurora", "asteroid",
-          "orbital-foundry", "celestial-archive")
+          "orbital-foundry", "celestial-archive", "full-thrust")
 
 
 def new_id() -> str:
@@ -1048,7 +1050,11 @@ def load_settings() -> dict:
         out["paper"] = doc["paper"]
     if doc.get("pdf_viewer") in ("app", "system"):
         out["pdf_viewer"] = doc["pdf_viewer"]
-    if doc.get("theme") in THEMES:
+    # Admiralty was the default before Full Thrust, and every save wrote the whole settings
+    # file, so a stored "admiralty" without theme_chosen is the old default, not a choice.
+    if isinstance(doc.get("theme_chosen"), bool):
+        out["theme_chosen"] = doc["theme_chosen"]
+    if doc.get("theme") in THEMES and (doc["theme"] != "admiralty" or out["theme_chosen"]):
         out["theme"] = doc["theme"]
     if isinstance(doc.get("language"), str):
         out["language"] = doc["language"]
@@ -1063,6 +1069,8 @@ def load_settings() -> dict:
 
 def save_settings(**changes) -> tuple[bool, str]:
     settings = load_settings()
+    if "theme" in changes:
+        changes["theme_chosen"] = True
     settings.update({k: v for k, v in changes.items() if k in DEFAULT_SETTINGS})
     paths.user_data_dir().mkdir(parents=True, exist_ok=True)
     _write_json(paths.user_data_dir() / "settings.json", {"schema_version": migrations.CURRENT, **settings})

@@ -25,6 +25,7 @@
 :root[data-theme="bridge"] { --theme-cover:url("themes/bridge.webp"); }
 :root[data-theme="carbon-armor"] { --theme-cover:url("themes/carbon-armor.webp"); }
 :root[data-theme="night-sky"] { --theme-cover:url("themes/night-sky.webp"); }
+:root[data-theme="full-thrust"] { --theme-cover:url("themes/full-thrust.webp"); }
 :root[data-theme="nebula"] { --theme-cover:url("themes/nebula.webp"); }
 :root[data-theme="aurora"] { --theme-cover:url("themes/aurora.webp"); }
 :root[data-theme="asteroid"] { --theme-cover:url("themes/asteroid.webp"); }
