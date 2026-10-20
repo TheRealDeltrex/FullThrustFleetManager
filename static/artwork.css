@@ -13,7 +13,23 @@
 .portrait-choice:has(input:focus-visible) { outline:3px solid var(--accent); outline-offset:2px; }
 .fleet-portrait { display:flex; align-items:center; gap:14px; padding:12px; }
 .fleet-portrait .ship-portrait { width:112px; }
-.theme-art { display:none; }
+/* Decorative covers share one renderer; keep rules and SSD symbols out of this layer. */
+.theme-art {
+  display:block; height:clamp(100px,17vw,230px);
+  background-image:var(--theme-cover, url("themes/admiralty.webp"));
+  background-size:cover; background-position:center;
+  border-bottom:2px solid var(--accent);
+}
+:root[data-theme="admiralty"] { --theme-cover:url("themes/admiralty.webp"); }
+:root[data-theme="lunar"] { --theme-cover:url("themes/lunar.webp"); }
+:root[data-theme="bridge"] { --theme-cover:url("themes/bridge.webp"); }
+:root[data-theme="carbon-armor"] { --theme-cover:url("themes/carbon-armor.webp"); }
+:root[data-theme="night-sky"] { --theme-cover:url("themes/night-sky.webp"); }
+:root[data-theme="nebula"] { --theme-cover:url("themes/nebula.webp"); }
+:root[data-theme="aurora"] { --theme-cover:url("themes/aurora.webp"); }
+:root[data-theme="asteroid"] { --theme-cover:url("themes/asteroid.webp"); }
+:root[data-theme="orbital-foundry"] { --theme-cover:url("themes/orbital-foundry.webp"); }
+:root[data-theme="celestial-archive"] { --theme-cover:url("themes/celestial-archive.webp"); }
 
 /* Only these two selectors introduce the illustrated themes. Controls remain native HTML. */
 :root[data-theme="orbital-foundry"] {
@@ -26,13 +42,6 @@
   --muted:#536475; --line:#b5b0a5; --accent:#07536a; --accent-soft:#dce9e9;
   --chrome:#142b42; --chrome-ink:#fcfaf5; --chrome-muted:#d3dedf;
 }
-html[data-theme="orbital-foundry"] .theme-art,
-html[data-theme="celestial-archive"] .theme-art {
-  display:block; height:clamp(100px,17vw,230px); background-size:cover; background-position:center;
-  border-bottom:2px solid var(--accent);
-}
-html[data-theme="orbital-foundry"] .theme-art { background-image:url("themes/orbital-foundry.webp"); }
-html[data-theme="celestial-archive"] .theme-art { background-image:url("themes/celestial-archive.webp"); }
 html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .panel {
   box-shadow:0 6px 20px #00000014; border-radius:10px;
 }
