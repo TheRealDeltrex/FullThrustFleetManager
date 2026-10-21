@@ -1058,6 +1058,7 @@ def campaign() -> str:
             "crippled": fleet_rules.ship_is_crippled(design, ship["damage"]),
             "systems_out": fleet_rules.repairable_systems(design, ship["damage"]),
             "system_labels": fleet_rules.system_labels(design),
+            "yard_block": store.yard_block(fleet, ship),
         })
     return render_template("campaign.html", active_tab="campaign", statuses=store.STATUSES,
                            selected={"fleet": fleet, "ships": ships,
@@ -1092,7 +1093,7 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
     the current fleet's ships that are in no force yet."""
     grid = campaign["map"]
     if not grid:
-        return {"forces": [], "free_ships": [], "force_systems": []}
+        return {"forces": [], "free_ships": [], "force_systems": [], "reinforcements": []}
     fleets = {f["id"]: f for f in store.campaign_fleets(campaign["id"])}
     side_names = {s["id"]: s["name"] for s in campaign["sides"]}
     side_class = {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])}
@@ -1110,11 +1111,22 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
             "ships": ships, "options": options, "why": why, "order": order,
             "own": force["side"] == fleet.get("campaign_side"),
         })
+    names = {(f["id"], s["uid"]): s for f in fleets.values() for s in f["ships"]}
+    later = []
+    for group in campaign["reinforcements"]:
+        assigned.update((x["fleet"], x["uid"]) for x in group["ships"])
+        system = starmap.system_at(grid, group["q"], group["r"])
+        later.append({"group": group, "side": side_names.get(group["side"], ""),
+                      "side_class": side_class.get(group["side"], ""),
+                      "where": system["name"] if system else "",
+                      "ships": [names[(x["fleet"], x["uid"])] for x in group["ships"]
+                                if (x["fleet"], x["uid"]) in names],
+                      "own": group["side"] == fleet.get("campaign_side")})
     free = [s for s in fleet["ships"]
             if (fleet["id"], s["uid"]) not in assigned and s["status"] != "destroyed"]
     systems = sorted(grid["systems"], key=lambda s: (s["owner"] != fleet.get("campaign_side"),
                                                      not s["base"], s["name"]))
-    return {"forces": rows, "free_ships": free, "force_systems": systems}
+    return {"forces": rows, "free_ships": free, "force_systems": systems, "reinforcements": later}
 
 
 def _contacts_context(campaign: dict, fleet: dict) -> dict:
@@ -1346,6 +1358,22 @@ def _unassign_ship(campaign: dict) -> tuple[bool, str]:
     # Each ship's Leave button names it in the URL, inside its force's form.
     fleet_id, _sep, uid = (request.args.get("ship") or "").partition(":")
     return store.unassign_ship(campaign, request.form.get("force", ""), fleet_id, uid)
+
+
+@register_action("schedule_reinforcement")
+def _schedule_reinforcement(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    fleet = store.get_fleet(form.get("fleet", ""))
+    picked = _picked_hex(form.get("at"), campaign["map"]) if campaign["map"] else None
+    if not fleet or not picked:
+        return False, _("Pick a star system for the task force.")
+    return store.schedule_reinforcement(campaign, fleet, form.getlist("ship"), _as_count(form.get("week")),
+                                        *picked, form.get("name", ""))
+
+
+@register_action("cancel_reinforcement")
+def _cancel_reinforcement(campaign: dict) -> tuple[bool, str]:
+    return store.cancel_reinforcement(campaign, request.form.get("reinforcement", ""))
 
 
 @register_action("contact_report")
