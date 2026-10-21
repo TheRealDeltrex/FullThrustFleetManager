@@ -782,3 +782,17 @@ def test_a_turret_gunboats_and_robot_fighters_are_edited_on_the_workbench(client
         {"carrier": uid["gunboat_rack"], "type": "gatling", "extras": ["heavy"], "ecm": 1}]
     assert draft["default_loadout"]["fighters"] == [
         {"hangar": uid["fighter_rack"], "type": "attack", "extras": ["robot"]}]
+
+
+def test_a_carried_gunboat_squadron_may_mix_types(client):
+    design_id = make(client, "Tender", ruleset="ftpc")
+    draft, _dirty = store.working_design(design_id)
+    client.post(f"/design/{design_id}", data=fields(draft, action="add_system", system_type="gunboat_rack"))
+    draft, _dirty = store.working_design(design_id)
+    uid = next(s["uid"] for s in draft["systems"] if s["type"] == "gunboat_rack")
+    assert f'name="gunboat-{uid}-boat-0"' in client.get(f"/design/{design_id}").get_data(as_text=True)
+    client.post(f"/design/{design_id}", data=fields(draft, action="apply", **{
+        f"gunboat-{uid}-type": "needle", f"gunboat-{uid}-boat-0": "rocket"}))
+    draft, _dirty = store.working_design(design_id)
+    assert draft["default_loadout"]["gunboats"] == [
+        {"carrier": uid, "type": "needle", "types": ["rocket"] + ["needle"] * 5}]
