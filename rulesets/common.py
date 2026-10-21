@@ -90,6 +90,14 @@ def source_ref(source: dict) -> str:
     return f"{book} p.{source.get('page')}"
 
 
+def printed_npv(design: dict, source: dict, printed: int) -> str:
+    """The NPV an adopted design brings along: printed, or for a design adjusted to fit the rules
+    (its name ends in *, its note says how) the value the adjustment gave it."""
+    if str(design.get("name") or "").endswith("*"):
+        return f"the adjusted design costs NPV {printed} under the Fleet Book rules"
+    return f"{source_ref(source)} prints NPV {printed}"
+
+
 def convert_star_ranger(design: dict, long_torpedo: dict, superior_sensors: str = "") -> list[str]:
     """A Star Ranger design's systems in the CD and PC terms that equal them; the notes it adds.
     The long-range pulse torpedo (MASS 8 +2 an arc, 3 a MASS) is CD's class-2 torpedo and PC's
