@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from i18n import _
-from rulesets import RULESETS, Issue
+from rulesets import RULESETS, Issue, fleet_common
 
 DESTROYED = "destroyed"
 FLEET_OPTION_KEYS = (
@@ -275,6 +275,27 @@ def badge_label(key: str) -> str:
 REPAIR_SYSTEMS_PER_WEEK = 3   # "you may roll for up to three systems on each ship ... per Turn"
 REPAIR_TARGET = 3             # "on a D6 roll of 3 or more the system ... is repaired"
 DRIVE_SUCCESSES = 2           # "Drive systems require TWO successful repair rolls if fully disabled"
+
+
+FTL_HEXES_PER_WEEK = 6        # "each fleet of FTL ships can move up to 6 hexes" (FT p.35)
+
+
+def force_reach(ships: list[tuple[dict, dict | None]]) -> tuple[int, str]:
+    """(hexes a task force may move this week, why not when 0). Every ship must make the jump,
+    on its own FTL or carried, and none may be docked for repairs (FT p.36)."""
+    if not any(s.get("status") != "destroyed" for s, _d in ships):
+        return 0, _("No ships.")
+    if any(d is None for _s, d in ships):
+        return 0, _("A ship's design is missing.")
+    docked = [s for s, _d in ships if s.get("status") == "docked"]
+    if docked:
+        return 0, _("{name} is docked.", name=docked[0].get("name") or docked[0].get("table_id"))
+    fixed, carried = fleet_common.jump_blockers(ships)
+    if fixed:
+        return 0, _("{name} cannot move.", name=fixed[0].get("name") or fixed[0].get("table_id"))
+    if not carried:
+        return 0, _("Ships without a working FTL drive need tender bays or tugs in the force.")
+    return FTL_HEXES_PER_WEEK, ""
 
 
 def hull_boxes(design: dict | None) -> int:
