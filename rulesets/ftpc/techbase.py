@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from i18n import _
 from rulesets import common
+from rulesets.ftpc import rules
 
 _int = common.as_int
 
@@ -197,16 +198,23 @@ def design_techs(design: dict, loadout: dict | None, options: dict) -> set[str]:
             # beams flies the gun kind.
             out.add("gun_fighter" if "kgun" in types and "beam" not in types else "beam_fighter")
     for g in common.loadout_entries(loadout, "gunboats"):
-        out.add("gunboats")
-        if g.get("type") in GUNBOAT_TECH:
-            out.add(GUNBOAT_TECH[g["type"]])
-        extras = g.get("extras") if isinstance(g.get("extras"), list) else []
-        if "ftl" in extras:
-            out.add("ftl_gunboats")
-        if "heavy" in extras:
-            out.add("heavy_gunboats")
-        if _int(g.get("ecm")) > 0:
-            out.add("ecm")
+        out |= gunboat_techs(g)
+    return out
+
+
+def gunboat_techs(squadron: dict) -> set[str]:
+    """What a gunboat squadron needs: each of its boats' weapons, and its modifications."""
+    out = {"gunboats"}
+    for kind in rules.boat_types(squadron):
+        if kind in GUNBOAT_TECH:
+            out.add(GUNBOAT_TECH[kind])
+    extras = squadron.get("extras") if isinstance(squadron.get("extras"), list) else []
+    if "ftl" in extras:
+        out.add("ftl_gunboats")
+    if "heavy" in extras:
+        out.add("heavy_gunboats")
+    if _int(squadron.get("ecm")) > 0:
+        out.add("ecm")
     return out
 
 

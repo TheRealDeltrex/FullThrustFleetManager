@@ -758,15 +758,45 @@ def gunboat_ecm(entry: dict) -> int:
     return max(0, _int(entry.get("ecm")))
 
 
+def boat_types(entry: dict) -> list[str]:
+    """The type of each of the squadron's six gunboats. PC p.79 lets a squadron mix types
+    ("You may mix and match types and weapons as you wish"); a mixed squadron lists all six in
+    `types`, an unmixed one names its `type` alone."""
+    types = entry.get("types")
+    if isinstance(types, list) and len(types) == data.GUNBOAT_SQUADRON:
+        return [t if isinstance(t, str) else "" for t in types]
+    kind = entry.get("type")
+    return [kind if isinstance(kind, str) else ""] * data.GUNBOAT_SQUADRON
+
+
+def gunboat_types_known(entry: dict) -> bool:
+    return (all(t in data.GUNBOAT_POINTS for t in boat_types(entry))
+            and all(x in data.GUNBOAT_EXTRAS for x in _gunboat_extras(entry)))
+
+
 def gunboat_squadron_points(entry: dict) -> int:
-    """PC pp.123-124: six gunboats of the type, +6 FTL and +12 heavy for the squadron, +3 a
-    gunboat per level of electronic warfare."""
-    each = data.GUNBOAT_POINTS.get(entry.get("type"))
-    if each is None:
+    """PC pp.123-124: each gunboat at its type's price, +6 FTL and +12 heavy for the squadron,
+    +3 a gunboat per level of electronic warfare. The modifications are priced per squadron, so
+    in a mixed squadron they apply to all six (ruling)."""
+    if not all(t in data.GUNBOAT_POINTS for t in boat_types(entry)):
         return 0
-    return (data.GUNBOAT_SQUADRON * each
+    return (sum(data.GUNBOAT_POINTS[t] for t in boat_types(entry))
             + sum(data.GUNBOAT_EXTRAS.get(x, 0) for x in _gunboat_extras(entry))
             + data.GUNBOAT_SQUADRON * data.GUNBOAT_ECM_POINTS * gunboat_ecm(entry))
+
+
+def independent_squadron(entry: dict) -> dict:
+    """A squadron the fleet fields on its own, with no carrier: only FTL gunboats can, since
+    "unlike FTL fighters, FTL Gunboats do not need a carrying vessel" (PC p.80)."""
+    return {**entry, "extras": ["ftl", *(x for x in _gunboat_extras(entry) if x != "ftl")]}
+
+
+def validate_independent_squadrons(squadrons: list[dict], violation) -> None:
+    for entry in squadrons:
+        if not gunboat_types_known(entry):
+            violation("unknown_gunboat_type", _("Unknown gunboat type."))
+        if gunboat_ecm(entry) > data.GUNBOAT_ECM_MAX:
+            violation("gunboat_ecm", _("Electronic warfare gunboats carry ECM up to level 3."))
 
 
 def salvo_space(entry: dict, salvo: str) -> int | None:
@@ -1147,8 +1177,7 @@ def _validate_gunboats(design: dict, by_uid: dict, violation) -> None:
                       _("Gunboat squadron assigned to a rack or bay this design does not have."))
             continue
         uid = carrier["uid"]
-        if (entry.get("type") not in data.GUNBOAT_POINTS
-                or any(x not in data.GUNBOAT_EXTRAS for x in _gunboat_extras(entry))):
+        if not gunboat_types_known(entry):
             violation("unknown_gunboat_type", _("Unknown gunboat type."), uid)
         if gunboat_ecm(entry) > data.GUNBOAT_ECM_MAX:
             violation("gunboat_ecm", _("Electronic warfare gunboats carry ECM up to level 3."), uid)

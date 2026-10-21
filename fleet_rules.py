@@ -118,6 +118,21 @@ def dummy_bogey_points(fleet: dict) -> int:
     return dummy_bogeys(fleet) * rs.dummy_bogey_points if rs else 0
 
 
+def gunboat_squadrons(fleet: dict) -> list[dict]:
+    """The FTL gunboat squadrons the fleet fields without a carrier, where its ruleset has
+    gunboats (PC p.80); else none."""
+    rs = ruleset_of(fleet)
+    squadrons = fleet.get("gunboat_squadrons")
+    if not getattr(rs, "gunboat_types", ()) or not isinstance(squadrons, list):
+        return []
+    return [g for g in squadrons if isinstance(g, dict)]
+
+
+def gunboat_squadron_points(fleet: dict) -> int:
+    rs = ruleset_of(fleet)
+    return sum(rs.gunboat_squadron_points(g) for g in gunboat_squadrons(fleet))
+
+
 def morale(fleet: dict, designs: dict) -> tuple[int, int] | None:
     """(MASS destroyed, MASS at which the fleet withdraws), where the ruleset has a fleet morale
     rule (CD p.40). Ships whose design is missing count for nothing."""
@@ -133,7 +148,7 @@ def fleet_points(fleet: dict, designs: dict) -> int:
         ship_points(s, designs.get(s.get("design_id")), opts)
         for s in fleet.get("ships", [])
         if s.get("status") != DESTROYED
-    ) + dummy_bogey_points(fleet)
+    ) + dummy_bogey_points(fleet) + gunboat_squadron_points(fleet)
 
 
 def design_issues(design: dict, options: dict) -> list[Issue]:

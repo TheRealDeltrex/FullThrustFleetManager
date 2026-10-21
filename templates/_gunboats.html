@@ -1,0 +1,41 @@
+{# One gunboat squadron's fields (PC pp.79-82): its type, the modifications and ECM level, and
+   the six boats, which may each be another type (p.79). An empty boat means the squadron's type. #}
+{% macro squadron_fields(prefix, squadron, types, extras, empty=True) %}
+  <div class="loadout-row">
+    <label>{{ _("Squadron") }}
+      <select class="input" name="{{ prefix }}type">
+        {% if empty %}<option value="">{{ _("Empty") }}</option>{% endif %}
+        {% for key, text in types %}
+          <option value="{{ key }}" {% if squadron and squadron.type == key %}selected{% endif %}>{{ text }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    {% for key, text in extras %}
+      <label class="check"><input type="checkbox" name="{{ prefix }}{{ key }}"
+        {% if squadron and key in (squadron.extras or []) %}checked{% endif %} /> {{ text }}</label>
+    {% endfor %}
+    <label>{{ _("ECM") }}
+      <select class="input sm" name="{{ prefix }}ecm">
+        {% for n in range(0, 4) %}
+          <option value="{{ n }}" {% if squadron and (squadron.ecm or 0) == n %}selected{% endif %}>{% if n %}{{ _("Level {n}", n=n) }}{% else %}{{ _("None") }}{% endif %}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+  <details class="boats" {% if squadron and squadron.types %}open{% endif %}>
+    <summary>{{ _("Mix types") }}</summary>
+    <div class="loadout-row">
+      {% for index in range(6) %}
+        {% set boat = squadron.types[index] if squadron and squadron.types else "" %}
+        <label>{{ _("Boat {n}", n=index + 1) }}
+          <select class="input" name="{{ prefix }}boat-{{ index }}">
+            <option value="">{{ _("Same") }}</option>
+            {% for key, text in types %}
+              <option value="{{ key }}" {% if boat == key and boat != squadron.type %}selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      {% endfor %}
+    </div>
+  </details>
+{% endmacro %}
