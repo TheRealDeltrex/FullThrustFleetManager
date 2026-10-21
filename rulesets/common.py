@@ -218,6 +218,16 @@ def hull_descriptor(boxes: int, tmf: int, descriptors: tuple[tuple[int, str], ..
     return hull_descriptor_label("Fragile")
 
 
+SCAN_ESCORT_MAX, SCAN_CRUISER_MAX = 44, 90
+
+
+def scan_class(tmf: int) -> str:
+    """"escort", "cruiser" or "capital" by MASS, on CD p.42's bands."""
+    if tmf <= SCAN_ESCORT_MAX:
+        return "escort"
+    return "cruiser" if tmf <= SCAN_CRUISER_MAX else "capital"
+
+
 def pick_class(tmf: int, classes: tuple) -> tuple[str, str]:
     """(label, code) of the (label, code, low, high) band containing tmf whose centre is nearest,
     ties to the smaller class. An open-ended band (high None) counts its lower bound as the

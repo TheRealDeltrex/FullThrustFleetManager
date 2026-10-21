@@ -152,6 +152,11 @@ class Ruleset(Protocol):
         morale rule, else None."""
         ...
 
+    def scan_class(self, design: dict) -> str:
+        """What a long-range scan reads the ship as: "escort", "cruiser" or "capital" (FT
+        pp.21, 34)."""
+        ...
+
     def adopt_design(self, design: dict) -> dict | None:
         """A catalog design of a `catalog_sources` ruleset as this ruleset's own: a new id and
         this ruleset id, changed where this ruleset's book says the design must change. The
