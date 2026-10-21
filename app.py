@@ -1075,7 +1075,7 @@ def _campaign_context(fleet: dict) -> dict:
         {"fleet": f, "points": fleet_rules.fleet_points(f, store.designs_for_fleet(f))}
         for f in members if f["campaign_side"] == side["id"]]} for side in campaign["sides"]]
     return {"campaign": campaign, "sides": sides, **_starmap_context(campaign),
-            **_forces_context(campaign, fleet)}
+            **_forces_context(campaign, fleet), **_contacts_context(campaign, fleet)}
 
 
 def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
@@ -1115,6 +1115,32 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
     systems = sorted(grid["systems"], key=lambda s: (s["owner"] != fleet.get("campaign_side"),
                                                      not s["base"], s["name"]))
     return {"forces": rows, "free_ships": free, "force_systems": systems}
+
+
+def _contacts_context(campaign: dict, fleet: dict) -> dict:
+    """The Contacts panel (step C4): this week's meetings, each with every side's scan report,
+    the current fleet's side's choice (the others stay hidden until all have chosen) and, after
+    a battle, the ships that were there with links to their damage."""
+    fleets = {f["id"]: f for f in store.campaign_fleets(campaign["id"])}
+    side_names = {s["id"]: s["name"] for s in campaign["sides"]}
+    side_class = {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])}
+    rows = []
+    for contact in store.this_weeks_contacts(campaign):
+        forces = store.contact_forces(campaign, contact)
+        sides = []
+        for side in contact["sides"]:
+            ships = [(fl, ship) for force in forces if force["side"] == side
+                     for fl, ship, _d in store.force_ships(campaign, force, fleets)]
+            sides.append({"id": side, "name": side_names.get(side, side),
+                          "class": side_class.get(side, ""),
+                          "report": contact["reports"][side], "choice": contact["choices"][side],
+                          "forces": [f["name"] for f in forces if f["side"] == side], "ships": ships,
+                          "leaving": side in contact["leaving"]})
+        system = starmap.system_at(campaign["map"], contact["q"], contact["r"]) if campaign["map"] else None
+        rows.append({"contact": contact, "sides": sides,
+                     "where": system["name"] if system else starmap.hex_label(contact["q"], contact["r"]),
+                     "own": own if (own := fleet.get("campaign_side")) in contact["sides"] else ""})
+    return {"contacts": rows, "scan_classes": fleet_rules.SCAN_CLASSES}
 
 
 def _starmap_context(campaign: dict) -> dict:
@@ -1322,6 +1348,40 @@ def _unassign_ship(campaign: dict) -> tuple[bool, str]:
     return store.unassign_ship(campaign, request.form.get("force", ""), fleet_id, uid)
 
 
+@register_action("contact_report")
+def _contact_report(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    counts = {k: _as_count(form.get(k)) for k in fleet_rules.SCAN_CLASSES}
+    return store.set_contact_report(campaign, form.get("contact", ""), form.get("side", ""), counts)
+
+
+@register_action("contact_choice")
+def _contact_choice(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    roll = _as_count(form.get("roll")) or None
+    return store.set_contact_choice(campaign, form.get("contact", ""), form.get("side", ""),
+                                    form.get("choice", ""), roll)
+
+
+@register_action("battle_result")
+def _battle_result(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    return store.set_battle_result(campaign, form.get("contact", ""), form.get("result", ""),
+                                   form.get("notes", ""))
+
+
+@register_action("reopen_contact")
+def _reopen_contact(campaign: dict) -> tuple[bool, str]:
+    return store.reopen_contact(campaign, request.form.get("contact", ""))
+
+
+def _as_count(raw: str | None) -> int:
+    try:
+        return max(0, int(raw or 0))
+    except ValueError:
+        return 0
+
+
 @register_action("add_campaign_log")
 def _add_campaign_log(campaign: dict) -> tuple[bool, str]:
     return store.add_campaign_log(campaign, int(request.form.get("week") or 0),
@@ -1401,6 +1461,23 @@ def book_url(code: str, page: int | None = None) -> str:
 
 
 app.jinja_env.globals["book_url"] = book_url
+
+
+def scan_label(cls: str) -> str:
+    return {"escort": _("escort"), "cruiser": _("cruiser"), "capital": _("capital")}.get(cls, cls)
+
+
+def choice_label(choice: str) -> str:
+    return {"fight": _("Fight"), "withdraw": _("Withdraw"), "standoff": _("Stand off")}.get(choice, choice)
+
+
+def outcome_label(outcome: str) -> str:
+    return {"battle": _("Battle."), "standoff": _("Stand off: both stay in the system."),
+            "leave": _("No battle: every side leaves next week."),
+            "escaped": _("Got away: the withdrawing side leaves next week.")}.get(outcome, outcome)
+
+
+app.jinja_env.globals.update(scan_label=scan_label, choice_label=choice_label, outcome_label=outcome_label)
 app.jinja_env.globals["FIGHTER_BAY_TYPES"] = common.FIGHTER_BAY_TYPES
 app.jinja_env.globals["GUNBOAT_CARRIER_TYPES"] = common.GUNBOAT_CARRIER_TYPES
 

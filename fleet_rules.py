@@ -298,6 +298,43 @@ def force_reach(ships: list[tuple[dict, dict | None]]) -> tuple[int, str]:
     return FTL_HEXES_PER_WEEK, ""
 
 
+SCAN_CLASSES = ("escort", "cruiser", "capital")
+CONTACT_CHOICES = ("fight", "withdraw", "standoff")
+CATCH_ROLL = 6
+
+
+def scan_counts(ships: list[tuple[dict, dict | None]]) -> dict[str, int]:
+    """The long-range scan of a group (FT p.34): how many ships of each basic class. Lost ships
+    and ships whose design is missing do not show."""
+    counts = dict.fromkeys(SCAN_CLASSES, 0)
+    for ship, design in ships:
+        rs = RULESETS.get(design.get("ruleset")) if design else None
+        if rs and ship.get("status") != "destroyed":
+            counts[rs.scan_class(design)] += 1
+    return counts
+
+
+def catch_roll_needed(choices: dict[str, str]) -> bool:
+    picks = set(choices.values())
+    return "fight" in picks and "withdraw" in picks
+
+
+def contact_outcome(choices: dict[str, str], roll: int | None) -> tuple[str, list[str]]:
+    """(outcome, sides that leave the system) once every side has chosen (FT p.35). No side
+    fights: all stand off, or else all leave. Someone fights: a withdrawing side gets away unless
+    the catch roll is a 6, and the battle is fought by whoever stays; when only the fighting side
+    stays, the others have "escaped". With more than two sides, one catch roll stands for all
+    (an app rule)."""
+    sides = list(choices)
+    if "fight" not in choices.values():
+        if all(choices[s] == "standoff" for s in sides):
+            return "standoff", []
+        return "leave", sides
+    escaped = [s for s in sides if choices[s] == "withdraw"] if roll != CATCH_ROLL else []
+    staying = [s for s in sides if s not in escaped]
+    return ("battle" if len(staying) > 1 else "escaped"), escaped
+
+
 def hull_boxes(design: dict | None) -> int:
     rs = RULESETS.get(design.get("ruleset")) if design else None
     return sum(rs.damage_track(design)) if rs and design else 0

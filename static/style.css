@@ -248,6 +248,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .order.side-6, .pennant.side-6 { stroke: #ff7ad9; color: #ff7ad9; } .order.side-7, .pennant.side-7 { stroke: #a3a3a3; color: #a3a3a3; }
 .task-force { border-top: 1px solid var(--line); padding-top: 8px; }
 .task-force:first-child { border-top: 0; padding-top: 0; }
+.campaign-contacts input[type="number"] { width: 4.5em; }
 @media (max-width: 760px) { .starmap-grid { grid-template-columns: 1fr; } }
 .ssd-click [data-ref] { cursor: pointer; }
 .ssd-click [data-ref]:hover { opacity: .55; }

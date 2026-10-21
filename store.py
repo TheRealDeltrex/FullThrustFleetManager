@@ -1129,6 +1129,7 @@ def normalize_campaign(doc: object) -> dict | None:
         "log": log,
         "map": (grid := normalize_starmap(doc.get("map"), {s["id"] for s in sides})),
         "forces": _norm_forces(doc.get("forces"), {s["id"] for s in sides}, grid),
+        "contacts": _norm_contacts(doc.get("contacts"), {s["id"] for s in sides}, grid),
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
     }
@@ -1196,6 +1197,50 @@ def _norm_forces(raw: object, side_ids: set[str], grid: dict | None) -> list[dic
         seen_ids.add(f["id"])
         out.append({"id": f["id"], "side": f["side"], "name": _as_str(f.get("name"), f["id"], 40),
                     "q": q, "r": r, "order": order, "ships": ships})
+    return out
+
+
+MAX_CONTACTS = 500
+CONTACT_OUTCOMES = ("", "battle", "standoff", "leave", "escaped")
+
+
+def _norm_contacts(raw: object, side_ids: set[str], grid: dict | None) -> list[dict]:
+    """Contacts (step C4): sides meeting in a system at the end of a week (FT pp.34-35). Each
+    side's scan report as the others see it, its choice, the catch roll, the outcome with the
+    sides that must leave, and a battle's result (a side id, or "drawn")."""
+    if not grid or not isinstance(raw, list):
+        return []
+    out, seen = [], set()
+    for c in raw[-MAX_CONTACTS:]:
+        if not isinstance(c, dict) or not _safe_id(c.get("id")) or c["id"] in seen:
+            continue
+        q, r = _as_int(c.get("q"), -1), _as_int(c.get("r"), -1)
+        sides = [s for s in c.get("sides", []) if s in side_ids] if isinstance(c.get("sides"), list) else []
+        if len(set(sides)) < 2 or not (0 <= q < grid["width"] and 0 <= r < grid["height"]):
+            continue
+        sides = list(dict.fromkeys(sides))
+        reports = c.get("reports") if isinstance(c.get("reports"), dict) else {}
+        choices = c.get("choices") if isinstance(c.get("choices"), dict) else {}
+        leaving = c.get("leaving") if isinstance(c.get("leaving"), list) else []
+        roll = c.get("roll")
+        outcome = c.get("outcome") if c.get("outcome") in CONTACT_OUTCOMES else ""
+        result = c.get("result") if c.get("result") in (*sides, "drawn") else ""
+        before = c.get("owner_before") if isinstance(c.get("owner_before"), str) else None
+        seen.add(c["id"])
+        out.append({
+            "id": c["id"], "week": _as_int(c.get("week"), 1, 1, 100000), "q": q, "r": r,
+            "sides": sides,
+            "reports": {s: {k: _as_int((reports.get(s) or {}).get(k) if isinstance(reports.get(s), dict)
+                                       else 0, 0, 0, 999) for k in fleet_rules.SCAN_CLASSES}
+                        for s in sides},
+            "choices": {s: choices.get(s) if choices.get(s) in fleet_rules.CONTACT_CHOICES else ""
+                        for s in sides},
+            "roll": _as_int(roll, 0, 1, 6) if isinstance(roll, int) and not isinstance(roll, bool) else None,
+            "outcome": outcome, "leaving": [s for s in sides if s in leaving] if outcome else [],
+            "result": result if outcome == "battle" else "",
+            "owner_before": before if before in (*side_ids, "") else None,
+            "notes": _as_str(c.get("notes"), limit=2000),
+        })
     return out
 
 
@@ -1387,10 +1432,160 @@ def meetings(campaign: dict) -> list[tuple[dict, list[dict]]]:
     return out
 
 
+def this_weeks_contacts(campaign: dict) -> list[dict]:
+    return [c for c in campaign["contacts"] if c["week"] == campaign["week"]]
+
+
+def _contact(campaign: dict, contact_id: str) -> dict | None:
+    return next((c for c in this_weeks_contacts(campaign) if c["id"] == contact_id), None)
+
+
+def _contact_system(campaign: dict, contact: dict) -> dict | None:
+    return starmap.system_at(campaign["map"], contact["q"], contact["r"]) if campaign["map"] else None
+
+
+def _contact_place(campaign: dict, contact: dict) -> str:
+    system = _contact_system(campaign, contact)
+    return system["name"] if system else starmap.hex_label(contact["q"], contact["r"])
+
+
+def _side_name(campaign: dict, side: str) -> str:
+    return next((s["name"] for s in campaign["sides"] if s["id"] == side), side)
+
+
+def contact_forces(campaign: dict, contact: dict) -> list[dict]:
+    """The task forces of the contact's sides in its system now."""
+    return [f for f in campaign["forces"]
+            if (f["q"], f["r"]) == (contact["q"], contact["r"]) and f["side"] in contact["sides"]]
+
+
+def _open_contact(campaign: dict, system: dict, forces: list[dict], fleets: dict[str, dict]) -> dict:
+    """A new contact for this week, each side's report starting as what its scan really shows."""
+    taken = {c["id"] for c in campaign["contacts"]}
+    n = len(taken) + 1
+    while f"k{n}" in taken:
+        n += 1
+    sides = list(dict.fromkeys(f["side"] for f in forces))
+    reports = {side: fleet_rules.scan_counts(
+        [(ship, design) for force in forces if force["side"] == side
+         for _f, ship, design in force_ships(campaign, force, fleets)]) for side in sides}
+    contact = {"id": f"k{n}", "week": campaign["week"], "q": system["q"], "r": system["r"],
+               "sides": sides, "reports": reports, "choices": dict.fromkeys(sides, ""), "roll": None,
+               "outcome": "", "leaving": [], "result": "", "owner_before": None, "notes": ""}
+    campaign["contacts"] = (campaign["contacts"] + [contact])[-MAX_CONTACTS:]
+    return contact
+
+
+def set_contact_report(campaign: dict, contact_id: str, side: str,
+                       counts: dict[str, int]) -> tuple[bool, str]:
+    """What a side's scan shows the others: the real count by default, changed by decoy drones
+    and weasel boats (FT pp.21-22, 34)."""
+    contact = _contact(campaign, contact_id)
+    if not contact or side not in contact["sides"]:
+        return False, _("Contact not found.")
+    if contact["outcome"]:
+        return False, _("The sides have already chosen.")
+    contact["reports"][side] = {k: max(0, min(999, int(counts.get(k) or 0)))
+                                for k in fleet_rules.SCAN_CLASSES}
+    return True, _("Scan report updated.")
+
+
+def _claim(campaign: dict, contact: dict, side: str) -> str:
+    """The system goes to the side left holding it (an app rule; FT p.36 calls it superiority).
+    A bare star has nothing to hold. Returns the text for the log."""
+    system = _contact_system(campaign, contact)
+    if not system or system["kind"] == "empty" or system["owner"] == side:
+        return ""
+    contact["owner_before"] = system["owner"]
+    system["owner"] = side
+    return " " + _("{system} is now held by {side}.", system=system["name"], side=_side_name(campaign, side))
+
+
+def set_contact_choice(campaign: dict, contact_id: str, side: str, choice: str,
+                       roll: int | None = None) -> tuple[bool, str]:
+    """A side's choice (FT p.35). The last one in reveals them all and settles the contact,
+    rolling the catch roll unless the players rolled it themselves (`roll`)."""
+    contact = _contact(campaign, contact_id)
+    if not contact or side not in contact["sides"]:
+        return False, _("Contact not found.")
+    if contact["outcome"]:
+        return False, _("The sides have already chosen.")
+    if choice not in fleet_rules.CONTACT_CHOICES:
+        return False, _("Choose fight, withdraw or stand off.")
+    contact["choices"][side] = choice
+    if not all(contact["choices"].values()):
+        return True, _("Choice made.")
+    if fleet_rules.catch_roll_needed(contact["choices"]):
+        contact["roll"] = roll if roll in range(1, 7) else random.randint(1, 6)
+    outcome, leaving = fleet_rules.contact_outcome(contact["choices"], contact["roll"])
+    contact["outcome"], contact["leaving"] = outcome, leaving
+    where = _contact_place(campaign, contact)
+    if outcome == "standoff":
+        text = _("{system}: stand off.", system=where)
+    elif outcome == "leave":
+        text = _("{system}: no battle, every side leaves.", system=where)
+    elif outcome == "escaped":
+        stays = next(s for s in contact["sides"] if s not in leaving)
+        text = _("{system}: {sides} got away (catch roll {roll}).", system=where, roll=contact["roll"],
+                 sides=", ".join(_side_name(campaign, s) for s in leaving))
+        text += _claim(campaign, contact, stays)
+    elif contact["roll"]:
+        text = _("{system}: battle (catch roll {roll}).", system=where, roll=contact["roll"])
+    else:
+        text = _("{system}: battle.", system=where)
+    campaign["log"].append({"week": campaign["week"], "text": text})
+    return True, text
+
+
+def set_battle_result(campaign: dict, contact_id: str, result: str, notes: str = "") -> tuple[bool, str]:
+    """The winning side holds the system and the others must leave it (an app rule), or "drawn":
+    the battle was broken off and nobody claims the system (FT p.35)."""
+    contact = _contact(campaign, contact_id)
+    if not contact or contact["outcome"] != "battle":
+        return False, _("Contact not found.")
+    if contact["result"]:
+        return False, _("The battle is already recorded.")
+    if result not in (*contact["sides"], "drawn"):
+        return False, _("Choose who won.")
+    contact["result"], contact["notes"] = result, notes.strip()[:2000]
+    where = _contact_place(campaign, contact)
+    if result == "drawn":
+        text = _("{system}: battle broken off.", system=where)
+    else:
+        contact["leaving"] = [s for s in contact["sides"] if s != result]
+        text = _("{system}: battle won by {side}.", system=where, side=_side_name(campaign, result))
+        text += _claim(campaign, contact, result)
+    campaign["log"].append({"week": campaign["week"], "text": text})
+    return True, text
+
+
+def reopen_contact(campaign: dict, contact_id: str) -> tuple[bool, str]:
+    """Clears this week's choices and result, and gives the system back."""
+    contact = _contact(campaign, contact_id)
+    if not contact:
+        return False, _("Contact not found.")
+    system = _contact_system(campaign, contact)
+    if system and contact["owner_before"] is not None:
+        system["owner"] = contact["owner_before"]
+    contact.update(choices=dict.fromkeys(contact["sides"], ""), roll=None, outcome="", leaving=[],
+                   result="", owner_before=None)
+    return True, _("Contact reopened.")
+
+
 def next_week(campaign: dict) -> tuple[bool, str]:
     """Every force carries out its order, the week advances, ships' locations follow their force,
     and each system where sides meet goes into the campaign log."""
     fleets = {f["id"]: f for f in campaign_fleets(campaign["id"])}
+    for contact in this_weeks_contacts(campaign):
+        where = _contact_place(campaign, contact)
+        if not contact["outcome"]:
+            return False, _("Settle the contact at {system} first.", system=where)
+        if contact["outcome"] == "battle" and not contact["result"]:
+            return False, _("Record the battle at {system} first.", system=where)
+        for force in campaign["forces"]:
+            if (force in contact_forces(campaign, contact) and force["side"] in contact["leaving"]
+                    and not force["order"] and reachable_systems(campaign, force)[0]):
+                return False, _("{name} must leave {system} this week.", name=force["name"], system=where)
     moved = False
     for force in campaign["forces"]:
         if force["order"]:
@@ -1414,6 +1609,7 @@ def next_week(campaign: dict) -> tuple[bool, str]:
         text = _("Contact at {system}: {forces}.", system=system["name"],
                  forces=", ".join(f"{f['name']} ({names[f['side']]})" for f in forces))
         campaign["log"].append({"week": campaign["week"], "text": text})
+        _open_contact(campaign, system, forces, fleets)
     if found:
         return True, _("Week {n}: contact at {systems}.", n=campaign["week"],
                        systems=", ".join(system["name"] for system, _f in found))
@@ -1450,6 +1646,7 @@ def add_campaign_log(campaign: dict, week: int, text: str) -> tuple[bool, str]:
 def new_starmap(campaign: dict, width: int, height: int) -> tuple[bool, str]:
     campaign["map"] = starmap.blank(width, height)
     campaign["forces"] = []
+    campaign["contacts"] = []
     return True, _("Blank star map ready: click a hex to add a system.")
 
 
@@ -1460,6 +1657,7 @@ def random_starmap(campaign: dict, width: int, height: int, stars: int,
     campaign["map"] = starmap.generate(width, height, max(1, min(stars, 400)),
                                        [s["id"] for s in campaign["sides"]], seed)
     campaign["forces"] = []
+    campaign["contacts"] = []
     placed = len(campaign["map"]["systems"])
     if placed < stars:
         return True, _("Only {n} stars fit on a map this size (seed {seed}).", n=placed, seed=seed)
@@ -1530,6 +1728,7 @@ def import_starmap(campaign: dict, data: bytes) -> tuple[bool, str]:
         return False, _("Not a star map file.")
     campaign["map"] = grid
     campaign["forces"] = []
+    campaign["contacts"] = []
     return True, _("Star map loaded: {n} systems.", n=len(grid["systems"]))
 
 

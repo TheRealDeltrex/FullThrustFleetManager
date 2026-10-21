@@ -202,6 +202,17 @@ What exists:
   tugs cannot carry. `store.next_week` carries out every order, sets each ship's `location` to
   the system name and logs a contact where sides meet (`store.meetings`); replacing the map
   clears the forces. Pennants and dashed order lines are drawn by `starmap.to_svg(forces=)`.
+- Contacts (step C4): `campaign["contacts"]` [{id k1.., week, q, r, sides, reports {side:
+  {escort, cruiser, capital}}, choices {side: fight|withdraw|standoff|""}, roll, outcome
+  battle|standoff|leave|escaped, leaving [sides], result side|"drawn", owner_before, notes}],
+  normalised by `store._norm_contacts`. `next_week` opens one per meeting with each side's real
+  scan (`fleet_rules.scan_counts`, the protocol's `scan_class`), which that side may change
+  (decoys, weasel boats). The pure rules are `fleet_rules.contact_outcome` /
+  `catch_roll_needed` (FT p.35). The last choice settles it; a won battle or a fleet that got
+  away gives the system to the side left there (`store._claim`, an app rule, undone by
+  `reopen_contact`). Next week refuses while a contact this week is unsettled, a battle is
+  unrecorded, or a force that must leave has no order and can move. Only the current fleet's
+  side sees its own choice before all are in.
 
 ## Rulebook viewer
 
