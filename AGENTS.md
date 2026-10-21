@@ -18,4 +18,6 @@ what is built. This file only adds how Codex and Claude work together; it does n
   uncommitted changes in the tree.
 - Ship artwork is stored as WebP; keep original PNGs out of the repo
   (see `docs/SHIP-ARTWORK.md`).
+- Run `git config core.hooksPath .githooks` once in your checkout: the pre-push hook lints
+  before every push, so a lint error never turns CI red.
 - If you change anything `CLAUDE.md` describes, update `CLAUDE.md` in the same PR.
