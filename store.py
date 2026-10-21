@@ -15,6 +15,7 @@ import base64
 import io
 import json
 import math
+import random
 import re
 import uuid
 import zipfile
@@ -26,12 +27,13 @@ import fleet_rules
 import migrations
 import paths
 import portraits
+import starmap
 from i18n import _
 from rulesets import RULESETS, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "campaign": ".FTCampaign",
-              "backup": ".FTBackup"}
+              "starmap": ".FTStarmap", "backup": ".FTBackup"}
 DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "full-thrust", "language": "en",
                     # True once the player picks a look; see load_settings.
                     "theme_chosen": False,
@@ -1125,9 +1127,39 @@ def normalize_campaign(doc: object) -> dict | None:
         "week": _as_int(doc.get("week"), 1, 1, 100000),
         "sides": sides[:MAX_SIDES] if len(sides) >= 2 else _default_sides(),
         "log": log,
+        "map": normalize_starmap(doc.get("map"), {s["id"] for s in sides}),
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
     }
+
+
+def normalize_starmap(doc: object, side_ids: set[str]) -> dict | None:
+    """A campaign's star map (starmap.py), or None. Systems off the grid or on a taken hex are
+    dropped; an owner that is not a side of this campaign reads as unowned."""
+    if not isinstance(doc, dict):
+        return None
+    out = starmap.blank(_as_int(doc.get("width"), starmap.DEFAULT_WIDTH),
+                        _as_int(doc.get("height"), starmap.DEFAULT_HEIGHT))
+    seed = doc.get("seed")
+    whole = isinstance(seed, int) and not isinstance(seed, bool)
+    out["seed"] = _as_int(seed, 0, 0, 2**31 - 1) if whole else None
+    taken = set()
+    for s in doc.get("systems", []) if isinstance(doc.get("systems"), list) else []:
+        if not isinstance(s, dict):
+            continue
+        q, r = _as_int(s.get("q"), -1), _as_int(s.get("r"), -1)
+        if not (0 <= q < out["width"] and 0 <= r < out["height"]) or (q, r) in taken:
+            continue
+        taken.add((q, r))
+        out["systems"].append({
+            "q": q, "r": r,
+            "name": _as_str(s.get("name"), starmap.hex_label(q, r), 40),
+            "kind": s.get("kind") if s.get("kind") in starmap.KINDS else "settled",
+            "owner": s.get("owner") if s.get("owner") in side_ids else "",
+            "base": s.get("base") is True,
+        })
+    out["systems"].sort(key=lambda s: (s["q"], s["r"]))
+    return out
 
 
 def _campaign_path(campaign_id: str) -> Path | None:
@@ -1232,6 +1264,87 @@ def remove_side(campaign: dict, side_id: str) -> tuple[bool, str]:
 
 def add_campaign_log(campaign: dict, week: int, text: str) -> tuple[bool, str]:
     return add_log_entry(campaign, week, text)
+
+
+def new_starmap(campaign: dict, width: int, height: int) -> tuple[bool, str]:
+    campaign["map"] = starmap.blank(width, height)
+    return True, _("Blank star map ready: click a hex to add a system.")
+
+
+def random_starmap(campaign: dict, width: int, height: int, stars: int,
+                   seed: int | None = None) -> tuple[bool, str]:
+    if seed is None:
+        seed = random.randrange(1, 1_000_000)
+    campaign["map"] = starmap.generate(width, height, max(1, min(stars, 400)),
+                                       [s["id"] for s in campaign["sides"]], seed)
+    placed = len(campaign["map"]["systems"])
+    if placed < stars:
+        return True, _("Only {n} stars fit on a map this size (seed {seed}).", n=placed, seed=seed)
+    return True, _("Random star map, seed {seed}.", seed=seed)
+
+
+def set_star_system(campaign: dict, q: int, r: int, *, name: str, kind: str, owner: str,
+                    base: bool) -> tuple[bool, str]:
+    """Adds the system on hex (q, r) or changes the one there."""
+    grid = campaign.get("map")
+    if not grid or not (0 <= q < grid["width"] and 0 <= r < grid["height"]):
+        return False, _("That hex is not on the map.")
+    system = starmap.system_at(grid, q, r)
+    added = system is None
+    if added:
+        system = {"q": q, "r": r}
+        grid["systems"].append(system)
+    system.update(name=name.strip()[:40] or starmap.unused_name(grid), base=base,
+                  kind=kind if kind in starmap.KINDS else "settled",
+                  owner=owner if owner in {s["id"] for s in campaign["sides"]} else "")
+    return True, _("System added.") if added else _("System updated.")
+
+
+def remove_star_system(campaign: dict, q: int, r: int) -> tuple[bool, str]:
+    grid = campaign.get("map")
+    system = starmap.system_at(grid, q, r) if grid else None
+    if not system:
+        return False, _("No system on that hex.")
+    grid["systems"].remove(system)
+    return True, _("System removed.")
+
+
+def export_starmap(campaign_id: str) -> tuple[str, str] | None:
+    campaign = get_campaign(campaign_id)
+    if not campaign or not campaign["map"]:
+        return None
+    doc = {"schema_version": migrations.CURRENT, "kind": "FTStarmap", "map": campaign["map"],
+           "sides": campaign["sides"]}
+    name = _filename(campaign["name"] + " map", EXTENSIONS["starmap"])
+    return name, json.dumps(doc, indent=1, ensure_ascii=False)
+
+
+def import_starmap(campaign: dict, data: bytes) -> tuple[bool, str]:
+    """Replaces the campaign's map with an .FTStarmap. Owners follow the file's sides by
+    position, so a map shared from another campaign keeps who holds what."""
+    try:
+        doc = json.loads(data.decode("utf-8-sig"))
+    except (UnicodeDecodeError, ValueError):
+        doc = None
+    if not isinstance(doc, dict) or doc.get("kind") != "FTStarmap":
+        return False, _("Not a star map file.")
+    try:
+        migrations.upgrade("campaign", {"schema_version": doc.get("schema_version")})
+    except migrations.TooNewError:
+        return False, _("This file comes from a newer version of the app.")
+    theirs = [s.get("id") for s in doc.get("sides", []) if isinstance(s, dict)] \
+        if isinstance(doc.get("sides"), list) else []
+    ours = [s["id"] for s in campaign["sides"]]
+    rename = dict(zip(theirs, ours))
+    raw = doc.get("map")
+    if isinstance(raw, dict) and isinstance(raw.get("systems"), list):
+        raw = dict(raw, systems=[dict(s, owner=rename.get(s.get("owner"), "")) if isinstance(s, dict) else s
+                                 for s in raw["systems"]])
+    grid = normalize_starmap(raw, set(ours))
+    if not grid:
+        return False, _("Not a star map file.")
+    campaign["map"] = grid
+    return True, _("Star map loaded: {n} systems.", n=len(grid["systems"]))
 
 
 def delete_campaign(campaign_id: str) -> tuple[bool, str]:
@@ -1535,6 +1648,8 @@ def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], lis
             used = designs + [{"id": s["design_id"]} for s in fleet["ships"]]
             art.update(portraits.subset(used, fleet, doc.get("portraits")))
         return factions, designs, fleets, [campaign], art
+    if kind == "FTStarmap":
+        raise _Refused(_("Load a star map on a campaign's Star map panel."))
     raise _Refused(_("Not a Fleet Manager file."))
 
 
