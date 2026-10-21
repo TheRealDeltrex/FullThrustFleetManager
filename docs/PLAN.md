@@ -805,7 +805,8 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    which stays the total, at `schema_version` 2.
 4. Campaign module (11.3) with installations and the random campaign generator, in steps C1-C8
    (campaign manager) and G1-G4 (generator); see the roadmap doc. C1 (campaigns grouping
-   fleets into sides, a week counter, a campaign log, `.FTCampaign`) is done.
+   fleets into sides, a week counter, a campaign log, `.FTCampaign`) and C2 (a hex star map:
+   random, drawn by hand, or loaded from an `.FTStarmap` file) are done.
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

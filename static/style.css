@@ -221,6 +221,25 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 /* Campaign tab (PLAN 9.5) */
 .ship-grid { display: grid; grid-template-columns: minmax(200px, 320px) minmax(0, 1fr); gap: 16px; }
 .campaign-ship h3 { display: flex; align-items: center; gap: 8px; }
+/* Star map (starmap.py): a dark sky in every look, like the record sheets keep a light ground. */
+.starmap-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 240px); gap: 16px; align-items: start; }
+.starmap-wrap svg.starmap { width: 100%; height: auto; display: block; background: #0b1020; border-radius: 6px; }
+.starmap .hex { fill: #0b1020; stroke: #26304d; stroke-width: 1; }
+.starmap a:hover .hex, .starmap .hex:hover { fill: #141c36; }
+.starmap .hex.sel { fill: #1c2747; }
+.starmap .hex-ring { fill: none; stroke: #ffd166; stroke-width: 2; pointer-events: none; }
+.starmap .star { stroke: #0b1020; stroke-width: .8; }
+.starmap .star.empty { fill: none; stroke: #c9d1e6; stroke-width: 1; }
+.starmap .base { fill: none; stroke-width: 1.4; }
+.starmap .star-name { fill: #dfe5f5; font-size: 7px; text-anchor: middle; pointer-events: none; }
+.starmap-swatch { width: 12px; height: 12px; vertical-align: -1px; }
+.starmap .unowned, .starmap-swatch .unowned { fill: #c9d1e6; } .starmap .base.unowned { stroke: #c9d1e6; fill: none; }
+.side-0 { fill: #4fa3ff; } .side-1 { fill: #ff5d5d; } .side-2 { fill: #4fd18b; } .side-3 { fill: #ffb547; }
+.side-4 { fill: #b48cff; } .side-5 { fill: #2de2c8; } .side-6 { fill: #ff7ad9; } .side-7 { fill: #a3a3a3; }
+.base.side-0 { stroke: #4fa3ff; } .base.side-1 { stroke: #ff5d5d; } .base.side-2 { stroke: #4fd18b; } .base.side-3 { stroke: #ffb547; }
+.base.side-4 { stroke: #b48cff; } .base.side-5 { stroke: #2de2c8; } .base.side-6 { stroke: #ff7ad9; } .base.side-7 { stroke: #a3a3a3; }
+.starmap .base[class*="side-"] { fill: none; }
+@media (max-width: 760px) { .starmap-grid { grid-template-columns: 1fr; } }
 .ssd-click [data-ref] { cursor: pointer; }
 .ssd-click [data-ref]:hover { opacity: .55; }
 .repair { border-top: 1px solid var(--line); padding-top: 10px; }
