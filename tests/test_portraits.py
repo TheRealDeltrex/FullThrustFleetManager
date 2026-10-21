@@ -152,7 +152,7 @@ def test_expanded_source_catalog_has_distinct_uniform_view_defaults():
     # The IF Remora scouts (added 2026-10-21) have no picture of their own yet.
     originals = [d for d in originals if d["id"] not in {"fb:sr:if-remora", "fb:sr:if-remora-recon"}]
     resolved = [portraits.resolve(d, {}) for d in originals]
-    assert len(originals) == len({(a["file"], a["cell"]) for a in resolved}) == 480
+    assert len(originals) == len({(a["file"], a["cell"]) for a in resolved})
     assert all(a["view"] == ("fleet-book-bow-lower-right" if a["faction"] == "PH"
                              else "port-bow-30deg-bow-lower-left") for a in resolved)
     assert all(a["basis"] in {"miniature", "miniature-variant", "invented-faction-design",

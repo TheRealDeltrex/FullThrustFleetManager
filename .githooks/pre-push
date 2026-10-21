@@ -1,0 +1,10 @@
+#!/bin/sh
+# Runs the CI lint step before a push so a lint error never reaches a pull request.
+# Enabled by `git config core.hooksPath .githooks` (Claude sessions set it on start).
+# Skip once with `git push --no-verify`.
+for py in .venv/Scripts/python.exe .venv/bin/python python3 python; do
+  if command -v "$py" >/dev/null 2>&1 && "$py" -m ruff --version >/dev/null 2>&1; then
+    exec "$py" -m ruff check .
+  fi
+done
+echo "pre-push: ruff not installed, lint skipped (pip install ruff)" >&2

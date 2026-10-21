@@ -73,7 +73,9 @@ What exists:
 - `data/catalog/` — the read-only catalog; see Catalog below. `data/errata.json` — book values
   that disagree with the rules, with the reason (PLAN 8).
 - `.github/workflows/tests.yml` (ruff + full pytest, and a web-build boot check, on push/PR), `deploy-pages.yml` and
-  `build-linux.yml` (both manual, workflow_dispatch).
+  `build-linux.yml` (both manual, workflow_dispatch). `.githooks/pre-push` runs `ruff check .`
+  before every push; `.claude/settings.json` enables it (`git config core.hooksPath .githooks`)
+  when a session starts. Before pushing a PR branch, also run the tests for what you changed.
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from the bought originals (source folder set in `tools/build_rulebooks.py`).
