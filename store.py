@@ -1,8 +1,8 @@
 """Persistence and every mutation (layer 3). Mutators return (ok: bool, msg: str).
 
 User library under paths.user_data_dir(): designs/<id>.json, fleets/<id>.json,
-campaigns/<id>.json, factions.json, settings.json (PLAN 5.7). Catalog designs come from the bundled data/catalog/*.json, are never
-written, and are read-only: editing one makes a variant.
+campaigns/<id>.json, factions.json, settings.json (PLAN 5.7). Catalog designs come from the
+bundled data/catalog/*.json, are never written, and are read-only: editing one makes a variant.
 
 Untrusted input: library files and imports pass through normalize_design() / normalize_fleet(),
 the single place types are enforced (Frostgrave lesson: a field that slips through imports fine
@@ -367,7 +367,8 @@ def normalize_fleet(doc: object) -> dict | None:
         "ships": ships,
         # The campaign the fleet fights in and its side there (PLAN 11.3); one campaign at a time.
         "campaign_id": _as_opt_str(doc.get("campaign_id")),
-        "campaign_side": _as_opt_str(doc.get("campaign_side")) if _as_opt_str(doc.get("campaign_id")) else None,
+        "campaign_side": (_as_opt_str(doc.get("campaign_side"))
+                          if _as_opt_str(doc.get("campaign_id")) else None),
         "log": log,
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
@@ -1493,7 +1494,8 @@ def _fleets_need_only(fleets: list[dict], designs: list[dict], ruleset: str) -> 
 
 def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[dict], dict]:
     """(factions, designs, fleets, campaigns, ship pictures) of an .FTDesign, .FTFleet or
-    .FTCampaign, all checked; raises _Refused. Pictures are kept only for the designs and ships the file carries."""
+    .FTCampaign, all checked; raises _Refused. Pictures are kept only for the designs and ships
+    the file carries."""
     try:
         doc = json.loads(data.decode("utf-8-sig"))
     except (UnicodeDecodeError, ValueError):
