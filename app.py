@@ -443,6 +443,8 @@ def fleet_select(fleet_id: str) -> Response:
     if not store.get_fleet(fleet_id):
         abort(404)
     session["fleet_id"] = fleet_id
+    if request.args.get("to") == "campaign":
+        return redirect(url_for("campaign"))
     return redirect(url_for("fleet_overview", view=request.args.get("view")))
 
 
@@ -1058,7 +1060,20 @@ def campaign() -> str:
         })
     return render_template("campaign.html", active_tab="campaign", statuses=store.STATUSES,
                            selected={"fleet": fleet, "ships": ships,
-                                     "ruleset": RULESETS.get(fleet["ruleset"])})
+                                     "ruleset": RULESETS.get(fleet["ruleset"]),
+                                     **_campaign_context(fleet)})
+
+
+def _campaign_context(fleet: dict) -> dict:
+    """The campaign bar: the fleet's campaign and its sides, or the campaigns it could join."""
+    campaign = store.get_campaign(fleet["campaign_id"])
+    if not campaign:
+        return {"campaign": None, "joinable": store.list_campaigns(fleet["ruleset"])}
+    members = store.campaign_fleets(campaign["id"])
+    sides = [{"side": side, "fleets": [
+        {"fleet": f, "points": fleet_rules.fleet_points(f, store.designs_for_fleet(f))}
+        for f in members if f["campaign_side"] == side["id"]]} for side in campaign["sides"]]
+    return {"campaign": campaign, "sides": sides}
 
 
 @register_action("set_damage")
@@ -1119,6 +1134,71 @@ def _replenish(fleet: dict) -> tuple[bool, str]:
 def _add_log(fleet: dict) -> tuple[bool, str]:
     return store.add_log_entry(fleet, int(request.form.get("week") or 0),
                                request.form.get("text", ""))
+
+
+@register_action("new_campaign")
+def _new_campaign(fleet: dict) -> tuple[bool, str]:
+    campaign, msg = store.create_campaign(fleet, request.form.get("name", ""))
+    return campaign is not None, msg
+
+
+@register_action("join_campaign")
+def _join_campaign(fleet: dict) -> tuple[bool, str]:
+    # One field "campaign:side" from the join list, or the side picker of the current campaign.
+    campaign_id, _sep, side = (request.form.get("join") or "").partition(":")
+    if not campaign_id:
+        campaign_id, side = fleet.get("campaign_id") or "", request.form.get("side", "")
+    return store.join_campaign(fleet, campaign_id, side)
+
+
+@register_action("leave_campaign")
+def _leave_campaign(fleet: dict) -> tuple[bool, str]:
+    return store.leave_campaign(fleet)
+
+
+# The campaign's own forms post here; their handlers get the campaign, not a fleet.
+@register_action("update_campaign")
+def _update_campaign(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    sides = {key[5:]: value for key, value in form.items() if key.startswith("side-")}
+    return store.update_campaign(campaign, name=form.get("name"),
+                                 week=int(form["week"]) if form.get("week") else None,
+                                 notes=form.get("notes"), sides=sides)
+
+
+@register_action("next_week")
+def _next_week(campaign: dict) -> tuple[bool, str]:
+    return store.next_week(campaign)
+
+
+@register_action("add_side")
+def _add_side(campaign: dict) -> tuple[bool, str]:
+    return store.add_side(campaign, request.form.get("name", ""))
+
+
+@register_action("remove_side")
+def _remove_side(campaign: dict) -> tuple[bool, str]:
+    # Each side's Remove button sits in the campaign form and names its side in the URL.
+    return store.remove_side(campaign, request.args.get("side") or request.form.get("side", ""))
+
+
+@register_action("add_campaign_log")
+def _add_campaign_log(campaign: dict) -> tuple[bool, str]:
+    return store.add_campaign_log(campaign, int(request.form.get("week") or 0),
+                                  request.form.get("text", ""))
+
+
+@app.route("/campaigns/<campaign_id>/action", methods=["POST"])
+def campaigns_action(campaign_id: str) -> Response:
+    campaign = store.get_campaign(campaign_id)
+    if not campaign:
+        abort(404)
+    if request.form.get("action") == "delete_campaign":
+        ok, msg = store.delete_campaign(campaign_id)
+        flash(msg, "success" if ok else "error")
+    elif dispatch_action(campaign):
+        store.save_campaign(campaign)
+    return redirect(url_for("campaign"))
 
 
 @app.route("/campaign/<fleet_id>/action", methods=["POST"])
@@ -1238,6 +1318,14 @@ def _attachment(filename: str, data: str | bytes, mimetype: str) -> Response:
 @app.route("/export/fleet/<fleet_id>")
 def export_fleet(fleet_id: str) -> Response:
     exported = store.export_fleet(fleet_id)
+    if not exported:
+        abort(404)
+    return _attachment(*exported, "application/json")
+
+
+@app.route("/export/campaign/<campaign_id>")
+def export_campaign(campaign_id: str) -> Response:
+    exported = store.export_campaign(campaign_id)
     if not exported:
         abort(404)
     return _attachment(*exported, "application/json")

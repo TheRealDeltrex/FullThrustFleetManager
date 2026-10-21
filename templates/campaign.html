@@ -14,6 +14,99 @@
         <span class="muted">{{ _("Click a hull box, an armour circle or a system to mark it.") }}</span>
       </div>
 
+      {# The campaign this fleet fights in: sides, the week, the campaign log (PLAN 11.3). #}
+      {% set c = selected.campaign %}
+      <div class="panel campaign-bar">
+        <h3 class="fold" data-fold="campaign-bar" tabindex="0">{% if c %}{{ c.name }} · {{ _("Week {n}", n=c.week) }}{% else %}{{ _("No campaign") }}{% endif %}</h3>
+        <div class="body stack">
+          {% if c %}
+            {% set to_campaign = url_for('campaigns_action', campaign_id=c.id) %}
+            <form method="post" action="{{ to_campaign }}" class="stack" data-autosave="update_campaign">
+              <div class="row">
+                <input class="input grow" name="name" value="{{ c.name }}" required
+                       aria-label="{{ _('Campaign name') }}" />
+                <label class="check">{{ _("Week") }}
+                  <input class="input sm" type="number" min="1" name="week" value="{{ c.week }}" /></label>
+                <button class="btn" type="submit" name="action" value="next_week" formnovalidate>{{ _("Next week") }}</button>
+              </div>
+              <div class="grid-fields">
+                {% for row in selected.sides %}
+                  <div class="stack">
+                    <input class="input" name="side-{{ row.side.id }}" value="{{ row.side.name }}"
+                           aria-label="{{ _('Side name') }}" />
+                    {% for m in row.fleets %}
+                      <span>{% if m.fleet.id == f.id %}<b>{{ m.fleet.name }}</b>{% else %}<a href="{{ url_for('fleet_select', fleet_id=m.fleet.id, to='campaign') }}">{{ m.fleet.name }}</a>{% endif %}
+                        <span class="muted">· {{ _("{n} pts", n=m.points) }}</span></span>
+                    {% else %}
+                      <span class="muted">{{ _("No fleets") }}</span>
+                    {% endfor %}
+                    {% if not row.fleets and c.sides|length > 2 %}
+                      <button class="btn sm ghost" type="submit" name="action" value="remove_side" formnovalidate
+                              formaction="{{ to_campaign }}?side={{ row.side.id }}">{{ _("Remove side") }}</button>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+              <textarea class="input wide" name="notes" rows="2" aria-label="{{ _('Campaign notes') }}"
+                        placeholder="{{ _('Notes') }}">{{ c.notes }}</textarea>
+              <noscript><button class="btn primary" type="submit" name="action" value="update_campaign">{{ _("Apply") }}</button></noscript>
+            </form>
+            <div class="row">
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row"
+                    data-autosave="join_campaign">
+                <label class="check">{{ _("This fleet's side") }}
+                  <select class="input" name="side">
+                    {% for side in c.sides %}
+                      <option value="{{ side.id }}" {% if side.id == f.campaign_side %}selected{% endif %}>{{ side.name }}</option>
+                    {% endfor %}
+                  </select></label>
+                <noscript><button class="btn" type="submit" name="action" value="join_campaign">{{ _("Apply") }}</button></noscript>
+                <button class="btn ghost" type="submit" name="action" value="leave_campaign">{{ _("Leave campaign") }}</button>
+              </form>
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <input class="input" name="name" placeholder="{{ _('Side name') }}" aria-label="{{ _('Side name') }}" />
+                <button class="btn" type="submit" name="action" value="add_side">{{ _("Add side") }}</button>
+              </form>
+              <div class="spacer"></div>
+              <a class="btn" href="{{ url_for('export_campaign', campaign_id=c.id) }}">{{ _("Export") }}</a>
+              <form method="post" action="{{ to_campaign }}">
+                <button class="btn ghost" type="submit" name="action" value="delete_campaign">{{ _("Delete campaign") }}</button>
+              </form>
+            </div>
+            <div class="stack">
+              {% for entry in c.log %}
+                <p><b>{{ _("Week {n}", n=entry.week) }}</b> · {{ entry.text }}</p>
+              {% endfor %}
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <input class="input sm" type="number" min="0" name="week" value="{{ c.week }}"
+                       aria-label="{{ _('Week') }}" />
+                <input class="input grow" name="text" placeholder="{{ _('Campaign log entry') }}"
+                       aria-label="{{ _('Campaign log entry') }}" />
+                <button class="btn" type="submit" name="action" value="add_campaign_log">{{ _("Add entry") }}</button>
+              </form>
+            </div>
+          {% else %}
+            {% if selected.joinable %}
+              <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
+                <select class="input" name="join" aria-label="{{ _('Campaign and side') }}">
+                  {% for camp in selected.joinable %}
+                    {% for side in camp.sides %}
+                      <option value="{{ camp.id }}:{{ side.id }}">{{ camp.name }} · {{ side.name }}</option>
+                    {% endfor %}
+                  {% endfor %}
+                </select>
+                <button class="btn" type="submit" name="action" value="join_campaign">{{ _("Join") }}</button>
+              </form>
+            {% endif %}
+            <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
+              <input class="input grow" name="name" placeholder="{{ _('Campaign name') }}"
+                     aria-label="{{ _('Campaign name') }}" />
+              <button class="btn" type="submit" name="action" value="new_campaign">{{ _("New campaign") }}</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+
       {% for row in selected.ships %}
         {% set ship = row.ship %}
         <div class="panel campaign-ship">
@@ -127,7 +220,7 @@
             <p class="muted">{{ _("No entries yet.") }}</p>
           {% endfor %}
           <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row">
-            <input class="input sm" type="number" min="0" name="week" value="0"
+            <input class="input sm" type="number" min="0" name="week" value="{{ c.week if c else 0 }}"
                    aria-label="{{ _('Week') }}" />
             <input class="input grow" name="text" placeholder="{{ _('What happened') }}"
                    aria-label="{{ _('What happened') }}" />

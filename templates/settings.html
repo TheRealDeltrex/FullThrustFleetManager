@@ -43,7 +43,7 @@
           {% if settings.last_backup %}<span class="muted">{{ _("Last backup: {date}", date=settings.last_backup[:10]) }}</span>{% endif %}
         </form>
         <form method="post" action="{{ url_for('import_upload') }}" enctype="multipart/form-data" class="row">
-          <input class="input" type="file" name="file" accept=".FTFleet,.FTDesign,.FTBackup" required />
+          <input class="input" type="file" name="file" accept=".FTFleet,.FTDesign,.FTCampaign,.FTBackup" required />
           <button class="btn" type="submit">{{ _("Import") }}</button>
         </form>
         {% if held_import %}
