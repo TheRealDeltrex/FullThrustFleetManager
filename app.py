@@ -401,6 +401,15 @@ def _fleet_context(fleet: dict, view: str) -> dict:
         "dummy_bogeys": fleet_rules.dummy_bogeys(fleet),
         "morale": fleet_rules.morale(fleet, designs),
         "dummy_bogey_points": fleet_rules.dummy_bogey_points(fleet),
+        # FTL gunboat squadrons flying without a carrier (PC p.80): the editor and their points.
+        "gunboat_types": getattr(RULESETS.get(fleet["ruleset"]), "gunboat_types", ()),
+        "gunboat_extras": [(k, v) for k, v in getattr(RULESETS.get(fleet["ruleset"]),
+                                                       "gunboat_extras", ()) if k != "ftl"],
+        "gunboat_squadrons": [
+            (g, RULESETS[fleet["ruleset"]].gunboat_squadron_points(g),
+             RULESETS[fleet["ruleset"]].gunboat_squadron_label(g))
+            for g in fleet_rules.gunboat_squadrons(fleet)],
+        "gunboat_squadron_points": fleet_rules.gunboat_squadron_points(fleet),
         "library": library,
         "library_groups": groups,
         "library_total": len(every_design),
@@ -467,6 +476,46 @@ def _update_details(fleet: dict) -> tuple[bool, str]:
         notes=form.get("notes", ""),
         dummy_bogeys=int(form.get("dummy_bogeys") or 0) if "dummy_bogeys" in form else None,
     )
+
+
+def _read_gunboats(prefix: str, offered) -> dict:
+    """One gunboat squadron's fields: its type, the boats that differ from it (PC p.79 lets a
+    squadron mix types; an empty boat field means the squadron's type), the modifications in
+    `offered` and the ECM level."""
+    form = request.form
+    kind = form.get(prefix + "type", "")
+    boats = [form.get(f"{prefix}boat-{i}") or kind for i in range(6)]
+    squadron: dict = {"type": kind}
+    if len(set(boats)) > 1:
+        squadron["types"] = boats
+    else:
+        squadron["type"] = boats[0]
+    extras = [key for key, _label in offered if form.get(prefix + key) == "on"]
+    if extras:
+        squadron["extras"] = extras
+    if _form_count(prefix + "ecm"):
+        squadron["ecm"] = _form_count(prefix + "ecm")
+    return squadron
+
+
+@register_action("add_gunboats")
+def _add_gunboats(fleet: dict) -> tuple[bool, str]:
+    return store.add_gunboat_squadron(fleet, request.form.get("gunboat_type", ""))
+
+
+@register_action("update_gunboats")
+def _update_gunboats(fleet: dict) -> tuple[bool, str]:
+    # FTL is what lets a squadron fly without a carrier, so it is not offered (PC p.80).
+    offered = [(k, v) for k, v in getattr(fleet_rules.ruleset_of(fleet), "gunboat_extras", ())
+               if k != "ftl"]
+    return store.update_gunboat_squadrons(fleet, {
+        g["uid"]: _read_gunboats(f"fleet-gunboat-{g['uid']}-", offered)
+        for g in fleet["gunboat_squadrons"] if f"fleet-gunboat-{g['uid']}-type" in request.form})
+
+
+@register_action("remove_gunboats")
+def _remove_gunboats(fleet: dict) -> tuple[bool, str]:
+    return store.remove_gunboat_squadron(fleet, request.args.get("gunboats", ""))
 
 
 @register_action("add_squadron")
@@ -812,13 +861,7 @@ def _read_loadout(design: dict) -> dict:
                 continue
             # One squadron of six per rack or bay (PC p.79), with its modifications.
             offered = getattr(RULESETS.get(design["ruleset"]), "gunboat_extras", ())
-            squadron = {"carrier": uid, "type": form[f"gunboat-{uid}-type"]}
-            extras = [key for key, _label in offered if form.get(f"gunboat-{uid}-{key}") == "on"]
-            if extras:
-                squadron["extras"] = extras
-            if _form_count(f"gunboat-{uid}-ecm"):
-                squadron["ecm"] = _form_count(f"gunboat-{uid}-ecm")
-            gunboats.append(squadron)
+            gunboats.append({"carrier": uid, **_read_gunboats(f"gunboat-{uid}-", offered)})
         elif system["type"] == "sm_magazine":
             if f"salvos-{uid}-std" in form:
                 # Counts and a stage count per magazine (CD p.25: never a mix of regular and

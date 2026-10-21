@@ -241,6 +241,9 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
         *([_("Dummy bogeys: {n} ({p} points)", n=fleet_rules.dummy_bogeys(fleet),
              p=fleet_rules.dummy_bogey_points(fleet))] if fleet_rules.dummy_bogeys(fleet) else []),
         f"{_('Ships')}: " + ", ".join(f"{k} {v}" for k, v in fleet_rules.ship_counts(fleet).items()),
+        # FTL gunboat squadrons flying without a carrier (PC p.80).
+        *(_("FTL gunboat squadron: {label} ({p} points)", label=rs.gunboat_squadron_label(g),
+            p=rs.gunboat_squadron_points(g)) for g in fleet_rules.gunboat_squadrons(fleet)),
     ]
     morale = fleet_rules.morale(fleet, designs)
     if morale:
@@ -417,6 +420,10 @@ def tracker_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         for label, boxes, endurance, uid in _tracker_rows(ship, design):
             spent = min(boxes, 1 if uid in used else int(lost.pop(uid, 0)))
             rows.append((f"{ship['table_id']} {ship['name']}", label, boxes, endurance, spent))
+    rs = RULESETS.get(fleet["ruleset"])
+    for squadron in fleet_rules.gunboat_squadrons(fleet):
+        # PC p.79: six gunboats, six points of combat endurance.
+        rows.append((rs.gunboat_squadron_label(squadron), _("Gunboat squadron"), 6, 6, 0))
     if not rows:
         return
     pdf.add_page()
@@ -448,6 +455,8 @@ def quickref_pages(pdf: FleetPDF, fleets: list[dict], designs_by_fleet: list[dic
         options.update({k: v for k, v in fleet_rules.fleet_options(fleet).items() if v})
         if fleet_rules.dummy_bogeys(fleet):
             present.add("dummy_bogeys")
+        if fleet_rules.gunboat_squadrons(fleet):
+            present.add("gunboats")
         for ship in fleet["ships"]:
             design = designs.get(ship["design_id"])
             for system in design["systems"] if design else []:

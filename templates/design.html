@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_factions.html" import faction_picker with context %}
 {% from "_portraits.html" import picture with context %}
+{% import "_gunboats.html" as gunboats %}
 {% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-3{% endblock %}
 {% block content %}
@@ -453,27 +454,7 @@
                   <fieldset class="loadout-group">
                     <legend>{% if system.type == 'gunboat_rack' %}{{ _("Gunboat rack {uid}", uid=system.uid) }}{% else %}{{ _("Boat bay {uid}", uid=system.uid) }}{% endif %}
                       <span class="muted">{{ _("1 squadron of 6 gunboats") }}</span></legend>
-                    <div class="loadout-row">
-                      <label>{{ _("Squadron") }}
-                        <select class="input" name="{{ prefix }}type">
-                          <option value="">{{ _("Empty") }}</option>
-                          {% for key, text in selected.gunboat_types %}
-                            <option value="{{ key }}" {% if squadron and squadron.type == key %}selected{% endif %}>{{ text }}</option>
-                          {% endfor %}
-                        </select>
-                      </label>
-                      {% for key, text in selected.gunboat_extras %}
-                        <label class="check"><input type="checkbox" name="{{ prefix }}{{ key }}"
-                          {% if squadron and key in (squadron.extras or []) %}checked{% endif %} /> {{ text }}</label>
-                      {% endfor %}
-                      <label>{{ _("ECM") }}
-                        <select class="input sm" name="{{ prefix }}ecm">
-                          {% for n in range(0, 4) %}
-                            <option value="{{ n }}" {% if squadron and (squadron.ecm or 0) == n %}selected{% endif %}>{% if n %}{{ _("Level {n}", n=n) }}{% else %}{{ _("None") }}{% endif %}</option>
-                          {% endfor %}
-                        </select>
-                      </label>
-                    </div>
+                    {{ gunboats.squadron_fields(prefix, squadron, selected.gunboat_types, selected.gunboat_extras) }}
                   </fieldset>
                 {% endfor %}
                 <p class="muted">{{ _("Loadout: {n} points", n=selected.loadout_points) }}</p>
