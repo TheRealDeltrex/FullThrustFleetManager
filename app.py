@@ -38,6 +38,7 @@ import paths
 import pdf_export
 import portraits
 import ssd_layout
+import starmap
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
@@ -1073,7 +1074,33 @@ def _campaign_context(fleet: dict) -> dict:
     sides = [{"side": side, "fleets": [
         {"fleet": f, "points": fleet_rules.fleet_points(f, store.designs_for_fleet(f))}
         for f in members if f["campaign_side"] == side["id"]]} for side in campaign["sides"]]
-    return {"campaign": campaign, "sides": sides}
+    return {"campaign": campaign, "sides": sides, **_starmap_context(campaign)}
+
+
+def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
+    q, _sep, r = (raw or "").partition(",")
+    try:
+        q, r = int(q), int(r)
+    except ValueError:
+        return None
+    return (q, r) if 0 <= q < grid["width"] and 0 <= r < grid["height"] else None
+
+
+def _starmap_context(campaign: dict) -> dict:
+    """The Star map panel: the drawing (each hex links to itself) and the picked hex."""
+    grid = campaign["map"]
+    if not grid:
+        return {"starmap": None, "map_defaults": starmap}
+    picked = _picked_hex(request.args.get("hex"), grid)
+    system = starmap.system_at(grid, *picked) if picked else None
+    svg = starmap.to_svg(grid, campaign["sides"], url_for("campaign") + "?hex=", picked,
+                         _("Star map of {name}", name=campaign["name"]))
+    return {"starmap": {
+        "grid": grid, "svg": Markup(svg), "picked": picked, "system": system,
+        "hex_label": starmap.hex_label(*picked) if picked else "",
+        "suggested_name": starmap.unused_name(grid),
+        "side_class": {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])},
+    }, "map_defaults": starmap}
 
 
 @register_action("set_damage")
@@ -1182,6 +1209,45 @@ def _remove_side(campaign: dict) -> tuple[bool, str]:
     return store.remove_side(campaign, request.args.get("side") or request.form.get("side", ""))
 
 
+def _map_size(form) -> tuple[int, int]:
+    return (int(form.get("width") or starmap.DEFAULT_WIDTH),
+            int(form.get("height") or starmap.DEFAULT_HEIGHT))
+
+
+@register_action("new_starmap")
+def _new_starmap(campaign: dict) -> tuple[bool, str]:
+    return store.new_starmap(campaign, *_map_size(request.form))
+
+
+@register_action("random_starmap")
+def _random_starmap(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    seed = form.get("seed", "").strip()
+    return store.random_starmap(campaign, *_map_size(form), int(form.get("stars") or starmap.DEFAULT_STARS),
+                                int(seed) if seed else None)
+
+
+def _form_hex(campaign: dict) -> tuple[int, int] | None:
+    return _picked_hex(request.form.get("hex"), campaign["map"]) if campaign["map"] else None
+
+
+@register_action("set_star_system")
+def _set_star_system(campaign: dict) -> tuple[bool, str]:
+    picked = _form_hex(campaign)
+    if not picked:
+        return False, _("That hex is not on the map.")
+    form = request.form
+    return store.set_star_system(campaign, *picked, name=form.get("name", ""),
+                                 kind=form.get("kind", ""), owner=form.get("owner", ""),
+                                 base=form.get("base") == "on")
+
+
+@register_action("remove_star_system")
+def _remove_star_system(campaign: dict) -> tuple[bool, str]:
+    picked = _form_hex(campaign)
+    return store.remove_star_system(campaign, *picked) if picked else (False, _("No system on that hex."))
+
+
 @register_action("add_campaign_log")
 def _add_campaign_log(campaign: dict) -> tuple[bool, str]:
     return store.add_campaign_log(campaign, int(request.form.get("week") or 0),
@@ -1198,6 +1264,23 @@ def campaigns_action(campaign_id: str) -> Response:
         flash(msg, "success" if ok else "error")
     elif dispatch_action(campaign):
         store.save_campaign(campaign)
+    picked = request.form.get("hex")
+    return redirect(url_for("campaign", hex=picked) if picked else url_for("campaign"))
+
+
+@app.route("/campaigns/<campaign_id>/map", methods=["POST"])
+def campaign_map_upload(campaign_id: str) -> Response:
+    campaign = store.get_campaign(campaign_id)
+    if not campaign:
+        abort(404)
+    upload = request.files.get("file")
+    if not upload or not upload.filename:
+        flash(_("Choose a star map file."), "error")
+        return redirect(url_for("campaign"))
+    ok, msg = store.import_starmap(campaign, upload.read(1024 * 1024))
+    if ok:
+        store.save_campaign(campaign)
+    flash(msg, "success" if ok else "error")
     return redirect(url_for("campaign"))
 
 
@@ -1326,6 +1409,14 @@ def export_fleet(fleet_id: str) -> Response:
 @app.route("/export/campaign/<campaign_id>")
 def export_campaign(campaign_id: str) -> Response:
     exported = store.export_campaign(campaign_id)
+    if not exported:
+        abort(404)
+    return _attachment(*exported, "application/json")
+
+
+@app.route("/export/starmap/<campaign_id>")
+def export_starmap(campaign_id: str) -> Response:
+    exported = store.export_starmap(campaign_id)
     if not exported:
         abort(404)
     return _attachment(*exported, "application/json")

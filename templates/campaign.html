@@ -107,6 +107,86 @@
         </div>
       </div>
 
+      {# The campaign's star map (PLAN 11.3, step C2): each hex is a link that picks it. #}
+      {% if c %}
+        {% set sm = selected.starmap %}
+        {% set d = selected.map_defaults %}
+        <div class="panel campaign-map">
+          <h3 class="fold" data-fold="campaign-map" tabindex="0">{{ _("Star map") }}</h3>
+          <div class="body stack">
+            {% if sm %}
+              <div class="starmap-grid">
+                <div class="starmap-wrap">{{ sm.svg }}</div>
+                <div class="stack">
+                  {% if sm.picked %}
+                    {% set sys = sm.system %}
+                    <form method="post" action="{{ to_campaign }}" class="stack"
+                          {% if sys %}data-autosave="set_star_system"{% endif %}>
+                      <input type="hidden" name="hex" value="{{ sm.picked[0] }},{{ sm.picked[1] }}" />
+                      <b>{{ _("Hex {n}", n=sm.hex_label) }}</b>
+                      <input class="input" name="name" value="{{ sys.name if sys else sm.suggested_name }}"
+                             aria-label="{{ _('System name') }}" />
+                      <select class="input" name="kind" aria-label="{{ _('Kind') }}">
+                        {% for kind, label in [("settled", _("Settled")), ("outpost", _("Outpost")), ("empty", _("No settlement"))] %}
+                          <option value="{{ kind }}" {% if sys and sys.kind == kind %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                      <select class="input" name="owner" aria-label="{{ _('Held by') }}">
+                        <option value="">{{ _("Unclaimed") }}</option>
+                        {% for side in c.sides %}
+                          <option value="{{ side.id }}" {% if sys and sys.owner == side.id %}selected{% endif %}>{{ side.name }}</option>
+                        {% endfor %}
+                      </select>
+                      <label class="check"><input type="checkbox" name="base" {% if sys and sys.base %}checked{% endif %} />
+                        {{ _("Naval base") }}</label>
+                      <div class="row">
+                        {% if sys %}
+                          <noscript><button class="btn" type="submit" name="action" value="set_star_system">{{ _("Apply") }}</button></noscript>
+                          <button class="btn ghost" type="submit" name="action" value="remove_star_system">{{ _("Remove system") }}</button>
+                        {% else %}
+                          <button class="btn primary" type="submit" name="action" value="set_star_system">{{ _("Add system") }}</button>
+                        {% endif %}
+                      </div>
+                    </form>
+                  {% else %}
+                    <span class="muted">{{ _("Click a hex.") }}</span>
+                  {% endif %}
+                  <div class="stack starmap-key">
+                    {% for side in c.sides %}
+                      <span><svg class="starmap-swatch" viewBox="0 0 12 12"><circle class="star settled {{ sm.side_class[side.id] }}" cx="6" cy="6" r="5"/></svg> {{ side.name }}</span>
+                    {% endfor %}
+                    <span class="muted">{{ _("Large dot settled, small outpost, ring naval base. 1 hex = 1 light year.") }}</span>
+                    {% if sm.grid.seed %}<span class="muted">{{ _("Seed {seed}", seed=sm.grid.seed) }}</span>{% endif %}
+                  </div>
+                  <a class="btn" href="{{ url_for('export_starmap', campaign_id=c.id) }}">{{ _("Download map") }}</a>
+                </div>
+              </div>
+            {% endif %}
+            <details class="stack" {% if not sm %}open{% endif %}>
+              <summary>{{ _("New map") if sm else _("Make a star map") }}</summary>
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <label class="check">{{ _("Width") }}
+                  <input class="input sm" type="number" name="width" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ d.DEFAULT_WIDTH }}" /></label>
+                <label class="check">{{ _("Height") }}
+                  <input class="input sm" type="number" name="height" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ d.DEFAULT_HEIGHT }}" /></label>
+                <label class="check">{{ _("Stars") }}
+                  <input class="input sm" type="number" name="stars" min="1" max="400" value="{{ d.DEFAULT_STARS }}" /></label>
+                <label class="check">{{ _("Seed") }}
+                  <input class="input sm" type="number" name="seed" min="1" placeholder="{{ _('any') }}" /></label>
+                <button class="btn" type="submit" name="action" value="random_starmap">{{ _("Random map") }}</button>
+                <button class="btn" type="submit" name="action" value="new_starmap">{{ _("Blank map") }}</button>
+              </form>
+              <form method="post" action="{{ url_for('campaign_map_upload', campaign_id=c.id) }}"
+                    enctype="multipart/form-data" class="row">
+                <input class="input" type="file" name="file" accept=".FTStarmap" required
+                       aria-label="{{ _('Star map file') }}" />
+                <button class="btn" type="submit">{{ _("Load map") }}</button>
+              </form>
+            </details>
+          </div>
+        </div>
+      {% endif %}
+
       {% for row in selected.ships %}
         {% set ship = row.ship %}
         <div class="panel campaign-ship">
