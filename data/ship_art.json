@@ -479,7 +479,9 @@
     "sr:oudf-cooma": "miniature-v2:sr:oudf-cooma",
     "sr:oudf-auckland": "miniature-v2:sr:oudf-auckland",
     "sr:oudf-brisbane": "miniature-v2:sr:oudf-brisbane",
-    "sr:oudf-jervis-bay": "miniature-v2:sr:oudf-jervis-bay"
+    "sr:oudf-jervis-bay": "miniature-v2:sr:oudf-jervis-bay",
+    "sr:if-jibrail-sensors": "miniature-v2:sr:if-jibrail-sensors",
+    "sr:if-arabiya-flagship": "miniature-v2:sr:if-arabiya-flagship"
   },
   "portraits": {
     "official:fb1:nac-harrison": {
@@ -8511,6 +8513,28 @@
       "reference_image_url": null,
       "revision": "owner-fleet-book-style-2026-10-20",
       "variant": "FB 1"
+    },
+    "miniature-v2:sr:if-jibrail-sensors": {
+      "file": "ships/if-miniatures-v2-01.webp",
+      "cell": 15,
+      "label": "Jibrail (Sensors)",
+      "code": "BDN",
+      "faction": "IF",
+      "basis": "invented-faction-design",
+      "view": "port-bow-30deg-bow-lower-left",
+      "reference_url": null,
+      "reference_image_url": null
+    },
+    "miniature-v2:sr:if-arabiya-flagship": {
+      "file": "ships/if-miniatures-v2-01.webp",
+      "cell": 14,
+      "label": "Arabiya (Flagship)",
+      "code": "DN",
+      "faction": "IF",
+      "basis": "invented-faction-design",
+      "view": "port-bow-30deg-bow-lower-left",
+      "reference_url": null,
+      "reference_image_url": null
     }
   },
   "class_defaults": {
