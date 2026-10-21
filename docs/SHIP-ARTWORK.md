@@ -50,7 +50,9 @@ Phalon designs in Fleet Book style. These are generated interpretations,
 not engineering-verified replicas. Shop photos are not bundled. The eight Ravager
 defaults use the five [Star Ranger miniature photographs](https://fullthrust.star-ranger.com/MISCstats.htm)
 (FTX01-05), with three weapon variants retaining their photographed base hulls. Their
-earlier invented portraits remain available under their original IDs.
+earlier invented portraits remain available under their original IDs. At the owner's
+request, the current side-panel livery is silver skulls on dark space grey, replacing
+the reference models' red-white checkerboards without changing hull architecture.
 
 Do not interpret miniature stands, hexagonal bases, mounting posts, sprues or loose kit parts
 as ship geometry. Where only unassembled parts are pictured (for example KEYSTONE/KEROSENE),

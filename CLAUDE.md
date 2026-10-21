@@ -55,7 +55,8 @@ What exists:
   Fleet Book style/view at owner request; other factions use port-bow. Optional `columns` and
   `rows` support repair atlases; omitted dimensions mean 4 by 4. Ravager defaults use
   a 3 by 3 atlas based on the five Star Ranger FTX01-05 miniature photos, including
-  three derived weapon variants. All prior IDs remain valid.
+  three derived weapon variants. The owner-selected livery replaces checkered side
+  panels with silver skulls on dark space grey. All prior IDs remain valid.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
   across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds
