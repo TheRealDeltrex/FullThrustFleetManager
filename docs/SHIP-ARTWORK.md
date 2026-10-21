@@ -44,10 +44,13 @@ generation prompts. Civilian and generic FT2/MT art follows each ship's role. Pa
 are artistic choices, not rules or official faction specifications.
 
 The publisher's [Full Thrust miniature range](https://shop.groundzerogames.co.uk/full-thrust-starships.html)
-provided reference photographs. Current defaults comprise 218 miniature-based interpretations
-(including variants), 239 invented faction-compatible hulls, 15 restored original Phalon
-portraits and six Phalon extensions in Fleet Book style. These are generated interpretations,
-not engineering-verified replicas. Shop photos are not bundled.
+provided reference photographs. Defaults combine miniature-based interpretations (including
+variants), invented faction-compatible hulls, restored original Phalon portraits and additional
+Phalon designs in Fleet Book style. These are generated interpretations,
+not engineering-verified replicas. Shop photos are not bundled. The eight Ravager
+defaults use the five [Star Ranger miniature photographs](https://fullthrust.star-ranger.com/MISCstats.htm)
+(FTX01-05), with three weapon variants retaining their photographed base hulls. Their
+earlier invented portraits remain available under their original IDs.
 
 Do not interpret miniature stands, hexagonal bases, mounting posts, sprues or loose kit parts
 as ship geometry. Where only unassembled parts are pictured (for example KEYSTONE/KEROSENE),

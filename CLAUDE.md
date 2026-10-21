@@ -53,7 +53,9 @@ What exists:
   Per-portrait metadata records references, basis and view. Owner-corrected defaults use new
   IDs/files and remap only changed cells. Original Phalon art is restored and extended in its
   Fleet Book style/view at owner request; other factions use port-bow. Optional `columns` and
-  `rows` support repair atlases; omitted dimensions mean 4 by 4. All prior IDs remain valid.
+  `rows` support repair atlases; omitted dimensions mean 4 by 4. Ravager defaults use
+  a 3 by 3 atlas based on the five Star Ranger FTX01-05 miniature photos, including
+  three derived weapon variants. All prior IDs remain valid.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
   across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds
