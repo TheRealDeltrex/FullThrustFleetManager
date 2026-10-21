@@ -108,26 +108,6 @@
     ]
   },
   {
-    "id": "fb:sr:if-jibrail",
-    "book_value": 527,
-    "rules_value": 527,
-    "reason": "Star Ranger IF page: the two PTorp(5) torpedoes cover five arcs each; their MASS (4 +1 per extra arc) closes the design at 154 and the printed 527, but FB1 p.7 limits a pulse torpedo to three adjacent arcs.",
-    "expected_violations": [
-      "torpedo_arcs",
-      "torpedo_arcs"
-    ]
-  },
-  {
-    "id": "fb:sr:if-arabiya",
-    "book_value": 694,
-    "rules_value": 694,
-    "reason": "Star Ranger IF page: the two PTorp(4) torpedoes cover four arcs each; their MASS (4 +1 per extra arc) closes the design at 204 and the printed 694, but FB1 p.7 limits a pulse torpedo to three adjacent arcs.",
-    "expected_violations": [
-      "torpedo_arcs",
-      "torpedo_arcs"
-    ]
-  },
-  {
     "id": "fb:sr:oudf-freemantle",
     "book_value": 99,
     "rules_value": 97,
@@ -348,5 +328,50 @@
     "book_value": 50,
     "rules_value": 48,
     "reason": "Star Ranger prices this 2-box hull on three rows at 3 points a box (6); the app charges a hull of three boxes or fewer the usual 2 a box (4), since a ship is not dearer for being small (owner's ruling)."
+  },
+  {
+    "id": "fb:sr:ni-chayal-cochavim",
+    "book_value": 615,
+    "rules_value": 615,
+    "reason": "Adjusted design (marked *): trimming the page's torpedo arcs to three leaves MASS unused, which Cross Dimensions and Project Continuum allow and the Fleet Books do not, so it is listed under CD and PC only.",
+    "expected_violations": [
+      "mass_under"
+    ]
+  },
+  {
+    "id": "fb:sr:if-jibrail",
+    "book_value": 515,
+    "rules_value": 515,
+    "reason": "Adjusted design (marked *): trimming the page's torpedo arcs to three leaves MASS unused, which Cross Dimensions and Project Continuum allow and the Fleet Books do not, so it is listed under CD and PC only.",
+    "expected_violations": [
+      "mass_under"
+    ]
+  },
+  {
+    "id": "fb:sr:if-jibrail-sensors",
+    "book_value": 519,
+    "rules_value": 519,
+    "reason": "Adjusted design (marked *): trimming the page's torpedo arcs to three leaves MASS unused, which Cross Dimensions and Project Continuum allow and the Fleet Books do not, so it is listed under CD and PC only.",
+    "expected_violations": [
+      "mass_under"
+    ]
+  },
+  {
+    "id": "fb:sr:if-arabiya",
+    "book_value": 688,
+    "rules_value": 688,
+    "reason": "Adjusted design (marked *): trimming the page's torpedo arcs to three leaves MASS unused, which Cross Dimensions and Project Continuum allow and the Fleet Books do not, so it is listed under CD and PC only.",
+    "expected_violations": [
+      "mass_under"
+    ]
+  },
+  {
+    "id": "fb:sr:if-arabiya-flagship",
+    "book_value": 690,
+    "rules_value": 690,
+    "reason": "Adjusted design (marked *): trimming the page's torpedo arcs to three leaves MASS unused, which Cross Dimensions and Project Continuum allow and the Fleet Books do not, so it is listed under CD and PC only.",
+    "expected_violations": [
+      "mass_under"
+    ]
   }
 ]

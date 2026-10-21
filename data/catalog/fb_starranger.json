@@ -24791,7 +24791,7 @@
    "ruleset": "fb",
    "race": "human",
    "faction": "NI",
-   "name": "Chayal Cochavim",
+   "name": "Chayal Cochavim*",
    "type_label": "Heavy Battleship",
    "type_code": "BDN",
    "hull_kind": "warship",
@@ -24904,11 +24904,9 @@
      "uid": "s10",
      "type": "lrpt",
      "arcs": [
-      "AP",
       "FP",
       "F",
-      "FS",
-      "AS"
+      "FS"
      ]
     },
     {
@@ -24951,10 +24949,10 @@
     "kind": "catalog",
     "book": "SR",
     "page": 0,
-    "npv_book": 627,
+    "npv_book": 615,
     "url": "https://fullthrust.star-ranger.com/NIstats.htm"
    },
-   "notes": "",
+   "notes": "* Adjusted: the page's third long-range torpedo on five arcs is trimmed to three, the limit for a torpedo; the page prints NPV 627.",
    "hull_rows": 3
   },
   {
@@ -39089,7 +39087,7 @@
    "ruleset": "fb",
    "race": "human",
    "faction": "IF",
-   "name": "Jibrail",
+   "name": "Jibrail*",
    "type_label": "Heavy Battleship",
    "type_code": "BDN",
    "hull_kind": "warship",
@@ -39105,22 +39103,18 @@
      "uid": "s1",
      "type": "pulse_torpedo",
      "arcs": [
-      "AP",
       "FP",
       "F",
-      "FS",
-      "AS"
+      "FS"
      ]
     },
     {
      "uid": "s2",
      "type": "pulse_torpedo",
      "arcs": [
-      "AP",
       "FP",
       "F",
-      "FS",
-      "AS"
+      "FS"
      ]
     },
     {
@@ -39264,10 +39258,192 @@
     "kind": "catalog",
     "book": "SR",
     "page": 0,
-    "npv_book": 527,
+    "npv_book": 515,
     "url": "https://fullthrust.star-ranger.com/IFstats.htm"
    },
-   "notes": "The page lets each bracketed weapon block be swapped at build (4 HMR, 2 SMR, 4 class-2 on 3 arcs, or 2 six-arc and 1 three-arc class-2); this is its listed fit."
+   "notes": "* Adjusted: the page's two torpedoes on five arcs are trimmed to three (FB1 p.7); the page prints NPV 527. The page lets each bracketed weapon block be swapped at build (4 HMR, 2 SMR, 4 class-2 on 3 arcs, or 2 six-arc and 1 three-arc class-2); this is its listed fit."
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:sr:if-jibrail-sensors",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "IF",
+   "name": "Jibrail (Sensors)*",
+   "type_label": "Heavy Battleship",
+   "type_code": "BDN",
+   "hull_kind": "warship",
+   "tmf": 154,
+   "hull_boxes": 39,
+   "armour": 10,
+   "armour_layers": [],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "AP",
+      "FP",
+      "F",
+      "FS",
+      "AS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "adfc"
+    },
+    {
+     "uid": "s11",
+     "type": "pds"
+    },
+    {
+     "uid": "s12",
+     "type": "pds"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "pds"
+    },
+    {
+     "uid": "s16",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s17",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s18",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s19",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s20",
+     "type": "enhanced_sensors"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "SR",
+    "page": 0,
+    "npv_book": 519,
+    "url": "https://fullthrust.star-ranger.com/IFstats.htm"
+   },
+   "notes": "* Adjusted: the page's two torpedoes on five arcs are trimmed to three (FB1 p.7); the page prints NPV 527. Variant: one fire control becomes enhanced sensors (2 MASS, 8 points)."
   },
   {
    "schema_version": 2,
@@ -39275,7 +39451,7 @@
    "ruleset": "fb",
    "race": "human",
    "faction": "IF",
-   "name": "Arabiya",
+   "name": "Arabiya*",
    "type_label": "Dreadnought",
    "type_code": "DN",
    "hull_kind": "warship",
@@ -39333,7 +39509,6 @@
      "uid": "s5",
      "type": "pulse_torpedo",
      "arcs": [
-      "AP",
       "FP",
       "F",
       "FS"
@@ -39343,7 +39518,6 @@
      "uid": "s6",
      "type": "pulse_torpedo",
      "arcs": [
-      "AP",
       "FP",
       "F",
       "FS"
@@ -39481,10 +39655,303 @@
     "kind": "catalog",
     "book": "SR",
     "page": 0,
-    "npv_book": 694,
+    "npv_book": 688,
     "url": "https://fullthrust.star-ranger.com/IFstats.htm"
    },
-   "notes": "Carries Remora scouts and can tow 6 MASS through FTL."
+   "notes": "* Adjusted: the page's two torpedoes on four arcs are trimmed to three (FB1 p.7); the page prints NPV 694. Carries Remora scouts and can tow 6 MASS through FTL."
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:sr:if-arabiya-flagship",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "IF",
+   "name": "Arabiya (Flagship)*",
+   "type_label": "Dreadnought",
+   "type_code": "DN",
+   "hull_kind": "warship",
+   "tmf": 204,
+   "hull_boxes": 54,
+   "armour": 12,
+   "armour_layers": [],
+   "thrust": 4,
+   "ftl": true,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "AP",
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s2",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "AP",
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s3",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s4",
+     "type": "beam",
+     "class": 3,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s5",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s6",
+     "type": "pulse_torpedo",
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s7",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s8",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "F",
+      "FS",
+      "AS",
+      "A",
+      "AP",
+      "FP"
+     ]
+    },
+    {
+     "uid": "s9",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s10",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s11",
+     "type": "beam",
+     "class": 2,
+     "arcs": [
+      "FP",
+      "F",
+      "FS"
+     ]
+    },
+    {
+     "uid": "s12",
+     "type": "adfc"
+    },
+    {
+     "uid": "s13",
+     "type": "pds"
+    },
+    {
+     "uid": "s14",
+     "type": "pds"
+    },
+    {
+     "uid": "s15",
+     "type": "pds"
+    },
+    {
+     "uid": "s16",
+     "type": "pds"
+    },
+    {
+     "uid": "s17",
+     "type": "pds"
+    },
+    {
+     "uid": "s18",
+     "type": "pds"
+    },
+    {
+     "uid": "s19",
+     "type": "screen",
+     "level": 1
+    },
+    {
+     "uid": "s20",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s21",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s22",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s23",
+     "type": "fire_control"
+    },
+    {
+     "uid": "s24",
+     "type": "tug_drive",
+     "tow_mass": 6
+    },
+    {
+     "uid": "s25",
+     "type": "enhanced_sensors"
+    },
+    {
+     "uid": "s26",
+     "type": "hold",
+     "kind": "passenger",
+     "mass": 1
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "SR",
+    "page": 0,
+    "npv_book": 690,
+    "url": "https://fullthrust.star-ranger.com/IFstats.htm"
+   },
+   "notes": "* Adjusted: the page's two torpedoes on four arcs are trimmed to three (FB1 p.7); the page prints NPV 694. Variant: one three-arc class-2 battery becomes enhanced sensors (2 MASS, 8 points) and 1 MASS of passenger space for an admiral's staff."
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:sr:if-remora",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "IF",
+   "name": "Remora*",
+   "type_label": "Scout",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 7,
+   "hull_boxes": 1,
+   "armour": 1,
+   "armour_layers": [],
+   "thrust": 9,
+   "ftl": false,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "enhanced_sensors"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "SR",
+    "page": 0,
+    "npv_book": 25,
+    "url": "https://fullthrust.star-ranger.com/IFstats.htm"
+   },
+   "notes": "* Adjusted: the page prints TMF 3, NPV 10. Enhanced sensors take 2 MASS, so the hull grows from TMF 3 to 7 to carry them at thrust 9."
+  },
+  {
+   "schema_version": 2,
+   "id": "fb:sr:if-remora-recon",
+   "ruleset": "fb",
+   "race": "human",
+   "faction": "IF",
+   "name": "Remora (Recon)*",
+   "type_label": "Scout",
+   "type_code": "SC",
+   "hull_kind": "warship",
+   "tmf": 5,
+   "hull_boxes": 1,
+   "armour": 0,
+   "armour_layers": [],
+   "thrust": 9,
+   "ftl": false,
+   "streamlining": "none",
+   "systems": [
+    {
+     "uid": "s1",
+     "type": "enhanced_sensors"
+    }
+   ],
+   "default_loadout": {
+    "pulsers": [],
+    "fighters": [],
+    "magazines": []
+   },
+   "allow_rule_breaking": false,
+   "layout_hints": {},
+   "source": {
+    "kind": "catalog",
+    "book": "SR",
+    "page": 0,
+    "npv_book": 19,
+    "url": "https://fullthrust.star-ranger.com/IFstats.htm"
+   },
+   "notes": "* Adjusted: the page prints TMF 3, NPV 10. Recon variant: armour removed; at TMF 5 (printed 3) it carries the enhanced sensors at thrust 9."
   },
   {
    "schema_version": 2,

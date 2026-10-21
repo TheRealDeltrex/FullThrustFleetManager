@@ -162,7 +162,7 @@ RULESET = FBRuleset()
 # The Fleet Books are a closed system (owner's ruling): what the rules code knows only to price the
 # Star Ranger pages is costed, so the catalog gate can check those pages, but is never legal here.
 NOT_IN_BOOKS = frozenset({"emp", "rocket_cannon", "graser", "hdc", "lrpt", "amt", "superior_sensors",
-                          "age_penalty"})
+                          "enhanced_sensors", "age_penalty"})
 
 
 def _not_in_books(design: dict) -> list[Issue]:

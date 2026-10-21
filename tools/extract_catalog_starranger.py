@@ -287,7 +287,8 @@ NI = [
     ("Sabra-S", "Stealth Battleship", 130, 664, 40, 6, 4, f"B2:{P}*4 B2:{F3}*2 B2:{S}*4 B2:all*5 ADFC PDS*5 FC*3", {"rows": 3, "stealth": 2}),
     ("Chalutz Chalal", "Heavy Battleship", 170, 627, 50, 5, 4, f"B2:{P}*2 B2:{F3}*2 B2:{S}*2 B2:all LRPT:{P} LRPT:{S} PDS*4 FC*3 HB*2", NI3),
     ("Chalutz Chalal-G", "Heavy Battleship", 170, 642, 50, 5, 4, f"B2:{P}*2 B2:{S}*2 B2:all*2 PT:{FP2} PT:{FS2} G2:{F3} PDS*4 FC*3 HB*2", NI3),
-    ("Chayal Cochavim", "Heavy Battleship", 170, 627, 50, 5, 4, f"B2:{P}*2 B2:{S}*2 B2:all*3 LRPT:{P} LRPT:{S} LRPT:AP,FP,F,FS,AS PDS*4 FC*3", NI3),
+    ("Chayal Cochavim*", "Heavy Battleship", 170, 615, 50, 5, 4, f"B2:{P}*2 B2:{S}*2 B2:all*3 LRPT:{P} LRPT:{S} LRPT:{F3} PDS*4 FC*3",
+     {**NI3, "note": "* Adjusted: the page's third long-range torpedo on five arcs is trimmed to three, the limit for a torpedo; the page prints NPV 627."}),
     ("Ben Gurion", "Superdreadnought", 240, 883, 73, 11, 4, f"B2:{P}*4 B2:{F3}*3 B2:{S}*4 B2:all LRPT:{P}*2 LRPT:{S}*2 ADFC PDS*5 FC*4", NI3),
     ("Ben Gurion-G", "Superdreadnought", 240, 918, 74, 11, 4, f"B2:{P}*4 B2:{F3}*4 B2:{S}*4 B2:all*2 PT:{F3} G3:{F3} ADFC PDS*5 FC*4", NI3),
     ("Kineret", "Light Carrier", 150, 550, 42, 7, 4, f"B2:{P}*2 B2:{S}*2 PT:{F3} PDS*4 FC*2 HB*4", NI3),
@@ -449,6 +450,10 @@ CRUSTY = [
 ]
 
 P4 = "AP,FP,F,FS"
+# * marks a design adjusted here to fit the rules (owner's ruling 2026-10-21); the note says how.
+JIBRAIL = "* Adjusted: the page's two torpedoes on five arcs are trimmed to three (FB1 p.7); the page prints NPV 527. "
+ARABIYA = "* Adjusted: the page's two torpedoes on four arcs are trimmed to three (FB1 p.7); the page prints NPV 694. "
+REMORA = "* Adjusted: the page prints TMF 3, NPV 10. "
 IF_NOTE = "The page lets each bracketed weapon block be swapped at build (4 HMR, 2 SMR, 4 class-2 on 3 arcs, or 2 six-arc and 1 three-arc class-2); this is its listed fit."
 IF = [
     ("al Shaulah", "Strikeship", 10, 37, 1, 0, 6, "MSL*2 FC", {"rows": 3, "note": "Alternative fits: 1 SMR or 2 needle beams. Its only defence is luck."}),
@@ -461,8 +466,12 @@ IF = [
     ("Hattin", "Heavy Cruiser", 84, 287, 22, 6, 4, f"B3:{P5} B2:all*2 B2:{F3} B2:all ADFC PDS*4 S1 FC*2", {"note": IF_NOTE}),
     ("Khartoum", "Attack Cruiser", 90, 306, 23, 6, 4, f"B3:{P5} B2:all*2 B2:{F3} MSL*4 PDS*3 S1 FC*2", {"note": IF_NOTE}),
     ("Saif ed Din", "Battleship", 124, 424, 31, 9, 4, f"B3:{P5}*2 B2:all*4 B2:{F3}*2 ADFC PDS*4 S1 FC*3", {"note": "Sword of Islam. " + IF_NOTE}),
-    ("Jibrail", "Heavy Battleship", 154, 527, 39, 10, 4, f"PT:{P5}*2 B3:{P5} B2:all*4 B2:{F3}*2 ADFC PDS*5 S1 FC*4", {"note": IF_NOTE}),
-    ("Arabiya", "Dreadnought", 204, 694, 54, 12, 4, f"B3:{P4}*2 B3:{F3}*2 PT:{P4}*2 B2:all*2 B2:{F3}*4 ADFC PDS*6 S1 FC*4 TUG:6", {"note": "Carries Remora scouts and can tow 6 MASS through FTL."}),
+    ("Jibrail*", "Heavy Battleship", 154, 515, 39, 10, 4, f"PT:{F3}*2 B3:{P5} B2:all*4 B2:{F3}*2 ADFC PDS*5 S1 FC*4", {"note": JIBRAIL + IF_NOTE}),
+    ("Jibrail (Sensors)*", "Heavy Battleship", 154, 519, 39, 10, 4, f"PT:{F3}*2 B3:{P5} B2:all*4 B2:{F3}*2 ADFC PDS*5 S1 FC*3 ESENS", {"note": JIBRAIL + "Variant: one fire control becomes enhanced sensors (2 MASS, 8 points)."}),
+    ("Arabiya*", "Dreadnought", 204, 688, 54, 12, 4, f"B3:{P4}*2 B3:{F3}*2 PT:{F3}*2 B2:all*2 B2:{F3}*4 ADFC PDS*6 S1 FC*4 TUG:6", {"note": ARABIYA + "Carries Remora scouts and can tow 6 MASS through FTL."}),
+    ("Arabiya (Flagship)*", "Dreadnought", 204, 690, 54, 12, 4, f"B3:{P4}*2 B3:{F3}*2 PT:{F3}*2 B2:all*2 B2:{F3}*3 ADFC PDS*6 S1 FC*4 TUG:6 ESENS P:1", {"note": ARABIYA + "Variant: one three-arc class-2 battery becomes enhanced sensors (2 MASS, 8 points) and 1 MASS of passenger space for an admiral's staff."}),
+    ("Remora*", "Scout", 7, 25, 1, 1, 9, "ESENS", {"ftl": False, "note": REMORA + "Enhanced sensors take 2 MASS, so the hull grows from TMF 3 to 7 to carry them at thrust 9."}),
+    ("Remora (Recon)*", "Scout", 5, 19, 1, 0, 9, "ESENS", {"ftl": False, "note": REMORA + "Recon variant: armour removed; at TMF 5 (printed 3) it carries the enhanced sensors at thrust 9."}),
     ("Madinah", "Battle Carrier", 184, 633, 42, 10, 4, f"B3:{P5} B2:all*4 B2:{F3}*2 ADFC PDS*4 S1 FC*2 HB*4", {"note": IF_NOTE}),
     ("Madinah (CVH)", "Heavy Carrier", 184, 632, 42, 10, 4, "B2:all*2 ADFC PDS*5 S1 FC HB*6", {"note": "Six-bay heavy carrier option."}),
 ]
