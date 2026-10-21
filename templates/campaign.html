@@ -187,6 +187,93 @@
         </div>
       {% endif %}
 
+      {# Contacts (step C4): sides meeting in a system (FT pp.34-35). #}
+      {% if c and selected.contacts %}
+        <div class="panel campaign-contacts">
+          <h3 class="fold" data-fold="campaign-contacts" tabindex="0">{{ _("Contacts") }}</h3>
+          <div class="body stack">
+            {% for row in selected.contacts %}
+              {% set k = row.contact %}
+              <div class="stack task-force">
+                <b>{{ row.where }}</b>
+                {% for side in row.sides %}
+                  <div class="row">
+                    <svg class="starmap-swatch" viewBox="0 0 12 12"><circle class="star settled {{ side.class }}" cx="6" cy="6" r="5"/></svg>
+                    <span>{{ side.name }}</span>
+                    <span class="muted">{{ side.forces|join(", ") }}</span>
+                    <div class="spacer"></div>
+                    {% if side.id == row.own and not k.outcome %}
+                      <form method="post" action="{{ to_campaign }}" class="row" data-autosave="contact_report">
+                        <input type="hidden" name="contact" value="{{ k.id }}" />
+                        <input type="hidden" name="side" value="{{ side.id }}" />
+                        <span class="muted">{{ _("Scan shows") }}</span>
+                        {% for cls in selected.scan_classes %}
+                          <label class="check"><input class="input num" type="number" min="0" max="999" name="{{ cls }}" value="{{ side.report[cls] }}" /> {{ scan_label(cls) }}</label>
+                        {% endfor %}
+                        <noscript><button class="btn sm" type="submit" name="action" value="contact_report">{{ _("Apply") }}</button></noscript>
+                      </form>
+                    {% else %}
+                      <span class="chip">{% for cls in selected.scan_classes %}{{ side.report[cls] }} {{ scan_label(cls) }}{% if not loop.last %} · {% endif %}{% endfor %}</span>
+                    {% endif %}
+                    {% if k.outcome %}
+                      <span class="chip">{{ choice_label(side.choice) }}</span>
+                      {% if side.leaving %}<span class="chip warn">{{ _("Must leave") }}</span>{% endif %}
+                    {% elif side.id != row.own %}
+                      <span class="muted">{{ _("Chosen") if side.choice else _("Choosing") }}</span>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+                {% if not k.outcome and row.own %}
+                  <form method="post" action="{{ to_campaign }}" class="row">
+                    <input type="hidden" name="contact" value="{{ k.id }}" />
+                    <input type="hidden" name="side" value="{{ row.own }}" />
+                    <input type="hidden" name="action" value="contact_choice" />
+                    {% if k.choices[row.own] %}<span class="muted">{{ _("You chose: {choice}", choice=choice_label(k.choices[row.own])) }}</span>{% endif %}
+                    <div class="spacer"></div>
+                    <select class="input" name="roll" aria-label="{{ _('Catch roll') }}">
+                      <option value="">{{ _("Catch roll: app rolls") }}</option>
+                      {% for n in range(1, 7) %}<option value="{{ n }}">{{ _("Catch roll: {n}", n=n) }}</option>{% endfor %}
+                    </select>
+                    {% for choice in ("fight", "withdraw", "standoff") %}
+                      <button class="btn sm" type="submit" name="choice" value="{{ choice }}">{{ choice_label(choice) }}</button>
+                    {% endfor %}
+                  </form>
+                {% endif %}
+                {% if k.outcome %}
+                  <span>{{ outcome_label(k.outcome) }}{% if k.roll %} <span class="muted">· {{ _("catch roll {n}", n=k.roll) }}</span>{% endif %}</span>
+                {% endif %}
+                {% if k.outcome == "battle" %}
+                  <div class="row">
+                    {% for side in row.sides %}{% for fl, ship in side.ships %}
+                      <a class="chip st-{{ ship.status }}" href="{{ url_for('fleet_select', fleet_id=fl.id, to='campaign') }}">{{ ship.table_id }} {{ ship.name }} · {{ ship.status }}</a>
+                    {% endfor %}{% endfor %}
+                  </div>
+                  {% if k.result %}
+                    <span>{{ _("Broken off") if k.result == "drawn" else _("Won by {side}", side=(row.sides|selectattr("id", "equalto", k.result)|first).name) }}{% if k.notes %} <span class="muted">· {{ k.notes }}</span>{% endif %}</span>
+                  {% else %}
+                    <form method="post" action="{{ to_campaign }}" class="row">
+                      <input type="hidden" name="contact" value="{{ k.id }}" />
+                      <select class="input" name="result" aria-label="{{ _('Result') }}">
+                        {% for side in row.sides %}<option value="{{ side.id }}">{{ _("Won by {side}", side=side.name) }}</option>{% endfor %}
+                        <option value="drawn">{{ _("Broken off") }}</option>
+                      </select>
+                      <input class="input" name="notes" placeholder="{{ _('Notes') }}" aria-label="{{ _('Notes') }}" />
+                      <button class="btn sm" type="submit" name="action" value="battle_result">{{ _("Record battle") }}</button>
+                    </form>
+                  {% endif %}
+                {% endif %}
+                {% if k.outcome %}
+                  <form method="post" action="{{ to_campaign }}" class="row"><div class="spacer"></div>
+                    <input type="hidden" name="contact" value="{{ k.id }}" />
+                    <button class="btn sm ghost" type="submit" name="action" value="reopen_contact">{{ _("Reopen") }}</button>
+                  </form>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
       {# Task forces (step C3): ships of one side travelling together, 6 hexes a week (FT p.35). #}
       {% if c and selected.starmap %}
         <div class="panel campaign-forces">
