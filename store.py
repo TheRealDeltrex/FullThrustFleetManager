@@ -159,10 +159,7 @@ def _norm_loadout(v: object) -> dict | None:
     ] if isinstance(v.get("pulsers"), list) else []
     # Project Continuum gunboat squadrons (PC pp.79-82) on a rack or in a boat bay.
     gunboats = [
-        {"carrier": g["carrier"], "type": g["type"][:20],
-         **({"extras": [x[:20] for x in _as_str_list(g["extras"])]}
-            if _as_str_list(g.get("extras")) else {}),
-         **({"ecm": _as_int(g["ecm"], 0, 0, 9)} if isinstance(g.get("ecm"), int) and g["ecm"] > 0 else {})}
+        {"carrier": g["carrier"], **_norm_gunboats(g)}
         for g in v.get("gunboats", [])
         if isinstance(g, dict) and isinstance(g.get("carrier"), str) and isinstance(g.get("type"), str)
     ] if isinstance(v.get("gunboats"), list) else []
@@ -171,6 +168,21 @@ def _norm_loadout(v: object) -> dict | None:
         out["craft"] = craft
     if gunboats:
         out["gunboats"] = gunboats
+    return out
+
+
+def _norm_gunboats(g: dict) -> dict:
+    """One gunboat squadron (PC pp.79-82): its type, the six boats' types when it mixes them
+    (p.79), the squadron's modifications and ECM level."""
+    out: dict = {"type": g["type"][:20]}
+    types = g.get("types")
+    if (isinstance(types, list) and len(types) == 6 and all(isinstance(t, str) for t in types)
+            and len(set(types)) > 1):
+        out["types"] = [t[:20] for t in types]
+    if _as_str_list(g.get("extras")):
+        out["extras"] = [x[:20] for x in _as_str_list(g["extras"])]
+    if isinstance(g.get("ecm"), int) and g["ecm"] > 0:
+        out["ecm"] = _as_int(g["ecm"], 0, 0, 9)
     return out
 
 
@@ -344,6 +356,12 @@ def normalize_fleet(doc: object) -> dict | None:
         "points_limit": _as_int(limit, 0, 0, 1000000) if limit is not None else 0,
         "options": {k: options.get(k) is True for k in fleet_rules.FLEET_OPTION_KEYS},
         "dummy_bogeys": _as_int(doc.get("dummy_bogeys"), 0, 0, 1000),
+        # FTL gunboat squadrons flying without a carrier (PC p.80).
+        "gunboat_squadrons": [
+            {"uid": g["uid"][:20], **_norm_gunboats(g)}
+            for g in doc.get("gunboat_squadrons", [])
+            if isinstance(g, dict) and isinstance(g.get("uid"), str) and isinstance(g.get("type"), str)
+        ][:100] if isinstance(doc.get("gunboat_squadrons"), list) else [],
         "squadrons": squadrons,
         "ships": ships,
         "campaign_id": _as_opt_str(doc.get("campaign_id")),  # reserved for the campaign module
@@ -811,6 +829,33 @@ def update_fleet_details(fleet: dict, *, name: str | None = None, admiral: str |
             return False, _("The number of dummy bogeys cannot be negative.")
         fleet["dummy_bogeys"] = min(dummy_bogeys, 1000)
     return True, _("Fleet updated.")
+
+
+def add_gunboat_squadron(fleet: dict, kind: str) -> tuple[bool, str]:
+    """An FTL gunboat squadron the fleet fields without a carrier (PC p.80)."""
+    rs = RULESETS.get(fleet["ruleset"])
+    if kind not in dict(getattr(rs, "gunboat_types", ())):
+        return False, _("Choose a gunboat type.")
+    taken = {g["uid"] for g in fleet["gunboat_squadrons"]}
+    uid = next(f"g{n}" for n in range(1, len(taken) + 2) if f"g{n}" not in taken)
+    fleet["gunboat_squadrons"].append({"uid": uid, "type": kind})
+    return True, _("Gunboat squadron added.")
+
+
+def update_gunboat_squadrons(fleet: dict, squadrons: dict[str, dict]) -> tuple[bool, str]:
+    """Replaces each listed squadron's type, boats, modifications and ECM, keyed by uid."""
+    for i, old in enumerate(fleet["gunboat_squadrons"]):
+        if old["uid"] in squadrons:
+            fleet["gunboat_squadrons"][i] = {"uid": old["uid"], **_norm_gunboats(squadrons[old["uid"]])}
+    return True, _("Gunboat squadrons updated.")
+
+
+def remove_gunboat_squadron(fleet: dict, uid: str) -> tuple[bool, str]:
+    before = len(fleet["gunboat_squadrons"])
+    fleet["gunboat_squadrons"] = [g for g in fleet["gunboat_squadrons"] if g["uid"] != uid]
+    if len(fleet["gunboat_squadrons"]) == before:
+        return False, _("No such gunboat squadron.")
+    return True, _("Gunboat squadron removed.")
 
 
 def add_squadron(fleet: dict, name: str) -> tuple[bool, str]:
