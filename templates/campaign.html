@@ -187,6 +187,85 @@
         </div>
       {% endif %}
 
+      {# Task forces (step C3): ships of one side travelling together, 6 hexes a week (FT p.35). #}
+      {% if c and selected.starmap %}
+        <div class="panel campaign-forces">
+          <h3 class="fold" data-fold="campaign-forces" tabindex="0">{{ _("Task forces") }}</h3>
+          <div class="body stack">
+            {% for row in selected.forces %}
+              {% set tf = row.force %}
+              <div class="stack task-force">
+              <form method="post" action="{{ to_campaign }}" class="stack"
+                    {% if row.own %}data-autosave="update_force"{% endif %}>
+                <input type="hidden" name="force" value="{{ tf.id }}" />
+                <div class="row">
+                  <svg class="starmap-swatch" viewBox="0 0 12 12"><circle class="star settled {{ row.side_class }}" cx="6" cy="6" r="5"/></svg>
+                  {% if row.own %}
+                    <input class="input" name="name" value="{{ tf.name }}" aria-label="{{ _('Task force name') }}" />
+                  {% else %}<b>{{ tf.name }}</b>{% endif %}
+                  <span class="muted">{{ row.side }} · {{ _("at {place}", place=row.where) }}</span>
+                  <div class="spacer"></div>
+                  {% if row.own %}
+                    <select class="input" name="order" aria-label="{{ _('Orders') }}">
+                      <option value="">{{ _("Hold position") }}</option>
+                      {% for sys, dist in row.options %}
+                        <option value="{{ sys.q }},{{ sys.r }}" {% if row.order and row.order.q == sys.q and row.order.r == sys.r %}selected{% endif %}>
+                          {{ _("Jump to {place} ({n} hexes)", place=sys.name, n=dist) }}</option>
+                      {% endfor %}
+                    </select>
+                    <noscript><button class="btn sm" type="submit" name="action" value="update_force">{{ _("Apply") }}</button></noscript>
+                  {% elif row.order %}
+                    <span class="chip">{{ _("Jumping to {place}", place=row.order.name) }}</span>
+                  {% endif %}
+                </div>
+                {% if row.own and row.why %}<span class="muted">{{ row.why }}</span>{% endif %}
+                <div class="row">
+                  {% for fl, ship, design in row.ships %}
+                    <span class="chip">{{ ship.table_id }} {{ ship.name }}{% if fl.id != f.id %} <span class="muted">· {{ fl.name }}</span>{% endif %}
+                      {% if row.own %}<button class="btn sm ghost" type="submit" name="action" value="unassign_ship"
+                        formaction="{{ to_campaign }}?ship={{ fl.id }}:{{ ship.uid }}" aria-label="{{ _('Leave') }}">×</button>{% endif %}</span>
+                  {% else %}
+                    <span class="muted">{{ _("No ships") }}</span>
+                  {% endfor %}
+                </div>
+                {% if row.own %}
+                  <div class="row"><div class="spacer"></div>
+                    <button class="btn sm ghost" type="submit" name="action" value="remove_force">{{ _("Disband") }}</button></div>
+                {% endif %}
+              </form>
+              {% if row.own and selected.free_ships %}
+                <form method="post" action="{{ to_campaign }}" class="row">
+                  <input type="hidden" name="force" value="{{ tf.id }}" />
+                  <input type="hidden" name="fleet" value="{{ f.id }}" />
+                  {% for ship in selected.free_ships %}
+                    <label class="check"><input type="checkbox" name="ship" value="{{ ship.uid }}" /> {{ ship.table_id }} {{ ship.name }}</label>
+                  {% endfor %}
+                  <button class="btn sm" type="submit" name="action" value="assign_ships">{{ _("Add ships") }}</button>
+                </form>
+              {% endif %}
+              </div>
+            {% else %}
+              <span class="muted">{{ _("No task forces yet.") }}</span>
+            {% endfor %}
+            {% if f.campaign_side and selected.force_systems %}
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <input type="hidden" name="side" value="{{ f.campaign_side }}" />
+                <input type="hidden" name="fleet" value="{{ f.id }}" />
+                {% for ship in selected.free_ships %}<input type="hidden" name="ship" value="{{ ship.uid }}" />{% endfor %}
+                <input class="input" name="name" placeholder="{{ _('Task force name') }}" aria-label="{{ _('Task force name') }}" />
+                <select class="input" name="at" aria-label="{{ _('Starting system') }}">
+                  {% for sys in selected.force_systems %}
+                    <option value="{{ sys.q }},{{ sys.r }}">{{ sys.name }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn" type="submit" name="action" value="add_force">{{ _("New task force") }}</button>
+                {% if selected.free_ships %}<span class="muted">{{ _("with this fleet's {n} unassigned ships", n=selected.free_ships|length) }}</span>{% endif %}
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
       {% for row in selected.ships %}
         {% set ship = row.ship %}
         <div class="panel campaign-ship">

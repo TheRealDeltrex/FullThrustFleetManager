@@ -126,7 +126,7 @@ def _corners(x: float, y: float) -> str:
 
 
 def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int, int] | None = None,
-           label: str = "") -> str:
+           label: str = "", forces: list[dict] | None = None) -> str:
     """The map as inline SVG. With href ("/campaign?hex="), every hex links to href + "q,r", which
     selects it without any script. Side colours are side-0 ... side-7 classes in style.css."""
     width = SIZE * (1.5 * starmap["width"] + 0.5) + 4
@@ -155,5 +155,22 @@ def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int
         out.append(f'<circle class="star {s["kind"]} {side}" cx="{x:.1f}" cy="{y - 3:.1f}" r="{radius}"/>')
         out.append(f'<text class="star-name" x="{x:.1f}" y="{y + 12:.1f}">{escape(s["name"])}</text>')
         out.append("</a>" if href else "</g>")
+    # Task forces: a pennant per side present on a hex, its orders as a dashed line.
+    for f in forces or []:
+        if f.get("order"):
+            (x1, y1), (x2, y2) = _centre(f["q"], f["r"]), _centre(*f["order"])
+            out.append(f'<line class="order {colour.get(f["side"], "unowned")}" x1="{x1:.1f}" y1="{y1:.1f}" '
+                       f'x2="{x2:.1f}" y2="{y2:.1f}"/>')
+    placed: dict[tuple[int, int], list[str]] = {}
+    for f in forces or []:
+        sides_here = placed.setdefault((f["q"], f["r"]), [])
+        if f["side"] in sides_here:
+            continue
+        sides_here.append(f["side"])
+        x, y = _centre(f["q"], f["r"])
+        x, y = x - 11 + 7 * (len(sides_here) - 1), y - 13
+        out.append(f'<path class="pennant {colour.get(f["side"], "unowned")}" '
+                   f'd="M{x:.1f} {y:.1f}v9M{x:.1f} {y:.1f}l6 2.5l-6 2.5z">'
+                   f'<title>{escape(f["name"])}</title></path>')
     out.append("</svg>")
     return "".join(out)

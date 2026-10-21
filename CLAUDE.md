@@ -194,6 +194,14 @@ What exists:
   so picking one needs no script. The map keeps a dark sky in every look. `.FTStarmap` files
   carry the map and the sides; loading one maps owners onto this campaign's sides by position.
   Settings > Import refuses them and points to the Star map panel.
+- Task forces (step C3): `campaign["forces"]` [{id tf1.., side, name, q, r, order [q, r] or
+  null, ships [{fleet, uid}]}], normalised by `store._norm_forces` (on a map, a known side, a ship
+  in one force only). A force sits on a star system and jumps up to `FTL_HEXES_PER_WEEK` (6, FT
+  p.35) to another; `fleet_rules.force_reach` refuses a docked ship, a starbase or gate
+  (`fleet_common.jump_blockers`), or ships without working FTL that the force's tender bays and
+  tugs cannot carry. `store.next_week` carries out every order, sets each ship's `location` to
+  the system name and logs a contact where sides meet (`store.meetings`); replacing the map
+  clears the forces. Pennants and dashed order lines are drawn by `starmap.to_svg(forces=)`.
 
 ## Rulebook viewer
 
