@@ -1074,7 +1074,8 @@ def _campaign_context(fleet: dict) -> dict:
     sides = [{"side": side, "fleets": [
         {"fleet": f, "points": fleet_rules.fleet_points(f, store.designs_for_fleet(f))}
         for f in members if f["campaign_side"] == side["id"]]} for side in campaign["sides"]]
-    return {"campaign": campaign, "sides": sides, **_starmap_context(campaign)}
+    return {"campaign": campaign, "sides": sides, **_starmap_context(campaign),
+            **_forces_context(campaign, fleet)}
 
 
 def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
@@ -1086,6 +1087,36 @@ def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
     return (q, r) if 0 <= q < grid["width"] and 0 <= r < grid["height"] else None
 
 
+def _forces_context(campaign: dict, fleet: dict) -> dict:
+    """The Task forces panel (step C3): every force with its ships and the jumps open to it, and
+    the current fleet's ships that are in no force yet."""
+    grid = campaign["map"]
+    if not grid:
+        return {"forces": [], "free_ships": [], "force_systems": []}
+    fleets = {f["id"]: f for f in store.campaign_fleets(campaign["id"])}
+    side_names = {s["id"]: s["name"] for s in campaign["sides"]}
+    side_class = {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])}
+    rows, assigned = [], set()
+    for force in campaign["forces"]:
+        system = starmap.system_at(grid, force["q"], force["r"])
+        options, why = store.reachable_systems(campaign, force)
+        order = starmap.system_at(grid, *force["order"]) if force["order"] else None
+        ships = store.force_ships(campaign, force, fleets)
+        assigned.update((f["id"], s["uid"]) for f, s, _d in ships)
+        rows.append({
+            "force": force, "side": side_names.get(force["side"], ""),
+            "side_class": side_class.get(force["side"], ""),
+            "where": system["name"] if system else starmap.hex_label(force["q"], force["r"]),
+            "ships": ships, "options": options, "why": why, "order": order,
+            "own": force["side"] == fleet.get("campaign_side"),
+        })
+    free = [s for s in fleet["ships"]
+            if (fleet["id"], s["uid"]) not in assigned and s["status"] != "destroyed"]
+    systems = sorted(grid["systems"], key=lambda s: (s["owner"] != fleet.get("campaign_side"),
+                                                     not s["base"], s["name"]))
+    return {"forces": rows, "free_ships": free, "force_systems": systems}
+
+
 def _starmap_context(campaign: dict) -> dict:
     """The Star map panel: the drawing (each hex links to itself) and the picked hex."""
     grid = campaign["map"]
@@ -1094,7 +1125,7 @@ def _starmap_context(campaign: dict) -> dict:
     picked = _picked_hex(request.args.get("hex"), grid)
     system = starmap.system_at(grid, *picked) if picked else None
     svg = starmap.to_svg(grid, campaign["sides"], url_for("campaign") + "?hex=", picked,
-                         _("Star map of {name}", name=campaign["name"]))
+                         _("Star map of {name}", name=campaign["name"]), campaign["forces"])
     return {"starmap": {
         "grid": grid, "svg": Markup(svg), "picked": picked, "system": system,
         "hex_label": starmap.hex_label(*picked) if picked else "",
@@ -1246,6 +1277,49 @@ def _set_star_system(campaign: dict) -> tuple[bool, str]:
 def _remove_star_system(campaign: dict) -> tuple[bool, str]:
     picked = _form_hex(campaign)
     return store.remove_star_system(campaign, *picked) if picked else (False, _("No system on that hex."))
+
+
+@register_action("add_force")
+def _add_force(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    picked = _picked_hex(form.get("at"), campaign["map"]) if campaign["map"] else None
+    if not picked:
+        return False, _("Pick a star system for the task force.")
+    force, msg = store.add_force(campaign, form.get("side", ""), form.get("name", ""), *picked)
+    if force and form.getlist("ship") and (fleet := store.get_fleet(form.get("fleet", ""))):
+        store.assign_ships(campaign, force["id"], fleet, form.getlist("ship"))
+    return force is not None, msg
+
+
+@register_action("update_force")
+def _update_force(campaign: dict) -> tuple[bool, str]:
+    """The force's own form, saved as it changes: its name and this week's orders."""
+    force_id = request.form.get("force", "")
+    ok, msg = store.rename_force(campaign, force_id, request.form.get("name", ""))
+    if ok and "order" in request.form:
+        dest = _picked_hex(request.form.get("order"), campaign["map"]) if campaign["map"] else None
+        ok, msg = store.set_force_order(campaign, force_id, dest)
+    return ok, msg
+
+
+@register_action("remove_force")
+def _remove_force(campaign: dict) -> tuple[bool, str]:
+    return store.remove_force(campaign, request.form.get("force", ""))
+
+
+@register_action("assign_ships")
+def _assign_ships(campaign: dict) -> tuple[bool, str]:
+    fleet = store.get_fleet(request.form.get("fleet", ""))
+    if not fleet:
+        return False, _("Fleet not found.")
+    return store.assign_ships(campaign, request.form.get("force", ""), fleet, request.form.getlist("ship"))
+
+
+@register_action("unassign_ship")
+def _unassign_ship(campaign: dict) -> tuple[bool, str]:
+    # Each ship's Leave button names it in the URL, inside its force's form.
+    fleet_id, _sep, uid = (request.args.get("ship") or "").partition(":")
+    return store.unassign_ship(campaign, request.form.get("force", ""), fleet_id, uid)
 
 
 @register_action("add_campaign_log")
