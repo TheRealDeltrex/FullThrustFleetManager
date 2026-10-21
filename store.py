@@ -1,8 +1,8 @@
 """Persistence and every mutation (layer 3). Mutators return (ok: bool, msg: str).
 
-User library under paths.user_data_dir(): designs/<id>.json, fleets/<id>.json, factions.json,
-settings.json (PLAN 5.7). Catalog designs come from the bundled data/catalog/*.json, are never
-written, and are read-only: editing one makes a variant.
+User library under paths.user_data_dir(): designs/<id>.json, fleets/<id>.json,
+campaigns/<id>.json, factions.json, settings.json (PLAN 5.7). Catalog designs come from the
+bundled data/catalog/*.json, are never written, and are read-only: editing one makes a variant.
 
 Untrusted input: library files and imports pass through normalize_design() / normalize_fleet(),
 the single place types are enforced (Frostgrave lesson: a field that slips through imports fine
@@ -30,7 +30,8 @@ from i18n import _
 from rulesets import RULESETS, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
-EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "backup": ".FTBackup"}
+EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "campaign": ".FTCampaign",
+              "backup": ".FTBackup"}
 DEFAULT_SETTINGS = {"paper": "A4", "pdf_viewer": "app", "theme": "full-thrust", "language": "en",
                     # True once the player picks a look; see load_settings.
                     "theme_chosen": False,
@@ -364,7 +365,10 @@ def normalize_fleet(doc: object) -> dict | None:
         ][:100] if isinstance(doc.get("gunboat_squadrons"), list) else [],
         "squadrons": squadrons,
         "ships": ships,
-        "campaign_id": _as_opt_str(doc.get("campaign_id")),  # reserved for the campaign module
+        # The campaign the fleet fights in and its side there (PLAN 11.3); one campaign at a time.
+        "campaign_id": _as_opt_str(doc.get("campaign_id")),
+        "campaign_side": (_as_opt_str(doc.get("campaign_side"))
+                          if _as_opt_str(doc.get("campaign_id")) else None),
         "log": log,
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
@@ -1085,6 +1089,163 @@ def add_log_entry(fleet: dict, week: int, text: str) -> tuple[bool, str]:
     return True, _("Log entry added.")
 
 
+# ---- Campaigns (PLAN 11.3) ------------------------------------------------------------------------
+# A campaign groups fleets of one ruleset into sides and counts the weeks (FT p.35: a map turn is
+# about a week). Membership lives on the fleet (campaign_id, campaign_side), so a fleet is in one
+# campaign at a time and deleting a fleet needs no campaign edit.
+
+MAX_SIDES = 8
+
+
+def _default_sides() -> list[dict]:
+    return [{"id": "blue", "name": _("Blue")}, {"id": "red", "name": _("Red")}]
+
+
+def normalize_campaign(doc: object) -> dict | None:
+    if not isinstance(doc, dict):
+        return None
+    doc = migrations.upgrade("campaign", dict(doc))
+    if (not isinstance(doc.get("ruleset"), str) or doc["ruleset"] not in RULESETS
+            or not _safe_id(doc.get("id"))):
+        return None
+    sides, seen = [], set()
+    for side in doc.get("sides", []) if isinstance(doc.get("sides"), list) else []:
+        if isinstance(side, dict) and _safe_id(side.get("id")) and side["id"] not in seen:
+            seen.add(side["id"])
+            sides.append({"id": side["id"], "name": _as_str(side.get("name"), side["id"], 40)})
+    log = [
+        {"week": _as_int(e.get("week"), 0, 0, 100000), "text": _as_str(e.get("text"), limit=1000)}
+        for e in doc.get("log", []) if isinstance(e, dict)
+    ] if isinstance(doc.get("log"), list) else []
+    return {
+        "schema_version": migrations.CURRENT,
+        "id": doc["id"],
+        "ruleset": doc["ruleset"],
+        "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
+        "week": _as_int(doc.get("week"), 1, 1, 100000),
+        "sides": sides[:MAX_SIDES] if len(sides) >= 2 else _default_sides(),
+        "log": log,
+        "notes": _as_str(doc.get("notes"), limit=4000),
+        "modified": _as_str(doc.get("modified"), limit=40),
+    }
+
+
+def _campaign_path(campaign_id: str) -> Path | None:
+    sid = _safe_id(campaign_id)
+    return _dir("campaigns") / f"{sid}.json" if sid else None
+
+
+def get_campaign(campaign_id: str | None) -> dict | None:
+    path = _campaign_path(campaign_id) if campaign_id else None
+    return normalize_campaign(_read_json(path)) if path and path.is_file() else None
+
+
+def list_campaigns(ruleset: str | None = None) -> list[dict]:
+    out = [c for c in (normalize_campaign(_read_json(p)) for p in sorted(_dir("campaigns").glob("*.json")))
+           if c and (ruleset is None or c["ruleset"] == ruleset)]
+    return sorted(out, key=lambda c: c["name"].lower())
+
+
+def save_campaign(campaign: dict) -> tuple[bool, str]:
+    clean = normalize_campaign(campaign)
+    if not clean:
+        return False, _("Not a valid campaign.")
+    clean["modified"] = now()
+    _write_json(_campaign_path(clean["id"]), clean)
+    campaign.clear()
+    campaign.update(clean)
+    return True, ""
+
+
+def campaign_fleets(campaign_id: str) -> list[dict]:
+    return [f for f in list_fleets() if f["campaign_id"] == campaign_id]
+
+
+def create_campaign(fleet: dict, name: str) -> tuple[dict | None, str]:
+    """A new campaign in the fleet's ruleset, with the fleet on its first side."""
+    campaign = normalize_campaign({"id": new_id(), "ruleset": fleet["ruleset"],
+                                   "name": name.strip() or _("New campaign")})
+    save_campaign(campaign)
+    fleet["campaign_id"], fleet["campaign_side"] = campaign["id"], campaign["sides"][0]["id"]
+    return campaign, _("Campaign created.")
+
+
+def join_campaign(fleet: dict, campaign_id: str, side_id: str) -> tuple[bool, str]:
+    campaign = get_campaign(campaign_id)
+    if not campaign:
+        return False, _("Campaign not found.")
+    if campaign["ruleset"] != fleet["ruleset"]:
+        return False, _("That campaign uses another ruleset.")
+    if side_id not in {s["id"] for s in campaign["sides"]}:
+        return False, _("Side not found.")
+    fleet["campaign_id"], fleet["campaign_side"] = campaign_id, side_id
+    return True, _("Fleet joined {name}.", name=campaign["name"])
+
+
+def leave_campaign(fleet: dict) -> tuple[bool, str]:
+    if not fleet.get("campaign_id"):
+        return False, _("The fleet is in no campaign.")
+    fleet["campaign_id"] = fleet["campaign_side"] = None
+    return True, _("Fleet left the campaign.")
+
+
+def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
+                    notes: str | None = None, sides: dict[str, str] | None = None) -> tuple[bool, str]:
+    if name is not None:
+        campaign["name"] = name.strip()[:80] or campaign["name"]
+    if week is not None:
+        campaign["week"] = max(1, week)
+    if notes is not None:
+        campaign["notes"] = notes[:4000]
+    for side in campaign["sides"]:
+        if sides and (sides.get(side["id"]) or "").strip():
+            side["name"] = sides[side["id"]].strip()[:40]
+    return True, _("Campaign updated.")
+
+
+def next_week(campaign: dict) -> tuple[bool, str]:
+    campaign["week"] += 1
+    return True, _("Week {n}.", n=campaign["week"])
+
+
+def add_side(campaign: dict, name: str) -> tuple[bool, str]:
+    if len(campaign["sides"]) >= MAX_SIDES:
+        return False, _("A campaign has at most {n} sides.", n=MAX_SIDES)
+    taken = {s["id"] for s in campaign["sides"]}
+    n = len(taken) + 1
+    while f"side{n}" in taken:
+        n += 1
+    campaign["sides"].append({"id": f"side{n}", "name": name.strip()[:40] or _("Side {n}", n=n)})
+    return True, _("Side added.")
+
+
+def remove_side(campaign: dict, side_id: str) -> tuple[bool, str]:
+    if side_id not in {s["id"] for s in campaign["sides"]}:
+        return False, _("Side not found.")
+    if len(campaign["sides"]) <= 2:
+        return False, _("A campaign needs two sides.")
+    if any(f["campaign_side"] == side_id for f in campaign_fleets(campaign["id"])):
+        return False, _("Move that side's fleets first.")
+    campaign["sides"] = [s for s in campaign["sides"] if s["id"] != side_id]
+    return True, _("Side removed.")
+
+
+def add_campaign_log(campaign: dict, week: int, text: str) -> tuple[bool, str]:
+    return add_log_entry(campaign, week, text)
+
+
+def delete_campaign(campaign_id: str) -> tuple[bool, str]:
+    """The fleets stay, out of any campaign."""
+    path = _campaign_path(campaign_id)
+    if not path or not path.is_file():
+        return False, _("Campaign not found.")
+    for fleet in campaign_fleets(campaign_id):
+        leave_campaign(fleet)
+        save_fleet(fleet)
+    path.unlink()
+    return True, _("Campaign deleted.")
+
+
 # ---- Settings -------------------------------------------------------------------------------------
 
 
@@ -1147,6 +1308,26 @@ def export_fleet(fleet_id: str) -> tuple[str, str] | None:
     return _filename(fleet["name"], EXTENSIONS["fleet"]), json.dumps(doc, indent=1, ensure_ascii=False)
 
 
+def export_campaign(campaign_id: str) -> tuple[str, str] | None:
+    """(filename, JSON text): the campaign, every fleet in it and what those fleets need."""
+    campaign = get_campaign(campaign_id)
+    if not campaign:
+        return None
+    fleets = campaign_fleets(campaign_id)
+    used: dict[str, dict] = {}
+    for fleet in fleets:
+        used.update(designs_for_fleet(fleet))
+    designs = [d for d in used.values() if not is_catalog(d["id"])]
+    art: dict = {}
+    for fleet in fleets:
+        art.update(portraits.subset(list(designs_for_fleet(fleet).values()), fleet))
+    wanted = {d["faction"] for d in designs} | {f["faction"] for f in fleets}
+    doc = {"schema_version": migrations.CURRENT, "kind": "FTCampaign", "campaign": campaign,
+           "fleets": fleets, "designs": designs,
+           "factions": [f for f in custom_factions() if f["id"] in wanted], "portraits": art}
+    return _filename(campaign["name"], EXTENSIONS["campaign"]), json.dumps(doc, indent=1, ensure_ascii=False)
+
+
 def export_design(design_id: str) -> tuple[str, str] | None:
     design = get_design(design_id)
     if not design:
@@ -1161,7 +1342,7 @@ def export_backup() -> tuple[str, bytes]:
     buf = io.BytesIO()
     root = paths.user_data_dir()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
-        for sub in ("designs", "fleets"):
+        for sub in ("designs", "fleets", "campaigns"):
             for p in sorted(_dir(sub).glob("*.json")):
                 z.write(p, f"{sub}/{p.name}")
         for name in ("factions.json", "settings.json", "portraits.json"):
@@ -1183,7 +1364,7 @@ BACKUP_REMINDER_DAYS = 14  # PLAN 5.7
 def backup_due() -> bool:
     """The web build's reminder: the library holds something and neither a backup nor a "Later"
     happened in the last two weeks."""
-    if not any(_dir("designs").glob("*.json")) and not any(_dir("fleets").glob("*.json")):
+    if not any(any(_dir(sub).glob("*.json")) for sub in ("designs", "fleets", "campaigns")):
         return False
     settings = load_settings()
     stamps = [settings[k] for k in ("last_backup", "backup_snoozed") if settings[k]]
@@ -1250,15 +1431,15 @@ def _import_design(raw: object) -> dict | None:
 
 
 def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tuple[bool, str, list[str]]:
-    """Import an .FTFleet / .FTDesign / .FTBackup. Returns (ok, msg, conflicts): conflicts are
+    """Import an .FTFleet / .FTDesign / .FTCampaign / .FTBackup. Returns (ok, msg, conflicts): conflicts are
     names of items skipped because the local copy is newer; call again with overwrite_newer=True
     after the player confirms (PLAN 5.6). The whole file is read and checked before anything is
     written, so a refused file leaves the library as it was."""
     try:
         if data[:2] == b"PK":
-            factions, designs, fleets, art, skipped = _read_backup(data)
+            factions, designs, fleets, campaigns, art, skipped = _read_backup(data)
         else:
-            factions, designs, fleets, art = _read_document(data)
+            factions, designs, fleets, campaigns, art = _read_document(data)
             skipped = 0
     except _Refused as refusal:
         return False, str(refusal), []
@@ -1271,7 +1452,8 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     conflicts: list[str] = []
     written = 0
     for doc, local, path in ([(d, get_design(d["id"]), _design_path(d["id"])) for d in designs]
-                             + [(f, get_fleet(f["id"]), _fleet_path(f["id"])) for f in fleets]):
+                             + [(f, get_fleet(f["id"]), _fleet_path(f["id"])) for f in fleets]
+                             + [(c, get_campaign(c["id"]), _campaign_path(c["id"])) for c in campaigns]):
         if _newer(local, doc) and not overwrite_newer:
             conflicts.append(doc["name"])
             continue
@@ -1286,6 +1468,10 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
         if skipped:
             msg += " " + _("{n} unreadable entries skipped.", n=skipped)
         return True, msg, conflicts
+    if campaigns:
+        if conflicts:
+            return True, _("Imported; {n} newer local copies kept.", n=len(conflicts)), conflicts
+        return True, _("Campaign {name} imported.", name=campaigns[0]["name"]), []
     if fleets:
         if conflicts:
             return True, _("Imported; {n} newer local copies kept.", n=len(conflicts)), conflicts
@@ -1295,9 +1481,21 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     return True, _("Design {name} imported.", name=designs[0]["name"]), []
 
 
-def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict]:
-    """(factions, designs, fleets, ship pictures) of an .FTDesign or .FTFleet, all checked;
-    raises _Refused. Pictures are kept only for the designs and ships the file carries."""
+def _fleets_need_only(fleets: list[dict], designs: list[dict], ruleset: str) -> None:
+    """Refuses fleets whose designs are neither in the file nor known here, or of another ruleset."""
+    known = {d["id"] for d in designs} | set(_catalog()) | {d["id"] for d in list_designs()}
+    missing = {s["design_id"] for f in fleets for s in f["ships"]} - known
+    if missing:
+        names = ", ".join(sorted(missing))
+        raise _Refused(_("The fleet uses designs that are not in the file: {ids}.", ids=names))
+    if any(d["ruleset"] != ruleset for d in designs):
+        raise _Refused(_("The file mixes designs of another ruleset into the fleet."))
+
+
+def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[dict], dict]:
+    """(factions, designs, fleets, campaigns, ship pictures) of an .FTDesign, .FTFleet or
+    .FTCampaign, all checked; raises _Refused. Pictures are kept only for the designs and ships
+    the file carries."""
     try:
         doc = json.loads(data.decode("utf-8-sig"))
     except (UnicodeDecodeError, ValueError):
@@ -1311,27 +1509,37 @@ def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], dic
         design = _import_design(doc.get("design"))
         if not design:
             raise _Refused(_("The file holds no usable design."))
-        return factions, [design], [], portraits.subset([design], doc=doc.get("portraits"))
+        return factions, [design], [], [], portraits.subset([design], doc=doc.get("portraits"))
     if kind == "FTFleet":
         fleet = normalize_fleet(doc.get("fleet"))
         if not fleet:
             raise _Refused(_("The file holds no usable fleet."))
         raw = doc.get("designs") if isinstance(doc.get("designs"), list) else []
         designs = [d for d in (_import_design(x) for x in raw) if d]
-        known = {d["id"] for d in designs} | set(_catalog()) | {d["id"] for d in list_designs()}
-        missing = {s["design_id"] for s in fleet["ships"]} - known
-        if missing:
-            names = ", ".join(sorted(missing))
-            raise _Refused(_("The fleet uses designs that are not in the file: {ids}.", ids=names))
-        if any(d["ruleset"] != fleet["ruleset"] for d in designs):
-            raise _Refused(_("The file mixes designs of another ruleset into the fleet."))
+        _fleets_need_only([fleet], designs, fleet["ruleset"])
         used = designs + [{"id": s["design_id"]} for s in fleet["ships"]]
-        return factions, designs, [fleet], portraits.subset(used, fleet, doc.get("portraits"))
+        return factions, designs, [fleet], [], portraits.subset(used, fleet, doc.get("portraits"))
+    if kind == "FTCampaign":
+        campaign = normalize_campaign(doc.get("campaign"))
+        if not campaign:
+            raise _Refused(_("The file holds no usable campaign."))
+        raw = doc.get("designs") if isinstance(doc.get("designs"), list) else []
+        designs = [d for d in (_import_design(x) for x in raw) if d]
+        raw = doc.get("fleets") if isinstance(doc.get("fleets"), list) else []
+        fleets = [f for f in (normalize_fleet(x) for x in raw) if f]
+        if any(f["ruleset"] != campaign["ruleset"] or f["campaign_id"] != campaign["id"] for f in fleets):
+            raise _Refused(_("The file holds fleets that are not in its campaign."))
+        _fleets_need_only(fleets, designs, campaign["ruleset"])
+        art: dict = {}
+        for fleet in fleets:
+            used = designs + [{"id": s["design_id"]} for s in fleet["ships"]]
+            art.update(portraits.subset(used, fleet, doc.get("portraits")))
+        return factions, designs, fleets, [campaign], art
     raise _Refused(_("Not a Fleet Manager file."))
 
 
-def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict, int]:
-    """(factions, designs, fleets, ship pictures, entries skipped) of an .FTBackup; raises
+def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[dict], dict, int]:
+    """(factions, designs, fleets, campaigns, ship pictures, entries skipped) of an .FTBackup; raises
     _Refused. An entry
     that cannot be read as a design or fleet of this app is skipped and counted, not guessed at;
     one from a newer app refuses the whole backup."""
@@ -1341,6 +1549,7 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict,
         raise _Refused(_("Not a Fleet Manager backup.")) from None
     designs: list[dict] = []
     fleets: list[dict] = []
+    campaigns: list[dict] = []
     factions: list[dict] = []
     art: dict = {}
     skipped = 0
@@ -1355,7 +1564,7 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict,
             if "portraits.json" in names:
                 art = portraits.normalize(json.loads(z.read("portraits.json").decode("utf-8")))
             for name in names:
-                m = re.fullmatch(r"(designs|fleets)/([A-Za-z0-9_-]{1,64})\.json", name)
+                m = re.fullmatch(r"(designs|fleets|campaigns)/([A-Za-z0-9_-]{1,64})\.json", name)
                 if not m:
                     continue
                 try:
@@ -1363,18 +1572,17 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], dict,
                 except (UnicodeDecodeError, ValueError):
                     skipped += 1
                     continue
-                if m.group(1) == "designs":
-                    doc = _import_design(raw)
-                else:
-                    doc = normalize_fleet(raw)
+                kind = m.group(1)
+                doc = {"designs": _import_design, "fleets": normalize_fleet,
+                       "campaigns": normalize_campaign}[kind](raw)
                 if not doc:
                     skipped += 1
                     continue
-                (designs if m.group(1) == "designs" else fleets).append(doc)
+                {"designs": designs, "fleets": fleets, "campaigns": campaigns}[kind].append(doc)
         except (zipfile.BadZipFile, OSError, RuntimeError, ValueError) as error:
             if isinstance(error, migrations.TooNewError):
                 raise
             raise _Refused(_("Not a Fleet Manager backup.")) from None
-    if not designs and not fleets:
+    if not designs and not fleets and not campaigns:
         raise _Refused(_("The backup is empty."))
-    return factions, designs, fleets, art, skipped
+    return factions, designs, fleets, campaigns, art, skipped
