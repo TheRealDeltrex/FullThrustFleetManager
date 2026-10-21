@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "_portraits.html" import picture with context %}
+{% import "_gunboats.html" as gunboats %}
 {% block title %}{{ _("Fleet overview") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-2{% endblock %}
 {% block content %}
@@ -121,6 +122,7 @@
           <b>{{ selected.report.points }}{% if f.points_limit %} / {{ f.points_limit }}{% endif %}</b>
           <div class="bar"><i style="width: {{ (100 * selected.report.points / f.points_limit) | round | int if f.points_limit else 0 }}%"></i></div>
           {% if selected.dummy_bogeys %}<span class="muted">{{ _("incl. {n} dummy bogeys ({p})", n=selected.dummy_bogeys, p=selected.dummy_bogey_points) }}</span>{% endif %}
+          {% if selected.gunboat_squadrons %}<span class="muted">{{ _("incl. {n} gunboat squadrons ({p})", n=selected.gunboat_squadrons|length, p=selected.gunboat_squadron_points) }}</span>{% endif %}
         </div>
         <div class="tile">
           <span class="muted">{{ _("Ships") }}</span>
@@ -293,6 +295,38 @@
         {% endif %}
         {% endif %}
       </div>
+
+      {% if selected.gunboat_types %}
+      {# ---- FTL gunboat squadrons that fly without a carrier (PC p.80) ---- #}
+      <div class="panel" id="fleet-gunboats">
+        <h3 class="fold" data-fold="fleet-gunboats" tabindex="0">{{ _("FTL gunboat squadrons") }}</h3>
+        <div class="body stack">
+          {% if selected.gunboat_squadrons %}
+          <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="stack"
+                data-autosave="update_gunboats">
+            {% for squadron, points, label in selected.gunboat_squadrons %}
+              <fieldset class="loadout-group">
+                <legend>{{ label }} <span class="muted">{{ points }} {{ _("pts") }}</span></legend>
+                {{ gunboats.squadron_fields("fleet-gunboat-" ~ squadron.uid ~ "-", squadron,
+                                            selected.gunboat_types, selected.gunboat_extras, empty=False) }}
+                <div class="row"><div class="spacer"></div>
+                  <button class="btn ghost sm" type="submit" name="action" value="remove_gunboats"
+                          formaction="{{ url_for('fleet_action', fleet_id=f.id, gunboats=squadron.uid) }}">{{ _("Remove") }}</button>
+                </div>
+              </fieldset>
+            {% endfor %}
+            <noscript><button class="btn primary" type="submit" name="action" value="update_gunboats">{{ _("Save squadrons") }}</button></noscript>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id) }}" class="row">
+            <select class="input" name="gunboat_type" aria-label="{{ _('Gunboat type') }}">
+              {% for key, text in selected.gunboat_types %}<option value="{{ key }}">{{ text }}</option>{% endfor %}
+            </select>
+            <button class="btn" type="submit" name="action" value="add_gunboats">{{ _("Add gunboat squadron") }}</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
 
       {# ---- Fleet details ---- #}
       <div class="panel" id="fleet-details">

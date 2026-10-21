@@ -557,7 +557,16 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - Gunboats (PC pp.79-82) are a loadout key `gunboats`: [{carrier, type, extras, ecm}], one
   squadron of six per `gunboat_rack` or `boat_bay` (`common.GUNBOAT_CARRIER_TYPES`); a ruleset's
   `gunboat_types` / `gunboat_extras` properties drive the editor. Ruling: a squadron in a boat bay
-  takes 24 craft MASS (MASS 4 a boat, p.80). FTL gunboat squadrons flying alone are not modelled.
+  takes 24 craft MASS (MASS 4 a boat, p.80). A squadron may mix types (p.79): `types` lists all
+  six boats (absent when uniform; `rules.boat_types()` reads both) and the per-squadron
+  modifications cover all six. The editor is the `templates/_gunboats.html` macro, shared by the
+  Design tab's loadout and the Fleet tab.
+- FTL gunboat squadrons need no carrier (p.80): `fleet["gunboat_squadrons"]` [{uid, type, ...}],
+  FTL implied and paid (`rules.independent_squadron`). `fleet_rules.gunboat_squadron_points`
+  adds them to the total through the ruleset's `gunboat_squadron_points`, gated on
+  `gunboat_types` like the loadout editor; `fleet_issues` validates them and counts them in the
+  tech base. They are not ships: no card, no morale MASS, no dummy-bogey allowance; the PDF lists
+  them on the roster and the tracker.
 - The Imperial tech base (`techbase.py`, PC pp.125-127) is the fleet option `pc_tech_base`:
   `design_techs()` maps systems, hull options and loadouts to technologies,
   `with_prerequisites()` closes them, and `fleet_issues` reports the choices as an info and over
