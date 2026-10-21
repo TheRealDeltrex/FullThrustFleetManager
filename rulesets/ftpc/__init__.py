@@ -89,6 +89,9 @@ class FTPCRuleset:
     def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
         return fleet_common.morale_mass(ships)
 
+    def scan_class(self, design: dict) -> str:
+        return rules.ship_class(common.as_int(design.get("tmf")))
+
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *(r for r in fb_tech.races() if r.id in ALIEN_RACES)]
 

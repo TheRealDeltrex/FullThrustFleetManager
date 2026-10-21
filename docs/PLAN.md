@@ -808,7 +808,8 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    fleets into sides, a week counter, a campaign log, `.FTCampaign`) and C2 (a hex star map:
    random, drawn by hand, or loaded from an `.FTStarmap` file) and C3 (task forces placed on
    star systems, jump orders of up to 6 hexes a week, Next week moves them and logs contacts)
-   are done.
+   and C4 (contacts: the long-range scan, fight / withdraw / stand off with the catch roll, the
+   battle result and who holds the system) are done.
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

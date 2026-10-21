@@ -108,6 +108,11 @@ class FT2Ruleset:
     def morale_mass(self, ships: list) -> tuple[int, int] | None:
         return None
 
+    def scan_class(self, design: dict) -> str:
+        """FT p.29's classes by MASS; a supership reads as a capital, a merchant by its MASS."""
+        cls = rules.ship_class(dict(design, hull_kind=""))
+        return "capital" if cls == "supership" else cls
+
     def adopt_design(self, design: dict) -> dict | None:
         return None
 
