@@ -121,6 +121,7 @@ SYSTEM_RULES: dict[str, SystemRule] = {
         lambda s: _("Class-{n} hyperspatial distortion cannon", n=_int(s.get("class"), 1)),
     ),
     "superior_sensors": (lambda s, t: 2, lambda s, m: 30, lambda s: _("Superior sensors")),
+    "enhanced_sensors": (lambda s, t: 2, lambda s, m: 8, lambda s: _("Enhanced sensors")),  # as CD/PC
     "submunition": (lambda s, t: 1, lambda s, m: 3, lambda s: _("Submunition pack")),
     "sm_launcher": (lambda s, t: 3, lambda s, m: 9, lambda s: _("Salvo missile launcher")),
     "sm_magazine": (

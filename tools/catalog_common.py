@@ -25,7 +25,8 @@ System notation, space separated, `*n` repeats a token:
   RC<class>[:arcs]  Crusty rocket cannon (as a beam)
   HDC<class>[:arc]  hyperspatial distortion cannon (defaults to F)
   LRPT:arcs         long-range pulse torpedo
-  AMT  anti-matter torpedo   SSENS  superior sensors   AGE:<mass>  MASS lost to age
+  AMT  anti-matter torpedo   SSENS  superior sensors   ESENS  enhanced sensors
+  AGE:<mass>  MASS lost to age
 Arcs are comma separated ("F,FS,FP") or "all".
 """
 
@@ -120,6 +121,8 @@ def parse_systems(notation: str, ruleset: str) -> tuple[list[dict], dict]:
             add({"type": "amt"})
         elif head == "SSENS":
             add({"type": "superior_sensors"})
+        elif head == "ESENS":
+            add({"type": "enhanced_sensors"})
         elif head == "AGE":
             add({"type": "age_penalty", "mass": int(rest)})
         elif head == "VS":
