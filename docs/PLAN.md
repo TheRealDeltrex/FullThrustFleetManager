@@ -700,7 +700,7 @@ helpers (9.5). Destroyed ships stay in the fleet (greyed, excluded from points) 
 ### 11.2 Hooks reserved now for the campaign module
 
 `fleet.campaign_id`, `ship.location`, `log[].week`, statuses `docked` and `hulk`. Do not reuse
-them for anything else.
+them for anything else. `fleet.campaign_id` and `fleet.campaign_side` are in use since step C1.
 
 ### 11.3 Campaign module (after v1, optional for users)
 
@@ -803,7 +803,9 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    data-model change - the power pools are per-turn play state, so the sheet prints a box and
    nothing is stored - but the Phalon layered shell did: `armour_layers` beside `armour`,
    which stays the total, at `schema_version` 2.
-4. Campaign module (11.3) with installations and the random campaign generator
+4. Campaign module (11.3) with installations and the random campaign generator, in steps C1-C8
+   (campaign manager) and G1-G4 (generator); see the roadmap doc. C1 (campaigns grouping
+   fleets into sides, a week counter, a campaign log, `.FTCampaign`) is done.
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

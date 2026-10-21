@@ -179,7 +179,13 @@ What exists:
   shape that was clicked. Clicking the last marked box unmarks it. The fields under the diagram
   do the same thing, so the tab works with scripting off; the dice buttons are optional too.
 - Hooks reserved for the later campaign module (PLAN 11.2) are in use but not repurposed:
-  `ship.location`, `log[].week`, statuses `docked` and `hulk`, `fleet.campaign_id` (unused).
+  `ship.location`, `log[].week`, statuses `docked` and `hulk`.
+- Campaigns (PLAN 11.3, roadmap step C1): `campaigns/<id>.json` holds name, ruleset, week,
+  sides and a log; membership lives on the fleet (`campaign_id`, `campaign_side`), so a fleet is
+  in one campaign at a time and every fleet in it shares the campaign's ruleset. The campaign bar
+  on the Campaign tab posts fleet actions (`new_campaign`, `join_campaign`, `leave_campaign`) to
+  `/campaign/<fleet>/action` and campaign actions to `/campaigns/<id>/action`. `.FTCampaign`
+  exports the campaign with its fleets and their designs; backups carry `campaigns/`.
 
 ## Rulebook viewer
 
@@ -255,7 +261,8 @@ What exists:
 - **Normalisation is the trust boundary.** Everything read from the library or an import goes
   through `normalize_design()` / `normalize_fleet()`, which clamp types and drop junk and are the
   only place new fields are accepted. Add every new field there in the same commit.
-- Export/import (PLAN 5.6): `.FTFleet` (fleet + its non-catalog designs + custom factions),
+- Export/import (PLAN 5.6): `.FTCampaign` (campaign + its fleets + their designs),
+  `.FTFleet` (fleet + its non-catalog designs + custom factions),
   `.FTDesign`, `.FTBackup` (a zip of the library). `import_file()` returns
   `(ok, msg, conflicts)`; a *newer local copy* is kept and named in `conflicts`, and the caller
   re-calls with `overwrite_newer=True` after the player confirms. `modified` is an ISO string at
