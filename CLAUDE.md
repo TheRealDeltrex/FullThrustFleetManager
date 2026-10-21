@@ -186,6 +186,14 @@ What exists:
   on the Campaign tab posts fleet actions (`new_campaign`, `join_campaign`, `leave_campaign`) to
   `/campaign/<fleet>/action` and campaign actions to `/campaigns/<id>/action`. `.FTCampaign`
   exports the campaign with its fleets and their designs; backups carry `campaigns/`.
+- Star maps (step C2): `campaign["map"]` = {width, height, seed, systems [{q, r, name, kind
+  settled|outpost|empty, owner side id or "", base}]}, normalised by `store.normalize_starmap`.
+  `starmap.py` is pure: flat-topped hexes in odd-q offset coordinates (`hex_distance`, labels
+  "0304" from 01), the seeded `generate()` (an app rule: stars two hexes apart, homes with naval
+  bases for the first two sides) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
+  so picking one needs no script. The map keeps a dark sky in every look. `.FTStarmap` files
+  carry the map and the sides; loading one maps owners onto this campaign's sides by position.
+  Settings > Import refuses them and points to the Star map panel.
 
 ## Rulebook viewer
 
