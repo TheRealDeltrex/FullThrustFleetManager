@@ -815,7 +815,7 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    Incident of FT pp.36-38 as a ready-made campaign) and C8 (installations: stations placed in
    task forces that stay put, fight where they stand and serve as repair yards) are done, and
    so is G1 (the map generator's settings: spacing, settled and outpost shares, bases per side,
-   names).
+   names) and G2 (scenario templates: invasion, raid, border war).
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

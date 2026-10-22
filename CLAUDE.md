@@ -236,6 +236,10 @@ What exists:
   draws, else the sides without objectives (the defenders) win. A result stops Next week until
   `reopen_campaign`. `store.lafayette_campaign()` sets up FT pp.36-38 from `LAFAYETTE` (map
   positions read off FT p.37); its force budgets go in the notes.
+- Scenarios (step G2): `scenarios.py` is pure; `build(kind, map, sides, attacker)` turns
+  `invasion` / `raid` / `border_war` (all app rules) into owners, objectives, a last week and a
+  note, and `store.apply_scenario` applies it in week 1 before any contact. A side's home is its
+  first naval base on the map. Objectives only measure holdings, so a template is a holding.
 - Installations (step C8) are ordinary fleet ships whose design `fleet_common.installation()`
   accepts: a starbase, a gate, or a design with neither FTL nor thrust (FT p.27; a PC monster
   ship `section` is not one). Placed in a task force on a system they never move and cannot
