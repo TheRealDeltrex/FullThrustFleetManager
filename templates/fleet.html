@@ -236,7 +236,7 @@
            say where designs come from instead of offering a picker with nothing in it. #}
         {% if not selected.library_total %}
         <p class="body muted">{{ _("No ship designs for {ruleset} yet.", ruleset=selected.ruleset.name) }}
-          <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab first.") }}</a></p>
+          <a href="{{ url_for('design') }}">{{ _("Design one in the Ship Design tab first.") }}</a></p>
         {% else %}
         {# Which ships the list offers: the fleet's own faction, all of them, or the factions
            ticked in the Pick popover. Remembered per fleet. #}
@@ -270,7 +270,7 @@
           <p class="body muted">{{ _("Tick one or more factions to list their ships.") }}</p>
           {% else %}
         <p class="body muted">{{ _("No {faction} ship designs yet.", faction=selected.faction_name) }}
-          <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab,") }}</a>
+          <a href="{{ url_for('design') }}">{{ _("Design one in the Ship Design tab,") }}</a>
           {{ _("or show all ships to pick from every faction.") }}</p>
           {% endif %}
         {% else %}
