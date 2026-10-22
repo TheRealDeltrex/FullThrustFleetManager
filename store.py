@@ -24,6 +24,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import fleet_rules
+import forcegen
 import migrations
 import paths
 import portraits
@@ -1659,6 +1660,82 @@ def apply_scenario(campaign: dict, kind: str, attacker: str) -> tuple[bool, str]
     campaign["end_week"], campaign["result"] = setup["end_week"], None
     campaign["notes"] = (setup["notes"] + ("\n" + campaign["notes"] if campaign["notes"] else ""))[:4000]
     return True, _("{scenario} set up.", scenario=scenarios.label(kind))
+
+
+def force_candidates(ruleset: str, faction: str | None) -> list[tuple[str, int, str]]:
+    """(id, points, scan class) of the catalog warships a generated force may take (G3): the
+    faction's FTL warships, merchants, installations and sections left out."""
+    rs = RULESETS[ruleset]
+    options = fleet_rules.default_options(ruleset)
+    out = []
+    for d in catalog_designs(ruleset):
+        if (d.get("faction") or None) != (faction or None) or d.get("hull_kind") not in ("", "warship"):
+            continue
+        if d.get("ftl") is not True or fleet_common.installation(d):
+            continue
+        out.append((d["id"], fleet_rules.ship_points({}, d, options), rs.scan_class(d)))
+    return sorted(out)
+
+
+def generated_factions(ruleset: str) -> list[tuple[str, str]]:
+    """(faction id or "", name) for every faction the catalog has warships for in the ruleset."""
+    seen = {d.get("faction") or "" for d in catalog_designs(ruleset)
+            if d.get("hull_kind") in ("", "warship") and d.get("ftl") is True}
+    return sorted(((f, faction_name(f, ruleset) or _("No faction")) for f in seen), key=lambda x: x[1])
+
+
+def generate_forces(campaign: dict, side: str, faction: str, budget: int, defence: int = 0,
+                    seed: int | None = None) -> tuple[dict | None, str]:
+    """A new fleet for the side (step G3) bought from the catalog with `budget` points, joined
+    to the campaign and, on a map, formed up as a task force at the side's home. `defence`
+    points more go to each settled world the side holds, as a garrison force there; the books
+    print no non-FTL warships, so garrisons are FTL warships too (an app rule)."""
+    if side not in {s["id"] for s in campaign["sides"]}:
+        return None, _("Side not found.")
+    candidates = force_candidates(campaign["ruleset"], faction or None)
+    if not candidates:
+        return None, _("The catalog has no warships for that faction in this ruleset.")
+    rng = random.Random(random.randrange(1, 1_000_000) if seed is None else seed)
+    race = next((f.get("race") for f in builtin_factions(campaign["ruleset"]) if f["id"] == faction), None)
+    side_name = _side_name(campaign, side)
+    fleet, msg = create_fleet(campaign["ruleset"], _("{side} fleet", side=side_name),
+                              race=race or "human", faction=faction or None, points_limit=0)
+    if not fleet:
+        return None, msg
+    fleet["campaign_id"], fleet["campaign_side"] = campaign["id"], side
+    groups: list[tuple[dict | None, list[str]]] = []
+    grid = campaign["map"]
+    home = scenarios.home(grid, side) if grid else None
+    groups.append((home, forcegen.pick(candidates, budget, rng)))
+    if grid and defence:
+        for system in grid["systems"]:
+            if system["owner"] == side and system["kind"] == "settled":
+                groups.append((system, forcegen.pick(candidates, defence, rng)))
+    total = 0
+    for system, ids in groups:
+        if not ids:
+            continue
+        squadron = system["name"] if system else ""
+        if squadron:
+            fleet["squadrons"].append({"id": f"sq{len(fleet['squadrons']) + 1}", "name": squadron[:40]})
+        before = {s["uid"] for s in fleet["ships"]}
+        for design_id in ids:
+            add_ship(fleet, design_id, squadron=fleet["squadrons"][-1]["id"])
+        total += len(ids)
+        if system:
+            name = _("Main fleet") if system is home else _("{system} garrison", system=system["name"])
+            force, _msg = add_force(campaign, side, name, system["q"], system["r"])
+            if force:
+                force["ships"] = [{"fleet": fleet["id"], "uid": s["uid"]}
+                                  for s in fleet["ships"] if s["uid"] not in before]
+    if not total:
+        delete_fleet(fleet["id"])
+        return None, _("Nothing in the catalog fits {n} points.", n=budget)
+    used = {s["squadron"] for s in fleet["ships"]}
+    fleet["squadrons"] = [q for q in fleet["squadrons"] if q["id"] in used]
+    save_fleet(fleet)
+    points = fleet_rules.fleet_points(fleet, designs_for_fleet(fleet))
+    return fleet, _("{fleet}: {n} ships, {points} points.", fleet=fleet["name"], n=total, points=points)
 
 
 def reopen_campaign(campaign: dict) -> tuple[bool, str]:

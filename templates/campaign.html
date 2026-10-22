@@ -115,6 +115,26 @@
                 <noscript><button class="btn" type="submit" name="action" value="set_objectives">{{ _("Apply") }}</button></noscript>
               </form>
             {% endif %}
+            <details class="stack">
+              <summary>{{ _("Generate a fleet") }}</summary>
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <select class="input" name="side" aria-label="{{ _('Side') }}">
+                  {% for side in c.sides %}<option value="{{ side.id }}">{{ side.name }}</option>{% endfor %}
+                </select>
+                <select class="input" name="faction" aria-label="{{ _('Faction') }}">
+                  {% for fid, fname in selected.generated_factions %}<option value="{{ fid }}" {% if fid == f.faction %}selected{% endif %}>{{ fname }}</option>{% endfor %}
+                </select>
+                <label class="check">{{ _("Points") }}
+                  <input class="input" type="number" min="1" name="points" value="3000" required /></label>
+                {% if c.map %}
+                  <label class="check">{{ _("Garrison per settled world") }}
+                    <input class="input" type="number" min="0" name="defence" value="0" /></label>
+                {% endif %}
+                <label class="check">{{ _("Seed") }}
+                  <input class="input sm" type="number" name="seed" min="1" placeholder="{{ _('any') }}" /></label>
+                <button class="btn" type="submit" name="action" value="generate_forces">{{ _("Generate") }}</button>
+              </form>
+            </details>
             <div class="row">
               <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row"
                     data-autosave="join_campaign">
