@@ -49,8 +49,24 @@
               </div>
               <textarea class="input wide" name="notes" rows="2" aria-label="{{ _('Campaign notes') }}"
                         placeholder="{{ _('Notes') }}">{{ c.notes }}</textarea>
+              <div class="row">
+                <input type="hidden" name="hidden" value="0" />
+                <label class="check"><input type="checkbox" name="hidden" value="1" {% if c.hidden %}checked{% endif %} />
+                  {{ _("Hidden movement") }}</label>
+              </div>
               <noscript><button class="btn primary" type="submit" name="action" value="update_campaign">{{ _("Apply") }}</button></noscript>
             </form>
+            {% if c.hidden and selected.view %}
+              <form method="post" action="{{ url_for('campaign_view', campaign_id=c.id) }}" class="row">
+                <span class="muted">{{ _("Umpire view") if selected.view.umpire else _("{side}'s view", side=selected.view.side_name) }}</span>
+                {% if selected.view.umpire %}
+                  <button class="btn sm" type="submit" name="view" value="show">{{ _("Back to {side}'s view", side=selected.view.side_name) }}</button>
+                {% else %}
+                  <button class="btn sm" type="submit" name="view" value="umpire">{{ _("Umpire view") }}</button>
+                {% endif %}
+                <button class="btn sm" type="submit" name="view" value="hand">{{ _("Hand over") }}</button>
+              </form>
+            {% endif %}
             <div class="row">
               <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row"
                     data-autosave="join_campaign">
@@ -74,7 +90,7 @@
               </form>
             </div>
             <div class="stack">
-              {% for entry in c.log %}
+              {% for entry in selected.log %}
                 <p><b>{{ _("Week {n}", n=entry.week) }}</b> · {{ entry.text }}</p>
               {% endfor %}
               <form method="post" action="{{ to_campaign }}" class="row">
@@ -107,6 +123,19 @@
         </div>
       </div>
 
+      {# Hidden movement (step C6): a hand-over screen whenever the side at the screen changes. #}
+      {% set view = selected.view %}
+      {% if view and view.handover %}
+        <div class="panel handover">
+          <div class="body stack">
+            <h3>{{ _("Hand over to {side}", side=view.side_name or f.name) }}</h3>
+            <form method="post" action="{{ url_for('campaign_view', campaign_id=c.id) }}" class="row">
+              <button class="btn primary" type="submit" name="view" value="show">{{ _("Show {side}'s view", side=view.side_name or f.name) }}</button>
+              <button class="btn ghost" type="submit" name="view" value="umpire">{{ _("Umpire view") }}</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
       {# The campaign's star map (PLAN 11.3, step C2): each hex is a link that picks it. #}
       {% if c %}
         {% set sm = selected.starmap %}
@@ -307,20 +336,23 @@
                 </div>
                 {% if row.own and row.why %}<span class="muted">{{ row.why }}</span>{% endif %}
                 <div class="row">
+                  {% if not row.shown %}<span class="muted">{{ _("Ships unknown") }}</span>{% else %}
+                  {% if tf.dummy %}<span class="chip">{{ _("Dummy marker") }}</span>{% endif %}
                   {% for fl, ship, design in row.ships %}
                     <span class="chip">{{ ship.table_id }} {{ ship.name }}{% if fl.id != f.id %} <span class="muted">· {{ fl.name }}</span>{% endif %}
                       {% if row.own %}<button class="btn sm ghost" type="submit" name="action" value="unassign_ship"
                         formaction="{{ to_campaign }}?ship={{ fl.id }}:{{ ship.uid }}" aria-label="{{ _('Leave') }}">×</button>{% endif %}</span>
                   {% else %}
-                    <span class="muted">{{ _("No ships") }}</span>
+                    {% if not tf.dummy %}<span class="muted">{{ _("No ships") }}</span>{% endif %}
                   {% endfor %}
+                  {% endif %}
                 </div>
                 {% if row.own %}
                   <div class="row"><div class="spacer"></div>
                     <button class="btn sm ghost" type="submit" name="action" value="remove_force">{{ _("Disband") }}</button></div>
                 {% endif %}
               </form>
-              {% if row.own and selected.free_ships %}
+              {% if row.own and selected.free_ships and not tf.dummy %}
                 <form method="post" action="{{ to_campaign }}" class="row">
                   <input type="hidden" name="force" value="{{ tf.id }}" />
                   <input type="hidden" name="fleet" value="{{ f.id }}" />
@@ -345,6 +377,7 @@
                     <option value="{{ sys.q }},{{ sys.r }}">{{ sys.name }}</option>
                   {% endfor %}
                 </select>
+                <label class="check"><input type="checkbox" name="dummy" /> {{ _("Dummy marker") }}</label>
                 <button class="btn" type="submit" name="action" value="add_force">{{ _("New task force") }}</button>
                 {% if selected.free_ships %}<span class="muted">{{ _("with this fleet's {n} unassigned ships", n=selected.free_ships|length) }}</span>{% endif %}
               </form>
@@ -485,6 +518,7 @@
       {% else %}
         <div class="panel empty">{{ _("This fleet has no ships yet.") }}</div>
       {% endfor %}
+      {% endif %}
 
       <div class="panel">
         <h3 class="fold" data-fold="campaign-log" tabindex="0">{{ _("Fleet log") }}</h3>

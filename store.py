@@ -1142,15 +1142,21 @@ def normalize_campaign(doc: object) -> dict | None:
         if isinstance(side, dict) and _safe_id(side.get("id")) and side["id"] not in seen:
             seen.add(side["id"])
             sides.append({"id": side["id"], "name": _as_str(side.get("name"), side["id"], 40)})
-    log = [
-        {"week": _as_int(e.get("week"), 0, 0, 100000), "text": _as_str(e.get("text"), limit=1000)}
-        for e in doc.get("log", []) if isinstance(e, dict)
-    ] if isinstance(doc.get("log"), list) else []
+    side_ids = {s["id"] for s in sides}
+    log = []
+    for e in doc.get("log", []) if isinstance(doc.get("log"), list) else []:
+        if isinstance(e, dict):
+            entry = {"week": _as_int(e.get("week"), 0, 0, 100000), "text": _as_str(e.get("text"), limit=1000)}
+            # Only these sides see the entry under hidden movement (C6); absent means everyone.
+            if isinstance(e.get("sides"), list):
+                entry["sides"] = [s for s in e["sides"] if s in side_ids]
+            log.append(entry)
     return {
         "schema_version": migrations.CURRENT,
         "id": doc["id"],
         "ruleset": doc["ruleset"],
         "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
+        "hidden": doc.get("hidden") is True,
         "week": _as_int(doc.get("week"), 1, 1, 100000),
         "sides": sides[:MAX_SIDES] if len(sides) >= 2 else _default_sides(),
         "log": log,
@@ -1223,8 +1229,9 @@ def _norm_forces(raw: object, side_ids: set[str], grid: dict | None) -> list[dic
                     seen_ships.add(key)
                     ships.append({"fleet": ref["fleet"], "uid": ref["uid"]})
         seen_ids.add(f["id"])
+        dummy = f.get("dummy") is True
         out.append({"id": f["id"], "side": f["side"], "name": _as_str(f.get("name"), f["id"], 40),
-                    "q": q, "r": r, "order": order, "ships": ships})
+                    "q": q, "r": r, "order": order, "ships": [] if dummy else ships, "dummy": dummy})
     return out
 
 
@@ -1356,7 +1363,10 @@ def leave_campaign(fleet: dict) -> tuple[bool, str]:
 
 
 def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
-                    notes: str | None = None, sides: dict[str, str] | None = None) -> tuple[bool, str]:
+                    notes: str | None = None, sides: dict[str, str] | None = None,
+                    hidden: bool | None = None) -> tuple[bool, str]:
+    if hidden is not None:
+        campaign["hidden"] = hidden
     if name is not None:
         campaign["name"] = name.strip()[:80] or campaign["name"]
     if week is not None:
@@ -1387,7 +1397,10 @@ def force_ships(campaign: dict, force: dict,
     return out
 
 
-def add_force(campaign: dict, side: str, name: str, q: int, r: int) -> tuple[dict | None, str]:
+def add_force(campaign: dict, side: str, name: str, q: int, r: int,
+              dummy: bool = False) -> tuple[dict | None, str]:
+    """A task force on a star system. A dummy marker (FT p.34) has no ships, moves like a fleet
+    and is exposed and removed when it ends a week beside an enemy force (an app rule)."""
     grid = campaign.get("map")
     if not grid or not starmap.system_at(grid, q, r):
         return None, _("Pick a star system for the task force.")
@@ -1400,7 +1413,7 @@ def add_force(campaign: dict, side: str, name: str, q: int, r: int) -> tuple[dic
     while f"tf{n}" in taken:
         n += 1
     force = {"id": f"tf{n}", "side": side, "name": name.strip()[:40] or _("Task force {n}", n=n),
-             "q": q, "r": r, "order": None, "ships": []}
+             "q": q, "r": r, "order": None, "ships": [], "dummy": dummy}
     campaign["forces"].append(force)
     return force, _("Task force added.")
 
@@ -1425,7 +1438,7 @@ def assign_ships(campaign: dict, force_id: str, fleet: dict, uids: list[str]) ->
     """Moves the fleet's chosen ships into the force, out of any other. Only a fleet of the
     force's side may join it, and a ship joins where the force is."""
     force = _force(campaign, force_id)
-    if not force:
+    if not force or force["dummy"]:
         return False, _("Task force not found.")
     if fleet.get("campaign_id") != campaign["id"] or fleet.get("campaign_side") != force["side"]:
         return False, _("Only ships of the force's side can join it.")
@@ -1451,7 +1464,7 @@ def unassign_ship(campaign: dict, force_id: str, fleet_id: str, uid: str) -> tup
 
 def reachable_systems(campaign: dict, force: dict) -> tuple[list[tuple[dict, int]], str]:
     """(systems the force can jump to this week with their distance, why none)."""
-    reach, why = fleet_rules.force_reach(
+    reach, why = (fleet_rules.FTL_HEXES_PER_WEEK, "") if force["dummy"] else fleet_rules.force_reach(
         [(ship, design) for _f, ship, design in force_ships(campaign, force)])
     here = (force["q"], force["r"])
     systems = [(s, starmap.hex_distance(here, (s["q"], s["r"]))) for s in campaign["map"]["systems"]]
@@ -1472,6 +1485,26 @@ def set_force_order(campaign: dict, force_id: str, dest: tuple[int, int] | None)
                                n=fleet_rules.FTL_HEXES_PER_WEEK)
     force["order"] = [target["q"], target["r"]]
     return True, _("{name} jumps to {dest}.", name=force["name"], dest=target["name"])
+
+
+def sees_force(campaign: dict, side: str, force: dict) -> bool:
+    """Under hidden movement (FT p.34) a side sees its own forces and those it is in contact
+    with this week; otherwise every marker is on the table."""
+    if not campaign["hidden"] or force["side"] == side:
+        return True
+    return any(side in c["sides"] and force["side"] in c["sides"]
+               and (c["q"], c["r"]) == (force["q"], force["r"]) for c in this_weeks_contacts(campaign))
+
+
+def sees_log(campaign: dict, side: str, entry: dict) -> bool:
+    return not campaign["hidden"] or "sides" not in entry or side in entry["sides"]
+
+
+def _exposed_dummies(campaign: dict) -> list[dict]:
+    """Dummy markers sharing a hex with another side's real force."""
+    real = {((f["q"], f["r"]), f["side"]) for f in campaign["forces"] if f["ships"]}
+    return [f for f in campaign["forces"] if f["dummy"]
+            and any(where == (f["q"], f["r"]) and side != f["side"] for where, side in real)]
 
 
 def meetings(campaign: dict) -> list[tuple[dict, list[dict]]]:
@@ -1632,7 +1665,7 @@ def set_contact_choice(campaign: dict, contact_id: str, side: str, choice: str,
         text = _("{system}: battle (catch roll {roll}).", system=where, roll=contact["roll"])
     else:
         text = _("{system}: battle.", system=where)
-    campaign["log"].append({"week": campaign["week"], "text": text})
+    campaign["log"].append({"week": campaign["week"], "text": text, "sides": list(contact["sides"])})
     return True, text
 
 
@@ -1654,7 +1687,7 @@ def set_battle_result(campaign: dict, contact_id: str, result: str, notes: str =
         contact["leaving"] = [s for s in contact["sides"] if s != result]
         text = _("{system}: battle won by {side}.", system=where, side=_side_name(campaign, result))
         text += _claim(campaign, contact, result)
-    campaign["log"].append({"week": campaign["week"], "text": text})
+    campaign["log"].append({"week": campaign["week"], "text": text, "sides": list(contact["sides"])})
     return True, text
 
 
@@ -1696,7 +1729,7 @@ def next_week(campaign: dict) -> tuple[bool, str]:
         system = starmap.system_at(campaign["map"], force["q"], force["r"])
         campaign["log"].append({"week": campaign["week"], "text": _(
             "{name} ({side}) arrive at {system}.", name=force["name"],
-            side=_side_name(campaign, force["side"]), system=system["name"])})
+            side=_side_name(campaign, force["side"]), system=system["name"]), "sides": [force["side"]]})
     touched = set()
     for force in campaign["forces"]:
         system = starmap.system_at(campaign["map"], force["q"], force["r"]) if campaign["map"] else None
@@ -1708,12 +1741,21 @@ def next_week(campaign: dict) -> tuple[bool, str]:
     for fleet_id in touched:
         save_fleet(fleets[fleet_id])
     names = {s["id"]: s["name"] for s in campaign["sides"]}
+    for dummy in _exposed_dummies(campaign):
+        campaign["forces"].remove(dummy)
+        system = starmap.system_at(campaign["map"], dummy["q"], dummy["r"])
+        campaign["log"].append({"week": campaign["week"], "text": _(
+            "{name} ({side}) at {system} was a dummy marker.", name=dummy["name"],
+            side=names[dummy["side"]], system=system["name"] if system else "")})
     found = meetings(campaign)
     for system, forces in found:
         text = _("Contact at {system}: {forces}.", system=system["name"],
                  forces=", ".join(f"{f['name']} ({names[f['side']]})" for f in forces))
-        campaign["log"].append({"week": campaign["week"], "text": text})
+        campaign["log"].append({"week": campaign["week"], "text": text,
+                                "sides": list(dict.fromkeys(f["side"] for f in forces))})
         _open_contact(campaign, system, forces, fleets)
+    if campaign["hidden"]:
+        return True, _("Week {n}.", n=campaign["week"])
     if found:
         return True, _("Week {n}: contact at {systems}.", n=campaign["week"],
                        systems=", ".join(system["name"] for system, _f in found))
