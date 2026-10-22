@@ -1,6 +1,6 @@
 {% from "_themes.html" import theme_options %}
 <!DOCTYPE html>
-<html lang="{{ LANG }}" data-theme="{{ THEME }}">
+<html lang="{{ LANG }}" data-theme="{{ THEME }}" data-path="{{ request.path }}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -96,6 +96,7 @@
       {% block content %}{% endblock %}
     </main>
 
+    <script src="{{ url_for('static', filename='keepscroll.js') }}"></script>
     <script src="{{ url_for('static', filename='autosave.js') }}"></script>
     <script src="{{ url_for('static', filename='collapse.js') }}"></script>
     <script src="{{ url_for('static', filename='reorder.js') }}"></script>

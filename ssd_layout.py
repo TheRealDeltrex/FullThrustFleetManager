@@ -936,7 +936,9 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         if left + min(row_len, per) * cell > width - 12:
             armour_left = width / 2 - min(row_len, per) * cell / 2
         for i in range(row_len):
-            ccx = armour_left + (i % per) * cell + cell / 2
+            # Damage takes the circles right to left, so number them from the right end.
+            line_len = min(per, row_len - (i // per) * per)
+            ccx = armour_left + (line_len - 1 - i % per) * cell + cell / 2
             ccy = y + (i // per) * cell + cell / 2
             box_index += 1
             prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9,
@@ -950,7 +952,8 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     hull_done = int(damage.get("hull") or 0)
     numbered = 0
     for row_index, row_len in enumerate(track):
-        for column in range(row_len):
+        # Damage marks each row off right to left, so the boxes are numbered from the right end.
+        for column in reversed(range(row_len)):
             numbered += 1
             bx, by = left + column * cell, y + row_index * cell
             prims.append(Rect(bx, by, cell, cell, fill=WHITE, stroke=0.9,
