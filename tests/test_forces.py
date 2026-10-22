@@ -115,7 +115,8 @@ def test_orders_reach_six_hexes_and_next_week_moves_and_logs_the_contact():
     ok, msg = store.next_week(campaign)
     assert ok and msg == "Week 2: contact at Bravo."
     assert (hunters["q"], hunters["order"]) == (5, None)
-    assert campaign["log"][-1] == {"week": 2, "text": "Contact at Bravo: Hunters (Blue), Raiders (Red)."}
+    assert campaign["log"][-1] == {"week": 2, "text": "Contact at Bravo: Hunters (Blue), Raiders (Red).",
+                                   "sides": ["blue", "red"]}
     assert {s["location"] for s in store.get_fleet(blue["id"])["ships"]} == {"Bravo"}
     assert [system["name"] for system, _forces in store.meetings(campaign)] == ["Bravo"]
 

@@ -220,6 +220,14 @@ What exists:
   `repair_ship` once per campaign week (`ship["repaired_week"]`); without a map nothing is
   checked. `campaign["reinforcements"]` [{id rf1.., side, name, week, q, r, ships}] become task
   forces in `next_week` (`store._arrivals`) before contacts are found.
+- Hidden movement (step C6): `campaign["hidden"]`. The tab looks through `_campaign_view()`: the
+  current fleet's side, behind a hand-over screen whenever that side changes
+  (`session["campaign_seen"]`), or the umpire (`session["campaign_umpire"]`), switched by
+  `POST /campaigns/<id>/view`. A side sees its own forces and those it is in contact with
+  (`store.sees_force`), others' orders and reinforcements only without hidden movement, and log
+  entries whose optional `sides` include it (`store.sees_log`). Other sides' ship lists are never
+  shown. A force with `dummy` has no ships, jumps 6 and is removed with a log entry when it ends
+  a week beside an enemy force (`store._exposed_dummies`).
 
 ## Rulebook viewer
 
