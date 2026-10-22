@@ -9,6 +9,7 @@ from __future__ import annotations
 import io
 import json
 import logging
+import math
 import os
 import re
 import secrets
@@ -273,7 +274,7 @@ def _portrait_editor(design: dict, target: str, back: str, name: str) -> str | R
 
 # ---- Fleet overview tab (PLAN 9.3) -------------------------------------------------------------
 
-VIEWS = ("cards", "roster")
+VIEWS = ("cards", "roster", "dock")
 
 
 def current_fleet() -> dict | None:
@@ -387,11 +388,13 @@ def _fleet_context(fleet: dict, view: str) -> dict:
             designs[s["design_id"]], damage=s["damage"])))
         for s in fleet["ships"] if s["design_id"] in designs
     }
+    view = view if view in VIEWS else "cards"
     return {
         "fleet": fleet,
         "designs": designs,
         "ruleset": RULESETS.get(fleet["ruleset"]),
-        "view": view if view in VIEWS else "cards",
+        "view": view,
+        "dock": _dock_context(fleet, designs, options, groups) if view == "dock" else None,
         "report": report,
         "badges": fleet_rules.badges(fleet, designs),
         "counts": fleet_rules.ship_counts(fleet),
@@ -424,6 +427,32 @@ def _fleet_context(fleet: dict, view: str) -> dict:
         "option_keys": fleet_rules.ruleset_option_keys(fleet["ruleset"]),
         "option_label": fleet_rules.option_label,
     }
+
+
+def _dock_context(fleet: dict, designs: dict, options: dict, groups: list[dict]) -> dict | None:
+    """The Space Dock: one ship of the fleet laid out like the Ship Design tab, with refits."""
+    if not fleet["ships"]:
+        return None
+    wanted = request.args.get("ship") or (session.get("dock_ship") or {}).get(fleet["id"])
+    ship = next((s for s in fleet["ships"] if s["uid"] == wanted), fleet["ships"][0])
+    session["dock_ship"] = {**(session.get("dock_ship") or {}), fleet["id"]: ship["uid"]}
+    design = designs.get(ship["design_id"])
+    out = {"ship": ship, "design": design, "refit_groups": groups}
+    if not design:
+        return out
+    rs = RULESETS[design["ruleset"]]
+    breakdown = rs.design_breakdown(design, options)
+    out.update(
+        breakdown=breakdown,
+        mass_limit=breakdown.derived.get("mass_limit") or design["tmf"],
+        points=fleet_rules.ship_points(ship, design, options),
+        svg=Markup(ssd_layout.to_svg(ssd_layout.layout(design, damage=ship["damage"]), draggable=True)),
+        read_only=store.is_catalog(design["id"]),
+        used_by=len(store.ships_using(design["id"])),
+        # The refit list always holds the ship's own design, even when the filter hides it.
+        listed=any(d["id"] == design["id"] for g in groups for d in g["designs"]),
+    )
+    return out
 
 
 @app.route("/fleet")
@@ -568,6 +597,11 @@ def _order_ships(fleet: dict) -> tuple[bool, str]:
                                 request.form.get("order", "").split(","))
 
 
+@register_action("refit_ship")
+def _refit_ship(fleet: dict) -> tuple[bool, str]:
+    return store.refit_ship(fleet, request.form.get("uid", ""), request.form.get("design_id", ""))
+
+
 @register_action("update_ship")
 def _update_ship(fleet: dict) -> tuple[bool, str]:
     form = request.form
@@ -586,9 +620,16 @@ def fleet_action(fleet_id: str) -> Response:
         flash(msg, "success" if ok else "error")
         session.pop("fleet_id", None)
         return redirect(url_for("fleet_overview"))
-    if dispatch_action(fleet):
+    if request.form.get("action") == "refit_variant":
+        # A variant for this ship alone, opened in the Ship Design tab to be refitted there.
+        variant_id, msg = store.refit_as_variant(fleet, request.form.get("uid", ""))
+        if variant_id:
+            store.save_fleet(fleet)
+            return redirect(url_for("design_detail", design_id=variant_id))
+        flash(msg, "error")
+    elif dispatch_action(fleet):
         store.save_fleet(fleet)
-    return redirect(url_for("fleet_overview", view=request.args.get("view")))
+    return redirect(url_for("fleet_overview", view=request.args.get("view"), ship=request.args.get("ship")))
 
 
 @app.route("/fleet/<fleet_id>/check")
@@ -710,7 +751,7 @@ def _design_context(design: dict, dirty: bool) -> dict:
                        for d in rs.system_types(design.get("race", "human"), options)},
         "loadout_points": rs.loadout_points(design, None, {}),
         "max_stages": getattr(rs, "max_stages", 1),
-        "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design))),
+        "svg": Markup(ssd_layout.to_svg(ssd_layout.layout(design), draggable=True)),
         "npv_book": design["source"].get("npv_book") if design["source"].get("kind") == "catalog" else None,
         "source_name": common.WEB_SOURCES.get(design["source"].get("book") or ""),
         # Systems whose rules come from the Star Ranger pages link to them on the rules page.
@@ -988,6 +1029,29 @@ def design_update(design_id: str) -> Response:
         return redirect(url_for("design_detail", design_id=design_id))
     store.save_draft(working)
     return redirect(url_for("design_detail", design_id=design_id))
+
+
+@app.route("/design/<design_id>/layout", methods=["POST"])
+def design_layout(design_id: str) -> Response:
+    """Drag-to-arrange on a ship diagram: pin one system's icon, or reset to the automatic
+    layout. It is drawing, not rules, so it saves at once, catalog designs included."""
+    if request.form.get("action") == "reset_layout":
+        ok, msg = store.set_layout_hint(design_id, None)
+    else:
+        try:
+            x, y = float(request.form.get("x", "")), float(request.form.get("y", ""))
+        except ValueError:
+            x = y = math.nan
+        if not (math.isfinite(x) and math.isfinite(y)):
+            ok, msg = False, _("Please enter a valid number.")
+        else:
+            ok, msg = store.set_layout_hint(design_id, request.form.get("uid", ""), x, y)
+    if not ok:
+        flash(msg, "error")
+    back = request.form.get("next", "")
+    if not back.startswith("/") or back.startswith("//") or "\\" in back:
+        back = url_for("design_detail", design_id=design_id)
+    return redirect(back)
 
 
 # ---- Print dialog (PLAN 10.3) -------------------------------------------------------------------
