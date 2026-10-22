@@ -308,6 +308,7 @@ def _norm_ship(s: object) -> dict | None:
         "squadron": _as_str(s.get("squadron"), limit=64),
         "status": s.get("status") if s.get("status") in STATUSES else "ready",
         "location": _as_str(s.get("location"), limit=120),
+        "repaired_week": _as_int(s.get("repaired_week"), 0, 0, 100000),
         "loadout": _norm_loadout(s.get("loadout")),
         "damage": {
             "hull": _as_int(dmg.get("hull"), 0, 0, 10000),
@@ -941,7 +942,7 @@ def add_ship(fleet: dict, design_id: str, name: str = "", table_id: str = "", sq
         "name": name.strip()[:80] or design["name"],
         "table_id": table_id.strip()[:16] or suggest_table_id(fleet, design["type_code"]),
         "squadron": squadron if squadron in sq_ids else sq_ids[0],
-        "status": "ready", "location": "", "loadout": _norm_loadout(loadout),
+        "status": "ready", "location": "", "repaired_week": 0, "loadout": _norm_loadout(loadout),
         "damage": {"hull": 0, "armour": 0, "systems_out": [], "drive_hits": 0,
                    "fighters_lost": {}, "salvos_spent": {}, "one_shot_used": []},
         "notes": "",
@@ -1061,11 +1062,35 @@ def toggle_system_out(fleet: dict, uid: str, system_uid: str) -> tuple[bool, str
     return True, _("System knocked out.")
 
 
+def yard_block(fleet: dict, ship: dict) -> str:
+    """Why the ship cannot use a repair yard now, or "". A fleet in a campaign with a star map
+    repairs and replenishes only docked in a task force at one of its side's naval bases (FT
+    p.35), and repairs once a week. Without a map nothing is checked."""
+    campaign = get_campaign(fleet.get("campaign_id"))
+    if not campaign or not campaign["map"]:
+        return ""
+    force = next((f for f in campaign["forces"]
+                  if {"fleet": fleet["id"], "uid": ship["uid"]} in f["ships"]), None)
+    system = starmap.system_at(campaign["map"], force["q"], force["r"]) if force else None
+    if not system or not system["base"] or system["owner"] != fleet.get("campaign_side"):
+        return _("Only at a naval base of your side.")
+    if ship["status"] != "docked":
+        return _("Dock the ship at {base} first.", base=system["name"])
+    return ""
+
+
 def repair_ship(fleet: dict, uid: str, plan: dict) -> tuple[bool, str]:
     """Apply a week of repairs computed by fleet_rules.repair_plan()."""
     ship = _ship(fleet, uid)
     if not ship:
         return False, _("Ship not found.")
+    if why := yard_block(fleet, ship):
+        return False, why
+    campaign = get_campaign(fleet.get("campaign_id"))
+    if campaign and campaign["map"]:
+        if ship["repaired_week"] == campaign["week"]:
+            return False, _("Repaired this week already.")
+        ship["repaired_week"] = campaign["week"]
     damage = ship["damage"]
     damage["hull"] = max(0, damage["hull"] - int(plan.get("hull") or 0))
     damage["drive_hits"] = max(0, damage["drive_hits"] - int(plan.get("drive_hits") or 0))
@@ -1080,6 +1105,8 @@ def replenish_ship(fleet: dict, uid: str) -> tuple[bool, str]:
     ship = _ship(fleet, uid)
     if not ship:
         return False, _("Ship not found.")
+    if why := yard_block(fleet, ship):
+        return False, why
     ship["damage"].update(fighters_lost={}, salvos_spent={}, one_shot_used=[])
     return True, _("Ship replenished.")
 
@@ -1130,6 +1157,7 @@ def normalize_campaign(doc: object) -> dict | None:
         "map": (grid := normalize_starmap(doc.get("map"), {s["id"] for s in sides})),
         "forces": _norm_forces(doc.get("forces"), {s["id"] for s in sides}, grid),
         "contacts": _norm_contacts(doc.get("contacts"), {s["id"] for s in sides}, grid),
+        "reinforcements": _norm_reinforcements(doc.get("reinforcements"), {s["id"] for s in sides}, grid),
         "notes": _as_str(doc.get("notes"), limit=4000),
         "modified": _as_str(doc.get("modified"), limit=40),
     }
@@ -1197,6 +1225,30 @@ def _norm_forces(raw: object, side_ids: set[str], grid: dict | None) -> list[dic
         seen_ids.add(f["id"])
         out.append({"id": f["id"], "side": f["side"], "name": _as_str(f.get("name"), f["id"], 40),
                     "q": q, "r": r, "order": order, "ships": ships})
+    return out
+
+
+MAX_REINFORCEMENTS = 200
+
+
+def _norm_reinforcements(raw: object, side_ids: set[str], grid: dict | None) -> list[dict]:
+    """Reinforcements (step C5): a side's ships that join the campaign in a given week, arriving
+    as a task force in a star system (FT p.35)."""
+    if not grid or not isinstance(raw, list):
+        return []
+    out, seen = [], set()
+    for x in raw[:MAX_REINFORCEMENTS]:
+        if not isinstance(x, dict) or not _safe_id(x.get("id")) or x["id"] in seen:
+            continue
+        q, r = _as_int(x.get("q"), -1), _as_int(x.get("r"), -1)
+        if x.get("side") not in side_ids or not (0 <= q < grid["width"] and 0 <= r < grid["height"]):
+            continue
+        ships = [{"fleet": s["fleet"], "uid": s["uid"]} for s in x.get("ships", [])
+                 if isinstance(s, dict) and _safe_id(s.get("fleet")) and _safe_id(s.get("uid"))
+                 ] if isinstance(x.get("ships"), list) else []
+        seen.add(x["id"])
+        out.append({"id": x["id"], "side": x["side"], "name": _as_str(x.get("name"), x["id"], 40),
+                    "week": _as_int(x.get("week"), 1, 1, 100000), "q": q, "r": r, "ships": ships})
     return out
 
 
@@ -1382,6 +1434,8 @@ def assign_ships(campaign: dict, force_id: str, fleet: dict, uids: list[str]) ->
         return False, _("Tick the ships to add.")
     for other in campaign["forces"]:
         other["ships"] = [x for x in other["ships"] if not (x["fleet"] == fleet["id"] and x["uid"] in picked)]
+    for other in campaign["reinforcements"]:
+        other["ships"] = [x for x in other["ships"] if not (x["fleet"] == fleet["id"] and x["uid"] in picked)]
     force["ships"] += [{"fleet": fleet["id"], "uid": uid} for uid in picked]
     return True, _("{n} ships joined {name}.", n=len(picked), name=force["name"])
 
@@ -1430,6 +1484,51 @@ def meetings(campaign: dict) -> list[tuple[dict, list[dict]]]:
         if len({f["side"] for f in here}) > 1:
             out.append((system, here))
     return out
+
+
+def schedule_reinforcement(campaign: dict, fleet: dict, uids: list[str], week: int, q: int, r: int,
+                           name: str = "") -> tuple[bool, str]:
+    """The fleet's chosen ships, in no task force yet, arrive as a new force in week `week`."""
+    if fleet.get("campaign_id") != campaign["id"] or not fleet.get("campaign_side"):
+        return False, _("The fleet is not in this campaign.")
+    if not campaign["map"] or not starmap.system_at(campaign["map"], q, r):
+        return False, _("Pick a star system for the task force.")
+    if week <= campaign["week"]:
+        return False, _("Reinforcements arrive in a later week.")
+    taken = {(x["fleet"], x["uid"]) for group in campaign["forces"] + campaign["reinforcements"]
+             for x in group["ships"]}
+    picked = [uid for uid in uids if _ship(fleet, uid) and (fleet["id"], uid) not in taken]
+    if not picked:
+        return False, _("Tick the ships to add.")
+    if len(campaign["reinforcements"]) >= MAX_REINFORCEMENTS:
+        return False, _("A campaign has at most {n} task forces.", n=MAX_REINFORCEMENTS)
+    ids = {x["id"] for x in campaign["reinforcements"]}
+    n = len(ids) + 1
+    while f"rf{n}" in ids:
+        n += 1
+    campaign["reinforcements"].append({
+        "id": f"rf{n}", "side": fleet["campaign_side"], "week": min(week, 100000), "q": q, "r": r,
+        "name": name.strip()[:40] or _("Reinforcements {n}", n=n),
+        "ships": [{"fleet": fleet["id"], "uid": uid} for uid in picked]})
+    return True, _("Reinforcements arrive in week {n}.", n=week)
+
+
+def cancel_reinforcement(campaign: dict, reinforcement_id: str) -> tuple[bool, str]:
+    before = len(campaign["reinforcements"])
+    campaign["reinforcements"] = [x for x in campaign["reinforcements"] if x["id"] != reinforcement_id]
+    return len(campaign["reinforcements"]) < before, _("Reinforcements cancelled.")
+
+
+def _arrivals(campaign: dict) -> list[dict]:
+    """Turns this week's reinforcements into task forces; returns the new forces."""
+    arrived = []
+    for group in [x for x in campaign["reinforcements"] if x["week"] <= campaign["week"]]:
+        campaign["reinforcements"].remove(group)
+        force, _msg = add_force(campaign, group["side"], group["name"], group["q"], group["r"])
+        if force:
+            force["ships"] = group["ships"]
+            arrived.append(force)
+    return arrived
 
 
 def this_weeks_contacts(campaign: dict) -> list[dict]:
@@ -1593,6 +1692,11 @@ def next_week(campaign: dict) -> tuple[bool, str]:
             force["order"] = None
             moved = True
     campaign["week"] += 1
+    for force in _arrivals(campaign):
+        system = starmap.system_at(campaign["map"], force["q"], force["r"])
+        campaign["log"].append({"week": campaign["week"], "text": _(
+            "{name} ({side}) arrive at {system}.", name=force["name"],
+            side=_side_name(campaign, force["side"]), system=system["name"])})
     touched = set()
     for force in campaign["forces"]:
         system = starmap.system_at(campaign["map"], force["q"], force["r"]) if campaign["map"] else None
@@ -1647,6 +1751,7 @@ def new_starmap(campaign: dict, width: int, height: int) -> tuple[bool, str]:
     campaign["map"] = starmap.blank(width, height)
     campaign["forces"] = []
     campaign["contacts"] = []
+    campaign["reinforcements"] = []
     return True, _("Blank star map ready: click a hex to add a system.")
 
 
@@ -1658,6 +1763,7 @@ def random_starmap(campaign: dict, width: int, height: int, stars: int,
                                        [s["id"] for s in campaign["sides"]], seed)
     campaign["forces"] = []
     campaign["contacts"] = []
+    campaign["reinforcements"] = []
     placed = len(campaign["map"]["systems"])
     if placed < stars:
         return True, _("Only {n} stars fit on a map this size (seed {seed}).", n=placed, seed=seed)
@@ -1686,7 +1792,7 @@ def remove_star_system(campaign: dict, q: int, r: int) -> tuple[bool, str]:
     system = starmap.system_at(grid, q, r) if grid else None
     if not system:
         return False, _("No system on that hex.")
-    if any((f["q"], f["r"]) == (q, r) for f in campaign["forces"]):
+    if any((f["q"], f["r"]) == (q, r) for f in campaign["forces"] + campaign["reinforcements"]):
         return False, _("Move the task forces there first.")
     grid["systems"].remove(system)
     return True, _("System removed.")
@@ -1729,6 +1835,7 @@ def import_starmap(campaign: dict, data: bytes) -> tuple[bool, str]:
     campaign["map"] = grid
     campaign["forces"] = []
     campaign["contacts"] = []
+    campaign["reinforcements"] = []
     return True, _("Star map loaded: {n} systems.", n=len(grid["systems"]))
 
 
