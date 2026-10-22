@@ -35,7 +35,7 @@ def test_the_pick_stays_in_budget_and_no_class_is_over_half():
 def test_a_generated_fleet_joins_the_side_and_forms_up_at_home():
     fleet, _msg = store.create_fleet("fb", "Home Fleet", faction="NAC")
     campaign, _msg = store.create_campaign(fleet, "Border")
-    store.random_starmap(campaign, 16, 12, 20, 11, settled=60, outposts=20)
+    store.random_starmap(campaign, 16, 12, 20, 11)
     store.save_fleet(fleet)
     twin = copy.deepcopy(campaign)
     made, msg = store.generate_forces(campaign, "red", "ESU", 3000, defence=300, seed=5)

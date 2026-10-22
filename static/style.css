@@ -226,6 +226,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .ship-grid { display: grid; grid-template-columns: minmax(200px, 320px) minmax(0, 1fr); gap: 16px; }
 .campaign-ship h3 { display: flex; align-items: center; gap: 8px; }
 /* Star map (starmap.py): a dark sky in every look, like the record sheets keep a light ground. */
+.map-counts { width: auto; }
 .starmap-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 240px); gap: 16px; align-items: start; }
 .starmap-wrap svg.starmap { width: 100%; height: auto; display: block; background: #0b1020; border-radius: 6px; }
 .starmap .hex { fill: #0b1020; stroke: #26304d; stroke-width: 1; }
