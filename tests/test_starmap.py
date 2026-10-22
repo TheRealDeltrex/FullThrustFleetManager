@@ -246,6 +246,15 @@ def test_the_frontline_lies_between_opposing_systems():
     assert on_row == {(4, 0), (5, 0)}                        # side by side
 
 
+def test_a_side_pushes_a_cluster_front_back_to_the_neutral_world():
+    """Master 2026-10-22: with 2 empty hexes between a side and a neutral cluster, the front is
+    the hex beside the neutral world."""
+    grid = a_line((0, "blue"), (3, ""))
+    grid["systems"].append({"q": 3, "r": 2, "name": "N2", "kind": "outpost", "owner": "", "base": False})
+    front = {cell for cell in starmap.frontline(grid) if cell[1] == 0}
+    assert (2, 0) in front and (1, 0) not in front
+
+
 def test_sides_project_their_front_only_so_far():
     """Master 2026-10-22: 4 hexes by default, set per campaign."""
     apart = a_line((0, "blue"), (10, "red"))
