@@ -144,7 +144,11 @@ What exists:
   every state-changing form from here on. `delete_fleet` is handled before dispatch because it
   has no fleet left to save.
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
-  and the roster table. Both use the same `ssd_layout` diagrams the PDF does.
+  the roster table, and the Space Dock (`?view=dock&ship=<uid>`, the pick remembered per fleet in
+  `session["dock_ship"]`): one ship's draggable diagram beside its design breakdown, a Refit
+  select (`refit_ship` -> `store.refit_ship`, drops damage/loadout entries the new design lacks),
+  "Refit as variant" (`store.refit_as_variant`, then opens the variant in Ship Design) and
+  "Edit design". All use the same `ssd_layout` diagrams the PDF does.
 - A ship's name and table ID are editable on its card; table IDs are unique per fleet,
   case-insensitive (`store._table_id_taken`, checked on add and on edit).
 - Add ship lists only the fleet's faction's designs when it has one; the "Show all ships" toggle
@@ -325,7 +329,16 @@ What exists:
   side columns flanking a central block of all-round systems, aft weapons under it, the armour
   circles and damage track (stars on the crew-factor boxes), and a bottom row with FTL, the
   drive lozenge with its thrust, the FB core-systems box and any holds or tug drives.
-  `layout_hints[uid] = {"x": .., "y": ..}` pins a system; drag-to-arrange can write them later.
+  Directly above the armour and hull boxes, bottom up: all fire controls in one row that never
+  wraps (squeezed if needed), PDS after them when the row has room else in rows above, then
+  hangars (`FIRE_CONTROLS` / `POINT_DEFENCE` / `HANGARS`).
+  `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
+- **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
+  wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`
+  (`editable`) adds the hidden layout form and "Reset layout", `static/ssddrag.js` posts the drop
+  through autosave to `POST /design/<id>/layout`. `store.set_layout_hint` saves at once (drawing,
+  not rules): into a library design and its draft, or for catalog designs into `layouts.json`
+  (merged by `get_design`, carried by backups). Used on the design tab and the Space Dock.
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
   a damaged drive; black on paper. `damage=None` is a blank copy.
 - Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race
