@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 
+import events
 import fleet_rules
 import forcegen
 import migrations
@@ -1085,6 +1086,8 @@ def yard_block(fleet: dict, ship: dict) -> str:
                   if {"fleet": fleet["id"], "uid": ship["uid"]} in f["ships"]), None)
     system = starmap.system_at(campaign["map"], force["q"], force["r"]) if force else None
     side = fleet.get("campaign_side")
+    if _effect(campaign, "supply", side):
+        return _("Supply trouble: no yard work this week.")
     base = system and system["base"] and system["owner"] == side
     stations = installations_at(campaign, side, force["q"], force["r"]) if system else []
     if not base and not stations:
@@ -1173,6 +1176,8 @@ def normalize_campaign(doc: object) -> dict | None:
         "ruleset": doc["ruleset"],
         "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
         "hidden": doc.get("hidden") is True,
+        "events": doc.get("events") is True,
+        "effects": _norm_effects(doc.get("effects"), {s["id"] for s in sides}),
         "end_week": _as_int(doc.get("end_week"), 0, 0, 100000),
         "objectives": _norm_objectives(doc.get("objectives"), {s["id"] for s in sides}),
         "result": _norm_result(doc.get("result"), {s["id"] for s in sides}),
@@ -1256,6 +1261,21 @@ def _norm_forces(raw: object, side_ids: set[str], grid: dict | None) -> list[dic
 
 MAX_REINFORCEMENTS = 200
 MAX_DRAW_TIERS = 2
+
+
+def _norm_effects(raw: object, side_ids: set[str]) -> dict:
+    """This week's event effects (step G4): sides short of supply and sides whose forces are
+    exposed, both for `week` only."""
+    raw = raw if isinstance(raw, dict) else {}
+    out = {"week": _as_int(raw.get("week"), 0, 0, 100000)}
+    for key in ("supply", "exposed"):
+        out[key] = [s for s in raw.get(key, []) if s in side_ids] if isinstance(raw.get(key), list) else []
+    return out
+
+
+def _effect(campaign: dict, key: str, side: str) -> bool:
+    effects = campaign.get("effects") or {}
+    return effects.get("week") == campaign["week"] and side in effects.get(key, [])
 
 
 def _norm_tier(raw: object) -> dict:
@@ -1348,6 +1368,7 @@ def _norm_contacts(raw: object, side_ids: set[str], grid: dict | None) -> list[d
             "result": result if outcome == "battle" else "",
             "owner_before": before if before in (*side_ids, "") else None,
             "notes": _as_str(c.get("notes"), limit=2000),
+            "shortened": c.get("shortened") is True,
         })
     return out
 
@@ -1413,9 +1434,11 @@ def leave_campaign(fleet: dict) -> tuple[bool, str]:
 
 def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
                     notes: str | None = None, sides: dict[str, str] | None = None,
-                    hidden: bool | None = None) -> tuple[bool, str]:
+                    hidden: bool | None = None, events: bool | None = None) -> tuple[bool, str]:
     if hidden is not None:
         campaign["hidden"] = hidden
+    if events is not None:
+        campaign["events"] = events
     if name is not None:
         campaign["name"] = name.strip()[:80] or campaign["name"]
     if week is not None:
@@ -1539,7 +1562,7 @@ def set_force_order(campaign: dict, force_id: str, dest: tuple[int, int] | None)
 def sees_force(campaign: dict, side: str, force: dict) -> bool:
     """Under hidden movement (FT p.34) a side sees its own forces and those it is in contact
     with this week; otherwise every marker is on the table."""
-    if not campaign["hidden"] or force["side"] == side:
+    if not campaign["hidden"] or force["side"] == side or _effect(campaign, "exposed", force["side"]):
         return True
     return any(side in c["sides"] and force["side"] in c["sides"]
                and (c["q"], c["r"]) == (force["q"], force["r"]) for c in this_weeks_contacts(campaign))
@@ -1599,6 +1622,50 @@ def cancel_reinforcement(campaign: dict, reinforcement_id: str) -> tuple[bool, s
     before = len(campaign["reinforcements"])
     campaign["reinforcements"] = [x for x in campaign["reinforcements"] if x["id"] != reinforcement_id]
     return len(campaign["reinforcements"]) < before, _("Reinforcements cancelled.")
+
+
+def _weekly_events(campaign: dict, rolls: dict[str, int] | None = None) -> None:
+    """Each side's 2D6 on the events table (step G4, `events.py`), logged for that side only
+    unless the whole sector sees it. `rolls` fixes the totals for tests."""
+    campaign["effects"] = {"week": campaign["week"], "supply": [], "exposed": []}
+    grid = campaign["map"]
+    for side in campaign["sides"]:
+        sid = side["id"]
+        total = (rolls or {}).get(sid) or random.randint(1, 6) + random.randint(1, 6)
+        kind = events.kind_for(total)
+        text, public = "", False
+        guarded = {(f["q"], f["r"]) for f in campaign["forces"] if f["side"] == sid and f["ships"]}
+        if kind in ("unrest", "pirates") and grid:
+            wanted = "settled" if kind == "unrest" else "outpost"
+            open_ = [s for s in grid["systems"] if s["owner"] == sid and s["kind"] == wanted
+                     and not s["base"] and (s["q"], s["r"]) not in guarded]
+            if open_:
+                lost = random.choice(open_)
+                lost["owner"] = ""
+                public = True
+                names = {"system": lost["name"], "side": side["name"]}
+                text = (_("Unrest: {system} breaks away from {side}.", **names) if kind == "unrest"
+                        else _("Pirates: {side} loses the outpost at {system}.", **names))
+        elif kind == "supply":
+            campaign["effects"]["supply"].append(sid)
+            text = _("Supply trouble: {side} can do no yard work this week.", side=side["name"])
+        elif kind == "leak":
+            campaign["effects"]["exposed"].append(sid)
+            public = True
+            text = _("Intelligence leak: {side}'s forces are known to all this week.", side=side["name"])
+        elif kind in ("late", "early"):
+            group = min((g for g in campaign["reinforcements"] if g["side"] == sid),
+                        key=lambda g: g["week"], default=None)
+            if group:
+                group["week"] = group["week"] + 1 if kind == "late" else campaign["week"]
+                text = (_("{name} is delayed a week.", name=group["name"]) if kind == "late"
+                        else _("{name} arrives early.", name=group["name"]))
+        if not text:
+            text = _("A quiet week for {side}.", side=side["name"])
+        entry = {"week": campaign["week"], "text": _("Event ({roll}): {text}", roll=total, text=text)}
+        if not public:
+            entry["sides"] = [sid]
+        campaign["log"].append(entry)
 
 
 def _arrivals(campaign: dict) -> list[dict]:
@@ -1904,6 +1971,12 @@ def set_battle_result(campaign: dict, contact_id: str, result: str, notes: str =
         contact["leaving"] = [s for s in contact["sides"] if s != result]
         text = _("{system}: battle won by {side}.", system=where, side=_side_name(campaign, result))
         text += _claim(campaign, contact, result)
+        # War weariness (G4, an app rule): an attacker beaten in battle has a week less.
+        beaten = [s for s in contact["sides"] if s != result and s in campaign["objectives"]]
+        if campaign["events"] and beaten and campaign["end_week"] > campaign["week"]:
+            campaign["end_week"] -= 1
+            contact["shortened"] = True
+            text += _(" War weariness: the campaign now ends after week {n}.", n=campaign["end_week"])
     campaign["log"].append({"week": campaign["week"], "text": text, "sides": list(contact["sides"])})
     return True, text
 
@@ -1916,6 +1989,8 @@ def reopen_contact(campaign: dict, contact_id: str) -> tuple[bool, str]:
     system = _contact_system(campaign, contact)
     if system and contact["owner_before"] is not None:
         system["owner"] = contact["owner_before"]
+    if contact.pop("shortened", False):
+        campaign["end_week"] += 1
     contact.update(choices=dict.fromkeys(contact["sides"], ""), roll=None, outcome="", leaving=[],
                    result="", owner_before=None)
     return True, _("Contact reopened.")
@@ -1949,6 +2024,8 @@ def next_week(campaign: dict) -> tuple[bool, str]:
             force["order"] = None
             moved = True
     campaign["week"] += 1
+    if campaign["events"]:
+        _weekly_events(campaign)
     for force in _arrivals(campaign):
         system = starmap.system_at(campaign["map"], force["q"], force["r"])
         campaign["log"].append({"week": campaign["week"], "text": _(

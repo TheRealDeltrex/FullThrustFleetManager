@@ -246,6 +246,13 @@ What exists:
   FTL catalog warships), joins it to the campaign, forms a "Main fleet" force at the side's home
   and, with a garrison budget, one force per settled world it holds. The books print no non-FTL
   warships, so garrisons are FTL ships too.
+- Weekly events (step G4, app rules): with `campaign["events"]`, `next_week` rolls 2D6 per
+  side on `events.py`'s table (`store._weekly_events`, before reinforcements arrive): unrest and
+  pirates take an unguarded settled world or outpost, supply trouble closes the side's yards
+  and a leak exposes its forces for that week (`campaign["effects"]`, read by `yard_block` and
+  `sees_force`), late or early moves its next reinforcement. War weariness: a battle lost by a
+  side with an objective takes a week off `end_week` (`contact["shortened"]`, undone by
+  `reopen_contact`).
 - Installations (step C8) are ordinary fleet ships whose design `fleet_common.installation()`
   accepts: a starbase, a gate, or a design with neither FTL nor thrust (FT p.27; a PC monster
   ship `section` is not one). Placed in a task force on a system they never move and cannot
