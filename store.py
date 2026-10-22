@@ -1157,6 +1157,9 @@ def normalize_campaign(doc: object) -> dict | None:
         "ruleset": doc["ruleset"],
         "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
         "hidden": doc.get("hidden") is True,
+        "end_week": _as_int(doc.get("end_week"), 0, 0, 100000),
+        "objectives": _norm_objectives(doc.get("objectives"), {s["id"] for s in sides}),
+        "result": _norm_result(doc.get("result"), {s["id"] for s in sides}),
         "week": _as_int(doc.get("week"), 1, 1, 100000),
         "sides": sides[:MAX_SIDES] if len(sides) >= 2 else _default_sides(),
         "log": log,
@@ -1236,6 +1239,36 @@ def _norm_forces(raw: object, side_ids: set[str], grid: dict | None) -> list[dic
 
 
 MAX_REINFORCEMENTS = 200
+MAX_DRAW_TIERS = 2
+
+
+def _norm_tier(raw: object) -> dict:
+    raw = raw if isinstance(raw, dict) else {}
+    return {"count": _as_int(raw.get("count"), 0, 0, 999), "include": _as_str(raw.get("include"), limit=40)}
+
+
+def _norm_objectives(raw: object, side_ids: set[str]) -> dict:
+    """Objectives (step C7) per side: win by holding `count` settled systems with `include`
+    among them, and up to two lesser holdings that make a draw at the end (FT p.36). A side
+    with none is the defender: it wins if nobody else has won or drawn by the last week."""
+    if not isinstance(raw, dict):
+        return {}
+    out = {}
+    for side, obj in raw.items():
+        if side in side_ids and isinstance(obj, dict):
+            tier = _norm_tier(obj)
+            draws = [_norm_tier(d) for d in obj.get("draw", [])[:MAX_DRAW_TIERS]
+                     ] if isinstance(obj.get("draw"), list) else []
+            if tier["count"]:
+                out[side] = dict(tier, draw=[d for d in draws if d["count"]])
+    return out
+
+
+def _norm_result(raw: object, side_ids: set[str]) -> dict | None:
+    if not isinstance(raw, dict) or raw.get("winner") not in (*side_ids, "draw"):
+        return None
+    return {"winner": raw["winner"], "week": _as_int(raw.get("week"), 1, 1, 100000),
+            "text": _as_str(raw.get("text"), limit=400)}
 
 
 def _norm_reinforcements(raw: object, side_ids: set[str], grid: dict | None) -> list[dict]:
@@ -1564,6 +1597,78 @@ def _arrivals(campaign: dict) -> list[dict]:
     return arrived
 
 
+def set_objectives(campaign: dict, end_week: int, objectives: dict[str, dict]) -> tuple[bool, str]:
+    campaign["end_week"] = max(0, min(100000, end_week))
+    campaign["objectives"] = _norm_objectives(objectives, {s["id"] for s in campaign["sides"]})
+    return True, _("Objectives updated.")
+
+
+def _verdict(campaign: dict) -> dict | None:
+    """The campaign's result at the end of this week, or None while it goes on: a side whose
+    objective is met wins at once; after the last week a lesser holding is a draw, and
+    otherwise the defenders win (FT p.36), or it is a draw when every side had an objective."""
+    grid, objectives = campaign["map"], campaign["objectives"]
+    if not grid or not objectives:
+        return None
+    for side in campaign["sides"]:
+        obj = objectives.get(side["id"])
+        if obj and starmap.holds(grid, side["id"], obj["count"], obj["include"]):
+            return {"winner": side["id"], "week": campaign["week"],
+                    "text": _("{side} wins: objective met.", side=side["name"])}
+    if not campaign["end_week"] or campaign["week"] < campaign["end_week"]:
+        return None
+    if any(starmap.holds(grid, side, d["count"], d["include"])
+           for side, obj in objectives.items() for d in obj["draw"]):
+        return {"winner": "draw", "week": campaign["week"], "text": _("A draw.")}
+    defenders = [s for s in campaign["sides"] if s["id"] not in objectives]
+    if not defenders:
+        return {"winner": "draw", "week": campaign["week"], "text": _("A draw: no side met its objective.")}
+    return {"winner": defenders[0]["id"], "week": campaign["week"],
+            "text": _("{side} wins: the attack ran out of time.",
+                      side=", ".join(s["name"] for s in defenders))}
+
+
+def reopen_campaign(campaign: dict) -> tuple[bool, str]:
+    campaign["result"] = None
+    return True, _("Campaign reopened.")
+
+
+LAFAYETTE = {
+    # FT p.37's map, read off the page: (column, row) from the top left, 14 by 20 hexes.
+    "systems": [("Lafayette", 6, 13, "settled"), ("Hudson", 2, 9, "settled"),
+                ("Merril's World", 3, 6, "settled"), ("Kakisa", 8, 17, "settled"),
+                ("New Toledo", 3, 17, "settled"), ("Baffin", 9, 8, "settled"),
+                ("Rock", 10, 4, "outpost"), ("VN-459", 7, 9, "outpost"), ("HR-1306", 11, 14, "outpost"),
+                ("X", 13, 5, "empty")],
+    "width": 14, "height": 20,
+}
+
+
+def lafayette_campaign(fleet: dict) -> tuple[dict | None, str]:
+    """FT pp.36-38's sample campaign: the NAC holds the sector, the ESU enters at X and must
+    take three settled systems, Lafayette among them, within seven weeks. New Toledo is the
+    naval base. Fleets are the players' own: the points budgets go into the notes."""
+    campaign, msg = create_campaign(fleet, _("The Lafayette Incident"))
+    campaign["sides"] = [{"id": "nac", "name": "NAC"}, {"id": "esu", "name": "ESU"}]
+    grid = starmap.blank(LAFAYETTE["width"], LAFAYETTE["height"])
+    for name, q, r, kind in LAFAYETTE["systems"]:
+        grid["systems"].append({"q": q, "r": r, "name": name, "kind": kind,
+                                "owner": "" if kind == "empty" else "nac", "base": name == "New Toledo"})
+    campaign["map"] = grid
+    campaign["end_week"] = 7
+    campaign["objectives"] = {"esu": {"count": 3, "include": "Lafayette",
+                                      "draw": [{"count": 2, "include": "Lafayette"},
+                                               {"count": 3, "include": ""}]}}
+    campaign["notes"] = _(
+        "FT pp.36-38. ESU: 10,000 points, all FTL, entering at X in week 1. NAC: 6,000 points of "
+        "FTL ships, plus non-FTL system defences of 1,500 at Lafayette, 1,000 at Hudson, 800 at "
+        "Merril's World, 800 at Baffin, 1,200 at New Toledo and 500 at Kakisa. No class may be "
+        "over half the ships of a force.")
+    fleet["campaign_side"] = "esu" if (fleet.get("faction") or "").upper() == "ESU" else "nac"
+    save_campaign(campaign)
+    return campaign, _("The Lafayette Incident is set up.")
+
+
 def this_weeks_contacts(campaign: dict) -> list[dict]:
     return [c for c in campaign["contacts"] if c["week"] == campaign["week"]]
 
@@ -1707,6 +1812,8 @@ def reopen_contact(campaign: dict, contact_id: str) -> tuple[bool, str]:
 def next_week(campaign: dict) -> tuple[bool, str]:
     """Every force carries out its order, the week advances, ships' locations follow their force,
     and each system where sides meet goes into the campaign log."""
+    if campaign["result"]:
+        return False, _("The campaign is over: {text}", text=campaign["result"]["text"])
     fleets = {f["id"]: f for f in campaign_fleets(campaign["id"])}
     for contact in this_weeks_contacts(campaign):
         where = _contact_place(campaign, contact)
@@ -1718,6 +1825,11 @@ def next_week(campaign: dict) -> tuple[bool, str]:
             if (force in contact_forces(campaign, contact) and force["side"] in contact["leaving"]
                     and not force["order"] and reachable_systems(campaign, force)[0]):
                 return False, _("{name} must leave {system} this week.", name=force["name"], system=where)
+    result = _verdict(campaign)
+    if result:
+        campaign["result"] = result
+        campaign["log"].append({"week": campaign["week"], "text": result["text"]})
+        return True, result["text"]
     moved = False
     for force in campaign["forces"]:
         if force["order"]:

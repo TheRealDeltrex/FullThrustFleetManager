@@ -67,6 +67,42 @@
                 <button class="btn sm" type="submit" name="view" value="hand">{{ _("Hand over") }}</button>
               </form>
             {% endif %}
+            {% if c.result %}
+              <form method="post" action="{{ to_campaign }}" class="row">
+                <b>{{ _("Week {n}", n=c.result.week) }} · {{ c.result.text }}</b>
+                <button class="btn sm ghost" type="submit" name="action" value="reopen_campaign">{{ _("Reopen") }}</button>
+              </form>
+            {% endif %}
+            {% if c.map %}
+              {% set settled = c.map.systems|selectattr("kind", "equalto", "settled")|map(attribute="name")|list %}
+              {% macro tier(key, t, settled) %}
+                <input class="input sm" type="number" min="0" name="{{ key }}-count" value="{{ t.count if t else 0 }}"
+                       aria-label="{{ _('Settled systems') }}" />
+                <select class="input" name="{{ key }}-include" aria-label="{{ _('Including') }}">
+                  <option value="">{{ _("any") }}</option>
+                  {% for name in settled %}
+                    <option value="{{ name }}" {% if t and t.include == name %}selected{% endif %}>{{ name }}</option>
+                  {% endfor %}
+                </select>
+              {% endmacro %}
+              <form method="post" action="{{ to_campaign }}" class="stack objectives" data-autosave="set_objectives">
+                <div class="row">
+                  <b>{{ _("Objectives") }}</b>
+                  <label class="check">{{ _("Last week") }}
+                    <input class="input sm" type="number" min="0" name="end_week" value="{{ c.end_week }}" /></label>
+                </div>
+                {% for side in c.sides %}
+                  {% set obj = c.objectives.get(side.id) %}
+                  <div class="row">
+                    <span>{{ side.name }}: {{ _("win holding") }}</span>{{ tier("obj-" ~ side.id, obj, settled) }}
+                    {% for i in range(2) %}
+                      <span>{{ _("draw") }}</span>{{ tier("obj-" ~ side.id ~ "-d" ~ i, obj.draw[i] if obj and obj.draw|length > i else none, settled) }}
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+                <noscript><button class="btn" type="submit" name="action" value="set_objectives">{{ _("Apply") }}</button></noscript>
+              </form>
+            {% endif %}
             <div class="row">
               <form method="post" action="{{ url_for('campaign_action', fleet_id=f.id) }}" class="row"
                     data-autosave="join_campaign">
@@ -118,6 +154,8 @@
               <input class="input grow" name="name" placeholder="{{ _('Campaign name') }}"
                      aria-label="{{ _('Campaign name') }}" />
               <button class="btn" type="submit" name="action" value="new_campaign">{{ _("New campaign") }}</button>
+              <button class="btn ghost" type="submit" name="action" value="new_lafayette"
+                      formnovalidate>{{ _("The Lafayette Incident") }}</button>
             </form>
           {% endif %}
         </div>
