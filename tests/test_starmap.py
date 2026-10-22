@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 
 import pytest
 
@@ -58,6 +59,31 @@ def test_the_generator_is_seeded_and_spaces_its_stars():
     assert sorted(h["owner"] for h in homes) == ["blue", "red"]
     assert all(h["kind"] == "settled" for h in homes)
     assert one["seed"] == 4242
+
+
+def test_the_generator_settings_shape_the_map():
+    sides = ["blue", "red", "green"]
+    grid = starmap.generate(20, 16, 30, sides, 9, spacing=3, settled=100, outposts=0, bases=3,
+                            names="catalog")
+    cells = [(s["q"], s["r"]) for s in grid["systems"]]
+    assert all(starmap.hex_distance(a, b) >= 3 for a in cells for b in cells if a != b)
+    assert {s["kind"] for s in grid["systems"]} == {"settled"}
+    assert all(re.fullmatch(r"[A-Z]+-\d{3,4}", s["name"]) for s in grid["systems"])
+    homes = {s["owner"] for s in grid["systems"] if s["base"]}
+    assert homes == set(sides)
+    for side in sides:
+        assert 1 <= sum(s["base"] and s["owner"] == side for s in grid["systems"]) <= 3
+    bare = starmap.generate(12, 10, 16, ["blue", "red"], 4, settled=0, outposts=0)
+    assert [s["kind"] for s in bare["systems"] if not s["base"]] == ["empty"] * 14
+
+
+def test_the_panel_passes_the_generator_settings(client):
+    _fleet, campaign = a_campaign()
+    post(client, campaign, action="random_starmap", width="12", height="10", stars="16", seed="3",
+         spacing="3", settled="20", outposts="90", bases="9", names="catalog")
+    grid = store.get_campaign(campaign["id"])["map"]
+    assert grid == starmap.generate(12, 10, 16, ["blue", "red"], 3, spacing=3, settled=20,
+                                    outposts=80, bases=5, names="catalog")
 
 
 def test_a_crowded_map_stops_when_no_hex_is_free():
