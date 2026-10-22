@@ -86,6 +86,10 @@ a.chip:hover { text-decoration: underline; }
 .flash { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); }
 .flash.success { background: var(--ok-soft); border-color: #bfe3cf; color: var(--ok); }
 .flash.error { background: var(--bad-soft); border-color: #f1c3be; color: var(--bad); }
+/* Shown while scrolled down (keepscroll.js): float at the top; a click dismisses. */
+.flashes.floating { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 60;
+  margin: 0; width: min(640px, calc(100vw - 24px)); cursor: pointer; }
+.flashes.floating .flash { box-shadow: 0 4px 16px rgba(0, 0, 0, .3); }
 
 /* ---- Work area: left pane, centre, right pane ---- */
 .work { display: grid; gap: 12px; padding: 12px; }

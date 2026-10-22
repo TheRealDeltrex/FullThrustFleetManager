@@ -101,6 +101,7 @@
 
     // The look can change from Settings, so the page takes the answer's theme too.
     if (doc.documentElement.dataset.theme) document.documentElement.dataset.theme = doc.documentElement.dataset.theme;
+    if (doc.documentElement.dataset.path) document.documentElement.dataset.path = doc.documentElement.dataset.path;
     ["header.topbar", "main"].forEach(function (selector) {
       var old = document.querySelector(selector);
       var fresh = doc.querySelector(selector);
