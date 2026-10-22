@@ -215,6 +215,11 @@ What exists:
   `reopen_contact`). Next week refuses while a contact this week is unsettled, a battle is
   unrecorded, or a force that must leave has no order and can move. Only the current fleet's
   side sees its own choice before all are in.
+- Bases and reinforcements (step C5): with a star map, `store.yard_block` allows repairs and
+  replenishment only for a docked ship in a task force at its side's naval base, and
+  `repair_ship` once per campaign week (`ship["repaired_week"]`); without a map nothing is
+  checked. `campaign["reinforcements"]` [{id rf1.., side, name, week, q, r, ships}] become task
+  forces in `next_week` (`store._arrivals`) before contacts are found.
 
 ## Rulebook viewer
 
