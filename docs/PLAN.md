@@ -686,7 +686,8 @@ on/off, **blank copy** (clean SSDs, no campaign state), **battle pack**: pick a 
 roster + sheets + trackers for fleet 1, the same for fleet 2, one orders chart per fleet and one
 shared quick reference.
 
-Black and white, photocopy-safe, fonts bundled (no system-font dependency).
+Black and white by default, photocopy-safe, with an optional colour dossier style. Both
+styles preserve black-on-white record-sheet symbols; fonts are bundled (no system-font dependency).
 
 ---
 
