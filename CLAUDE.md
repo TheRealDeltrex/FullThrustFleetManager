@@ -73,7 +73,9 @@ What exists:
 - `data/catalog/` — the read-only catalog; see Catalog below. `data/errata.json` — book values
   that disagree with the rules, with the reason (PLAN 8).
 - `.github/workflows/tests.yml` (ruff + full pytest, and a web-build boot check, on push/PR), `deploy-pages.yml` and
-  `build-linux.yml` (both manual, workflow_dispatch).
+  `build-linux.yml` (both manual, workflow_dispatch). `.githooks/pre-push` runs `ruff check .`
+  before every push; `.claude/settings.json` enables it (`git config core.hooksPath .githooks`)
+  when a session starts. Before pushing a PR branch, also run the tests for what you changed.
 - Also: `docs/PLAN.md`, `docs/mockups/` (serve with
   `python -m http.server 8765 --directory docs/mockups`), `rulebooks/` and the `tools/` that
   rebuild them from the bought originals (source folder set in `tools/build_rulebooks.py`).
@@ -185,7 +187,84 @@ What exists:
   shape that was clicked. Clicking the last marked box unmarks it. The fields under the diagram
   do the same thing, so the tab works with scripting off; the dice buttons are optional too.
 - Hooks reserved for the later campaign module (PLAN 11.2) are in use but not repurposed:
-  `ship.location`, `log[].week`, statuses `docked` and `hulk`, `fleet.campaign_id` (unused).
+  `ship.location`, `log[].week`, statuses `docked` and `hulk`.
+- Campaigns (PLAN 11.3, roadmap step C1): `campaigns/<id>.json` holds name, ruleset, week,
+  sides and a log; membership lives on the fleet (`campaign_id`, `campaign_side`), so a fleet is
+  in one campaign at a time and every fleet in it shares the campaign's ruleset. The campaign bar
+  on the Campaign tab posts fleet actions (`new_campaign`, `join_campaign`, `leave_campaign`) to
+  `/campaign/<fleet>/action` and campaign actions to `/campaigns/<id>/action`. `.FTCampaign`
+  exports the campaign with its fleets and their designs; backups carry `campaigns/`.
+- Star maps (step C2): `campaign["map"]` = {width, height, seed, systems [{q, r, name, kind
+  settled|outpost|empty, owner side id or "", base}]}, normalised by `store.normalize_starmap`.
+  `starmap.py` is pure: flat-topped hexes in odd-q offset coordinates (`hex_distance`, labels
+  "0304" from 01), the seeded `generate()` (an app rule, step G1: spacing, settled and outpost
+  shares, bases per side, star or catalogue names; a home base for every side, the first two at
+  opposite ends) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
+  so picking one needs no script. The map keeps a dark sky in every look. `.FTStarmap` files
+  carry the map and the sides; loading one maps owners onto this campaign's sides by position.
+  Settings > Import refuses them and points to the Star map panel.
+- Task forces (step C3): `campaign["forces"]` [{id tf1.., side, name, q, r, order [q, r] or
+  null, ships [{fleet, uid}]}], normalised by `store._norm_forces` (on a map, a known side, a ship
+  in one force only). A force sits on a star system and jumps up to `FTL_HEXES_PER_WEEK` (6, FT
+  p.35) to another; `fleet_rules.force_reach` refuses a docked ship, a starbase or gate
+  (`fleet_common.jump_blockers`), or ships without working FTL that the force's tender bays and
+  tugs cannot carry. `store.next_week` carries out every order, sets each ship's `location` to
+  the system name and logs a contact where sides meet (`store.meetings`); replacing the map
+  clears the forces. Pennants and dashed order lines are drawn by `starmap.to_svg(forces=)`.
+- Contacts (step C4): `campaign["contacts"]` [{id k1.., week, q, r, sides, reports {side:
+  {escort, cruiser, capital}}, choices {side: fight|withdraw|standoff|""}, roll, outcome
+  battle|standoff|leave|escaped, leaving [sides], result side|"drawn", owner_before, notes}],
+  normalised by `store._norm_contacts`. `next_week` opens one per meeting with each side's real
+  scan (`fleet_rules.scan_counts`, the protocol's `scan_class`), which that side may change
+  (decoys, weasel boats). The pure rules are `fleet_rules.contact_outcome` /
+  `catch_roll_needed` (FT p.35). The last choice settles it; a won battle or a fleet that got
+  away gives the system to the side left there (`store._claim`, an app rule, undone by
+  `reopen_contact`). Next week refuses while a contact this week is unsettled, a battle is
+  unrecorded, or a force that must leave has no order and can move. Only the current fleet's
+  side sees its own choice before all are in.
+- Bases and reinforcements (step C5): with a star map, `store.yard_block` allows repairs and
+  replenishment only for a docked ship in a task force at its side's naval base, and
+  `repair_ship` once per campaign week (`ship["repaired_week"]`); without a map nothing is
+  checked. `campaign["reinforcements"]` [{id rf1.., side, name, week, q, r, ships}] become task
+  forces in `next_week` (`store._arrivals`) before contacts are found.
+- Hidden movement (step C6): `campaign["hidden"]`. The tab looks through `_campaign_view()`: the
+  current fleet's side, behind a hand-over screen whenever that side changes
+  (`session["campaign_seen"]`), or the umpire (`session["campaign_umpire"]`), switched by
+  `POST /campaigns/<id>/view`. A side sees its own forces and those it is in contact with
+  (`store.sees_force`), others' orders and reinforcements only without hidden movement, and log
+  entries whose optional `sides` include it (`store.sees_log`). Other sides' ship lists are never
+  shown. A force with `dummy` has no ships, jumps 6 and is removed with a log entry when it ends
+  a week beside an enemy force (`store._exposed_dummies`).
+- Objectives (step C7): `campaign["objectives"]` {side: {count, include, draw [up to 2 tiers]}}
+  (hold `count` settled systems with `include` among them, `starmap.holds`), `end_week` and
+  `result` {winner side|"draw", week, text}. `next_week` judges the week just ended
+  (`store._verdict`) before moving anything: an objective met wins; after `end_week` a draw tier
+  draws, else the sides without objectives (the defenders) win. A result stops Next week until
+  `reopen_campaign`. `store.lafayette_campaign()` sets up FT pp.36-38 from `LAFAYETTE` (map
+  positions read off FT p.37); its force budgets go in the notes.
+- Scenarios (step G2): `scenarios.py` is pure; `build(kind, map, sides, attacker)` turns
+  `invasion` / `raid` / `border_war` (all app rules) into owners, objectives, a last week and a
+  note, and `store.apply_scenario` applies it in week 1 before any contact. A side's home is its
+  first naval base on the map. Objectives only measure holdings, so a template is a holding.
+- Force generator (step G3): `forcegen.pick` (pure) buys catalog designs for a budget, each
+  pick in the least-used scan class that keeps every class at half the ships or less (FT p.37).
+  `store.generate_forces` makes a new fleet for a side from `force_candidates` (the faction's
+  FTL catalog warships), joins it to the campaign, forms a "Main fleet" force at the side's home
+  and, with a garrison budget, one force per settled world it holds. The books print no non-FTL
+  warships, so garrisons are FTL ships too.
+- Weekly events (step G4, app rules): with `campaign["events"]`, `next_week` rolls 2D6 per
+  side on `events.py`'s table (`store._weekly_events`, before reinforcements arrive): unrest and
+  pirates take an unguarded settled world or outpost, supply trouble closes the side's yards
+  and a leak exposes its forces for that week (`campaign["effects"]`, read by `yard_block` and
+  `sees_force`), late or early moves its next reinforcement. War weariness: a battle lost by a
+  side with an objective takes a week off `end_week` (`contact["shortened"]`, undone by
+  `reopen_contact`).
+- Installations (step C8) are ordinary fleet ships whose design `fleet_common.installation()`
+  accepts: a starbase, a gate, or a design with neither FTL nor thrust (FT p.27; a PC monster
+  ship `section` is not one). Placed in a task force on a system they never move and cannot
+  be carried (PC p.116), the side cannot withdraw from a contact there, and a standing one is
+  a repair yard for its side's docked ships there, itself included (`store.installations_at`,
+  `yard_block`; an app rule beside FT p.35's naval bases).
 
 ## Rulebook viewer
 
@@ -261,7 +340,8 @@ What exists:
 - **Normalisation is the trust boundary.** Everything read from the library or an import goes
   through `normalize_design()` / `normalize_fleet()`, which clamp types and drop junk and are the
   only place new fields are accepted. Add every new field there in the same commit.
-- Export/import (PLAN 5.6): `.FTFleet` (fleet + its non-catalog designs + custom factions),
+- Export/import (PLAN 5.6): `.FTCampaign` (campaign + its fleets + their designs),
+  `.FTFleet` (fleet + its non-catalog designs + custom factions),
   `.FTDesign`, `.FTBackup` (a zip of the library). `import_file()` returns
   `(ok, msg, conflicts)`; a *newer local copy* is kept and named in `conflicts`, and the caller
   re-calls with `overwrite_newer=True` after the player confirms. `modified` is an ISO string at
@@ -422,7 +502,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `mt_missile`, `ortillery`, `minesweeper`, `reflex_field`, `cloak`.
 - FB types only the Star Ranger catalog uses (not in the picker; `rules.SYSTEM_RULES`): `emp` and
   `rocket_cannon` {class, arcs} cost as a beam; `graser` {class, arcs, no_reroll} (CD mass table,
-  x4, x3 without reroll); `hdc` {class, one arc}; `lrpt` {arcs}; `amt`, `superior_sensors`;
+  x4, x3 without reroll); `hdc` {class, one arc}; `lrpt` {arcs}; `amt`, `superior_sensors`,
+  `enhanced_sensors` (2/8 as CD and PC);
   `age_penalty` {mass} is MASS lost to age at 0 points. FB designs may also carry `hull_rows`
   3/4/5/6 (boxes x3/x2/x1.5/x1; Star Ranger; a hull of 3 boxes or fewer always costs 2 a box) and `stealth_hull` 1-2 (+2/+4 a hull and armour box).
   **The Fleet Books are closed (owner's ruling; CD too, only PC takes additions):** these are
@@ -562,7 +643,16 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - Gunboats (PC pp.79-82) are a loadout key `gunboats`: [{carrier, type, extras, ecm}], one
   squadron of six per `gunboat_rack` or `boat_bay` (`common.GUNBOAT_CARRIER_TYPES`); a ruleset's
   `gunboat_types` / `gunboat_extras` properties drive the editor. Ruling: a squadron in a boat bay
-  takes 24 craft MASS (MASS 4 a boat, p.80). FTL gunboat squadrons flying alone are not modelled.
+  takes 24 craft MASS (MASS 4 a boat, p.80). A squadron may mix types (p.79): `types` lists all
+  six boats (absent when uniform; `rules.boat_types()` reads both) and the per-squadron
+  modifications cover all six. The editor is the `templates/_gunboats.html` macro, shared by the
+  Design tab's loadout and the Fleet tab.
+- FTL gunboat squadrons need no carrier (p.80): `fleet["gunboat_squadrons"]` [{uid, type, ...}],
+  FTL implied and paid (`rules.independent_squadron`). `fleet_rules.gunboat_squadron_points`
+  adds them to the total through the ruleset's `gunboat_squadron_points`, gated on
+  `gunboat_types` like the loadout editor; `fleet_issues` validates them and counts them in the
+  tech base. They are not ships: no card, no morale MASS, no dummy-bogey allowance; the PDF lists
+  them on the roster and the tracker.
 - The Imperial tech base (`techbase.py`, PC pp.125-127) is the fleet option `pc_tech_base`:
   `design_techs()` maps systems, hull options and loadouts to technologies,
   `with_prerequisites()` closes them, and `fleet_issues` reports the choices as an info and over
@@ -585,12 +675,15 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `fb_fb2_savasku.json` (FB2 pp.26-32, 14 Sa'Vasku constructs),
   `fb_fb2_phalon.json` (FB2 pp.38-45, 15 Phalon classes),
   `ft2_core.json` (FT pp.14-15, 17 basic classes), `ft2_mt.json` (MT p.23, 14 designs),
-  `fb_starranger.json` (337 designs from fullthrust.star-ranger.com, GZG-sanctioned interim
+  `fb_starranger.json` (341 designs from fullthrust.star-ranger.com, GZG-sanctioned interim
   stats: the FB1/FB2 powers plus ten human factions IJSF to OUDF; book "SR", page 0,
   `source.url` the page; `npv_book` 0 where the page prints none, then the gate checks only
   legality). Written by `tools/extract_catalog_starranger.py`, whose tables put counts first as
   the pages do. FB lists, and CD and PC adopt, a Star Ranger design only where it is legal
-  unchanged under that ruleset (`store._adoptable`; FB 178, CD 232, PC 329 of 337); the Design tab groups them as "Star Ranger" and links the NPV chip to the
+  unchanged under that ruleset (`store._adoptable`; FB 178, CD 239, PC 336 of 341). A name ending in `*` marks a design
+  adjusted to fit the rules (owner's ruling: torpedo arcs trimmed to three, the IF Remora
+  enlarged for 2-MASS enhanced sensors); its `npv_book` is the adjusted cost and its note says
+  what the page printed (`common.printed_npv` words the adopted copies' notes); the Design tab groups them as "Star Ranger" and links the NPV chip to the
   page (`common.WEB_SOURCES`).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`
@@ -604,9 +697,9 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   up F, left P, right S; the FT capital classes' side A batteries cover two arcs, not three.
 - `tests/test_catalog_gate.py` (PLAN 8) judges each design with exactly the MT options it needs.
   139 of the 141 book designs match their printed NPV; the two errata entries are the FT p.31
-  design example and the FB2 p.18 Do'San. 49 Star Ranger designs are in errata too: 28 small
-  hulls the pages price at 3 a box, the rest page misprints or systems the page leaves out (two
-  IF pulse torpedoes break FB1's three-arc limit).
+  design example and the FB2 p.18 Do'San. 52 Star Ranger designs are in errata too: 28 small
+  hulls the pages price at 3 a box, five adjusted (`*`) designs left with unused MASS (legal in
+  CD and PC only), the rest page misprints or systems the page leaves out.
 - **Sa'Vasku and Phalon arcs come off the vector SSDs**, unlike Kra'Vak's. `ssd_arcs.py` has one
   reader per icon shape: `rings()` (human beams and Sa'Vasku stinger nodes), `pies()` (SM
   launchers and racks), `arrows()` (a Sa'Vasku pod launcher's arrowhead beside its cogged disc)
@@ -699,6 +792,17 @@ image (`page.get_pixmap(dpi=200)`).
   good source and simply skips whatever steps it is missing.
 - Commit per coherent step; each milestone issue is closed by the commit/PR that completes it.
 - Commit messages end with the attribution line the harness provides.
+- **A PR is not left waiting unwatched.** Master's standing rule is to merge once CI is green,
+  so the session that opened a PR drives it to merged:
+  - Subscribe to the PR, and whenever the turn ends with CI pending, also schedule a check-in
+    (`send_later`, about 15 minutes, then longer). Never end a turn with your PR unmerged and
+    nothing scheduled: a lost event must not stall the thread.
+  - A job that failed before any test ran (checkout, `pip install`, `playwright install`,
+    runner lost, a network error) is infrastructure: re-run the failed jobs once
+    (`rerun_failed_jobs`) without asking. A second identical failure, or any failing test or
+    lint, is real: fix it and push.
+  - Green: merge `devversion` in if it moved, wait for that run, merge. Then say so.
+  - Still stuck after two check-ins with no change: tell Master what it waits on, once.
 - **Shipping** (version bump, exe, release, Pages deploy) has its own procedure in
   `.claude/skills/shipping-a-release/SKILL.md`. Read it when actually shipping and not
   before. Two things in it are easy to get wrong from memory: deploy Pages **last**, after

@@ -575,6 +575,64 @@ def test_gunboat_squadrons(squadron, points):
     assert not codes(d) & {"unknown_gunboat_type", "boat_bay_full", "gunboat_ecm"}
 
 
+def test_a_squadron_may_mix_gunboat_types():
+    # PC p.79: "You are not required to make all the gunboats in a squadron the same." Each boat
+    # costs its own type; the squadron modifications are priced once for the six.
+    mixed = {"type": "beam", "types": ["beam", "beam", "needle", "needle", "gatling", "gatling"],
+             "extras": ["heavy"]}
+    d = design(tmf=60, hull_boxes=6, systems=[sys_("g", "boat_bay", mass=24)],
+               default_loadout={"gunboats": [{"carrier": "g", **mixed}]})
+    assert PC.loadout_points(d, None, {}) == 2 * 9 + 2 * 9 + 2 * 15 + 12
+    assert "unknown_gunboat_type" not in codes(d)
+    bad = {**mixed, "types": ["beam"] * 5 + ["laser"]}
+    assert "unknown_gunboat_type" in codes(design(
+        tmf=60, hull_boxes=6, systems=[sys_("g", "boat_bay", mass=24)],
+        default_loadout={"gunboats": [{"carrier": "g", **bad}]}))
+    from rulesets.ftpc import squadron_label, techbase
+
+    assert squadron_label(mixed) == "2 Beam gunboats, 2 Needle gunboats, 2 Gatling gunboats"
+    assert techbase.gunboat_techs(mixed) >= {"beams", "needle", "gatling", "heavy_gunboats"}
+
+
+def test_a_mixed_squadron_survives_normalisation_and_a_uniform_one_drops_its_list():
+    import store
+
+    def kept(squadron):
+        return store.normalize_design(design(systems=[sys_("g", "boat_bay", mass=24)], default_loadout={
+            "gunboats": [{"carrier": "g", **squadron}]}))["default_loadout"]["gunboats"][0]
+    mixed = {"type": "beam", "types": ["beam"] * 3 + ["pds"] * 3}
+    assert kept(mixed) == {"carrier": "g", **mixed}
+    assert kept({"type": "beam", "types": ["beam"] * 6}) == {"carrier": "g", "type": "beam"}
+    assert kept({"type": "beam", "types": ["pds"] * 2}) == {"carrier": "g", "type": "beam"}
+
+
+def test_ftl_gunboat_squadrons_fly_without_a_carrier():
+    # PC p.80: "Unlike FTL fighters, FTL Gunboats do not need a carrying vessel." The fleet
+    # fields them itself; FTL is implied and paid (+6), the rest as a carried squadron.
+    from test_fleet_rules import fleet
+
+    f = fleet(ruleset="ftpc", ships=[], points_limit=0, gunboat_squadrons=[
+        {"uid": "g1", "type": "beam"},
+        {"uid": "g2", "type": "kgun", "types": ["kgun"] * 4 + ["pds"] * 2, "extras": ["heavy"], "ecm": 1}])
+    assert fleet_rules.gunboat_squadron_points(f) == (54 + 6) + (4 * 12 + 2 * 9 + 6 + 12 + 18)
+    assert fleet_rules.fleet_points(f, {}) == fleet_rules.gunboat_squadron_points(f)
+    assert all(i.severity != "violation" for i in fleet_rules.fleet_report(f, {}).fleet_issues)
+    bad = fleet(ruleset="ftpc", ships=[], gunboat_squadrons=[{"uid": "g1", "type": "beam", "ecm": 4}])
+    assert "gunboat_ecm" in {i.code for i in fleet_rules.fleet_report(bad, {}).fleet_issues}
+    # Only a ruleset with gunboats fields them.
+    assert fleet_rules.gunboat_squadron_points(fleet(ruleset="ftcd", gunboat_squadrons=[
+        {"uid": "g1", "type": "beam"}])) == 0
+
+
+def test_a_carrierless_squadron_counts_in_the_tech_base():
+    from test_fleet_rules import fleet
+
+    f = fleet(ruleset="ftpc", ships=[], points_limit=0, options={"pc_tech_base": True},
+              gunboat_squadrons=[{"uid": "g1", "type": "graser"}])
+    info = next(i for i in fleet_rules.fleet_report(f, {}).fleet_issues if i.code == "tech_base")
+    assert "FTL gunboats" in info.message and "Standard grasers" in info.message
+
+
 def test_gunboat_racks_and_bays():
     assert mass_points("gunboat_rack") == (18, 0)
 

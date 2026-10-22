@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from i18n import _
-from rulesets import RULESETS, Issue
+from rulesets import RULESETS, Issue, fleet_common
 
 DESTROYED = "destroyed"
 FLEET_OPTION_KEYS = (
@@ -118,6 +118,21 @@ def dummy_bogey_points(fleet: dict) -> int:
     return dummy_bogeys(fleet) * rs.dummy_bogey_points if rs else 0
 
 
+def gunboat_squadrons(fleet: dict) -> list[dict]:
+    """The FTL gunboat squadrons the fleet fields without a carrier, where its ruleset has
+    gunboats (PC p.80); else none."""
+    rs = ruleset_of(fleet)
+    squadrons = fleet.get("gunboat_squadrons")
+    if not getattr(rs, "gunboat_types", ()) or not isinstance(squadrons, list):
+        return []
+    return [g for g in squadrons if isinstance(g, dict)]
+
+
+def gunboat_squadron_points(fleet: dict) -> int:
+    rs = ruleset_of(fleet)
+    return sum(rs.gunboat_squadron_points(g) for g in gunboat_squadrons(fleet))
+
+
 def morale(fleet: dict, designs: dict) -> tuple[int, int] | None:
     """(MASS destroyed, MASS at which the fleet withdraws), where the ruleset has a fleet morale
     rule (CD p.40). Ships whose design is missing count for nothing."""
@@ -133,7 +148,7 @@ def fleet_points(fleet: dict, designs: dict) -> int:
         ship_points(s, designs.get(s.get("design_id")), opts)
         for s in fleet.get("ships", [])
         if s.get("status") != DESTROYED
-    ) + dummy_bogey_points(fleet)
+    ) + dummy_bogey_points(fleet) + gunboat_squadron_points(fleet)
 
 
 def design_issues(design: dict, options: dict) -> list[Issue]:
@@ -260,6 +275,64 @@ def badge_label(key: str) -> str:
 REPAIR_SYSTEMS_PER_WEEK = 3   # "you may roll for up to three systems on each ship ... per Turn"
 REPAIR_TARGET = 3             # "on a D6 roll of 3 or more the system ... is repaired"
 DRIVE_SUCCESSES = 2           # "Drive systems require TWO successful repair rolls if fully disabled"
+
+
+FTL_HEXES_PER_WEEK = 6        # "each fleet of FTL ships can move up to 6 hexes" (FT p.35)
+
+
+def force_reach(ships: list[tuple[dict, dict | None]]) -> tuple[int, str]:
+    """(hexes a task force may move this week, why not when 0). Every ship must make the jump,
+    on its own FTL or carried, and none may be docked for repairs (FT p.36)."""
+    if not any(s.get("status") != "destroyed" for s, _d in ships):
+        return 0, _("No ships.")
+    if any(d is None for _s, d in ships):
+        return 0, _("A ship's design is missing.")
+    docked = [s for s, _d in ships if s.get("status") == "docked"]
+    if docked:
+        return 0, _("{name} is docked.", name=docked[0].get("name") or docked[0].get("table_id"))
+    fixed, carried = fleet_common.jump_blockers(ships)
+    if fixed:
+        return 0, _("{name} cannot move.", name=fixed[0].get("name") or fixed[0].get("table_id"))
+    if not carried:
+        return 0, _("Ships without a working FTL drive need tender bays or tugs in the force.")
+    return FTL_HEXES_PER_WEEK, ""
+
+
+SCAN_CLASSES = ("escort", "cruiser", "capital")
+CONTACT_CHOICES = ("fight", "withdraw", "standoff")
+CATCH_ROLL = 6
+
+
+def scan_counts(ships: list[tuple[dict, dict | None]]) -> dict[str, int]:
+    """The long-range scan of a group (FT p.34): how many ships of each basic class. Lost ships
+    and ships whose design is missing do not show."""
+    counts = dict.fromkeys(SCAN_CLASSES, 0)
+    for ship, design in ships:
+        rs = RULESETS.get(design.get("ruleset")) if design else None
+        if rs and ship.get("status") != "destroyed":
+            counts[rs.scan_class(design)] += 1
+    return counts
+
+
+def catch_roll_needed(choices: dict[str, str]) -> bool:
+    picks = set(choices.values())
+    return "fight" in picks and "withdraw" in picks
+
+
+def contact_outcome(choices: dict[str, str], roll: int | None) -> tuple[str, list[str]]:
+    """(outcome, sides that leave the system) once every side has chosen (FT p.35). No side
+    fights: all stand off, or else all leave. Someone fights: a withdrawing side gets away unless
+    the catch roll is a 6, and the battle is fought by whoever stays; when only the fighting side
+    stays, the others have "escaped". With more than two sides, one catch roll stands for all
+    (an app rule)."""
+    sides = list(choices)
+    if "fight" not in choices.values():
+        if all(choices[s] == "standoff" for s in sides):
+            return "standoff", []
+        return "leave", sides
+    escaped = [s for s in sides if choices[s] == "withdraw"] if roll != CATCH_ROLL else []
+    staying = [s for s in sides if s not in escaped]
+    return ("battle" if len(staying) > 1 else "escaped"), escaped
 
 
 def hull_boxes(design: dict | None) -> int:

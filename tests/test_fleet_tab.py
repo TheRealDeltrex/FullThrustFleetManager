@@ -447,3 +447,43 @@ def test_ships_are_reordered_by_dragging_and_saved_as_dropped(client):
     assert [s["uid"] for s in store.get_fleet(fleet_id)["ships"]] == ["sh3", "sh1", "sh2"]
     assert page.index('data-uid="sh3"') < page.index('data-uid="sh1"') < page.index('data-uid="sh2"')
     assert 'class="flash' not in page
+
+
+def test_ftl_gunboat_squadrons_are_fielded_without_a_carrier(client):
+    """PC p.80: FTL gunboats need no carrying vessel, so a PC fleet adds squadrons itself."""
+    assert "FTL gunboat squadrons" not in text(client.get(f"/fleet/{make_fleet(client)}"))
+    fleet_id = make_fleet(client, "Gunboats", ruleset="ftpc")
+    assert "FTL gunboat squadrons" in text(client.get("/fleet"))
+    client.post(f"/fleet/{fleet_id}/action", data={"action": "add_gunboats", "gunboat_type": "beam"})
+    assert store.get_fleet(fleet_id)["gunboat_squadrons"] == [{"uid": "g1", "type": "beam"}]
+    page = text(client.get("/fleet"))
+    assert 'name="fleet-gunboat-g1-type"' in page and 'name="fleet-gunboat-g1-boat-5"' in page
+    assert 'name="fleet-gunboat-g1-ftl"' not in page          # FTL is what lets them fly alone
+    # Two boats of another type make a mixed squadron (p.79).
+    client.post(f"/fleet/{fleet_id}/action", data={
+        "action": "update_gunboats", "autosave": "1", "fleet-gunboat-g1-type": "beam",
+        "fleet-gunboat-g1-boat-4": "pds", "fleet-gunboat-g1-boat-5": "pds",
+        "fleet-gunboat-g1-heavy": "on", "fleet-gunboat-g1-ecm": "0"})
+    squadron = store.get_fleet(fleet_id)["gunboat_squadrons"][0]
+    assert squadron == {"uid": "g1", "type": "beam", "types": ["beam"] * 4 + ["pds"] * 2,
+                        "extras": ["heavy"]}
+    page = text(client.get("/fleet"))
+    assert "4 Beam gunboats, 2 Point defence gunboats" in page
+    assert '<span class="muted">72 pts</span>' in page        # 4x9 + 2x9 + 6 FTL + 12 heavy
+    client.post(f"/fleet/{fleet_id}/action?gunboats=g1", data={"action": "remove_gunboats"})
+    assert store.get_fleet(fleet_id)["gunboat_squadrons"] == []
+
+
+def test_carrierless_gunboats_are_on_the_fleet_pdf(client):
+    import fitz
+
+    import pdf_export
+
+    fleet_id = make_fleet(client, "Gunboats", ruleset="ftpc")
+    client.post(f"/fleet/{fleet_id}/action", data={"action": "add_gunboats", "gunboat_type": "graser"})
+    fleet = store.get_fleet(fleet_id)
+    pdf = pdf_export.fleet_pdf([fleet], [{}], pdf_export.PrintOptions())
+    with fitz.open(stream=pdf, filetype="pdf") as doc:
+        text_ = " ".join(page.get_text() for page in doc)
+    assert "FTL gunboat squadron: Graser gunboats (60 points)" in text_
+    assert "Gunboat squadron" in text_                              # the tracker row

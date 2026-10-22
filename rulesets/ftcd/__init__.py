@@ -66,6 +66,9 @@ class FTCDRuleset:
         """(MASS lost, MASS at which the fleet withdraws), CD p.40; None where no rule."""
         return fleet_common.morale_mass(ships)
 
+    def scan_class(self, design: dict) -> str:
+        return rules.ship_class(common.as_int(design.get("tmf")))
+
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *aliens.races()]
 
@@ -123,7 +126,7 @@ class FTCDRuleset:
         points = self.design_breakdown(out, {}).points
         if printed and printed != points:
             source["npv_book"] = 0
-            changes.append(f"{common.source_ref(source)} prints NPV {printed}; "
+            changes.append(f"{common.printed_npv(out, source, printed)}; "
                            f"under Cross Dimensions the design costs {points}.")
         if changes:
             out["notes"] = " ".join(["Cross Dimensions:", *changes, out.get("notes") or ""]).strip()

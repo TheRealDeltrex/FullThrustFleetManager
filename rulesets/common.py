@@ -90,6 +90,14 @@ def source_ref(source: dict) -> str:
     return f"{book} p.{source.get('page')}"
 
 
+def printed_npv(design: dict, source: dict, printed: int) -> str:
+    """The NPV an adopted design brings along: printed, or for a design adjusted to fit the rules
+    (its name ends in *, its note says how) the value the adjustment gave it."""
+    if str(design.get("name") or "").endswith("*"):
+        return f"the adjusted design costs NPV {printed} under the Fleet Book rules"
+    return f"{source_ref(source)} prints NPV {printed}"
+
+
 def convert_star_ranger(design: dict, long_torpedo: dict, superior_sensors: str = "") -> list[str]:
     """A Star Ranger design's systems in the CD and PC terms that equal them; the notes it adds.
     The long-range pulse torpedo (MASS 8 +2 an arc, 3 a MASS) is CD's class-2 torpedo and PC's
@@ -208,6 +216,16 @@ def hull_descriptor(boxes: int, tmf: int, descriptors: tuple[tuple[int, str], ..
         if percent >= low:
             return hull_descriptor_label(label)
     return hull_descriptor_label("Fragile")
+
+
+SCAN_ESCORT_MAX, SCAN_CRUISER_MAX = 44, 90
+
+
+def scan_class(tmf: int) -> str:
+    """"escort", "cruiser" or "capital" by MASS, on CD p.42's bands."""
+    if tmf <= SCAN_ESCORT_MAX:
+        return "escort"
+    return "cruiser" if tmf <= SCAN_CRUISER_MAX else "capital"
 
 
 def pick_class(tmf: int, classes: tuple) -> tuple[str, str]:

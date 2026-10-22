@@ -701,7 +701,7 @@ helpers (9.5). Destroyed ships stay in the fleet (greyed, excluded from points) 
 ### 11.2 Hooks reserved now for the campaign module
 
 `fleet.campaign_id`, `ship.location`, `log[].week`, statuses `docked` and `hulk`. Do not reuse
-them for anything else.
+them for anything else. `fleet.campaign_id` and `fleet.campaign_side` are in use since step C1.
 
 ### 11.3 Campaign module (after v1, optional for users)
 
@@ -804,7 +804,21 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    data-model change - the power pools are per-turn play state, so the sheet prints a box and
    nothing is stored - but the Phalon layered shell did: `armour_layers` beside `armour`,
    which stays the total, at `schema_version` 2.
-4. Campaign module (11.3) with installations and the random campaign generator
+4. Campaign module (11.3) with installations and the random campaign generator, in steps C1-C8
+   (campaign manager) and G1-G4 (generator); see the roadmap doc. C1 (campaigns grouping
+   fleets into sides, a week counter, a campaign log, `.FTCampaign`) and C2 (a hex star map:
+   random, drawn by hand, or loaded from an `.FTStarmap` file) and C3 (task forces placed on
+   star systems, jump orders of up to 6 hexes a week, Next week moves them and logs contacts)
+   and C4 (contacts: the long-range scan, fight / withdraw / stand off with the catch roll, the
+   battle result and who holds the system) and C5 (repairs only docked at an own naval base,
+   once a week; reinforcements scheduled by week) and C6 (hidden movement: hot-seat hand-over,
+   umpire view, dummy markers) and C7 (objectives, a last week and the result; the Lafayette
+   Incident of FT pp.36-38 as a ready-made campaign) and C8 (installations: stations placed in
+   task forces that stay put, fight where they stand and serve as repair yards) are done, and
+   so is G1 (the map generator's settings: spacing, settled and outpost shares, bases per side,
+   names), G2 (scenario templates: invasion, raid, border war) and G3 (fleets bought from the
+   catalog for a points budget, no class over half the ships, garrisons for settled worlds) and
+   G4 (a weekly 2D6 event per side, and war weariness shortening an attacker's clock).
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

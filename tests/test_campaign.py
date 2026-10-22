@@ -274,3 +274,132 @@ def test_invalid_drive_results_do_not_apply_repairs(client, attempts, successes)
                      drive_attempts=str(attempts), drive_successes=str(successes)))
     assert "Drive repair successes cannot exceed attempts" in page
     assert store.get_fleet(fleet["id"])["ships"][0]["damage"] == before
+
+
+# ---- Campaigns: fleets on sides, the week counter (PLAN 11.3) --------------------------------------
+
+
+def campaign_post(client, campaign, **data):
+    return client.post(f"/campaigns/{campaign['id']}/action", data=data, follow_redirects=True)
+
+
+def test_a_new_campaign_puts_the_fleet_on_its_first_side(client):
+    fleet, _uid = a_fleet()
+    page = text(post(client, fleet, action="new_campaign", name="Lafayette Incident"))
+    assert "Campaign created" in page and "Lafayette Incident · Week 1" in page
+    fleet = store.get_fleet(fleet["id"])
+    campaign = store.get_campaign(fleet["campaign_id"])
+    assert campaign["ruleset"] == "fb"
+    assert [s["name"] for s in campaign["sides"]] == ["Blue", "Red"]
+    assert fleet["campaign_side"] == "blue"
+
+
+def test_a_second_fleet_joins_the_other_side_and_both_show(client):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    enemy, _msg = store.create_fleet("fb", "Strike Force", faction="ESU")
+    store.save_fleet(enemy)
+    client.get(f"/fleet/{enemy['id']}")
+    assert f'{campaign["id"]}:red' in text(client.get("/campaign"))     # offered on the join list
+    page = text(post(client, enemy, action="join_campaign", join=f"{campaign['id']}:red"))
+    assert "Fleet joined Border war" in page
+    assert "Home Fleet" in page and "Strike Force" in page
+    assert store.get_fleet(enemy["id"])["campaign_side"] == "red"
+
+
+def test_campaigns_keep_to_one_ruleset():
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    other, _msg = store.create_fleet("ft2", "Old guard")
+    ok, msg = store.join_campaign(other, campaign["id"], "blue")
+    assert not ok and "another ruleset" in msg
+    assert store.list_campaigns("ft2") == []
+    assert not store.join_campaign(fleet, campaign["id"], "green")[0]
+
+
+def test_next_week_and_renaming_sides(client):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    campaign_post(client, campaign, action="next_week")
+    assert store.get_campaign(campaign["id"])["week"] == 2
+    campaign_post(client, campaign, action="update_campaign", autosave="1", name="Border war",
+                  week="5", **{"side-blue": "NAC", "side-red": "ESU"})
+    saved = store.get_campaign(campaign["id"])
+    assert saved["week"] == 5 and [s["name"] for s in saved["sides"]] == ["NAC", "ESU"]
+    # The fleet log offers the campaign's week.
+    assert 'name="week" value="5"' in text(client.get("/campaign"))
+
+
+def test_sides_can_be_added_and_empty_ones_removed(client):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Three-way")
+    store.save_fleet(fleet)
+    campaign_post(client, campaign, action="add_side", name="Pirates")
+    saved = store.get_campaign(campaign["id"])
+    assert saved["sides"][-1] == {"id": "side3", "name": "Pirates"}
+    assert "fleets first" in store.remove_side(saved, "blue")[1]
+    campaign_post(client, campaign, action="remove_side", side="side3")
+    saved = store.get_campaign(campaign["id"])
+    assert [s["id"] for s in saved["sides"]] == ["blue", "red"]
+    assert "two sides" in store.remove_side(saved, "red")[1]
+
+
+def test_the_campaign_log_and_leaving(client):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    campaign_post(client, campaign, action="add_campaign_log", week="1", text="ESU fleet sighted")
+    assert "ESU fleet sighted" in text(client.get("/campaign"))
+    page = text(post(client, fleet, action="leave_campaign"))
+    assert "left the campaign" in page and "New campaign" in page
+    assert store.get_fleet(fleet["id"])["campaign_id"] is None
+
+
+def test_deleting_a_campaign_keeps_its_fleets(client):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    assert "Campaign deleted" in text(campaign_post(client, campaign, action="delete_campaign"))
+    kept = store.get_fleet(fleet["id"])
+    assert kept and kept["campaign_id"] is None and kept["campaign_side"] is None
+    assert store.get_campaign(campaign["id"]) is None
+
+
+def test_a_campaign_exports_and_imports_with_its_fleets(client, library):
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    response = client.get(f"/export/campaign/{campaign['id']}")
+    assert response.status_code == 200
+    assert ".FTCampaign" in response.headers["Content-Disposition"]
+    data = response.get_data()
+    store.delete_campaign(campaign["id"])
+    store.delete_fleet(fleet["id"])
+    ok, msg, conflicts = store.import_file("Border_war.FTCampaign", data)
+    assert ok and msg == "Campaign Border war imported." and conflicts == []
+    assert store.get_campaign(campaign["id"])["name"] == "Border war"
+    assert store.get_fleet(fleet["id"])["campaign_side"] == "blue"
+
+
+def test_a_campaign_file_with_a_stray_fleet_is_refused():
+    import json
+
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    doc = json.loads(store.export_campaign(campaign["id"])[1])
+    doc["fleets"][0]["campaign_id"] = "elsewhere"
+    ok, msg, _c = store.import_file("x.FTCampaign", json.dumps(doc).encode("utf-8"))
+    assert not ok and "not in its campaign" in msg
+
+
+def test_backups_carry_campaigns():
+    fleet, _uid = a_fleet()
+    campaign, _msg = store.create_campaign(fleet, "Border war")
+    store.save_fleet(fleet)
+    _name, data = store.export_backup()
+    store.delete_campaign(campaign["id"])
+    ok, _msg, _c = store.import_file("b.FTBackup", data, overwrite_newer=True)
+    assert ok and store.get_campaign(campaign["id"])["name"] == "Border war"
