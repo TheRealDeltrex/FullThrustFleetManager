@@ -1178,6 +1178,7 @@ def normalize_campaign(doc: object) -> dict | None:
         "hidden": doc.get("hidden") is True,
         "events": doc.get("events") is True,
         "front_reach": _as_int(doc.get("front_reach"), starmap.DEFAULT_FRONT_REACH, 1, starmap.MAX_SIZE),
+        "neutral_clusters": doc.get("neutral_clusters") is not False,
         "effects": _norm_effects(doc.get("effects"), {s["id"] for s in sides}),
         "end_week": _as_int(doc.get("end_week"), 0, 0, 100000),
         "objectives": _norm_objectives(doc.get("objectives"), {s["id"] for s in sides}),
@@ -1466,7 +1467,9 @@ def leave_campaign(fleet: dict) -> tuple[bool, str]:
 def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
                     notes: str | None = None, sides: dict[str, str] | None = None,
                     hidden: bool | None = None, events: bool | None = None,
-                    front_reach: int | None = None) -> tuple[bool, str]:
+                    front_reach: int | None = None, clusters: bool | None = None) -> tuple[bool, str]:
+    if clusters is not None:
+        campaign["neutral_clusters"] = clusters
     if front_reach is not None:
         campaign["front_reach"] = max(1, min(starmap.MAX_SIZE, front_reach))
     if hidden is not None:
@@ -2162,7 +2165,8 @@ def random_starmap(campaign: dict, width: int, height: int, stars: int,
     free["place"] = place if place in starmap.NEUTRAL_PLACES else starmap.DEFAULT_NEUTRAL["place"]
     try:
         grid = starmap.generate(width, height, stars, [s["id"] for s in campaign["sides"]], seed,
-                                spacing=spacing, counts=keep, neutral=free, names=names)
+                                spacing=spacing, counts=keep, neutral=free, names=names,
+                                reach=campaign["front_reach"], clusters=campaign["neutral_clusters"])
     except starmap.CountsError as e:
         if e.placed < stars:
             return False, _("These counts need {need} systems; only {n} stars fit.",
