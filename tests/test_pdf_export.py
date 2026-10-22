@@ -309,6 +309,92 @@ def test_gunboats_in_a_boat_bay_get_the_gunboat_reference():
 # ---- Print design and pagination ---------------------------------------------------------------
 
 
+@pytest.mark.parametrize("paper", ["A4", "Letter"])
+@pytest.mark.parametrize("style", ["mono", "color"])
+def test_six_ship_sheet_keeps_six_mixed_ships_on_one_page_and_seventh_on_next(paper, style,
+                                                                           monkeypatch):
+    ids = ["fb:fb1:nac-" + name for name in (
+        "minerva", "ticonderoga", "furious", "vandenburg", "valley-forge", "ark-royal")]
+    fleet = a_fleet(ships=ids + ids[:1])
+    for index, ship in enumerate(fleet["ships"]):
+        ship["name"] = f"Station {index + 1}: Expeditionary Squadron"
+    drawings = []
+    original = pdf_export.draw_diagram
+
+    def capture(pdf, diagram, x, y, width):
+        drawings.append((pdf.page_no(), diagram, x, y, width))
+        return original(pdf, diagram, x, y, width)
+
+    monkeypatch.setattr(pdf_export, "draw_diagram", capture)
+    options = pdf_export.PrintOptions(paper=paper, style=style, roster=False, orders=False,
+                                      tracker=False, quickref=False)
+    data, pages = render([fleet], options)
+    assert len(pages) == 2
+    assert "Ships 1-6 / 7" in pages[0] and "Ships 7-7 / 7" in pages[1]
+    assert [p for p, *_ in drawings] == [1] * 6 + [2]
+    assert all(f"Station {i}:" in pages[0] for i in range(1, 7))
+    assert "Station 7:" not in pages[0] and "Station 7:" in pages[1]
+    # Each uniformly scaled vector diagram must stay inside its own station, not just the page.
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+        height = pdf_export.PAPER[paper][1]
+        card_h = (height - 26 - 38 - 8) / 3
+        for index, (_, diagram, x, y, width) in enumerate(drawings):
+            row = index % 6 // 2
+            assert y >= 38 + row * (card_h + 4) + 12
+            assert y + width * diagram.height / diagram.width <= 38 + row * (card_h + 4) + card_h - 8
+            assert x >= 12
+            # Damage boxes remain writable at ordinary A4/Letter print scale.
+            boxes = [p for p in diagram.primitives
+                     if isinstance(p, pdf_export.ssd_layout.Rect) and (p.ref or "").startswith("hull:")]
+            assert min(p.w * width / diagram.width for p in boxes) >= 2
+
+
+def test_six_ship_layout_preserves_spacious_layout_symbols_and_damage(monkeypatch):
+    fleet = a_fleet(ships=["fb:fb1:nac-valley-forge"])
+    fleet["ships"][0]["damage"]["hull"] = 9
+    diagrams = []
+    original = pdf_export.draw_diagram
+
+    def capture(pdf, diagram, *args):
+        diagrams.append(diagram)
+        return original(pdf, diagram, *args)
+
+    monkeypatch.setattr(pdf_export, "draw_diagram", capture)
+    for layout in ("six", "spacious"):
+        render([fleet], pdf_export.PrintOptions(sheet_layout=layout))
+    assert len(diagrams) == 2
+    assert diagrams[0] == diagrams[1]
+
+
+@pytest.mark.parametrize("ruleset", ["fb", "ft2", "ftcd", "ftpc"])
+def test_six_ship_sheet_renders_each_ruleset(ruleset):
+    ids = [d["id"] for d in store.catalog_designs(ruleset)][:6]
+    assert len(ids) == 6
+    fleet = a_fleet(ruleset=ruleset, ships=ids)
+    data, pages = render([fleet], pdf_export.PrintOptions(roster=False, orders=False,
+                                                        tracker=False, quickref=False))
+    assert len(pages) == 1 and "Ships 1-6 / 6" in pages[0]
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+
+
+def test_print_dialog_exposes_and_submits_the_sheet_layout(client, monkeypatch):
+    a_fleet()
+    assert b'Fleet sheet (six ships per page)' in client.get("/print").data
+    captured = []
+    original = pdf_export.fleet_pdf
+
+    def capture(fleets, designs, options):
+        captured.append(options.sheet_layout)
+        return original(fleets, designs, options)
+
+    monkeypatch.setattr(pdf_export, "fleet_pdf", capture)
+    for layout in ("six", "spacious"):
+        assert client.post("/print", data={"sheets": "on", "sheet_layout": layout}).status_code == 200
+    assert captured == ["six", "spacious"]
+
+
 def _assert_page_bounds(doc):
     """Body text, headers and footers must stay on the printable page."""
     for page in doc:

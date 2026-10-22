@@ -665,10 +665,11 @@ Reference: `docs/mockups/print-fleet-sheet.html`.
    counts, options in force (incl. MT toggles), badges; table of ID, name, class, type, TMF,
    thrust, FTL, status (+damage), source, points (NPV + loadout); non-conforming ships marked;
    notes.
-2. **Record sheets:** boxes sized by damage-track width (small / medium / large, full width for
-   very large ships), packed in rows, largest first; box header "ID · name · class TMF";
-   campaign damage pre-marked. Docked, hulk and destroyed ships are left off (they stay on the
-   roster).
+2. **Record sheets:** six ships per page in a fixed two-column, three-row fleet sheet,
+   inspired by Full Thrust Light. Fleet order, full identities, MASS/thrust/points and the
+   original SSD symbols are retained. A selectable spacious layout keeps variable-size boxes
+   packed largest first for dense designs. Campaign damage is pre-marked. Docked, hulk and
+   destroyed ships are left off (they stay on the roster).
 3. **Orders chart:** ship ID x turns 1-10 with velocity columns (FB1 p.47 style).
 4. **Fighter/ordnance tracker** (only if the fleet carries any): per fighter group 6 fighter
    boxes + CEF circles (6, or 9 for long-range), per magazine salvo boxes, one-shot systems.
@@ -686,6 +687,7 @@ on/off, **blank copy** (clean SSDs, no campaign state), **battle pack**: pick a 
 roster + sheets + trackers for fleet 1, the same for fleet 2, one orders chart per fleet and one
 shared quick reference.
 
+Record-sheet layout: fleet sheet (six ships per page, default) or spacious sheets.
 Black and white by default, photocopy-safe, with an optional colour dossier style. Both
 styles preserve black-on-white record-sheet symbols; fonts are bundled (no system-font dependency).
 

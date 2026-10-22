@@ -169,7 +169,11 @@ What exists:
 - Fonts are the bundled IBM Plex TTFs; no system font is used. `PrintOptions.style` is
   `mono` (default, ink-saving black and white) or `color` (blue dossier accents), selected
   independently of the screen theme in the print dialog. Both retain black-on-white SSDs.
-  Shared page furniture, wrapping/repeating roster tables, framed packed ship sheets,
+  `PrintOptions.sheet_layout` / the print dialog selects `six` (default, a fixed 2-by-3
+  grid inspired by Full Thrust Light's fleet sheets) or `spacious` (the previous variable-size
+  packing for larger diagrams). Six-ship pages keep fleet order, full wrapped identities and
+  uniformly scaled, unchanged SSD primitives. Incomplete final pages keep the same card sizes.
+  Shared page furniture, wrapping/repeating roster tables, framed ship sheets,
   orders grids with velocity columns, bounded tracker cards and two-column references
   use the same print-first layout on A4 and Letter. Rulebook text and SSD primitives stay
   unchanged. Running headers abbreviate long fleet names; body identities wrap in full.
