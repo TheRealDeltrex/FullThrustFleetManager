@@ -247,6 +247,62 @@ def test_layout_hints_pin_a_system():
     assert (circle.cx, circle.cy) == (5, 7)
 
 
+def _centres(d: dict) -> dict[str, tuple[float, float]]:
+    return ssd_layout.layout(d).anchors
+
+
+def _armour_top(d: dict) -> float:
+    return min(p.cy - p.r for p in ssd_layout.layout(d).primitives
+               if isinstance(p, ssd_layout.Circle) and (p.ref or "").startswith("armour:"))
+
+
+def test_fire_controls_sit_in_one_row_straight_above_the_armour():
+    d = design("fb:fb1:nac-furious")
+    d["systems"] = [{"uid": f"fc{i}", "type": "fire_control"} for i in range(9)] + [
+        {"uid": "b", "type": "beam", "class": 2, "arcs": ["F"]}]
+    at = _centres(d)
+    rows = {at[f"fc{i}"][1] for i in range(9)}
+    assert len(rows) == 1  # never wrapped, however many
+    row = rows.pop()
+    assert at["b"][1] < row < _armour_top(d)
+    assert _armour_top(d) - row < 2 * ssd_layout.ICON_RADIUS
+
+
+def test_pds_share_the_fire_control_row_when_it_has_room_else_go_above():
+    d = design("fb:fb1:nac-furious")
+    d["systems"] = [{"uid": "fc", "type": "fire_control"}, {"uid": "p", "type": "pds"}]
+    at = _centres(d)
+    assert at["p"][1] == at["fc"][1] and at["p"][0] > at["fc"][0]
+    d["systems"] = [{"uid": f"fc{i}", "type": "fire_control"} for i in range(4)] + [
+        {"uid": f"p{i}", "type": "pds"} for i in range(8)]
+    at = _centres(d)
+    assert at["p0"][1] < at["fc0"][1]
+
+
+def test_hangars_sit_above_point_defence():
+    d = design("fb:fb1:nac-furious")
+    d["systems"] = [{"uid": "fc", "type": "fire_control"}, {"uid": "h", "type": "hangar"}] + [
+        {"uid": f"p{i}", "type": "pds"} for i in range(12)]
+    at = _centres(d)
+    assert at["h"][1] < at["p0"][1] < at["fc"][1]
+
+
+def test_a_draggable_svg_groups_each_system_at_its_anchor():
+    d = design("fb:fb1:nac-furious")
+    d["systems"] = [{"uid": "b", "type": "beam", "class": 1, "arcs": ["F"]}]
+    diagram = ssd_layout.layout(d)
+    svg = ssd_layout.to_svg(diagram, draggable=True)
+    x, y = diagram.anchors["b"]
+    assert f'<g class="sys" data-uid="b" data-x="{ssd_layout._fmt(x)}" data-y="{ssd_layout._fmt(y)}">' in svg
+    assert "<g" not in ssd_layout.to_svg(diagram)
+
+
+def test_a_pinned_icon_low_on_the_sheet_grows_it():
+    d = design("fb:fb1:nac-furious")
+    d["layout_hints"] = {d["systems"][0]["uid"]: {"x": 50, "y": 900}}
+    assert ssd_layout.layout(d).height >= 900
+
+
 def test_an_unknown_system_type_still_draws():
     d = design("fb:fb1:nac-furious")
     d["systems"] = [{"uid": "x", "type": "quantum_widget"}]
