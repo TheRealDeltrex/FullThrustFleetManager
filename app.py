@@ -1212,7 +1212,8 @@ def _starmap_context(campaign: dict, view: dict) -> dict:
     svg = starmap.to_svg(grid, campaign["sides"], url_for("campaign") + "?hex=", picked,
                          _("Star map of {name}", name=campaign["name"]),
                          [dict(f, order=f["order"] if _knows_orders(campaign, view, f) else None)
-                          for f in campaign["forces"] if _sees(campaign, view, f)])
+                          for f in campaign["forces"] if _sees(campaign, view, f)],
+                         reach=campaign["front_reach"])
     return {"starmap": {
         "grid": grid, "svg": Markup(svg), "picked": picked, "system": system,
         "hex_label": starmap.hex_label(*picked) if picked else "",
@@ -1317,7 +1318,9 @@ def _update_campaign(campaign: dict) -> tuple[bool, str]:
                                  week=int(form["week"]) if form.get("week") else None,
                                  notes=form.get("notes"), sides=sides,
                                  hidden=hidden[-1] == "1" if hidden else None,
-                                 events=events[-1] == "1" if events else None)
+                                 events=events[-1] == "1" if events else None,
+                                 front_reach=_as_count(form["front_reach"])
+                                 if form.get("front_reach") else None)
 
 
 @register_action("set_objectives")

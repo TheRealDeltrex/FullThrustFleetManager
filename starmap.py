@@ -277,19 +277,21 @@ def neighbours(q: int, r: int) -> list[tuple[int, int]]:
             (q + 1, r - 1 + down), (q + 1, r + down)]
 
 
-NEUTRAL = "~"                               # a frontline() region held by neutral worlds
-CLUSTER = 2                                 # neutral worlds this near each other form a cluster
+NEUTRAL, OPEN = "~", "-"                    # frontline() regions: neutral worlds', nobody's
+CLUSTER = 3                                 # neutral worlds this near each other form a cluster
+DEFAULT_FRONT_REACH = 4                     # how far a side's systems project its front
 
 
-def frontline(starmap: dict) -> set[tuple[int, int]]:
-    """The hexes on the front (an app rule, Master 2026-10-22). Each hex belongs to the side whose
-    held system is strictly nearest; the front is every hex two sides are equally near and every
-    hex beside one held by another side, so an odd gap gives a front two hexes wide and two
-    opposing systems side by side are both on it. Neutral worlds (unowned settled worlds and
-    outposts) hold their own hex, and a neutral world in a cluster (another within CLUSTER hexes)
-    the hexes around it too, wherever no side's system is nearer; the hexes beside that region
-    are front, so a lone neutral world is ringed by it however far the sides are, and a cluster
-    projects it up to two hexes out. A neutral hex beside a side's system is front too."""
+def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int, int]]:
+    """The hexes on the front (an app rule, Master 2026-10-22). Each hex within `reach` of a
+    side's held system belongs to the side whose system is strictly nearest, so sides further
+    apart leave open space and no front between them. The front is every hex two sides are
+    equally near and every hex beside one held by another side, so an odd gap gives a front two
+    hexes wide and two opposing systems side by side are both on it. Neutral worlds (unowned
+    settled worlds and outposts) hold their own hex, and one in a cluster (another within
+    CLUSTER hexes) the hexes around it too, wherever no side's system is nearer. A side's hex
+    beside that region is front, so a lone neutral world inside a side's reach is ringed by it
+    and a cluster pushes it two hexes out. A neutral hex beside a side's system is front too."""
     held: dict[str, list[tuple[int, int]]] = {}
     neutral: list[tuple[int, int]] = []
     for s in starmap["systems"]:
@@ -299,15 +301,18 @@ def frontline(starmap: dict) -> set[tuple[int, int]]:
             neutral.append((s["q"], s["r"]))
     if len(held) < 2 and not (held and neutral):
         return set()
-    reach = {w: int(any(o != w and hex_distance(w, o) <= CLUSTER for o in neutral)) for w in neutral}
+    radius = {w: int(any(o != w and hex_distance(w, o) <= CLUSTER for o in neutral)) for w in neutral}
     systems = {p: side for side, cells in held.items() for p in cells}
     owner: dict[tuple[int, int], str] = {}
     for q in range(starmap["width"]):
         for r in range(starmap["height"]):
-            near = sorted((min(hex_distance((q, r), p) for p in cells), side) for side, cells in held.items())
-            if any(hex_distance((q, r), w) <= reach[w] and hex_distance((q, r), w) < near[0][0]
+            near = sorted((min(hex_distance((q, r), p) for p in cells), side)
+                          for side, cells in held.items())
+            if any(hex_distance((q, r), w) <= radius[w] and hex_distance((q, r), w) < near[0][0]
                    for w in neutral):
                 owner[q, r] = NEUTRAL
+            elif near[0][0] > reach:
+                owner[q, r] = OPEN
             else:
                 owner[q, r] = "" if len(near) > 1 and near[0][0] == near[1][0] else near[0][1]
     front = set()
@@ -316,7 +321,8 @@ def frontline(starmap: dict) -> set[tuple[int, int]]:
         if side == NEUTRAL:
             if any(n in systems for n in neighbours(*cell)):
                 front.add(cell)
-        elif not side or NEUTRAL in around or any(o not in (side, "", NEUTRAL) for o in around):
+        elif side != OPEN and (not side or NEUTRAL in around
+                               or any(o not in (side, "", NEUTRAL, OPEN) for o in around)):
             front.add(cell)
     return front
 
@@ -342,13 +348,14 @@ def _corners(x: float, y: float) -> str:
 
 
 def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int, int] | None = None,
-           label: str = "", forces: list[dict] | None = None) -> str:
+           label: str = "", forces: list[dict] | None = None,
+           reach: int = DEFAULT_FRONT_REACH) -> str:
     """The map as inline SVG. With href ("/campaign?hex="), every hex links to href + "q,r", which
     selects it without any script. Side colours are side-0 ... side-7 classes in style.css."""
     width = SIZE * (1.5 * starmap["width"] + 0.5) + 4
     height = _H * (starmap["height"] + 0.5) + 4
     colour = {s["id"]: f"side-{i}" for i, s in enumerate(sides)}
-    front = frontline(starmap) if starmap.get("frontline") else set()
+    front = frontline(starmap, reach) if starmap.get("frontline") else set()
     out = [f'<svg class="starmap" viewBox="0 0 {width:.0f} {height:.0f}" role="img" '
            f'aria-label="{escape(label)}">']
     for q in range(starmap["width"]):

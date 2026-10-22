@@ -1177,6 +1177,7 @@ def normalize_campaign(doc: object) -> dict | None:
         "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
         "hidden": doc.get("hidden") is True,
         "events": doc.get("events") is True,
+        "front_reach": _as_int(doc.get("front_reach"), starmap.DEFAULT_FRONT_REACH, 1, starmap.MAX_SIZE),
         "effects": _norm_effects(doc.get("effects"), {s["id"] for s in sides}),
         "end_week": _as_int(doc.get("end_week"), 0, 0, 100000),
         "objectives": _norm_objectives(doc.get("objectives"), {s["id"] for s in sides}),
@@ -1464,7 +1465,10 @@ def leave_campaign(fleet: dict) -> tuple[bool, str]:
 
 def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
                     notes: str | None = None, sides: dict[str, str] | None = None,
-                    hidden: bool | None = None, events: bool | None = None) -> tuple[bool, str]:
+                    hidden: bool | None = None, events: bool | None = None,
+                    front_reach: int | None = None) -> tuple[bool, str]:
+    if front_reach is not None:
+        campaign["front_reach"] = max(1, min(starmap.MAX_SIZE, front_reach))
     if hidden is not None:
         campaign["hidden"] = hidden
     if events is not None:
