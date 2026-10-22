@@ -235,6 +235,12 @@ What exists:
   draws, else the sides without objectives (the defenders) win. A result stops Next week until
   `reopen_campaign`. `store.lafayette_campaign()` sets up FT pp.36-38 from `LAFAYETTE` (map
   positions read off FT p.37); its force budgets go in the notes.
+- Installations (step C8) are ordinary fleet ships whose design `fleet_common.installation()`
+  accepts: a starbase, a gate, or a design with neither FTL nor thrust (FT p.27; a PC monster
+  ship `section` is not one). Placed in a task force on a system they never move and cannot
+  be carried (PC p.116), the side cannot withdraw from a contact there, and a standing one is
+  a repair yard for its side's docked ships there, itself included (`store.installations_at`,
+  `yard_block`; an app rule beside FT p.35's naval bases).
 
 ## Rulebook viewer
 
