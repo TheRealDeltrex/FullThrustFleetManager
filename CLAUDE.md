@@ -64,6 +64,8 @@ What exists:
   `rows` support atlases or individual images (1 by 1); omitted dimensions mean 4 by 4.
   Individual images are centered with `background-size:contain`, preserving native aspect
   ratios rather than distorting hull geometry.
+  Eight `photo-v7:` material refinements supersede their `photo-v6:` defaults without
+  changing the older records. Revisions retain model keys, source URLs and camera angles.
   All prior IDs remain valid; explicit selections and uploads keep precedence.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs

@@ -14,7 +14,9 @@ Current artwork contract, updated 2026-10-22.
 
 Source catalog designs have default portraits. Ruleset adoptions share their source
 design's picture. New miniature-class defaults intentionally share images across variants.
-The photo-v6 defaults cover all 482 source catalog designs using 268 individual portraits.
+The miniature-reference defaults cover all 482 source catalog designs using 268 individual
+portraits. Eight `photo-v7:` finish refinements replace selected `photo-v6:` defaults;
+all earlier records remain valid choices.
 Variants sharing a miniature hull intentionally share a picture. Faction-neutral FT2/MT
 examples use an actual miniature of the matching hull class. There are two current choices
 per custom class group: 38 refreshed miniature-based choices plus the eight retained special
