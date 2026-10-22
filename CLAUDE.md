@@ -216,7 +216,9 @@ What exists:
   exact counts of settled worlds, outposts and (optional) bases and a core-worlds toggle, plus
   neutral settled worlds and outposts placed none / random / border. Counts are a hard rule
   (Master 2026-10-22): `CountsError` when the stars can't hold them, never fewer. Homes at
-  opposite ends, sides claim nearest stars in turn), `frontline()` (hexes shaded when
+  opposite ends, sides claim nearest stars in turn, then `claim_empty` gives bare stars inside a
+  sphere to its side, front aside), `influence()` / `frontline()` (only settled worlds and
+  outposts project; neutral clusters are `campaign["neutral_clusters"]`; hexes shaded when
   `map["frontline"]`: a side's sphere is the hexes within `campaign["front_reach"]` (default 4)
   of its systems, always outlined; ties between sides' nearest held systems, hexes beside another side's
   region, and a ring around neutral worlds' regions: their own hex, plus one more for a cluster within 3 hexes where every side is 2+ hexes further) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
