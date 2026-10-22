@@ -17,28 +17,79 @@ from html import escape
 KINDS = ("settled", "outpost", "empty")
 MIN_SIZE, MAX_SIZE = 4, 30
 DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STARS = 12, 10, 16
+MAX_STARS = 400
 SPACINGS = (1, 2, 3, 4)
-DEFAULT_SPACING, DEFAULT_SETTLED, DEFAULT_OUTPOSTS, DEFAULT_BASES = 2, 40, 30, 1
-MAX_BASES = 5
+DEFAULT_SPACING = 2
+# Exact counts per side (roadmap G1, Master 2026-10-22): settled worlds and outposts (home among
+# them), naval bases (optional, home first) and whether settled worlds form a core; neutral
+# systems belong to no side.
+# `core`: settled worlds nearest home and outposts beyond them; off, the two are mixed.
+DEFAULT_COUNTS = {"settled": 2, "outposts": 1, "bases": 1, "core": True}
+# Neutral systems: none, on random free stars, or on the stars sides are most evenly near (a
+# border region).
+NEUTRAL_PLACES = ("none", "random", "border")
+DEFAULT_NEUTRAL = {"settled": 2, "outposts": 2, "place": "none"}
+MAX_GENERATED_SIDES = 5
+DEFAULT_FRONT_REACH = 4                     # how far a side's worlds project its sphere
 NAME_STYLES = ("stars", "catalog")
 # Survey catalogue prefixes, as FT p.37 names its minor stars (VN-459, HR-1306).
 CATALOGS = ("BD", "GJ", "HD", "HR", "LHS", "VN")
 
 # Real star names, for random maps and as the suggestion for a new system.
 STAR_NAMES = (
-    "Achernar", "Acrux", "Adhara", "Albireo", "Alcor", "Aldebaran", "Alderamin", "Algenib",
-    "Algol", "Alhena", "Alioth", "Alkaid", "Almach", "Alnair", "Alnilam", "Alphard",
-    "Alphecca", "Alpheratz", "Altair", "Ankaa", "Antares", "Arcturus", "Arneb", "Atria",
-    "Avior", "Barnard", "Bellatrix", "Betelgeuse", "Canopus", "Capella", "Caph", "Castor",
-    "Cebalrai", "Deneb", "Denebola", "Diphda", "Dubhe", "Elnath", "Eltanin", "Enif",
-    "Fomalhaut", "Gacrux", "Gienah", "Hadar", "Hamal", "Izar", "Kochab", "Kornephoros",
-    "Lalande", "Lesath", "Luyten", "Markab", "Menkar", "Menkent", "Merak", "Miaplacidus",
-    "Mintaka", "Mirach", "Mirfak", "Mirzam", "Mizar", "Naos", "Nunki", "Peacock",
-    "Phecda", "Polaris", "Pollux", "Procyon", "Rasalhague", "Regulus", "Rigel", "Ross",
-    "Ruchbah", "Sabik", "Sadr", "Saiph", "Scheat", "Schedar", "Shaula", "Sirius",
-    "Spica", "Suhail", "Tarazed", "Thuban", "Unukalhai", "Vega", "Wezen", "Wolf",
-    "Zaurak", "Zosma", "Zubenelgenubi", "Zubeneschamali",
+    "Acamar", "Achernar", "Achird", "Acrux", "Adhafera", "Adhara", "Adhil", "Ain", "Aladfar",
+    "Albaldah", "Albireo", "Alcor", "Alcyone", "Aldebaran", "Alderamin", "Aldhanab", "Aldulfin",
+    "Alfirk", "Algedi", "Algenib", "Algieba", "Algol", "Algorab", "Alhena", "Alioth", "Aljanah",
+    "Alkaid", "Alkalurops", "Alkes", "Almach", "Alnair", "Alnasl", "Alnilam", "Alnitak", "Alniyat",
+    "Alphard", "Alphecca", "Alpheratz", "Alrescha", "Alsafi", "Alsephina", "Alshain", "Altair",
+    "Altais", "Alterf", "Aludra", "Alula Australis", "Alula Borealis", "Alya", "Ancha",
+    "Angetenar", "Ankaa", "Anser", "Antares", "Arcturus", "Arkab", "Arneb", "Ascella",
+    "Asellus Australis", "Asellus Borealis", "Aspidiske", "Asterope", "Atik", "Atlas", "Atria",
+    "Avior", "Azelfafage", "Azha", "Baham", "Barnard", "Baten Kaitos", "Beemim", "Bellatrix",
+    "Betelgeuse", "Biham", "Botein", "Brachium", "Canopus", "Capella", "Caph", "Castor",
+    "Cebalrai", "Celaeno", "Chara", "Chertan", "Cor Caroli", "Cursa", "Dabih", "Deneb",
+    "Deneb Algedi", "Denebola", "Diadem", "Diphda", "Dschubba", "Dubhe", "Electra", "Elgafar",
+    "Elkurud", "Elnath", "Eltanin", "Enif", "Errai", "Fafnir", "Fang", "Fawaris", "Fomalhaut",
+    "Fulu", "Furud", "Gacrux", "Gianfar", "Gienah", "Ginan", "Gomeisa", "Grumium", "Hadar",
+    "Hamal", "Hassaleh", "Heze", "Homam", "Imai", "Izar", "Jabbah", "Kaus Australis",
+    "Kaus Borealis", "Kaus Media", "Keid", "Kitalpha", "Kochab", "Kornephoros", "Kraz", "Kurhah",
+    "Lalande", "Larawag", "Lesath", "Lucida", "Luyten", "Maia", "Marfik", "Markab", "Matar",
+    "Mebsuta", "Megrez", "Meissa", "Mekbuda", "Menkalinan", "Menkar", "Menkent", "Menkib", "Merak",
+    "Merope", "Mesarthim", "Miaplacidus", "Mimosa", "Minelauva", "Mintaka", "Mira", "Mirach",
+    "Mirfak", "Mirzam", "Mizar", "Mothallah", "Muphrid", "Muscida", "Naos", "Nashira", "Nekkar",
+    "Nembus", "Nihal", "Nunki", "Nusakan", "Okab", "Peacock", "Phact", "Phecda", "Pherkad",
+    "Pipirima", "Pleione", "Polaris", "Polis", "Pollux", "Porrima", "Procyon", "Propus", "Proxima",
+    "Ran", "Rasalgethi", "Rasalhague", "Rastaban", "Regulus", "Revati", "Rigel", "Rigil Kentaurus",
+    "Ross", "Rotanev", "Ruchbah", "Rukbat", "Sabik", "Sadachbia", "Sadalbari", "Sadalmelik",
+    "Sadalsuud", "Sadr", "Saiph", "Sargas", "Sarin", "Sceptrum", "Scheat", "Schedar", "Seginus",
+    "Shaula", "Sheliak", "Sheratan", "Sirius", "Situla", "Skat", "Spica", "Sualocin", "Suhail",
+    "Sulafat", "Syrma", "Talitha", "Tania Australis", "Tania Borealis", "Tarazed", "Taygeta",
+    "Tegmine", "Tejat", "Thuban", "Tiaki", "Titawin", "Toliman", "Tureis", "Unukalhai",
+    "Unurgunite", "Vega", "Vindemiatrix", "Wasat", "Wezen", "Wolf", "Xamidimura", "Yed Posterior",
+    "Yed Prior", "Yildun", "Zaniah", "Zaurak", "Zavijava", "Zosma", "Zubenelgenubi",
+    "Zubenelhakrabi", "Zubeneschamali",
 )
+GREEK = ("Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta", "Iota", "Kappa",
+         "Lambda", "Mu", "Nu", "Xi", "Omicron", "Pi", "Rho", "Sigma", "Tau", "Upsilon", "Phi",
+         "Chi", "Psi", "Omega")
+CONSTELLATIONS = (
+    "Andromedae", "Antliae", "Apodis", "Aquarii", "Aquilae", "Arae", "Arietis", "Aurigae",
+    "Bootis", "Caeli", "Camelopardalis", "Cancri", "Canum Venaticorum", "Canis Majoris",
+    "Canis Minoris", "Capricorni", "Carinae", "Cassiopeiae", "Centauri", "Cephei", "Ceti",
+    "Chamaeleontis", "Circini", "Columbae", "Comae Berenices", "Coronae Australis",
+    "Coronae Borealis", "Corvi", "Crateris", "Crucis", "Cygni", "Delphini", "Doradus",
+    "Draconis", "Equulei", "Eridani", "Fornacis", "Geminorum", "Gruis", "Herculis", "Horologii",
+    "Hydrae", "Hydri", "Indi", "Lacertae", "Leonis", "Leonis Minoris", "Leporis", "Librae",
+    "Lupi", "Lyncis", "Lyrae", "Mensae", "Microscopii", "Monocerotis", "Muscae", "Normae",
+    "Octantis", "Ophiuchi", "Orionis", "Pavonis", "Pegasi", "Persei", "Phoenicis", "Pictoris",
+    "Piscium", "Piscis Austrini", "Puppis", "Pyxidis", "Reticuli", "Sagittae", "Sagittarii",
+    "Scorpii", "Sculptoris", "Scuti", "Serpentis", "Sextantis", "Tauri", "Telescopii",
+    "Trianguli", "Trianguli Australis", "Tucanae", "Ursae Majoris", "Ursae Minoris", "Velorum",
+    "Virginis", "Volantis", "Vulpeculae",
+)
+# Proper names plus Bayer designations ("Tau Ceti"), so large maps rarely repeat (Master asked
+# for at least 1200).
+NAME_POOL = STAR_NAMES + tuple(f"{g} {c}" for c in CONSTELLATIONS for g in GREEK)
 
 
 def hex_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
@@ -52,7 +103,10 @@ def hex_distance(a: tuple[int, int], b: tuple[int, int]) -> int:
 
 
 def blank(width: int = DEFAULT_WIDTH, height: int = DEFAULT_HEIGHT) -> dict:
-    return {"width": clamp_size(width), "height": clamp_size(height), "seed": None, "systems": []}
+    """An empty map. `draft` holds a generated map's settings until it is finalised; while it
+    does, changing them generates the map again."""
+    return {"width": clamp_size(width), "height": clamp_size(height), "seed": None, "systems": [],
+            "draft": None, "frontline": False}
 
 
 def clamp_size(n: int) -> int:
@@ -64,11 +118,21 @@ def system_at(starmap: dict, q: int, r: int) -> dict | None:
 
 
 def unused_name(starmap: dict, rng: random.Random | None = None) -> str:
+    """A pool name no system on the map has: a proper star name about half the time while any
+    are left, otherwise a Bayer designation."""
     taken = {s["name"] for s in starmap["systems"]}
-    free = [n for n in STAR_NAMES if n not in taken]
-    if not free:
-        return f"Star {len(taken) + 1}"
-    return rng.choice(free) if rng else free[0]
+    proper = [n for n in STAR_NAMES if n not in taken]
+    if not rng:
+        free = proper or [n for n in NAME_POOL if n not in taken]
+        return free[0] if free else f"Star {len(taken) + 1}"
+    if proper and rng.random() < 0.5:
+        return rng.choice(proper)
+    for _try in range(50):
+        name = rng.choice(NAME_POOL)
+        if name not in taken:
+            return name
+    free = [n for n in NAME_POOL if n not in taken]
+    return rng.choice(free) if free else f"Star {len(taken) + 1}"
 
 
 def catalog_name(starmap: dict, rng: random.Random) -> str:
@@ -79,17 +143,54 @@ def catalog_name(starmap: dict, rng: random.Random) -> str:
             return name
 
 
+class CountsError(ValueError):
+    """The counts ask for more systems than the map holds: `needed` against `placed` stars."""
+
+    def __init__(self, needed: int, placed: int):
+        super().__init__(f"{needed} systems needed, {placed} stars placed")
+        self.needed, self.placed = needed, placed
+
+
+def settings(width: int, height: int, stars: int, side_ids: list[str], *,
+             spacing: int = DEFAULT_SPACING, counts: dict | None = None,
+             neutral: dict | None = None, names: str = "stars") -> dict:
+    """The generator's inputs as kept on a draft map, with defaults filled in."""
+    counts = counts or {}
+    return {
+        "width": clamp_size(width), "height": clamp_size(height),
+        "stars": max(1, min(MAX_STARS, stars)), "spacing": spacing, "names": names,
+        "sides": {side: dict(DEFAULT_COUNTS, **counts.get(side, {})) for side in side_ids},
+        "neutral": dict(DEFAULT_NEUTRAL, **(neutral or {})),
+    }
+
+
+def needed(draft: dict) -> int:
+    """Systems the counts take: every side's settled worlds and outposts, and the neutral ones."""
+    neutral = draft["neutral"]
+    return (sum(c["settled"] + c["outposts"] for c in draft["sides"].values())
+            + (neutral["settled"] + neutral["outposts"] if neutral["place"] != "none" else 0))
+
+
 def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int, *,
-             spacing: int = DEFAULT_SPACING, settled: int = DEFAULT_SETTLED,
-             outposts: int = DEFAULT_OUTPOSTS, bases: int = DEFAULT_BASES,
-             names: str = "stars") -> dict:
-    """A random map (an app rule, roadmap G1): stars at least `spacing` hexes apart, `settled`
-    and `outposts` per cent of them settled worlds and outposts, the rest bare stars. Every
-    side gets a settled home with a naval base, the first two at opposite ends and any others
-    as far from those as the map allows; a settled world or outpost belongs to the home
-    clearly nearer to it (by more than two hexes) and the rest is contested. A side with more
-    than one base gets them on its own settled worlds furthest from home. Names are real stars
-    or survey catalogue numbers. The same seed and settings give the same map."""
+             spacing: int = DEFAULT_SPACING, counts: dict | None = None,
+             neutral: dict | None = None, names: str = "stars",
+             reach: int = DEFAULT_FRONT_REACH, clusters: bool = True) -> dict:
+    """A random map (an app rule, roadmap G1): stars at least `spacing` hexes apart. `counts`
+    gives each side exactly its settled worlds and outposts (its home among them) and naval bases
+    (side id -> {"settled", "outposts", "bases", "core"}, DEFAULT_COUNTS where missing);
+    `neutral` the settled worlds and outposts nobody holds and their `place` (NEUTRAL_PLACES:
+    none, random free stars, or a border region where the sides' systems are most evenly near);
+    the rest are bare stars. Homes: the first two sides at opposite ends, any others as far from those as the
+    map allows; a home is settled unless the side has only outposts. Sides then take turns
+    claiming the free star nearest their home until their counts are met. With `core` its
+    settled worlds are the nearest and its outposts lie beyond, otherwise the two are mixed.
+    Bases go on home, then on the side's settled worlds furthest from it, then its outposts.
+    Bare stars are then claimed as `claim_empty` says, with `reach` and `clusters`.
+    Raises CountsError when the stars placed cannot hold the counts. Names are real stars or
+    survey catalogue numbers. The same seed and settings give the same map, which comes back as
+    a draft holding those settings."""
+    draft = settings(width, height, stars, side_ids, spacing=spacing, counts=counts,
+                     neutral=neutral, names=names)
     rng = random.Random(seed)
     starmap = blank(width, height)
     starmap["seed"] = seed
@@ -97,40 +198,68 @@ def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int
     rng.shuffle(cells)
     placed: list[tuple[int, int]] = []
     for cell in cells:
-        if len(placed) >= stars:
+        if len(placed) >= draft["stars"]:
             break
         if all(hex_distance(cell, p) >= spacing for p in placed):
             placed.append(cell)
-    settled_cut, outpost_cut = settled / 100, (settled + outposts) / 100
+    if needed(draft) > len(placed):
+        raise CountsError(needed(draft), len(placed))
     for q, r in placed:
-        roll = rng.random()
-        kind = "settled" if roll < settled_cut else "outpost" if roll < outpost_cut else "empty"
         name = catalog_name(starmap, rng) if names == "catalog" else unused_name(starmap, rng)
-        starmap["systems"].append({"q": q, "r": r, "name": name, "kind": kind, "owner": "", "base": False})
+        starmap["systems"].append({"q": q, "r": r, "name": name, "kind": "empty", "owner": "", "base": False})
     systems = starmap["systems"]
+    mid = starmap["height"] // 2
     homes: list[tuple[dict, str]] = []
-    if len(side_ids) >= 2 and len(placed) >= 2:
-        west = min(systems, key=lambda s: (s["q"], abs(s["r"] - starmap["height"] // 2)))
-        east = max(systems, key=lambda s: (s["q"], -abs(s["r"] - starmap["height"] // 2)))
-        homes = [(west, side_ids[0]), (east, side_ids[1])]
-        for side in side_ids[2:]:
+    for side in side_ids:
+        if not homes:
+            home = min(systems, key=lambda s: (s["q"], abs(s["r"] - mid)))
+        elif len(homes) == 1:
+            home = max((s for s in systems if s is not homes[0][0]),
+                       key=lambda s: (s["q"], -abs(s["r"] - mid)))
+        else:
             free = [s for s in systems if all(s is not h for h, _side in homes)]
-            if not free:
-                break
-            homes.append((max(free, key=lambda s: min(_apart(s, h) for h, _side in homes)), side))
+            home = max(free, key=lambda s: min(_apart(s, h) for h, _side in homes))
+        home.update(kind="settled" if draft["sides"][side]["settled"] else "outpost", owner=side)
+        homes.append((home, side))
+    # Each side's claims, nearest first; a side drops out once it has what its counts ask for.
+    wants = {side: draft["sides"][side]["settled"] + draft["sides"][side]["outposts"] - 1
+             for side in side_ids}
+    claims: dict[str, list[dict]] = {side: [] for side in side_ids}
+    while any(len(claims[side]) < wants[side] for side in side_ids):
         for home, side in homes:
-            home.update(kind="settled", owner=side, base=True)
-    for system in systems:
-        if system["owner"] or system["kind"] == "empty" or not homes:
-            continue
-        near = sorted((_apart(system, home), side) for home, side in homes)
-        if near[1][0] - near[0][0] > 2:
-            system["owner"] = near[0][1]
+            if len(claims[side]) >= wants[side]:
+                continue
+            free = [s for s in systems if not s["owner"]]
+            pick = min(free, key=lambda s: (_apart(s, home), rng.random()))
+            pick["owner"] = side
+            claims[side].append(pick)
     for home, side in homes:
-        own = [s for s in systems if s["owner"] == side and s["kind"] == "settled" and not s["base"]]
-        for system in sorted(own, key=lambda s: -_apart(s, home))[:max(0, bases - 1)]:
+        c = draft["sides"][side]
+        settled = c["settled"] - (home["kind"] == "settled")
+        kinds = ["settled"] * settled + ["outpost"] * (len(claims[side]) - settled)
+        if not c["core"]:
+            rng.shuffle(kinds)
+        for system, kind in zip(claims[side], kinds):
+            system["kind"] = kind
+        rest = sorted(claims[side], key=lambda s: (s["kind"] != "settled", -_apart(s, home)))
+        for system in ([home] + rest)[:c["bases"]]:
             system["base"] = True
+    neutral = draft["neutral"]
+    free = [s for s in systems if not s["owner"]]
+    rng.shuffle(free)
+    if neutral["place"] == "border":
+        held = {side: [s for s in systems if s["owner"] == side] for side in side_ids}
+
+        def unevenness(s: dict) -> int:
+            near = sorted(min(_apart(s, h) for h in own) for own in held.values() if own)
+            return near[1] - near[0] if len(near) > 1 else 0
+        free.sort(key=unevenness)                            # stable: ties stay shuffled
+    if neutral["place"] != "none":
+        for i, system in enumerate(free[:neutral["settled"] + neutral["outposts"]]):
+            system["kind"] = "settled" if i < neutral["settled"] else "outpost"
     systems.sort(key=lambda s: (s["q"], s["r"]))
+    claim_empty(starmap, reach, clusters)
+    starmap["draft"] = draft
     return starmap
 
 
@@ -143,6 +272,92 @@ def holds(starmap: dict, side: str, count: int, include: str = "") -> bool:
     them when given: the shape of FT p.36's victory conditions."""
     held = [s for s in starmap["systems"] if s["owner"] == side and s["kind"] == "settled"]
     return len(held) >= count and (not include or any(s["name"] == include for s in held))
+
+
+def neighbours(q: int, r: int) -> list[tuple[int, int]]:
+    """The six hexes around (q, r) in odd-q coordinates, on or off the map."""
+    down = q & 1
+    return [(q, r - 1), (q, r + 1), (q - 1, r - 1 + down), (q - 1, r + down),
+            (q + 1, r - 1 + down), (q + 1, r + down)]
+
+
+NEUTRAL, OPEN = "~", "-"                    # frontline() regions: neutral worlds', nobody's
+CLUSTER = 3                                 # neutral worlds this near each other form a cluster
+
+
+def influence(starmap: dict, reach: int = DEFAULT_FRONT_REACH, clusters: bool = True
+              ) -> tuple[dict[tuple[int, int], str], set[tuple[int, int]]]:
+    """Who holds each hex, and the front (app rules, Master 2026-10-22). Only settled worlds and
+    outposts project. Each hex within `reach` of a side's held world belongs to the side whose
+    world is strictly nearest (a tie reads ""); beyond every side's reach is OPEN. The front is
+    every tied hex, every hex beside one held by another side (so an odd gap gives a front two
+    hexes wide and two opposing worlds side by side are both on it) and every side's hex beside
+    open space, so a side's sphere is always outlined.
+
+    Neutral worlds (unowned settled worlds and outposts) hold their own hex (NEUTRAL). With
+    `clusters`, one with another within CLUSTER hexes also holds the hexes around it wherever
+    every side's world is at least 2 hexes further away (a side 2 empty hexes off keeps the hex
+    beside the neutral world). A side's hex beside a neutral hex is front, so a lone neutral
+    world is ringed by front only inside a side's sphere; a cluster's region is outlined in open
+    space too. A neutral hex beside a side's world is front as well."""
+    held: dict[str, list[tuple[int, int]]] = {}
+    neutral: list[tuple[int, int]] = []
+    for s in starmap["systems"]:
+        if s["kind"] == "empty":
+            continue
+        if s["owner"]:
+            held.setdefault(s["owner"], []).append((s["q"], s["r"]))
+        else:
+            neutral.append((s["q"], s["r"]))
+    radius = {w: int(clusters and any(o != w and hex_distance(w, o) <= CLUSTER for o in neutral))
+              for w in neutral}
+    worlds = {p for cells in held.values() for p in cells}
+    owner: dict[tuple[int, int], str] = {}
+    clustered: set[tuple[int, int]] = set()
+    for q in range(starmap["width"]):
+        for r in range(starmap["height"]):
+            near = sorted((min(hex_distance((q, r), p) for p in cells), side)
+                          for side, cells in held.items()) or [(math.inf, "")]
+            # A neutral world is weak: past its own hex it holds only what a side is 2+ hexes further from.
+            holders = [w for w in neutral for d in [hex_distance((q, r), w)]
+                       if d == 0 or (d <= radius[w] and d + 1 < near[0][0])]
+            if holders:
+                owner[q, r] = NEUTRAL
+                if any(radius[w] for w in holders):
+                    clustered.add((q, r))
+            elif near[0][0] > reach:
+                owner[q, r] = OPEN
+            else:
+                owner[q, r] = "" if len(near) > 1 and near[0][0] == near[1][0] else near[0][1]
+    front = set()
+    for cell, side in owner.items():
+        around = [n for n in neighbours(*cell) if n in owner]
+        if side == NEUTRAL:
+            if any(n in worlds for n in around):
+                front.add(cell)
+        elif side == OPEN:
+            if any(n in clustered for n in around):
+                front.add(cell)
+        elif not side or any(owner[n] not in (side, "") for n in around):
+            front.add(cell)
+    return owner, front
+
+
+def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH,
+              clusters: bool = True) -> set[tuple[int, int]]:
+    """The hexes on the front: see influence()."""
+    return influence(starmap, reach, clusters)[1]
+
+
+def claim_empty(starmap: dict, reach: int = DEFAULT_FRONT_REACH, clusters: bool = True) -> None:
+    """Bare stars inside a side's sphere become that side's, except on the front (Master
+    2026-10-22); any other bare star, in a neutral region or open space, is nobody's."""
+    owner, front = influence(starmap, reach, clusters)
+    for s in starmap["systems"]:
+        if s["kind"] == "empty":
+            cell = (s["q"], s["r"])
+            side = owner.get(cell, "")
+            s["owner"] = side if side not in (NEUTRAL, OPEN) and cell not in front else ""
 
 
 def hex_label(q: int, r: int) -> str:
@@ -166,18 +381,20 @@ def _corners(x: float, y: float) -> str:
 
 
 def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int, int] | None = None,
-           label: str = "", forces: list[dict] | None = None) -> str:
+           label: str = "", forces: list[dict] | None = None,
+           reach: int = DEFAULT_FRONT_REACH, clusters: bool = True) -> str:
     """The map as inline SVG. With href ("/campaign?hex="), every hex links to href + "q,r", which
     selects it without any script. Side colours are side-0 ... side-7 classes in style.css."""
     width = SIZE * (1.5 * starmap["width"] + 0.5) + 4
     height = _H * (starmap["height"] + 0.5) + 4
     colour = {s["id"]: f"side-{i}" for i, s in enumerate(sides)}
+    front = frontline(starmap, reach, clusters) if starmap.get("frontline") else set()
     out = [f'<svg class="starmap" viewBox="0 0 {width:.0f} {height:.0f}" role="img" '
            f'aria-label="{escape(label)}">']
     for q in range(starmap["width"]):
         for r in range(starmap["height"]):
             x, y = _centre(q, r)
-            cls = "hex sel" if selected == (q, r) else "hex"
+            cls = "hex sel" if selected == (q, r) else "hex front" if (q, r) in front else "hex"
             poly = (f'<polygon class="{cls}" points="{_corners(x, y)}">'
                     f'<title>{hex_label(q, r)}</title></polygon>')
             out.append(f'<a href="{escape(href)}{q},{r}">{poly}</a>' if href else poly)

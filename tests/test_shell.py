@@ -19,7 +19,7 @@ def test_home_redirects_to_fleet_overview(client):
 @pytest.mark.parametrize("path", TAB_PATHS)
 def test_tab_renders_top_bar(client, path):
     html = client.get(path).get_data(as_text=True)
-    for label in ("Fleet overview", "Design", "Campaign", "Settings", "Fleet points", "Print fleet PDF"):
+    for label in ("Fleet overview", "Ship Design", "Campaign", "Settings", "Fleet points", "Print fleet PDF"):
         assert label in html
     # Exactly the requested tab is highlighted.
     assert len(re.findall(r'class="on"', html)) == 1
