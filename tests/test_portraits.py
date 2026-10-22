@@ -244,3 +244,12 @@ def test_photo_based_class_variants_share_images_and_preserve_legacy_choices(cli
         assert "upload" in portraits.resolve(design, portraits.load())
         page = client.get("/design/ftpc:" + base).get_data(as_text=True)
         assert 'data:image/jpeg;base64,' in page
+
+
+def test_individual_portraits_are_stored_small():
+    # docs/SHIP-ARTWORK.md: a single-image portrait is shown at 256 px at most, so the repo and
+    # the download carry it at 512 px on the long side, never the generator's full size.
+    for art in portraits.manifest()["portraits"].values():
+        if art.get("columns", 4) == 1 and art.get("rows", 4) == 1:
+            with Image.open(paths.bundle_dir() / "static" / art["file"]) as im:
+                assert max(im.size) <= 512, art["file"]
