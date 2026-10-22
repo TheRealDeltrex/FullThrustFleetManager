@@ -66,6 +66,10 @@ What exists:
   ratios rather than distorting hull geometry.
   Eight `photo-v7:` material refinements supersede their `photo-v6:` defaults without
   changing the older records. Revisions retain model keys, source URLs and camera angles.
+  `palette-v8:` defaults apply the owner-approved faction colours from
+  `docs/SHIP-ARTWORK.md`, overriding miniature paint but retaining hull shapes and source
+  viewing angles. Accents follow structural panels; no painted decorative motifs. NAC
+  uses thinner flush plates and rebuilt lighting to reduce miniature shading.
   All prior IDs remain valid; explicit selections and uploads keep precedence.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
