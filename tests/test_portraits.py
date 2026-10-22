@@ -22,7 +22,7 @@ def png():
     return out.getvalue()
 
 
-def test_every_official_design_has_unique_art_and_adoptions_share_it():
+def test_every_original_design_has_art_and_adoptions_share_it():
     originals = []
     for file in (paths.bundle_dir() / "data/catalog").glob("*.json"):
         designs = json.loads(file.read_text(encoding="utf-8"))["designs"]
@@ -30,7 +30,8 @@ def test_every_official_design_has_unique_art_and_adoptions_share_it():
         if file.name != "fb_starranger.json":
             originals.extend(designs)
     resolved = [portraits.resolve(d, {}) for d in originals]
-    assert len({(a["file"], a["cell"]) for a in resolved}) == len(originals) == 141
+    assert len(resolved) == len(originals) == 141
+    assert all(a and a.get("file") for a in resolved)
     for d in originals:
         if d["ruleset"] == "fb":
             for rs in ("ftcd", "ftpc"):
@@ -47,7 +48,9 @@ def test_two_gallery_choices_per_supported_class_and_assets_exist():
         path = paths.bundle_dir() / "static" / art["file"]
         assert path.is_file(), path
         with Image.open(path) as im:
-            assert im.width == im.height
+            if art.get("columns", 4) > 1 or art.get("rows", 4) > 1:
+                assert im.width == im.height
+            assert im.width > 0 and im.height > 0
         assert 0 <= art["cell"] < art.get("columns", 4) * art.get("rows", 4)
 
 
@@ -146,23 +149,29 @@ def test_clicking_a_picture_opens_the_picture_changer(client):
         assert ">Change picture</a>" not in page, url
 
 
-def test_expanded_source_catalog_has_distinct_uniform_view_defaults():
+def test_expanded_source_catalog_has_art_and_explicit_reference_views():
     originals = [d for file in (paths.bundle_dir() / "data/catalog").glob("*.json")
                  for d in json.loads(file.read_text(encoding="utf-8"))["designs"]]
-    # The IF Remora scouts (added 2026-10-21) have no picture of their own yet.
-    originals = [d for d in originals if d["id"] not in {"fb:sr:if-remora", "fb:sr:if-remora-recon"}]
     resolved = [portraits.resolve(d, {}) for d in originals]
-    assert len(originals) == len({(a["file"], a["cell"]) for a in resolved})
-    assert all(a["view"] == ("fleet-book-bow-lower-right" if a["faction"] == "PH"
-                             else "port-bow-30deg-bow-lower-left") for a in resolved)
+    assert len(originals) == len(resolved) == 482
+    for art in resolved:
+        assert art["view"] in {"source-photograph", "manufacturer-illustration", "faction-design",
+                               "fleet-book-bow-lower-right", "port-bow-30deg-bow-lower-left"}
+    # Shared class images are intentional, but cannot silently merge unrelated hulls.
+    cells = {}
+    for art in resolved:
+        key = (art["file"], art["cell"])
+        if key in cells:
+            assert art.get("model") and art["model"] == cells[key].get("model")
+        cells[key] = art
     assert all(a["basis"] in {"miniature", "miniature-variant", "invented-faction-design",
                              "fleet-book-restored", "fleet-book-style"}
                for a in resolved)
     for ruleset in RULESETS:
         for design in store.catalog_designs(ruleset):
             art = portraits.resolve(design, {})
-            assert art["view"] == ("fleet-book-bow-lower-right" if art["faction"] == "PH"
-                                   else "port-bow-30deg-bow-lower-left")
+            assert art["view"] in {"source-photograph", "manufacturer-illustration", "faction-design",
+                                   "fleet-book-bow-lower-right", "port-bow-30deg-bow-lower-left"}
 
 
 def test_versioned_defaults_preserve_existing_gallery_choices_and_uploads():
@@ -180,15 +189,20 @@ def test_versioned_defaults_preserve_existing_gallery_choices_and_uploads():
         assert f"custom:{code}:v2-2" in portraits.manifest()["portraits"]
 
 
-def test_phalon_owner_requested_originals_and_fleet_book_extension():
-    for identity, cell in (("fb2:ph-phyaa", 0), ("fb2:ph-vlath", 1), ("fb2:ph-draath", 14)):
+def test_phalon_photo_defaults_keep_originals_as_explicit_choices():
+    for identity in ("fb2:ph-phyaa", "fb2:ph-vlath", "fb2:ph-draath"):
         art = portraits.resolve({"id": "fb:" + identity}, {})
-        assert (art["file"], art["cell"]) == ("ships/ph.webp", cell)
-        assert art["basis"] == "fleet-book-restored"
+        assert art["view"] == "source-photograph"
+        assert art["basis"] == "miniature"
+    for identity, cell in (("fb2:ph-phyaa", 0), ("fb2:ph-vlath", 1), ("fb2:ph-draath", 14)):
+        legacy = portraits.manifest()["portraits"]["official:" + identity]
+        assert (legacy["file"], legacy["cell"]) == ("ships/ph.webp", cell)
     for identity in ("sr:ph-silith", "sr:ph-greeth", "sr:ph-gruuss-b"):
         art = portraits.resolve({"id": "fb:" + identity}, {})
-        assert art["file"] == "ships/ph-fleetbook-extension-v3.webp"
-        assert art["basis"] == "fleet-book-style"
+        assert art["view"] == "source-photograph"
+        assert art["basis"] == "miniature"
+    assert any(a["file"] == "ships/ph-fleetbook-extension-v3.webp"
+               for a in portraits.manifest()["portraits"].values())
 
 
 def test_portrait_renderer_uses_atlas_dimensions(client):
@@ -201,3 +215,32 @@ def test_portrait_renderer_uses_atlas_dimensions(client):
             art_url=lambda file: "/static/" + file)
     assert "background-size:300% 300%" in page
     assert "background-position:50.0% 50.0%" in page
+
+    # Individual images may retain their native portrait/landscape framing.
+    # Contain them without stretching their hull geometry to a square.
+    with client.application.test_request_context():
+        page = render_template_string(
+            '{% from "_portraits.html" import picture with context %}{{ picture(art, "Test") }}',
+            art={"file": "ships/test.webp", "cell": 0, "columns": 1, "rows": 1},
+            art_url=lambda file: "/static/" + file)
+    assert "background-size:contain;background-position:center" in page
+
+
+def test_photo_based_class_variants_share_images_and_preserve_legacy_choices(client):
+    pairs = (("sr:rav-attacker", "sr:rav-attacker-missile"),
+             ("sr:rav-raider", "sr:rav-raider-missile"),
+             ("sr:rav-raider-type-ii", "sr:rav-raider-type-ii-needle"))
+    for base, variant in pairs:
+        design = {"id": "fb:" + base}
+        art = portraits.resolve(design, {})
+        assert art == portraits.resolve({"id": "fb:" + variant}, {})
+        assert art["view"] == "source-photograph"
+        assert art["columns"] == art["rows"] == 1
+        assert len(art["references"]) == 2
+        legacy = "miniature-v2:" + base
+        portraits.save(portraits.design_target(design), art=legacy)
+        assert portraits.resolve(design, portraits.load()) == portraits.manifest()["portraits"][legacy]
+        portraits.save(portraits.design_target(design), data=png())
+        assert "upload" in portraits.resolve(design, portraits.load())
+        page = client.get("/design/ftpc:" + base).get_data(as_text=True)
+        assert 'data:image/jpeg;base64,' in page
