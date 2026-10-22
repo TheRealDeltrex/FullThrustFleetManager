@@ -1081,6 +1081,7 @@ def _campaign_context(fleet: dict) -> dict:
         return {"campaign": campaign, "sides": sides, "view": view, "starmap": None, "forces": [],
                 "contacts": [], "log": []}
     return {"campaign": campaign, "sides": sides, "view": view,
+            "generated_factions": store.generated_factions(campaign["ruleset"]),
             "log": [e for e in campaign["log"]
                     if view["umpire"] or store.sees_log(campaign, view["side"], e)],
             **_starmap_context(campaign, view),
@@ -1330,6 +1331,16 @@ def _set_objectives(campaign: dict) -> tuple[bool, str]:
 @register_action("apply_scenario")
 def _apply_scenario(campaign: dict) -> tuple[bool, str]:
     return store.apply_scenario(campaign, request.form.get("scenario", ""), request.form.get("attacker", ""))
+
+
+@register_action("generate_forces")
+def _generate_forces(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+    seed = form.get("seed", "").strip()
+    fleet, msg = store.generate_forces(campaign, form.get("side", ""), form.get("faction", ""),
+                                       _as_count(form.get("points")), _as_count(form.get("defence")),
+                                       int(seed) if seed.isdigit() else None)
+    return fleet is not None, msg
 
 
 @register_action("reopen_campaign")
