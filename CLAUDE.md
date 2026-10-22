@@ -48,12 +48,23 @@ What exists:
 - `static/artwork.css` adds the two illustrated palettes and decorative covers for all eleven themes from
   `static/themes/`. `portraits.py`, `data/ship_art.json`, `static/ships/` and `_portraits.html`
   provide portraits in every theme. See `docs/SHIP-ARTWORK.md` for extension and storage rules.
-  Versioned miniature-based atlases cover all 478 source designs plus 46 new custom choices;
-  187 legacy records remain valid. Optional `class_defaults` selects refreshed class pictures.
+  Versioned artwork covers the source catalog plus 46 custom choices;
+  legacy records remain valid. Optional `class_defaults` selects refreshed class pictures.
   Per-portrait metadata records references, basis and view. Owner-corrected defaults use new
   IDs/files and remap only changed cells. Original Phalon art is restored and extended in its
-  Fleet Book style/view at owner request; other factions use port-bow. Optional `columns` and
-  `rows` support repair atlases; omitted dimensions mean 4 by 4. All prior IDs remain valid.
+  Fleet Book style/view in legacy records; legacy human factions use port-bow. New `photo-v6:`
+  defaults use individual miniature-reference portraits with their native photo angles, clean
+  aerospace materials and corrected casting bends. Ships sharing a miniature class share one
+    portrait. `model` identifies that reference hull; `references` records source URLs. The 268
+  individual portraits cover all 482 source catalog designs; 25 generic rules
+  examples reuse matching miniature classes. Three no-miniature hulls are marked invented;
+  older Kra’Vak/Sa’Vasku illustration-based reconstructions are explicitly identified.
+    There are 38 refreshed miniature-based custom choices; special facilities retain earlier art.
+  Optional `columns` and
+  `rows` support atlases or individual images (1 by 1); omitted dimensions mean 4 by 4.
+  Individual images are centered with `background-size:contain`, preserving native aspect
+  ratios rather than distorting hull geometry.
+  All prior IDs remain valid; explicit selections and uploads keep precedence.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
   across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds
