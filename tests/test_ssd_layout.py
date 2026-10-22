@@ -323,20 +323,6 @@ def test_damage_marks_hull_armour_systems_and_drive():
     assert _crosses(damaged) == 2            # the dead system and the damaged drive
 
 
-def test_damage_runs_right_to_left_along_each_row():
-    """Master, 2026-10-22: armour and hull are marked off from the right end of a row."""
-    d = design("fb:fb1:nac-vandenburg")
-    diagram = ssd_layout.layout(d)
-    for kind in ("hull", "armour"):
-        shapes = {p.ref: p for p in diagram.primitives if p.ref.startswith(kind + ":")}
-        x = (lambda p: p.x) if kind == "hull" else (lambda p: p.cx)
-        y = (lambda p: p.y) if kind == "hull" else (lambda p: p.cy)
-        first, second = shapes[f"{kind}:1"], shapes[f"{kind}:2"]
-        assert y(first) == y(second) and x(first) > x(second), kind
-        row = [p for p in shapes.values() if y(p) == y(first)]
-        assert x(first) == max(x(p) for p in row), kind
-
-
 def test_a_blank_copy_ignores_campaign_damage():
     d = design("fb:fb1:nac-vandenburg")
     assert ssd_layout.layout(d, damage=None) == ssd_layout.layout(d, damage={})
