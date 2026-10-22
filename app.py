@@ -1276,6 +1276,12 @@ def _new_campaign(fleet: dict) -> tuple[bool, str]:
     return campaign is not None, msg
 
 
+@register_action("new_lafayette")
+def _new_lafayette(fleet: dict) -> tuple[bool, str]:
+    campaign, msg = store.lafayette_campaign(fleet)
+    return campaign is not None, msg
+
+
 @register_action("join_campaign")
 def _join_campaign(fleet: dict) -> tuple[bool, str]:
     # One field "campaign:side" from the join list, or the side picker of the current campaign.
@@ -1300,6 +1306,26 @@ def _update_campaign(campaign: dict) -> tuple[bool, str]:
                                  week=int(form["week"]) if form.get("week") else None,
                                  notes=form.get("notes"), sides=sides,
                                  hidden=hidden[-1] == "1" if hidden else None)
+
+
+@register_action("set_objectives")
+def _set_objectives(campaign: dict) -> tuple[bool, str]:
+    form = request.form
+
+    def tier(prefix: str) -> dict:
+        return {"count": _as_count(form.get(f"{prefix}-count")), "include": form.get(f"{prefix}-include", "")}
+
+    objectives = {}
+    for side in campaign["sides"]:
+        key = f"obj-{side['id']}"
+        draws = [tier(f"{key}-d{i}") for i in range(store.MAX_DRAW_TIERS)]
+        objectives[side["id"]] = dict(tier(key), draw=draws)
+    return store.set_objectives(campaign, _as_count(form.get("end_week")), objectives)
+
+
+@register_action("reopen_campaign")
+def _reopen_campaign(campaign: dict) -> tuple[bool, str]:
+    return store.reopen_campaign(campaign)
 
 
 @register_action("next_week")
