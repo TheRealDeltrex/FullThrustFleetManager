@@ -228,6 +228,13 @@ What exists:
   entries whose optional `sides` include it (`store.sees_log`). Other sides' ship lists are never
   shown. A force with `dummy` has no ships, jumps 6 and is removed with a log entry when it ends
   a week beside an enemy force (`store._exposed_dummies`).
+- Objectives (step C7): `campaign["objectives"]` {side: {count, include, draw [up to 2 tiers]}}
+  (hold `count` settled systems with `include` among them, `starmap.holds`), `end_week` and
+  `result` {winner side|"draw", week, text}. `next_week` judges the week just ended
+  (`store._verdict`) before moving anything: an objective met wins; after `end_week` a draw tier
+  draws, else the sides without objectives (the defenders) win. A result stops Next week until
+  `reopen_campaign`. `store.lafayette_campaign()` sets up FT pp.36-38 from `LAFAYETTE` (map
+  positions read off FT p.37); its force budgets go in the notes.
 
 ## Rulebook viewer
 

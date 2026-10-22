@@ -105,6 +105,13 @@ def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int
     return starmap
 
 
+def holds(starmap: dict, side: str, count: int, include: str = "") -> bool:
+    """Whether the side holds at least `count` settled systems, `include` (a system name) among
+    them when given: the shape of FT p.36's victory conditions."""
+    held = [s for s in starmap["systems"] if s["owner"] == side and s["kind"] == "settled"]
+    return len(held) >= count and (not include or any(s["name"] == include for s in held))
+
+
 def hex_label(q: int, r: int) -> str:
     """The printed hex number, column then row from 01 ("0304")."""
     return f"{q + 1:02d}{r + 1:02d}"
