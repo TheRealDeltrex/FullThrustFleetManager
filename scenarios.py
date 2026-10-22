@@ -22,7 +22,11 @@ def label(kind: str) -> str:
 
 
 def home(starmap: dict, side: str) -> dict | None:
-    return next((s for s in starmap["systems"] if s["owner"] == side and s["base"]), None)
+    """The side's first naval base, else its first settled world, else its first outpost (a side
+    may start with no base)."""
+    own = [s for s in starmap["systems"] if s["owner"] == side]
+    return next((s for test in (lambda s: s["base"], lambda s: s["kind"] == "settled",
+                                lambda s: s["kind"] == "outpost") for s in own if test(s)), None)
 
 
 def _apart(a: dict, b: dict) -> int:

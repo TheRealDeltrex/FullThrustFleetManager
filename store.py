@@ -1177,6 +1177,8 @@ def normalize_campaign(doc: object) -> dict | None:
         "name": _as_str(doc.get("name"), _("Unnamed campaign"), 80),
         "hidden": doc.get("hidden") is True,
         "events": doc.get("events") is True,
+        "front_reach": _as_int(doc.get("front_reach"), starmap.DEFAULT_FRONT_REACH, 1, starmap.MAX_SIZE),
+        "neutral_clusters": doc.get("neutral_clusters") is not False,
         "effects": _norm_effects(doc.get("effects"), {s["id"] for s in sides}),
         "end_week": _as_int(doc.get("end_week"), 0, 0, 100000),
         "objectives": _norm_objectives(doc.get("objectives"), {s["id"] for s in sides}),
@@ -1219,7 +1221,37 @@ def normalize_starmap(doc: object, side_ids: set[str]) -> dict | None:
             "base": s.get("base") is True,
         })
     out["systems"].sort(key=lambda s: (s["q"], s["r"]))
+    out["draft"] = _norm_draft(doc.get("draft"), side_ids)
+    out["frontline"] = doc.get("frontline") is True
     return out
+
+
+def _norm_draft(raw: object, side_ids: set[str]) -> dict | None:
+    """A draft map's generator settings (starmap.settings), or None once finalised."""
+    if not isinstance(raw, dict):
+        return None
+    sides = raw.get("sides") if isinstance(raw.get("sides"), dict) else {}
+
+    def counts(doc: object, defaults: dict) -> dict:
+        doc = doc if isinstance(doc, dict) else {}
+        out = {key: _as_int(doc.get(key), default, 0, starmap.MAX_STARS)
+               for key, default in defaults.items() if key not in ("core", "place")}
+        if "core" in defaults:
+            out["core"] = doc.get("core") is not False
+        if "place" in defaults:
+            place = doc.get("place")
+            out["place"] = place if place in starmap.NEUTRAL_PLACES else defaults["place"]
+        return out
+
+    return {
+        "width": starmap.clamp_size(_as_int(raw.get("width"), starmap.DEFAULT_WIDTH)),
+        "height": starmap.clamp_size(_as_int(raw.get("height"), starmap.DEFAULT_HEIGHT)),
+        "stars": _as_int(raw.get("stars"), starmap.DEFAULT_STARS, 1, starmap.MAX_STARS),
+        "spacing": _as_int(raw.get("spacing"), starmap.DEFAULT_SPACING, 1, max(starmap.SPACINGS)),
+        "names": raw.get("names") if raw.get("names") in starmap.NAME_STYLES else "stars",
+        "sides": {side: counts(c, starmap.DEFAULT_COUNTS) for side, c in sides.items() if side in side_ids},
+        "neutral": counts(raw.get("neutral"), starmap.DEFAULT_NEUTRAL),
+    }
 
 
 MAX_FORCES = 200
@@ -1434,7 +1466,12 @@ def leave_campaign(fleet: dict) -> tuple[bool, str]:
 
 def update_campaign(campaign: dict, *, name: str | None = None, week: int | None = None,
                     notes: str | None = None, sides: dict[str, str] | None = None,
-                    hidden: bool | None = None, events: bool | None = None) -> tuple[bool, str]:
+                    hidden: bool | None = None, events: bool | None = None,
+                    front_reach: int | None = None, clusters: bool | None = None) -> tuple[bool, str]:
+    if clusters is not None:
+        campaign["neutral_clusters"] = clusters
+    if front_reach is not None:
+        campaign["front_reach"] = max(1, min(starmap.MAX_SIZE, front_reach))
     if hidden is not None:
         campaign["hidden"] = hidden
     if events is not None:
@@ -2099,30 +2136,78 @@ def new_starmap(campaign: dict, width: int, height: int) -> tuple[bool, str]:
 
 
 def random_starmap(campaign: dict, width: int, height: int, stars: int,
-                   seed: int | None = None, **settings) -> tuple[bool, str]:
-    """A generated map (G1). `settings` are `starmap.generate`'s keywords, clamped here."""
+                   seed: int | None = None, *, spacing: int = starmap.DEFAULT_SPACING,
+                   counts: dict | None = None, neutral: dict | None = None,
+                   names: str = "stars") -> tuple[bool, str]:
+    """A generated map (G1), kept as a draft until finalised. Counts are exact: a side gets
+    precisely its settled worlds, outposts and bases, or the map is not made."""
+    if len(campaign["sides"]) > starmap.MAX_GENERATED_SIDES:
+        return False, _("The generator takes at most {n} sides.", n=starmap.MAX_GENERATED_SIDES)
     if seed is None:
         seed = random.randrange(1, 1_000_000)
+    names = names if names in starmap.NAME_STYLES else "stars"
+    spacing = max(1, min(max(starmap.SPACINGS), spacing))
+    stars = max(1, min(stars, starmap.MAX_STARS))
     keep = {}
-    if "spacing" in settings:
-        keep["spacing"] = max(1, min(max(starmap.SPACINGS), settings["spacing"]))
-    if "settled" in settings or "outposts" in settings:
-        keep["settled"] = max(0, min(100, settings.get("settled", starmap.DEFAULT_SETTLED)))
-        outposts = settings.get("outposts", starmap.DEFAULT_OUTPOSTS)
-        keep["outposts"] = max(0, min(100 - keep["settled"], outposts))
-    if "bases" in settings:
-        keep["bases"] = max(1, min(starmap.MAX_BASES, settings["bases"]))
-    if settings.get("names") in starmap.NAME_STYLES:
-        keep["names"] = settings["names"]
-    campaign["map"] = starmap.generate(width, height, max(1, min(stars, 400)),
-                                       [s["id"] for s in campaign["sides"]], seed, **keep)
+    for side in campaign["sides"]:
+        given = (counts or {}).get(side["id"], {})
+        c = {key: max(0, min(starmap.MAX_STARS, given.get(key, default)))
+             for key, default in starmap.DEFAULT_COUNTS.items() if key != "core"}
+        c["core"] = given.get("core", True) is not False
+        if c["settled"] + c["outposts"] < 1:
+            return False, _("{side}: at least one settled world or outpost.", side=side["name"])
+        if c["bases"] > c["settled"] + c["outposts"]:
+            return False, _("{side}: more bases than systems.", side=side["name"])
+        keep[side["id"]] = c
+    free = {key: max(0, min(starmap.MAX_STARS, (neutral or {}).get(key, default)))
+            for key, default in starmap.DEFAULT_NEUTRAL.items() if key != "place"}
+    place = (neutral or {}).get("place")
+    free["place"] = place if place in starmap.NEUTRAL_PLACES else starmap.DEFAULT_NEUTRAL["place"]
+    try:
+        grid = starmap.generate(width, height, stars, [s["id"] for s in campaign["sides"]], seed,
+                                spacing=spacing, counts=keep, neutral=free, names=names,
+                                reach=campaign["front_reach"], clusters=campaign["neutral_clusters"])
+    except starmap.CountsError as e:
+        if e.placed < stars:
+            return False, _("These counts need {need} systems; only {n} stars fit.",
+                            need=e.needed, n=e.placed)
+        return False, _("These counts need {need} systems; the map has {n} stars.",
+                        need=e.needed, n=e.placed)
+    grid["frontline"] = bool(campaign["map"] and campaign["map"]["frontline"])
+    campaign["map"] = grid
     campaign["forces"] = []
     campaign["contacts"] = []
     campaign["reinforcements"] = []
-    placed = len(campaign["map"]["systems"])
+    placed = len(grid["systems"])
     if placed < stars:
         return True, _("Only {n} stars fit on a map this size (seed {seed}).", n=placed, seed=seed)
     return True, _("Random star map, seed {seed}.", seed=seed)
+
+
+def set_frontline(campaign: dict, on: bool) -> tuple[bool, str]:
+    if not campaign["map"]:
+        return False, _("No star map.")
+    campaign["map"]["frontline"] = on
+    return True, ""
+
+
+def finalize_starmap(campaign: dict) -> tuple[bool, str]:
+    if not campaign["map"] or not campaign["map"]["draft"]:
+        return False, _("No draft map.")
+    campaign["map"]["draft"] = None
+    return True, _("Star map finalised.")
+
+
+def set_side_count(campaign: dict, n: int) -> tuple[bool, str]:
+    """Adds or removes sides from the end until the campaign has n (the generator's Sides)."""
+    n = max(2, min(MAX_SIDES, n))
+    while len(campaign["sides"]) < n:
+        add_side(campaign, "")
+    while len(campaign["sides"]) > n:
+        ok, msg = remove_side(campaign, campaign["sides"][-1]["id"])
+        if not ok:
+            return False, msg
+    return True, ""
 
 
 def set_star_system(campaign: dict, q: int, r: int, *, name: str, kind: str, owner: str,
@@ -2187,6 +2272,7 @@ def import_starmap(campaign: dict, data: bytes) -> tuple[bool, str]:
     grid = normalize_starmap(raw, set(ours))
     if not grid:
         return False, _("Not a star map file.")
+    grid["draft"] = None
     campaign["map"] = grid
     campaign["forces"] = []
     campaign["contacts"] = []

@@ -427,7 +427,12 @@ def _fleet_context(fleet: dict, view: str) -> dict:
 
 
 @app.route("/fleet")
-def fleet_overview() -> str:
+def fleet_overview() -> str | Response:
+    # The top bar's fleet picker submits ?go=<id>; a form, unlike a script-built URL, also
+    # stays inside the web build's frame.
+    if store.get_fleet(request.args.get("go", "")):
+        session["fleet_id"] = request.args["go"]
+        return redirect(url_for("fleet_overview"))
     fleet = current_fleet()
     if not fleet:
         return render_template("fleet.html", active_tab="fleet_overview", selected=None,
@@ -1207,7 +1212,8 @@ def _starmap_context(campaign: dict, view: dict) -> dict:
     svg = starmap.to_svg(grid, campaign["sides"], url_for("campaign") + "?hex=", picked,
                          _("Star map of {name}", name=campaign["name"]),
                          [dict(f, order=f["order"] if _knows_orders(campaign, view, f) else None)
-                          for f in campaign["forces"] if _sees(campaign, view, f)])
+                          for f in campaign["forces"] if _sees(campaign, view, f)],
+                         reach=campaign["front_reach"], clusters=campaign["neutral_clusters"])
     return {"starmap": {
         "grid": grid, "svg": Markup(svg), "picked": picked, "system": system,
         "hex_label": starmap.hex_label(*picked) if picked else "",
@@ -1307,12 +1313,15 @@ def _leave_campaign(fleet: dict) -> tuple[bool, str]:
 def _update_campaign(campaign: dict) -> tuple[bool, str]:
     form = request.form
     sides = {key[5:]: value for key, value in form.items() if key.startswith("side-")}
-    hidden, events = form.getlist("hidden"), form.getlist("events")
+    hidden, events, clusters = form.getlist("hidden"), form.getlist("events"), form.getlist("clusters")
     return store.update_campaign(campaign, name=form.get("name"),
                                  week=int(form["week"]) if form.get("week") else None,
                                  notes=form.get("notes"), sides=sides,
                                  hidden=hidden[-1] == "1" if hidden else None,
-                                 events=events[-1] == "1" if events else None)
+                                 events=events[-1] == "1" if events else None,
+                                 front_reach=_as_count(form["front_reach"])
+                                 if form.get("front_reach") else None,
+                                 clusters=clusters[-1] == "1" if clusters else None)
 
 
 @register_action("set_objectives")
@@ -1377,15 +1386,48 @@ def _new_starmap(campaign: dict) -> tuple[bool, str]:
 
 
 @register_action("random_starmap")
-def _random_starmap(campaign: dict) -> tuple[bool, str]:
+def _random_starmap(campaign: dict, reroll: bool = False) -> tuple[bool, str]:
+    """Makes a draft map, or makes the draft again as its inputs change (same seed unless New seed
+    was pressed) until Finalize."""
     form = request.form
-    seed = form.get("seed", "").strip()
-    settings = {key: _as_count(form[key])
-                for key in ("spacing", "settled", "outposts", "bases") if key in form}
-    if "names" in form:
-        settings["names"] = form["names"]
-    return store.random_starmap(campaign, *_map_size(form), int(form.get("stars") or starmap.DEFAULT_STARS),
-                                int(seed) if seed else None, **settings)
+    if "sides" in form:
+        ok, msg = store.set_side_count(campaign, _as_count(form["sides"]))
+        if not ok:
+            return False, msg
+    seed = "" if reroll else form.get("seed", "").strip()
+
+    def count(key: str, default: int) -> int:
+        return _as_count(form[key]) if form.get(key, "").strip() else default
+
+    counts = {side["id"]: {key: count(f"s-{side['id']}-{key}", default)
+                           for key, default in starmap.DEFAULT_COUNTS.items() if key != "core"}
+              for side in campaign["sides"]}
+    for side in campaign["sides"]:
+        # A checkbox posts nothing when off, so the form marks that the column is present.
+        core = form.get(f"s-{side['id']}-core") == "on"
+        counts[side["id"]]["core"] = core if "core-present" in form else True
+    neutral = {key: count(f"n-{key}", default)
+               for key, default in starmap.DEFAULT_NEUTRAL.items() if key != "place"}
+    neutral["place"] = form.get("n-place", starmap.DEFAULT_NEUTRAL["place"])
+    return store.random_starmap(campaign, *_map_size(form), count("stars", starmap.DEFAULT_STARS),
+                                int(seed) if seed else None,
+                                spacing=count("spacing", starmap.DEFAULT_SPACING),
+                                counts=counts, neutral=neutral, names=form.get("names", "stars"))
+
+
+@register_action("reroll_starmap")
+def _reroll_starmap(campaign: dict) -> tuple[bool, str]:
+    return _random_starmap(campaign, reroll=True)
+
+
+@register_action("set_frontline")
+def _set_frontline(campaign: dict) -> tuple[bool, str]:
+    return store.set_frontline(campaign, request.form.get("frontline") == "on")
+
+
+@register_action("finalize_starmap")
+def _finalize_starmap(campaign: dict) -> tuple[bool, str]:
+    return store.finalize_starmap(campaign)
 
 
 def _form_hex(campaign: dict) -> tuple[int, int] | None:
@@ -1510,6 +1552,11 @@ def _add_campaign_log(campaign: dict) -> tuple[bool, str]:
                                   request.form.get("text", ""))
 
 
+# A draft map is made again whenever its inputs change, so nothing may be built on it yet.
+NEEDS_FINAL_MAP = {"apply_scenario", "generate_forces", "next_week", "set_star_system",
+                   "remove_star_system", "add_force", "schedule_reinforcement"}
+
+
 @app.route("/campaigns/<campaign_id>/action", methods=["POST"])
 def campaigns_action(campaign_id: str) -> Response:
     campaign = store.get_campaign(campaign_id)
@@ -1518,6 +1565,9 @@ def campaigns_action(campaign_id: str) -> Response:
     if request.form.get("action") == "delete_campaign":
         ok, msg = store.delete_campaign(campaign_id)
         flash(msg, "success" if ok else "error")
+    elif (request.form.get("action") in NEEDS_FINAL_MAP and campaign["map"]
+          and campaign["map"]["draft"]):
+        flash(_("Finalize the star map first."), "error")
     elif dispatch_action(campaign):
         store.save_campaign(campaign)
     picked = request.form.get("hex")
