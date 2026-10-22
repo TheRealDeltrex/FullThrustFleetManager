@@ -217,8 +217,8 @@ What exists:
   neutral settled worlds and outposts placed none / random / border. Counts are a hard rule
   (Master 2026-10-22): `CountsError` when the stars can't hold them, never fewer. Homes at
   opposite ends, sides claim nearest stars in turn), `frontline()` (hexes shaded when
-  `map["frontline"]`: ties between sides' nearest held systems and hexes beside another side's
-  region) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
+  `map["frontline"]`: ties between sides' nearest held systems, hexes beside another side's
+  region, and a ring around neutral worlds' regions: their own hex, plus one more for a cluster) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
   so picking one needs no script. `scenarios.home` is a side's first base, else settled world,
   else outpost. The map keeps a dark sky in every look. `.FTStarmap` files
   carry the map and the sides; loading one maps owners onto this campaign's sides by position.

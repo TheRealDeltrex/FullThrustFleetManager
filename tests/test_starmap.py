@@ -244,7 +244,30 @@ def test_the_frontline_lies_between_opposing_systems():
     assert on_row == {(1, 0), (2, 0)}                        # distance 3: two hexes between
     on_row = {cell for cell in starmap.frontline(a_line((4, "blue"), (5, "red"))) if cell[1] == 0}
     assert on_row == {(4, 0), (5, 0)}                        # side by side
-    assert starmap.frontline(a_line((0, "blue"), (4, "blue"), (8, ""))) == set()
+    assert starmap.frontline(a_line((0, "blue"), (4, "blue"))) == set()
+
+
+def test_neutral_worlds_project_a_frontline():
+    """Master 2026-10-22: a neutral world is ringed by front however far the empire is; a cluster
+    projects it up to two hexes out."""
+    grid = starmap.blank(16, 12)
+
+    def add(q: int, r: int, owner: str) -> None:
+        grid["systems"].append({"q": q, "r": r, "name": f"S{q}{r}", "kind": "settled", "owner": owner,
+                                "base": False})
+
+    add(0, 0, "blue")
+    add(10, 6, "")
+    lone = (10, 6)
+    assert starmap.frontline(grid) == set(starmap.neighbours(*lone))
+    add(10, 8, "")                                     # two hexes away: a cluster
+    front = starmap.frontline(grid)
+    pair = [(10, 6), (10, 8)]
+    assert all(min(starmap.hex_distance(cell, w) for w in pair) == 2 for cell in front)
+    assert (10, 4) in front and (10, 7) not in front
+    add(11, 6, "blue")                                 # an empire system beside the lone pair member
+    front = starmap.frontline(grid)
+    assert {(10, 6), (11, 6)} <= front
 
 
 def test_the_frontline_toggle_shades_the_map(client):
