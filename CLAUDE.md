@@ -309,9 +309,7 @@ What exists:
   drive lozenge with its thrust, the FB core-systems box and any holds or tug drives.
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system; drag-to-arrange can write them later.
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
-  a damaged drive; black on paper. `damage=None` is a blank copy. Boxes and circles are numbered
-  right to left along each row (owner's choice), so damage is marked from the right end; the
-  CF stars follow the numbering.
+  a damaged drive; black on paper. `damage=None` is a blank copy.
 - Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race
   (`icon_set_for(race)` -> `"fb"` / `"ft2"` / `"fb_kravak"` / `"fb_savasku"` / `"fb_phalon"`,
   falling back to the `icon_set`
@@ -497,8 +495,8 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   meaning as the **total** box count, which is what the campaign damage clamp and the damage
   track use, and `armour_layers` holds the split, **inner layer first**. A design with no
   layers has the single layer every other race has. The sheet draws one row per layer with the
-  outermost on top, which is also the order damage removes them, so shell box 1 is the last
-  (rightmost) box of the top row.
+  outermost on top, which is also the order damage removes them, so shell box 1 is the first
+  box of the top row.
 - **The Phalon pulser L/M/C setting is a loadout entry, not design data** (FB2 p.35: chosen
   before each battle, never changed during one) and costs nothing. It is PLAN decision 25's
   default-in-design, overridable-per-ship pattern. The print dialog's `blank_pulsers` prints
