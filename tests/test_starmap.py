@@ -247,6 +247,15 @@ def test_the_frontline_lies_between_opposing_systems():
     assert starmap.frontline(a_line((0, "blue"), (4, "blue"))) == set()
 
 
+def test_sides_project_their_front_only_so_far():
+    """Master 2026-10-22: 4 hexes by default, set per campaign."""
+    apart = a_line((0, "blue"), (10, "red"))
+    assert starmap.frontline(apart) == set()
+    assert {cell for cell in starmap.frontline(apart, reach=5) if cell[1] == 0} == {(5, 0)}
+    odd = a_line((0, "blue"), (9, "red"))
+    assert {cell for cell in starmap.frontline(odd) if cell[1] == 0} == {(4, 0), (5, 0)}
+
+
 def test_neutral_worlds_project_a_frontline():
     """Master 2026-10-22: a neutral world is ringed by front however far the empire is; a cluster
     projects it up to two hexes out."""
@@ -259,13 +268,21 @@ def test_neutral_worlds_project_a_frontline():
     add(0, 0, "blue")
     add(10, 6, "")
     lone = (10, 6)
-    assert starmap.frontline(grid) == set(starmap.neighbours(*lone))
+    assert starmap.frontline(grid) == set()                  # beyond blue's reach: open space
+    assert starmap.frontline(grid, reach=30) == set(starmap.neighbours(*lone))
     add(10, 8, "")                                     # two hexes away: a cluster
-    front = starmap.frontline(grid)
+    front = starmap.frontline(grid, reach=30)
     pair = [(10, 6), (10, 8)]
     assert all(min(starmap.hex_distance(cell, w) for w in pair) == 2 for cell in front)
     assert (10, 4) in front and (10, 7) not in front
-    add(11, 6, "blue")                                 # an empire system beside the lone pair member
+    far = starmap.blank(16, 12)
+    far["systems"] = [dict(grid["systems"][0]), {"q": 4, "r": 4, "name": "A", "kind": "outpost",
+                                                 "owner": "", "base": False}]
+    far["systems"].append(dict(far["systems"][1], r=7, name="B"))       # three hexes: still a cluster
+    assert (4, 2) in starmap.frontline(far, reach=30)
+    far["systems"][2]["r"] = 8                                           # four: two lone worlds
+    assert (4, 2) not in starmap.frontline(far, reach=30)
+    add(11, 6, "blue")                                 # an empire system beside a neutral world
     front = starmap.frontline(grid)
     assert {(10, 6), (11, 6)} <= front
 
@@ -280,6 +297,9 @@ def test_the_frontline_toggle_shades_the_map(client):
     assert store.get_campaign(campaign["id"])["map"]["frontline"] is True
     post(client, campaign, action="set_frontline", autosave="1")
     assert store.get_campaign(campaign["id"])["map"]["frontline"] is False
+    assert store.get_campaign(campaign["id"])["front_reach"] == starmap.DEFAULT_FRONT_REACH
+    post(client, campaign, action="update_campaign", front_reach="7", autosave="1")
+    assert store.get_campaign(campaign["id"])["front_reach"] == 7
 
 
 def test_the_core_checkbox_reaches_the_generator(client):
