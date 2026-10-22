@@ -284,10 +284,11 @@ DEFAULT_FRONT_REACH = 4                     # how far a side's systems project i
 
 def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int, int]]:
     """The hexes on the front (an app rule, Master 2026-10-22). Each hex within `reach` of a
-    side's held system belongs to the side whose system is strictly nearest, so sides further
-    apart leave open space and no front between them. The front is every hex two sides are
-    equally near and every hex beside one held by another side, so an odd gap gives a front two
-    hexes wide and two opposing systems side by side are both on it. Neutral worlds (unowned
+    side's held system belongs to the side whose system is strictly nearest; beyond that is open
+    space. The front is every hex two sides are equally near, every hex beside one held by
+    another side (so an odd gap gives a front two hexes wide and two opposing systems side by
+    side are both on it) and every side's hex beside open space, so a side's sphere is always
+    outlined. Neutral worlds (unowned
     settled worlds and outposts) hold their own hex, and one in a cluster (another within
     CLUSTER hexes) the hexes around it too, wherever no side's system is nearer. A side's hex
     beside that region is front, so a lone neutral world inside a side's reach is ringed by it
@@ -299,7 +300,7 @@ def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int,
             held.setdefault(s["owner"], []).append((s["q"], s["r"]))
         elif s["kind"] != "empty":
             neutral.append((s["q"], s["r"]))
-    if len(held) < 2 and not (held and neutral):
+    if not held:
         return set()
     radius = {w: int(any(o != w and hex_distance(w, o) <= CLUSTER for o in neutral)) for w in neutral}
     systems = {p: side for side, cells in held.items() for p in cells}
@@ -321,8 +322,8 @@ def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int,
         if side == NEUTRAL:
             if any(n in systems for n in neighbours(*cell)):
                 front.add(cell)
-        elif side != OPEN and (not side or NEUTRAL in around
-                               or any(o not in (side, "", NEUTRAL, OPEN) for o in around)):
+        elif side != OPEN and (not side or NEUTRAL in around or OPEN in around
+                               or any(o not in (side, "", NEUTRAL) for o in around)):
             front.add(cell)
     return front
 
