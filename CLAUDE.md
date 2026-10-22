@@ -64,6 +64,12 @@ What exists:
   `rows` support atlases or individual images (1 by 1); omitted dimensions mean 4 by 4.
   Individual images are centered with `background-size:contain`, preserving native aspect
   ratios rather than distorting hull geometry.
+  Eight `photo-v7:` material refinements supersede their `photo-v6:` defaults without
+  changing the older records. Revisions retain model keys, source URLs and camera angles.
+  `palette-v8:` defaults apply the owner-approved faction colours from
+  `docs/SHIP-ARTWORK.md`, overriding miniature paint but retaining hull shapes and source
+  viewing angles. Accents follow structural panels; no painted decorative motifs. NAC
+  uses thinner flush plates and rebuilt lighting to reduce miniature shading.
   All prior IDs remain valid; explicit selections and uploads keep precedence.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
@@ -94,9 +100,9 @@ What exists:
 - `fleet_rules.py`, `store.py`, `migrations.py`, `data/factions.json` — see Storage below.
 
 - `ssd_layout.py` — the record sheet; see Ship diagram below.
-- The Design tab (`/design`, `/design/<id>`) — see Design tab below.
+- The Ship Design tab (`/design`, `/design/<id>`) — see Ship Design tab below.
 
-## Design tab
+## Ship Design tab
 
 - Routes: `GET /design` (library, no selection), `GET /design/<id>` (workbench),
   `POST /design/new`, `POST /design/<id>` with an `action` field. Catalog ids contain `:` and
@@ -138,7 +144,11 @@ What exists:
   every state-changing form from here on. `delete_fleet` is handled before dispatch because it
   has no fleet left to save.
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
-  and the roster table. Both use the same `ssd_layout` diagrams the PDF does.
+  the roster table, and the Space Dock (`?view=dock&ship=<uid>`, the pick remembered per fleet in
+  `session["dock_ship"]`): one ship's draggable diagram beside its design breakdown, a Refit
+  select (`refit_ship` -> `store.refit_ship`, drops damage/loadout entries the new design lacks),
+  "Refit as variant" (`store.refit_as_variant`, then opens the variant in Ship Design) and
+  "Edit design". All use the same `ssd_layout` diagrams the PDF does.
 - A ship's name and table ID are editable on its card; table IDs are unique per fleet,
   case-insensitive (`store._table_id_taken`, checked on add and on edit).
 - Add ship lists only the fleet's faction's designs when it has one; the "Show all ships" toggle
@@ -319,7 +329,16 @@ What exists:
   side columns flanking a central block of all-round systems, aft weapons under it, the armour
   circles and damage track (stars on the crew-factor boxes), and a bottom row with FTL, the
   drive lozenge with its thrust, the FB core-systems box and any holds or tug drives.
-  `layout_hints[uid] = {"x": .., "y": ..}` pins a system; drag-to-arrange can write them later.
+  Directly above the armour and hull boxes, bottom up: all fire controls in one row that never
+  wraps (squeezed if needed), PDS after them when the row has room else in rows above, then
+  hangars (`FIRE_CONTROLS` / `POINT_DEFENCE` / `HANGARS`).
+  `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
+- **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
+  wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`
+  (`editable`) adds the hidden layout form and "Reset layout", `static/ssddrag.js` posts the drop
+  through autosave to `POST /design/<id>/layout`. `store.set_layout_hint` saves at once (drawing,
+  not rules): into a library design and its draft, or for catalog designs into `layouts.json`
+  (merged by `get_design`, carried by backups). Used on the design tab and the Space Dock.
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
   a damaged drive; black on paper. `damage=None` is a blank copy.
 - Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race
@@ -387,7 +406,7 @@ What exists:
   rather than guessed at. Write the step and its test in the commit that bumps `CURRENT`.
 - `data/factions.json` holds the built-in factions per ruleset, each with its race; custom
   factions (with the race they were made for) live in the user library and travel with exports.
-  The Design tab's faction pickers (`templates/_factions.html`, `static/factions.js`) offer
+  The Ship Design tab's faction pickers (`templates/_factions.html`, `static/factions.js`) offer
   "New faction" (`store.faction_for_name`), list a custom faction only once a saved design carries
   it (`store.faction_choices`), and hide custom and other races' factions by two toggles saved as
   the `show_custom_factions` / `show_other_race_factions` settings (`POST /settings/factions`).
@@ -437,7 +456,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `required_options(design, loadout)` (the MT toggles a design needs), `icon_set_for(race)`,
   `quickref(systems_present, options, races)`, `fleet_issues(fleet, [(ship, design)], options)`
   (rules that judge the whole fleet; `fleet_report` adds them to `fleet_issues`) and
-  `hull_kinds` (the Design tab's "Hull kind" choices) and `dummy_bogey_points` (0 offers none; `fleet_rules.fleet_points` adds the fleet's
+  `hull_kinds` (the Ship Design tab's "Hull kind" choices) and `dummy_bogey_points` (0 offers none; `fleet_rules.fleet_points` adds the fleet's
   `dummy_bogeys` at that price). `loadout=None` means the design's default loadout.
 - **Races are additive modules inside a ruleset, never new rulesets** (PLAN 3 decision 3). A tech
   module is a plain module exposing the per-design half of the protocol (`system_defs()`,
@@ -453,7 +472,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - `validate_design(design, options)` also flags More Thrust content whose fleet toggle is off in
   `options` (`mt_toggle_off`, `mass_over_100`), so fleet conformance is just validation with the
   fleet's options. As with FTCD's options, a key absent from `options` (a design alone, as the
-  Design tab and `save_design` judge it) is only an `option_needed` info; `False` is the violation.
+  Ship Design tab and `save_design` judge it) is only an `option_needed` info; `False` is the violation.
 - The tournament check validates the ship's own loadout when it has one (`ship["loadout"]` in
   place of `default_loadout`), since that is what it carries and costs.
 - `rulesets/common.py`: what more than one ruleset needs. Integer rounding (`round_half_up`,
@@ -577,7 +596,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
 - Broadside arcs are exactly `FS, AS, AP, FP`; they cost as three arcs (class-1/2 beams as six).
 - Shell armour reuses `armour_layers` but costs 2, 4, 8 per box (doubling), not the Phalon
   2 x layer. MASS used may be under the total (CD p.42 "a maximum of"): a note, not a violation.
-- **Fleet options drive points, so the Design tab passes none**: the CPV hull cost and paying for
+- **Fleet options drive points, so the Ship Design tab passes none**: the CPV hull cost and paying for
   advanced FTL apply to fleet totals only, and a system behind an option (`cd_optional_systems`,
   `cd_multistage`, `cd_super_weapons`) is an `option_needed` note there and an `option_off`
   violation only where a fleet has that option explicitly off.
@@ -590,7 +609,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   `dummy_bogeys`) and `SHARED_ENTRIES` maps to entries; `fleet_morale` is on every sheet.
 - Loadout extras (CD pp.25, 30, 47) live in the loadout, not the design, under optional keys
   `store._norm_loadout` keeps only when used: fighter `extras` / `swing`, magazine `stages`,
-  top-level `craft` ({hangar, mass}). `derived["rich_loadout"]` makes the Design tab draw one
+  top-level `craft` ({hangar, mass}). `derived["rich_loadout"]` makes the Ship Design tab draw one
   row per bay (`fighter-<uid>-<i>-type|ftl|kinetic|swing`), `craft-<uid>`, and per magazine
   `stages-<uid>` with `salvos-<uid>-std|er` counts; `_read_loadout` falls back to the single
   `loadout-<uid>` select for the other rulesets. Multi-stage loads are paid in `loadout_points`
@@ -627,7 +646,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   (Ruleset protocol; FB and FT2 adopt nothing). `store._catalog()` calls it once per FB design:
   id `ftcd:<rest of the fb id>`. Every FB1 design costs its printed NPV unchanged. A design whose
   cost moves (the Kra'Vak, for their scatterguns) loses `npv_book` and says why in `notes`; the
-  Si'Tek swaps one K-1 gun for an ADFC as p.21 says. The Design tab groups the copies as
+  Si'Tek swaps one K-1 gun for an ADFC as p.21 says. The Ship Design tab groups the copies as
   "FB1 (FTCD)" etc., and the landing page's class count leaves them out.
 
 ## FTPC ruleset (`rulesets/ftpc/`)
@@ -650,10 +669,10 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   (`common.convert_star_ranger`; CD gets a class-2 torpedo). Their rules text is
   `data/quickref/sr.json` (hand-kept from the site, `url` per entry, `QuickRefEntry.url`): FB and
   PC quick references add it (`star_ranger_quickref`), `/rules/star-ranger` shows it all, and the
-  Design tab links a system to it.
+  Ship Design tab links a system to it.
 - New design fields `hull_rows` (3/4/5/6: hull boxes x3/x2/x1.5/x1; an advanced hull is three rows
   at x3 and ignores it), `stealth_hull` (0-2, +2/+4 a hull and armour box), `armour_regen`
-  (+2 a box). Normalised in `store`; the Design tab draws them when `derived["pc_hull_options"]`.
+  (+2 a box). Normalised in `store`; the Ship Design tab draws them when `derived["pc_hull_options"]`.
   Rows past the third threshold on 4+.
 - Shell armour costs 2 x layer as Phalon; screens are 5% a level with **no minimum**, which is
   why the FB1 Tibet costs 159 here. Broadside pairs (gatling/meson/pulser/TPA, SR K-1) are
@@ -672,7 +691,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   takes 24 craft MASS (MASS 4 a boat, p.80). A squadron may mix types (p.79): `types` lists all
   six boats (absent when uniform; `rules.boat_types()` reads both) and the per-squadron
   modifications cover all six. The editor is the `templates/_gunboats.html` macro, shared by the
-  Design tab's loadout and the Fleet tab.
+  Ship Design tab's loadout and the Fleet tab.
 - FTL gunboat squadrons need no carrier (p.80): `fleet["gunboat_squadrons"]` [{uid, type, ...}],
   FTL implied and paid (`rules.independent_squadron`). `fleet_rules.gunboat_squadron_points`
   adds them to the total through the ruleset's `gunboat_squadron_points`, gated on
@@ -709,7 +728,7 @@ PDF via fpdf2). The browser renders the same primitives as SVG: screen = paper.
   unchanged under that ruleset (`store._adoptable`; FB 178, CD 239, PC 336 of 341). A name ending in `*` marks a design
   adjusted to fit the rules (owner's ruling: torpedo arcs trimmed to three, the IF Remora
   enlarged for 2-MASS enhanced sensors); its `npv_book` is the adjusted cost and its note says
-  what the page printed (`common.printed_npv` words the adopted copies' notes); the Design tab groups them as "Star Ranger" and links the NPV chip to the
+  what the page printed (`common.printed_npv` words the adopted copies' notes); the Ship Design tab groups them as "Star Ranger" and links the NPV chip to the
   page (`common.WEB_SOURCES`).
   Files are `{"schema_version": 1, "designs": [...]}`; ids `<ruleset>:<book>:<faction->name>`.
 - **Generated, never hand-edited:** `tools/extract_catalog_fb1.py` and `extract_catalog_ft2.py`

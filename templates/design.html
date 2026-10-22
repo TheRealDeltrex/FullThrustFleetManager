@@ -2,7 +2,8 @@
 {% from "_factions.html" import faction_picker with context %}
 {% from "_portraits.html" import picture with context %}
 {% import "_gunboats.html" as gunboats %}
-{% block title %}{{ _("Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
+{% import "_ssd.html" as ssd %}
+{% block title %}{{ _("Ship Design") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-3{% endblock %}
 {% block content %}
   {# ---- Left: library tree (PLAN 9.4) ---- #}
@@ -526,7 +527,7 @@
   <aside class="side-col">
     <div class="panel">
       <h3 class="fold" data-fold="design-diagram" tabindex="0">{{ _("Ship diagram") }}</h3>
-      <div class="body ssd-wrap">{% if selected %}{{ selected.svg }}{% else %}<span class="muted">&ndash;</span>{% endif %}</div>
+      <div class="body ssd-wrap">{% if selected %}{{ ssd.editable(selected.svg, selected.design) }}{% else %}<span class="muted">&ndash;</span>{% endif %}</div>
     </div>
     <div class="panel">
       <h3 class="fold" data-fold="design-budget" tabindex="0">{{ _("Budget") }}</h3>
