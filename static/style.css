@@ -573,3 +573,17 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 }
 [data-theme="full-thrust"] .lib-list a.on { color:var(--accent); background:var(--accent-soft); }
 [data-theme="full-thrust"] input[type=checkbox] { accent-color:#358cc9; }
+
+/* Drag-to-arrange ship diagrams (static/ssddrag.js) */
+.ssd-edit g.sys { cursor: grab; touch-action: none; }
+.ssd-edit g.sys:hover { opacity: .6; }
+.ssd-edit g.sys.dragging { cursor: grabbing; opacity: .8; }
+.ssd-edit svg { touch-action: pan-y; }
+.ssd-edit .ssd-layout { justify-content: flex-end; margin-top: 4px; }
+.ssd-edit .ssd-layout:not(:has(button)) { display: none; }
+
+/* Space Dock (Fleet overview): the ship's diagram beside its specs */
+.dock { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; align-items: start; }
+.dock .ssd-wrap svg { max-height: 70vh; }
+.dock-ships { flex-wrap: wrap; }
+@media (max-width: 900px) { .dock { grid-template-columns: minmax(0, 1fr); } }
