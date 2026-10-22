@@ -395,6 +395,19 @@ def test_print_dialog_exposes_and_submits_the_sheet_layout(client, monkeypatch):
     assert captured == ["six", "spacious"]
 
 
+def test_compact_ship_id_is_never_truncated_and_long_identities_wrap():
+    fleet = a_fleet(ships=FB_SHIPS[:1])
+    ship = fleet["ships"][0]
+    ship["table_id"] = "WWWWWWWWWWWWWWWW"
+    ship["name"] = "The Northern Expeditionary Squadron's Flagship at the Distant Frontier"
+    data, pages = render([fleet], pdf_export.PrintOptions(roster=False, orders=False,
+                                                        tracker=False, quickref=False))
+    assert ship["table_id"] in pages[0]
+    assert "Distant Frontier" in " ".join(pages[0].split())
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+
+
 def _assert_page_bounds(doc):
     """Body text, headers and footers must stay on the printable page."""
     for page in doc:
