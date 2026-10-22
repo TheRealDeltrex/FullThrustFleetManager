@@ -22,6 +22,13 @@
 
       <h3 class="sep fold" data-fold="print-options" tabindex="0">{{ _("Options") }}</h3>
       <div class="body stack">
+        <label>{{ _("Print style") }}
+          <select class="input" name="print_style">
+            <option value="mono">{{ _("Black and white (ink-saving)") }}</option>
+            <option value="color">{{ _("Fleet dossier (colour)") }}</option>
+          </select>
+        </label>
+        <p class="muted">{{ _("Both styles keep record-sheet symbols black on white. Colour adds restrained blue headings and table accents.") }}</p>
         <label>{{ _("Paper") }}
           <select class="input" name="paper">
             {% for value in ("A4", "Letter") %}
