@@ -240,6 +240,12 @@ What exists:
   `invasion` / `raid` / `border_war` (all app rules) into owners, objectives, a last week and a
   note, and `store.apply_scenario` applies it in week 1 before any contact. A side's home is its
   first naval base on the map. Objectives only measure holdings, so a template is a holding.
+- Force generator (step G3): `forcegen.pick` (pure) buys catalog designs for a budget, each
+  pick in the least-used scan class that keeps every class at half the ships or less (FT p.37).
+  `store.generate_forces` makes a new fleet for a side from `force_candidates` (the faction's
+  FTL catalog warships), joins it to the campaign, forms a "Main fleet" force at the side's home
+  and, with a garrison budget, one force per settled world it holds. The books print no non-FTL
+  warships, so garrisons are FTL ships too.
 - Installations (step C8) are ordinary fleet ships whose design `fleet_common.installation()`
   accepts: a starbase, a gate, or a design with neither FTL nor thrust (FT p.27; a PC monster
   ship `section` is not one). Placed in a task force on a system they never move and cannot
