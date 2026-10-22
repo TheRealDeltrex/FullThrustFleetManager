@@ -747,6 +747,17 @@ image (`page.get_pixmap(dpi=200)`).
   good source and simply skips whatever steps it is missing.
 - Commit per coherent step; each milestone issue is closed by the commit/PR that completes it.
 - Commit messages end with the attribution line the harness provides.
+- **A PR is not left waiting unwatched.** Master's standing rule is to merge once CI is green,
+  so the session that opened a PR drives it to merged:
+  - Subscribe to the PR, and whenever the turn ends with CI pending, also schedule a check-in
+    (`send_later`, about 15 minutes, then longer). Never end a turn with your PR unmerged and
+    nothing scheduled: a lost event must not stall the thread.
+  - A job that failed before any test ran (checkout, `pip install`, `playwright install`,
+    runner lost, a network error) is infrastructure: re-run the failed jobs once
+    (`rerun_failed_jobs`) without asking. A second identical failure, or any failing test or
+    lint, is real: fix it and push.
+  - Green: merge `devversion` in if it moved, wait for that run, merge. Then say so.
+  - Still stuck after two check-ins with no change: tell Master what it waits on, once.
 - **Shipping** (version bump, exe, release, Pages deploy) has its own procedure in
   `.claude/skills/shipping-a-release/SKILL.md`. Read it when actually shipping and not
   before. Two things in it are easy to get wrong from memory: deploy Pages **last**, after
