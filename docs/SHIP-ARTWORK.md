@@ -1,6 +1,6 @@
 # Ship portraits and illustrated themes
 
-Implemented 2026-10-19. No release or commit is implied by this working-tree implementation.
+Current artwork contract, updated 2026-10-22.
 
 ## What users can do
 
@@ -12,23 +12,18 @@ Implemented 2026-10-19. No release or commit is implied by this working-tree imp
 - Download/restore a picture backup under Settings. The existing library export functions
   also include applicable portrait choices in design/fleet exports and full backups.
 
-All 478 source designs have distinct default portraits: 141 original book designs and
-337 Star Ranger designs. Ruleset adoptions share their source design's picture. There are
-46 current custom choices, two per class code, alongside retained legacy gallery choices.
-All 187 original portrait records and all intermediate versioned records remain valid;
-explicit user choices and uploads retain priority over new defaults.
+Source catalog designs have default portraits. Ruleset adoptions share their source
+design's picture. New miniature-class defaults intentionally share images across variants.
+The photo-v6 defaults cover all 482 source catalog designs using 268 individual portraits.
+Variants sharing a miniature hull intentionally share a picture. Faction-neutral FT2/MT
+examples use an actual miniature of the matching hull class. There are two current choices
+per custom class group: 38 refreshed miniature-based choices plus the eight retained special
+facility/section/jump-gate/platform choices. All earlier gallery records remain available.
+Explicit user choices and uploads retain priority over refreshed defaults.
 
-Owner annotations specify one arrow for the actual bow, two arrows for a full hull rebuild,
-and no arrow for no change. Corrections use new portrait IDs and atlas files. Only selected
-cells are remapped, so unmarked ships retain their exact old atlas/cell. The October 20 pass
-changed 70 official defaults and 11 custom choices in 11 new atlases. Four marked civilian
-cells already matched the requested direction and retained their earlier corrected art.
-
-The original 15 Fleet Book Phalon portraits are restored exactly. Six additional Phalon ships
-and ten custom facilities/ships extend that original style in a new atlas; the original spare
-cell supplies the generic choice. At the owner's explicit request these retain the original
-Fleet Book artwork's view (tubular bow lower-right), rather than the other factions' port-bow
-view. This exception is recorded per portrait and regression-tested.
+The earlier arrow-corrected atlases and original Fleet Book Phalon set remain valid legacy
+choices. New Phalon defaults use photographs of the actual miniatures; the older Fleet Book
+set is not deleted or reinterpreted. No released atlas or portrait ID changes meaning.
 
 The 23 custom class groups are SC, CT, FF, DD, DH, CL, CE, CH, CA, BC, BB, BDN, DN, SDN,
 CVE, CVL, CVA, M, BASE, SECTION, JG, PT and GENERIC. `class_defaults` selects the current
@@ -36,31 +31,52 @@ first choice. Existing class gallery pictures remain available for old selection
 
 ## Provenance and limits
 
-Images are generated interpretations, not official photographs or verified reconstructions
-of every individual miniature. The faction directions use the ship illustrations in Fleet
-Book 1 printed pages 13, 20, 27 and 34, and Fleet Book 2 pages 12, 26 and 38. These pages were
-provided as visual references; record-sheet symbols and page layout were excluded from the
-generation prompts. Civilian and generic FT2/MT art follows each ship's role. Paint schemes
-are artistic choices, not rules or official faction specifications.
+The `photo-v6:` rollout replaces older interpretations with individual miniature-reference
+portraits. Miniatures dictate hull architecture and proportions; their native camera angle
+is retained rather than forcing a uniform direction. Slight casting bends are corrected using
+longitudinal bow/stern alignment and transverse structural edges, accounting for perspective.
+NSL geometry must remain crisp, straight and square; fixed nose guns align with the hull.
+Miniature paint shading and tabletop lighting are discarded: surfaces are realized as clean
+painted armour, bare metal, carbon composite and selective plating under sunlight. Any ageing
+is subtle fading, without atmospheric grime or rust. Some fine detail is reconstructed from
+small photographs; the images are not engineering-verified replicas.
 
-The publisher's [Full Thrust miniature range](https://shop.groundzerogames.co.uk/full-thrust-starships.html)
-provided reference photographs. Current defaults comprise 218 miniature-based interpretations
-(including variants), 239 invented faction-compatible hulls, 15 restored original Phalon
-portraits and six Phalon extensions in Fleet Book style. These are generated interpretations,
-not engineering-verified replicas. Shop photos are not bundled.
+Named miniature classes and their variants reuse the same image. If there is no named-model
+photo, an available miniature from the same faction and hull class is preferred to invention.
+Invented hulls are permitted only where that class has no miniature. `model` and `references`
+record the chosen hull and sources. Three older Kra’Vak hulls (Lu’Dak, Do’San and Sha’Ken) use
+manufacturer/Fleet Book
+illustrations because usable model photographs were not located. Thirteen older Sa’Vasku
+hulls use the manufacturer illustration to identify geometry in a fleet photograph; their
+metadata declares the illustration view rather than claiming an exact photo angle. Existing IDs,
+user choices and uploads
+remain valid. The owner's later rendering feedback allows a further materials/lighting pass
+where remaining miniature-like shading needs improvement.
 
-Do not interpret miniature stands, hexagonal bases, mounting posts, sprues or loose kit parts
-as ship geometry. Where only unassembled parts are pictured (for example KEYSTONE/KEROSENE),
-use assembled faction models for shape language and label the design as invented.
+Images are generated interpretations, not official photographs or engineering-verified
+replicas. The publisher's [miniature range](https://shop.groundzerogames.co.uk/full-thrust-starships.html),
+[Star Ranger](https://fullthrust.star-ranger.com/), and linked miniature galleries supply
+shape references. Each portrait records its actual source URLs and model key. Fleet Book
+illustrations are used only as explicitly identified geometry references, never as record
+sheet decoration. Source-photo crops isolate a model from group photographs without
+changing its geometry. Paint schemes are visual choices, not rules.
+
+Only three new portraits are invented: the IF Remora scout and the unreleased OUDF
+Jervis Bay/Brisbane hulls. Remora variants share their image. The OUDF source documents
+that its master miniature was never released. Ettin reuses the FT1210 hull pictured as Ogre;
+it is not a newly invented carrier. Three older Kra’Vak hulls are illustration reconstructions,
+not invented replacements. Special custom facilities retain their earlier artwork.
+
+Stands, mounting posts, bases, sprues, loose kit components and neighbouring models must
+not become ship parts. Assembled photographs were found for KEYSTONE and KEROSENE;
+their new portraits use those photographs rather than the unassembled-parts listings.
 
 All generated PNGs, including discarded drafts, are preserved under
 `E:\ClaudeOnlineFolder\Full Thrust Pictures`, organized by faction. A faction root holds
-current atlases; `Discarded/` holds rejected/superseded/duplicate versions. `Index.html` links
-per-faction `Current-Ships.html` galleries showing the actual active cells, and `Archive.html`
-shows every PNG. `Picture-Index.md` maps 478 source designs and 46 custom choices to cells;
-`Picture-Inventory.json` records checksums. Older indexes live in
-`Documentation/Previous-Indexes/`. App themes and original custom-gallery art have their own
-folders. A partially used atlas can still contain retired cells; review the current-cell gallery.
+current portraits; `Discarded/` holds rejected and superseded versions. `References/`
+holds source images, and `Prompts/` holds generation prompts. `Index.html` links per-faction
+current and archive galleries. `Picture-Inventory.json` records checksums for every stored
+PNG. Earlier review indexes are retained under `Documentation/Previous-Indexes/`.
 
 The SSD/PDF engine and catalog statistics were not changed. Portraits and theme banners do
 not appear in the printed record sheets.
@@ -71,13 +87,16 @@ not appear in the printed record sheets.
   atlas file, zero-based cell, display metadata and class group. Catalog entries retain their
   existing IDs and data. No rule code depends on a portrait.
 - Atlas files in `static/ships/` and banners in `static/themes/` are committed as WebP
-  (quality 85), not PNG: the generated PNGs are about 3 MB each and would bloat the repo and
+  (quality 85–90), not PNG: the generated PNGs are about 3 MB each and would bloat the repo and
   the online build. Convert new art with Pillow before adding it.
 - Atlas files normally have four equal columns and rows. Optional per-portrait `columns`
-  and `rows` metadata supports other square grids (the Valhalla repair atlas is 3 by 3).
+  and `rows` metadata supports other grids or a single image (1 by 1). Individual
+  images use `background-size:contain` and centered positioning so a portrait/landscape
+  canvas never stretches the ship to a square. The Valhalla legacy repair atlas is 3 by 3.
   `_portraits.html` computes background size and position from those dimensions, defaulting
-  to 4 by 4 for every legacy record. Cells are addressed by CSS, so there are no generated controls, captions or symbols. Assigned cells
-  are unique; spare cells are not assigned as official ships. Do not rearrange a released
+    to 4 by 4 for every legacy record. Cells are addressed by CSS, so there are no generated
+  controls, captions or symbols. Shared cells must identify the same
+  `model`; spare cells are not assigned as official ships. Do not rearrange a released
   atlas: existing IDs must keep their meaning. Add a new versioned file and update metadata
   when replacing artwork. A future catalog addition needs one mapping and an art cell, not
   a redesign of the screens.
@@ -118,7 +137,8 @@ are retained in the artwork store; this permits restoring those ships from a bac
 
 ## Validation
 
-`tests/test_portraits.py` checks unique catalog coverage, two choices for every preset class,
+`tests/test_portraits.py` checks catalog coverage and intentional class sharing, two choices for
+every preset class,
 asset existence, override precedence, upload rejection, catalog isolation, backup round trips,
 explicit iframe form actions, and identical SSD SVG across all themes. `test_web_boot.py`
 also checks IndexedDB gallery persistence when enabled. Manual automated-browser validation
