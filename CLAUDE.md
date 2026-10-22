@@ -195,11 +195,11 @@ What exists:
   `replenish_ship` (fighters, salvos and one-shot systems in one week).
 - **Clicking the diagram**: every primitive carries a `ref` (`hull:7`, `armour:2`,
   `system:s3`), `to_svg()` emits it as `data-ref`, and `static/campaign.js` posts the ref of the
-  shape that was clicked. Clicking the last marked box unmarks it.
+  shape that was clicked. Clicking the last marked box unmarks it. The fields under the diagram
+  do the same thing, so the tab works with scripting off; the dice buttons are optional too.
 - `static/keepscroll.js` (every page) keeps the scroll position across the reload a click
   causes: it notes the scroll on click/change/submit and restores it when the next page has the
-  same `<html data-path>` (the web frame has no path of its own). The fields under the diagram
-  do the same thing, so the tab works with scripting off; the dice buttons are optional too.
+  same `<html data-path>` (the web frame has no path of its own).
 - Hooks reserved for the later campaign module (PLAN 11.2) are in use but not repurposed:
   `ship.location`, `log[].week`, statuses `docked` and `hulk`.
 - Campaigns (PLAN 11.3, roadmap step C1): `campaigns/<id>.json` holds name, ruleset, week,
