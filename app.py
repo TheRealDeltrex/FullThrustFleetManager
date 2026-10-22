@@ -1396,9 +1396,15 @@ def _random_starmap(campaign: dict, reroll: bool = False) -> tuple[bool, str]:
         return _as_count(form[key]) if form.get(key, "").strip() else default
 
     counts = {side["id"]: {key: count(f"s-{side['id']}-{key}", default)
-                           for key, default in starmap.DEFAULT_COUNTS.items()}
+                           for key, default in starmap.DEFAULT_COUNTS.items() if key != "core"}
               for side in campaign["sides"]}
-    neutral = {key: count(f"n-{key}", default) for key, default in starmap.DEFAULT_NEUTRAL.items()}
+    for side in campaign["sides"]:
+        # A checkbox posts nothing when off, so the form marks that the column is present.
+        core = form.get(f"s-{side['id']}-core") == "on"
+        counts[side["id"]]["core"] = core if "core-present" in form else True
+    neutral = {key: count(f"n-{key}", default)
+               for key, default in starmap.DEFAULT_NEUTRAL.items() if key != "place"}
+    neutral["place"] = form.get("n-place", starmap.DEFAULT_NEUTRAL["place"])
     return store.random_starmap(campaign, *_map_size(form), count("stars", starmap.DEFAULT_STARS),
                                 int(seed) if seed else None,
                                 spacing=count("spacing", starmap.DEFAULT_SPACING),
@@ -1408,6 +1414,11 @@ def _random_starmap(campaign: dict, reroll: bool = False) -> tuple[bool, str]:
 @register_action("reroll_starmap")
 def _reroll_starmap(campaign: dict) -> tuple[bool, str]:
     return _random_starmap(campaign, reroll=True)
+
+
+@register_action("set_frontline")
+def _set_frontline(campaign: dict) -> tuple[bool, str]:
+    return store.set_frontline(campaign, request.form.get("frontline") == "on")
 
 
 @register_action("finalize_starmap")
