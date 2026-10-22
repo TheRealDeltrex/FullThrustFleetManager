@@ -1926,11 +1926,23 @@ def new_starmap(campaign: dict, width: int, height: int) -> tuple[bool, str]:
 
 
 def random_starmap(campaign: dict, width: int, height: int, stars: int,
-                   seed: int | None = None) -> tuple[bool, str]:
+                   seed: int | None = None, **settings) -> tuple[bool, str]:
+    """A generated map (G1). `settings` are `starmap.generate`'s keywords, clamped here."""
     if seed is None:
         seed = random.randrange(1, 1_000_000)
+    keep = {}
+    if "spacing" in settings:
+        keep["spacing"] = max(1, min(max(starmap.SPACINGS), settings["spacing"]))
+    if "settled" in settings or "outposts" in settings:
+        keep["settled"] = max(0, min(100, settings.get("settled", starmap.DEFAULT_SETTLED)))
+        outposts = settings.get("outposts", starmap.DEFAULT_OUTPOSTS)
+        keep["outposts"] = max(0, min(100 - keep["settled"], outposts))
+    if "bases" in settings:
+        keep["bases"] = max(1, min(starmap.MAX_BASES, settings["bases"]))
+    if settings.get("names") in starmap.NAME_STYLES:
+        keep["names"] = settings["names"]
     campaign["map"] = starmap.generate(width, height, max(1, min(stars, 400)),
-                                       [s["id"] for s in campaign["sides"]], seed)
+                                       [s["id"] for s in campaign["sides"]], seed, **keep)
     campaign["forces"] = []
     campaign["contacts"] = []
     campaign["reinforcements"] = []
