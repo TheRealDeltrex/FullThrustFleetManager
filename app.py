@@ -37,6 +37,7 @@ import i18n
 import paths
 import pdf_export
 import portraits
+import scenarios
 import ssd_layout
 import starmap
 import store
@@ -1326,6 +1327,11 @@ def _set_objectives(campaign: dict) -> tuple[bool, str]:
     return store.set_objectives(campaign, _as_count(form.get("end_week")), objectives)
 
 
+@register_action("apply_scenario")
+def _apply_scenario(campaign: dict) -> tuple[bool, str]:
+    return store.apply_scenario(campaign, request.form.get("scenario", ""), request.form.get("attacker", ""))
+
+
 @register_action("reopen_campaign")
 def _reopen_campaign(campaign: dict) -> tuple[bool, str]:
     return store.reopen_campaign(campaign)
@@ -1601,6 +1607,7 @@ def outcome_label(outcome: str) -> str:
 
 
 app.jinja_env.globals.update(scan_label=scan_label, choice_label=choice_label, outcome_label=outcome_label)
+app.jinja_env.globals.update(scenario_kinds=scenarios.KINDS, scenario_label=scenarios.label)
 app.jinja_env.globals["FIGHTER_BAY_TYPES"] = common.FIGHTER_BAY_TYPES
 app.jinja_env.globals["GUNBOAT_CARRIER_TYPES"] = common.GUNBOAT_CARRIER_TYPES
 
