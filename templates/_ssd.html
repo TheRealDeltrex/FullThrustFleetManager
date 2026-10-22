@@ -1,0 +1,18 @@
+{# A ship diagram whose system icons can be dragged into place (static/ssddrag.js). The place is
+   saved per design, catalog designs included; "Reset layout" goes back to the automatic one. #}
+{% macro editable(svg, design) -%}
+  <div class="ssd-edit">
+    {{ svg }}
+    <form method="post" action="{{ url_for('design_layout', design_id=design.id) }}" class="row ssd-layout"
+          data-autosave="move_system">
+      <input type="hidden" name="uid" value="" />
+      <input type="hidden" name="x" value="" />
+      <input type="hidden" name="y" value="" />
+      <input type="hidden" name="next" value="{{ request.full_path }}" />
+      {% if design.layout_hints %}
+        <button class="btn sm ghost" type="submit" name="action" value="reset_layout"
+                data-autosave-click>{{ _("Reset layout") }}</button>
+      {% endif %}
+    </form>
+  </div>
+{%- endmacro %}

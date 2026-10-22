@@ -19,6 +19,7 @@ position; the catalog may ship them and drag-to-arrange can write them later.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field, replace
 from typing import Literal
 
@@ -93,6 +94,8 @@ class Diagram:
     width: float
     height: float
     primitives: tuple[Primitive, ...] = field(default_factory=tuple)
+    # uid -> (x, y): where each system's icon is centred, for drag-to-arrange.
+    anchors: dict[str, tuple[float, float]] = field(default_factory=dict, compare=False)
 
 
 # ---- Geometry helpers ---------------------------------------------------------------------------
@@ -738,7 +741,7 @@ def _icon(icon_set: str, system: dict, x: float, y: float, arcs: tuple[str, ...]
         draw = _labelled(str(system.get("type", "?"))[:4].upper(), wide=True)
     prims = [replace(shape, ref=f"system:{system.get('uid', '')}") for shape in draw(system, x, y, arcs)]
     if out:
-        prims.append(_cross(x, y, 10.5))
+        prims.append(replace(_cross(x, y, 10.5), ref=f"system:{system.get('uid', '')}"))
     return prims
 
 
@@ -756,6 +759,11 @@ WEAPONS = {
     "rocket_cannon", "hdc", "lrpt", "amt",
 }
 BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
+# Stacked straight above the armour and hull boxes, bottom up: the fire controls in one row,
+# point defence (after the fire controls when the row has room), then the hangars.
+FIRE_CONTROLS = {"fire_control", "adfc", "advanced_fire_control", "aadfc"}
+POINT_DEFENCE = {"pds", "pdaf"}
+HANGARS = {"hangar", "fighter_group", "hangar_bay"}
 
 
 def _side(arcs_of_system: list[str], all_arcs: tuple[str, ...]) -> str:
@@ -788,13 +796,20 @@ def _weight(system: dict) -> int:
 
 
 def _classify(design: dict, all_arcs: tuple[str, ...]) -> dict[str, list[dict]]:
-    groups: dict[str, list[dict]] = {k: [] for k in ("fore", "port", "starboard", "aft", "centre", "bottom")}
+    groups: dict[str, list[dict]] = {k: [] for k in ("fore", "port", "starboard", "aft", "centre", "bottom",
+                                                     "fire_control", "pds", "hangar")}
     for system in design.get("systems", []):
         if not isinstance(system, dict):
             continue
         stype = system.get("type")
         if stype in BOTTOM_ROW:
             groups["bottom"].append(system)
+        elif stype in FIRE_CONTROLS:
+            groups["fire_control"].append(system)
+        elif stype in POINT_DEFENCE:
+            groups["pds"].append(system)
+        elif stype in HANGARS:
+            groups["hangar"].append(system)
         elif stype in WEAPONS:
             groups[_side(system.get("arcs", []), all_arcs)].append(system)
         else:
@@ -802,6 +817,20 @@ def _classify(design: dict, all_arcs: tuple[str, ...]) -> dict[str, list[dict]]:
     for key in ("fore", "port", "starboard", "aft", "centre"):
         groups[key].sort(key=lambda s: -_weight(s))
     return groups
+
+
+def _icon_extent(icon_set: str, system: dict, arcs: tuple[str, ...]) -> float:
+    """How far an icon reaches left and right of its centre, from the shapes it draws."""
+    reach = 6.0
+    for p in _icon(icon_set, system, 0.0, 0.0, arcs, False):
+        if isinstance(p, Rect):
+            reach = max(reach, abs(p.x), abs(p.x + p.w))
+        elif isinstance(p, Circle):
+            reach = max(reach, abs(p.cx) + p.r)
+        elif isinstance(p, Path):
+            xs = re.findall(r"(-?\d+(?:\.\d+)?)\s+-?\d+(?:\.\d+)?", p.d)
+            reach = max([reach] + [abs(float(x)) for x in xs])
+    return reach
 
 
 # ---- The diagram ------------------------------------------------------------------------------------
@@ -863,11 +892,18 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     gap = 2 * ICON_RADIUS + 6
     y = 16.0
 
+    anchors: dict[str, tuple[float, float]] = {}
+    lowest = 0.0  # the lowest pinned icon; the sheet grows to keep it on the page
+
     def place(system: dict, x: float, cy: float) -> None:
+        nonlocal lowest
         pinned = hints.get(system.get("uid")) if isinstance(hints.get(system.get("uid")), dict) else None
         if pinned:
-            x = float(pinned.get("x", x))
-            cy = float(pinned.get("y", cy))
+            x = min(max(float(pinned.get("x", x)), 0.0), width)
+            cy = max(float(pinned.get("y", cy)), 0.0)
+            lowest = max(lowest, cy + ICON_RADIUS)
+        if system.get("uid"):
+            anchors[system["uid"]] = (round(x, 2), round(cy, 2))
         extra = {}
         if system.get("uid") in mass_by_uid:
             extra["mass"] = mass_by_uid[system["uid"]]
@@ -914,6 +950,45 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         for i, system in enumerate(row):
             place(system, x0 + i * gap, y)
         y += gap
+
+    # Hangars, point defence and the fire-control row, stacked down onto the armour and hull.
+    def packed(systems: list[dict], wrap: bool = True) -> list[list[tuple[dict, float]]]:
+        """Rows of (system, half width), each as wide as the box allows. Unwrapped, it is one
+        row however long."""
+        rows: list[list[tuple[dict, float]]] = [[]]
+        used = 0.0
+        for system in systems:
+            half = _icon_extent(icon_set, system, arcs)
+            if wrap and rows[-1] and used + 2 * half + 4 > width - 16:
+                rows.append([])
+                used = 0.0
+            rows[-1].append((system, half))
+            used += 2 * half + 4
+        return [r for r in rows if r]
+
+    def draw_row(row: list[tuple[dict, float]]) -> None:
+        nonlocal y
+        span = sum(2 * half + 4 for _s, half in row) - 4
+        # A row too long for the box (the fire controls never wrap) is squeezed to fit.
+        squeeze = min(1.0, (width - 16) / span) if span > 0 else 1.0
+        x = width / 2 - span * squeeze / 2
+        tall = max(half for _s, half in row)
+        cy = y + min(tall, ICON_RADIUS)
+        for system, half in row:
+            place(system, x + half * squeeze, cy)
+            x += (2 * half + 4) * squeeze
+        y = cy + min(tall, ICON_RADIUS) + 4
+
+    fc_row = packed(groups["fire_control"], wrap=False)
+    pds_rows = packed(groups["pds"])
+    if fc_row and len(pds_rows) == 1 and len(packed(groups["fire_control"] + groups["pds"])) == 1:
+        fc_row = [fc_row[0] + pds_rows[0]]
+        pds_rows = []
+    stack = packed(groups["hangar"]) + pds_rows + fc_row
+    if stack:
+        y -= ICON_RADIUS  # y is the next row's centre; the stack is laid from its top edge
+    for row in stack:
+        draw_row(row)
     y += 4
 
     # Armour circles, then the damage track with its crew-factor stars and threshold marks.
@@ -1015,7 +1090,7 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         y += 20
 
     y = _play_aids(prims, derived, width, y)
-    return Diagram(width, round(y + 6, 2), tuple(prims))
+    return Diagram(width, round(max(y + 6, lowest), 2), tuple(prims), anchors)
 
 
 def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) -> float:
@@ -1064,13 +1139,26 @@ def _escape(text: str) -> str:
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def to_svg(diagram: Diagram, class_name: str = "ssd") -> str:
+def to_svg(diagram: Diagram, class_name: str = "ssd", draggable: bool = False) -> str:
+    """The diagram as inline SVG. `draggable` wraps each system's shapes in a
+    `<g class="sys" data-uid data-x data-y>` (its anchor) for static/ssddrag.js."""
     parts = [
         f'<svg viewBox="0 0 {_fmt(diagram.width)} {_fmt(diagram.height)}" '
         f'xmlns="http://www.w3.org/2000/svg" class="{class_name}">'
     ]
+    group = None
     for p in diagram.primitives:
         ref = f' data-ref="{p.ref}"' if p.ref else ""
+        if draggable:
+            uid = p.ref[7:] if p.ref and p.ref.startswith("system:") else None
+            if group is not None and uid != group:
+                parts.append("</g>")
+                group = None
+            if uid is not None and group is None and uid in diagram.anchors:
+                ax, ay = diagram.anchors[uid]
+                parts.append(f'<g class="sys" data-uid="{_escape(uid)}" data-x="{_fmt(ax)}" '
+                             f'data-y="{_fmt(ay)}">')
+                group = uid
         if isinstance(p, Rect):
             radius = f' rx="{_fmt(p.r)}"' if p.r else ""
             parts.append(f'<rect x="{_fmt(p.x)}" y="{_fmt(p.y)}" width="{_fmt(p.w)}" height="{_fmt(p.h)}"'
@@ -1090,5 +1178,7 @@ def to_svg(diagram: Diagram, class_name: str = "ssd") -> str:
             weight = ' font-weight="700"' if p.bold else ""
             parts.append(f'<text x="{_fmt(p.x)}" y="{_fmt(p.y)}" font-size="{_fmt(p.size)}" '
                          f'text-anchor="{p.anchor}" fill="{p.fill}"{weight}{ref}>{_escape(p.text)}</text>')
+    if group is not None:
+        parts.append("</g>")
     parts.append("</svg>")
     return "".join(parts)

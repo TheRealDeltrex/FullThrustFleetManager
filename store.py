@@ -438,7 +438,9 @@ def _design_path(design_id: str) -> Path | None:
 def get_design(design_id: str) -> dict | None:
     """Catalog or library design (a copy; callers may mutate it)."""
     if design_id in _catalog():
-        return json.loads(json.dumps(_catalog()[design_id]))
+        design = json.loads(json.dumps(_catalog()[design_id]))
+        design["layout_hints"] = catalog_layouts().get(design_id, design["layout_hints"])
+        return design
     path = _design_path(design_id)
     return normalize_design(_read_json(path)) if path and path.is_file() else None
 
@@ -635,6 +637,57 @@ def working_design(design_id: str) -> tuple[dict | None, bool]:
     if draft:
         return draft, True
     return get_design(design_id), False
+
+
+# ---- Ship diagram layouts (drag-to-arrange) ---------------------------------------------------
+#
+# A dragged icon pins its system on the sheet (`layout_hints`). It is drawing, not rules, so it
+# saves at once: into a library design and its draft, or, for a read-only catalog design, into
+# layouts.json beside the library.
+
+
+def _layouts_path() -> Path:
+    return paths.user_data_dir() / "layouts.json"
+
+
+def catalog_layouts() -> dict[str, dict]:
+    doc = _read_json(_layouts_path()) if _layouts_path().is_file() else None
+    return {k: _norm_layout_hints(v) for k, v in (doc or {}).get("layouts", {}).items()
+            if isinstance(k, str)} if isinstance((doc or {}).get("layouts"), dict) else {}
+
+
+def _save_catalog_layouts(layouts: dict[str, dict]) -> None:
+    paths.user_data_dir().mkdir(parents=True, exist_ok=True)
+    _write_json(_layouts_path(), {"layouts": {k: v for k, v in layouts.items() if v}})
+
+
+def set_layout_hint(design_id: str, uid: str | None, x: float = 0, y: float = 0) -> tuple[bool, str]:
+    """Pins system `uid` at (x, y) on the design's sheet; uid None clears every pin."""
+    design = get_design(design_id)
+    if not design:
+        return False, _("Design not found.")
+    if uid is not None and uid not in {s["uid"] for s in design["systems"]}:
+        draft = get_draft(design_id)
+        if not draft or uid not in {s["uid"] for s in draft["systems"]}:
+            return False, _("System not found.")
+
+    def pin(hints: dict) -> dict:
+        if uid is None:
+            return {}
+        return _norm_layout_hints({**hints, uid: {"x": round(float(x), 1), "y": round(float(y), 1)}})
+
+    if is_catalog(design_id):
+        layouts = catalog_layouts()
+        layouts[design_id] = pin(layouts.get(design_id, {}))
+        _save_catalog_layouts(layouts)
+        return True, ""
+    design["layout_hints"] = pin(design["layout_hints"])
+    _write_design(design)
+    draft = get_draft(design_id)
+    if draft:
+        draft["layout_hints"] = pin(draft["layout_hints"])
+        _write_json(_draft_path(design_id), draft)
+    return True, ""
 
 
 # ---- Factions -------------------------------------------------------------------------------------
@@ -1010,6 +1063,48 @@ def update_ship(fleet: dict, uid: str, *, name: str | None = None, table_id: str
     if notes is not None:
         ship["notes"] = notes[:2000]
     return True, _("Ship updated.")
+
+
+def refit_ship(fleet: dict, uid: str, design_id: str) -> tuple[bool, str]:
+    """Rebuilds a ship to another design of the fleet's ruleset. Damage and loadout entries
+    that name systems the new design lacks are dropped."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return False, _("Ship not found.")
+    design = get_design(design_id)
+    if not design:
+        return False, _("Design not found.")
+    if design["ruleset"] != fleet["ruleset"]:
+        return False, _("That design belongs to another ruleset.")
+    if ship["design_id"] == design_id:
+        return True, ""
+    ship["design_id"] = design_id
+    known = {s["uid"] for s in design["systems"]}
+    damage = ship["damage"]
+    damage["systems_out"] = [u for u in damage["systems_out"] if u in known]
+    damage["one_shot_used"] = [u for u in damage["one_shot_used"] if u in known]
+    for key in ("fighters_lost", "salvos_spent"):
+        damage[key] = {k: v for k, v in damage[key].items() if k.split(":")[0] in known}
+    damage["hull"] = min(damage["hull"], fleet_rules.hull_boxes(design) or damage["hull"])
+    damage["armour"] = min(damage["armour"], design["armour"])
+    if ship["loadout"]:
+        refs = {"fighters": "hangar", "magazines": "magazine", "pulsers": "pulser", "craft": "hangar",
+                "gunboats": "carrier"}
+        ship["loadout"] = _norm_loadout({key: [e for e in entries if e.get(refs.get(key, "")) in known]
+                                         for key, entries in ship["loadout"].items()})
+    return True, _("{name} refitted as {design}.", name=ship["name"], design=design["name"])
+
+
+def refit_as_variant(fleet: dict, uid: str) -> tuple[str | None, str]:
+    """A new variant of the ship's design for this ship alone; (variant id, message)."""
+    ship = _ship(fleet, uid)
+    if not ship:
+        return None, _("Ship not found.")
+    variant, msg = make_variant(ship["design_id"])
+    if not variant:
+        return None, msg
+    ship["design_id"] = variant["id"]
+    return variant["id"], msg
 
 
 def set_ship_loadout(fleet: dict, uid: str, loadout: dict | None) -> tuple[bool, str]:
@@ -2391,7 +2486,7 @@ def export_backup() -> tuple[str, bytes]:
         for sub in ("designs", "fleets", "campaigns"):
             for p in sorted(_dir(sub).glob("*.json")):
                 z.write(p, f"{sub}/{p.name}")
-        for name in ("factions.json", "settings.json", "portraits.json"):
+        for name in ("factions.json", "settings.json", "portraits.json", "layouts.json"):
             if (root / name).is_file():
                 z.write(root / name, name)
     save_settings(last_backup=now())
@@ -2510,6 +2605,7 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
 
     if data[:2] == b"PK":
         written += art_written
+        _restore_layouts(data, overwrite_newer)
         msg = _("{n} items restored from the backup.", n=written)
         if skipped:
             msg += " " + _("{n} unreadable entries skipped.", n=skipped)
@@ -2525,6 +2621,23 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     if conflicts:
         return True, _("Kept the newer local copy of {name}.", name=conflicts[0]), conflicts
     return True, _("Design {name} imported.", name=designs[0]["name"]), []
+
+
+def _restore_layouts(data: bytes, overwrite: bool) -> None:
+    """A backup's catalog layouts; a local one wins unless the player chose to overwrite."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as z:
+            doc = json.loads(z.read("layouts.json").decode("utf-8"))
+    except (KeyError, zipfile.BadZipFile, OSError, UnicodeDecodeError, ValueError):
+        return
+    raw = doc.get("layouts") if isinstance(doc, dict) else None
+    incoming = {k: _norm_layout_hints(v) for k, v in raw.items() if isinstance(k, str)} \
+        if isinstance(raw, dict) else {}
+    layouts = catalog_layouts()
+    for design_id, hints in incoming.items():
+        if overwrite or design_id not in layouts:
+            layouts[design_id[:120]] = hints
+    _save_catalog_layouts(layouts)
 
 
 def _fleets_need_only(fleets: list[dict], designs: list[dict], ruleset: str) -> None:
