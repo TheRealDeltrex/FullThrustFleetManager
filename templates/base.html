@@ -23,7 +23,7 @@
             <form method="get" action="{{ url_for('fleet_overview') }}">
               <label class="sr-only" for="fleet-select">{{ _("Current fleet") }}</label>
               <select id="fleet-select" name="go"
-                      onchange="location.href='/fleet/' + this.value">
+                      onchange="this.form.submit()">
                 {% for f in all_fleets %}
                   <option value="{{ f.id }}" {% if current_fleet and current_fleet.id == f.id %}selected{% endif %}>
                     {{ f.ruleset|upper }} · {{ f.name }}</option>

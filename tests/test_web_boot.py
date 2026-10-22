@@ -63,6 +63,16 @@ def test_the_web_build_boots_and_saves_a_fleet(site_url):
         page.wait_for_function(
             "() => (localStorage.getItem('ftfm_library_v1') || '').includes('Web boot check')",
             timeout=30_000)
+        # The top bar's fleet picker switches fleets inside the app (it once left for a 404).
+        form.locator('[name="name"]').fill("Second fleet")
+        form.locator("button").last.click()
+        frame.locator("option[selected]", has_text="Second fleet").first.wait_for(
+            state="attached", timeout=60_000)
+        first = frame.locator("#fleet-select option", has_text="Web boot check").get_attribute("value")
+        frame.locator("#fleet-select").select_option(first)
+        frame.locator("option[selected]", has_text="Web boot check").first.wait_for(
+            state="attached", timeout=60_000)
+        assert page.url.startswith(f"{site_url}/app/")
         # The library now holds something, so the page offers a backup; it downloads as a file.
         with page.expect_download(timeout=60_000) as download:
             frame.locator("form.backup-due button.primary").click()
