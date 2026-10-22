@@ -80,6 +80,10 @@ class FBRuleset:
     def morale_mass(self, ships: list) -> tuple[int, int] | None:
         return None
 
+    def scan_class(self, design: dict) -> str:
+        # The Fleet Books print no class bands; CD p.42's, which gather the FB design system.
+        return common.scan_class(common.as_int(design.get("tmf")))
+
     def adopt_design(self, design: dict) -> dict | None:
         return None
 
@@ -162,7 +166,7 @@ RULESET = FBRuleset()
 # The Fleet Books are a closed system (owner's ruling): what the rules code knows only to price the
 # Star Ranger pages is costed, so the catalog gate can check those pages, but is never legal here.
 NOT_IN_BOOKS = frozenset({"emp", "rocket_cannon", "graser", "hdc", "lrpt", "amt", "superior_sensors",
-                          "age_penalty"})
+                          "enhanced_sensors", "age_penalty"})
 
 
 def _not_in_books(design: dict) -> list[Issue]:

@@ -72,12 +72,25 @@ class FTPCRuleset:
             fleet_doc, ships, options, ship_class=rules.ship_class,
             # A monster ship section without drives is part of a ship, not a battle rider.
             stationary=lambda d: rules.stationary(d) or rules.is_section(d), ship_points=points)
+        squadrons = independent_squadrons(fleet_doc)
+        rules.validate_independent_squadrons(squadrons, lambda code, msg: issues.append(
+            Issue(code, "violation", msg)))
         if options.get("pc_tech_base"):
-            issues += _tech_base_issues(ships, options)
+            issues += _tech_base_issues(ships, options, squadrons)
         return issues
+
+    def gunboat_squadron_points(self, squadron: dict) -> int:
+        """A squadron the fleet fields without a carrier: FTL gunboats (PC p.80)."""
+        return rules.gunboat_squadron_points(rules.independent_squadron(squadron))
+
+    def gunboat_squadron_label(self, squadron: dict) -> str:
+        return squadron_label(squadron)
 
     def morale_mass(self, ships: list[tuple[dict, dict]]) -> tuple[int, int] | None:
         return fleet_common.morale_mass(ships)
+
+    def scan_class(self, design: dict) -> str:
+        return rules.ship_class(common.as_int(design.get("tmf")))
 
     def races(self) -> list[Race]:
         return [Race("human", _("Human")), *(r for r in fb_tech.races() if r.id in ALIEN_RACES)]
@@ -148,8 +161,8 @@ class FTPCRuleset:
         if printed and printed != points:
             source["npv_book"] = 0
             out["notes"] = " ".join([
-                f"Project Continuum: {common.source_ref(source)} prints NPV "
-                f"{printed}; under Project Continuum the design costs {points}.",
+                f"Project Continuum: {common.printed_npv(out, source, printed)}; "
+                f"under Project Continuum the design costs {points}.",
                 out.get("notes") or ""]).strip()
         return out
 
@@ -216,10 +229,21 @@ ALIEN_ENTRIES = (
 )
 
 
-def _tech_base_issues(ships: list[tuple[dict, dict]], options: dict) -> list[Issue]:
-    """PC pp.125-127: the technologies the fleet's live human designs use, prerequisites
-    included, against the book's recommended ten choices; gunboats exclude fighters."""
+def independent_squadrons(fleet_doc: dict) -> list[dict]:
+    """The fleet's FTL gunboat squadrons that fly without a carrier, FTL included."""
+    squadrons = fleet_doc.get("gunboat_squadrons")
+    return [rules.independent_squadron(g) for g in squadrons if isinstance(g, dict)] \
+        if isinstance(squadrons, list) else []
+
+
+def _tech_base_issues(ships: list[tuple[dict, dict]], options: dict,
+                      squadrons: list[dict] = ()) -> list[Issue]:
+    """PC pp.125-127: the technologies the fleet's live human designs and its own gunboat
+    squadrons use, prerequisites included, against the book's recommended ten choices; gunboats
+    exclude fighters."""
     used: set[str] = set()
+    for squadron in squadrons:
+        used |= techbase.gunboat_techs(squadron)
     for ship, design in ships:
         if ship.get("status") in ("destroyed", "hulk") or _alien(design):
             continue
@@ -239,6 +263,15 @@ def _tech_base_issues(ships: list[tuple[dict, dict]], options: dict) -> list[Iss
         issues.append(Issue("gunboats_and_fighters", "violation",
                             _("An empire fielding gunboats may not also field fighters.")))
     return issues
+
+
+def squadron_label(squadron: dict) -> str:
+    """"Beam gunboats", or for a mixed squadron "2 Beam gunboats, 4 Needle gunboats"."""
+    types = rules.boat_types(squadron)
+    if len(set(types)) == 1:
+        return gunboat_label(types[0])
+    counts = {t: types.count(t) for t in dict.fromkeys(types)}
+    return ", ".join(f"{n} {gunboat_label(t)}" for t, n in counts.items())
 
 
 def gunboat_label(key: str) -> str:

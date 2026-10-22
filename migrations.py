@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 CURRENT = 2
-KINDS = ("design", "fleet", "factions", "settings")
+KINDS = ("design", "fleet", "campaign", "factions", "settings")
 
 # STEPS[kind][from_version] = fn(doc) -> doc at from_version + 1
 STEPS: dict[str, dict[int, Callable[[dict], dict]]] = {kind: {} for kind in KINDS}
@@ -47,7 +47,9 @@ class TooNewError(ValueError):
 
 STEPS["design"][1] = _design_1_to_2
 STEPS["fleet"][1] = _fleet_1_to_2
-# factions and settings are unchanged by v2, so they step forward untouched.
+# factions and settings are unchanged by v2, so they step forward untouched. Campaigns first
+# appear at v2; a v1 one cannot exist, and it would need nothing.
+STEPS["campaign"][1] = lambda doc: doc
 STEPS["factions"][1] = lambda doc: doc
 STEPS["settings"][1] = lambda doc: doc
 
