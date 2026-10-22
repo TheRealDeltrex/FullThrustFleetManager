@@ -180,7 +180,7 @@ def test_a_side_may_start_with_one_outpost_and_no_base():
     counts = {"blue": {"settled": 3, "outposts": 1, "bases": 1},
               "red": {"settled": 0, "outposts": 1, "bases": 0}}
     grid = starmap.generate(14, 10, 16, ["blue", "red"], 2, counts=counts)
-    red = [s for s in grid["systems"] if s["owner"] == "red"]
+    red = [s for s in grid["systems"] if s["owner"] == "red" and s["kind"] != "empty"]
     assert [(s["kind"], s["base"]) for s in red] == [("outpost", False)]
     assert scenarios.home(grid, "red") is red[0]
     outposts_only = starmap.generate(14, 10, 16, ["blue", "red"], 2, counts={
@@ -216,7 +216,8 @@ def test_neutral_systems_none_random_or_a_border_region():
     for seed in range(1, 6):
         grid, border = neutral("border", seed)
         assert sorted(s["kind"] for s in border) == ["outpost", "outpost", "settled", "settled"]
-        held = {side: [s for s in grid["systems"] if s["owner"] == side] for side in ("blue", "red")}
+        held = {side: [s for s in grid["systems"] if s["owner"] == side and s["kind"] != "empty"]
+                for side in ("blue", "red")}
 
         def gap(s: dict) -> int:
             blue, red = (min(starmap.hex_distance((s["q"], s["r"]), (h["q"], h["r"]))
@@ -253,6 +254,31 @@ def test_a_side_pushes_a_cluster_front_back_to_the_neutral_world():
     grid["systems"].append({"q": 3, "r": 2, "name": "N2", "kind": "outpost", "owner": "", "base": False})
     front = {cell for cell in starmap.frontline(grid) if cell[1] == 0}
     assert (2, 0) in front and (1, 0) not in front
+
+
+def test_bare_stars_in_a_sphere_belong_to_its_side():
+    """Master 2026-10-22: no unclaimed space inside a sphere, except on the front."""
+    grid = a_line((0, "blue"), (8, "red"))
+    for q in (2, 4, 6, 11):
+        grid["systems"].append({"q": q, "r": 0, "name": f"E{q}", "kind": "empty", "owner": "", "base": False})
+    starmap.claim_empty(grid)
+    owners = {s["q"]: s["owner"] for s in grid["systems"] if s["kind"] == "empty"}
+    assert owners == {2: "blue", 4: "", 6: "red", 11: "red"}       # 4 is the front, 11 inside red's reach
+    starmap.claim_empty(grid, reach=2)
+    owners = {s["q"]: s["owner"] for s in grid["systems"] if s["kind"] == "empty"}
+    assert owners == {2: "", 4: "", 6: "", 11: ""}                  # 2 and 6 now outline the spheres
+    generated = starmap.generate(16, 12, 30, ["blue", "red"], 3)
+    assert any(s["owner"] and s["kind"] == "empty" for s in generated["systems"])
+
+
+def test_neutral_clusters_are_optional_and_project_into_open_space():
+    grid = starmap.blank(16, 12)
+    for q, r, owner in ((0, 0, "blue"), (10, 6, ""), (10, 8, "")):
+        grid["systems"].append({"q": q, "r": r, "name": f"S{q}{r}", "kind": "settled", "owner": owner,
+                                "base": False})
+    front = starmap.frontline(grid)                      # the pair is far beyond blue's reach
+    assert (10, 4) in front and (10, 7) not in front
+    assert not {(10, 4), (10, 5)} & starmap.frontline(grid, clusters=False)
 
 
 def test_sides_project_their_front_only_so_far():
@@ -308,8 +334,9 @@ def test_the_frontline_toggle_shades_the_map(client):
     post(client, campaign, action="set_frontline", autosave="1")
     assert store.get_campaign(campaign["id"])["map"]["frontline"] is False
     assert store.get_campaign(campaign["id"])["front_reach"] == starmap.DEFAULT_FRONT_REACH
-    post(client, campaign, action="update_campaign", front_reach="7", autosave="1")
-    assert store.get_campaign(campaign["id"])["front_reach"] == 7
+    post(client, campaign, action="update_campaign", front_reach="7", clusters="0", autosave="1")
+    saved = store.get_campaign(campaign["id"])
+    assert (saved["front_reach"], saved["neutral_clusters"]) == (7, False)
 
 
 def test_the_core_checkbox_reaches_the_generator(client):
