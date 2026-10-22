@@ -80,6 +80,10 @@ class FBRuleset:
     def morale_mass(self, ships: list) -> tuple[int, int] | None:
         return None
 
+    def scan_class(self, design: dict) -> str:
+        # The Fleet Books print no class bands; CD p.42's, which gather the FB design system.
+        return common.scan_class(common.as_int(design.get("tmf")))
+
     def adopt_design(self, design: dict) -> dict | None:
         return None
 
