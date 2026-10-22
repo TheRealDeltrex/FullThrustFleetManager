@@ -1075,8 +1075,35 @@ def _campaign_context(fleet: dict) -> dict:
     sides = [{"side": side, "fleets": [
         {"fleet": f, "points": fleet_rules.fleet_points(f, store.designs_for_fleet(f))}
         for f in members if f["campaign_side"] == side["id"]]} for side in campaign["sides"]]
-    return {"campaign": campaign, "sides": sides, **_starmap_context(campaign),
-            **_forces_context(campaign, fleet), **_contacts_context(campaign, fleet)}
+    view = _campaign_view(campaign, fleet)
+    if view["handover"]:
+        return {"campaign": campaign, "sides": sides, "view": view, "starmap": None, "forces": [],
+                "contacts": [], "log": []}
+    return {"campaign": campaign, "sides": sides, "view": view,
+            "log": [e for e in campaign["log"]
+                    if view["umpire"] or store.sees_log(campaign, view["side"], e)],
+            **_starmap_context(campaign, view),
+            **_forces_context(campaign, fleet, view), **_contacts_context(campaign, fleet, view)}
+
+
+def _campaign_view(campaign: dict, fleet: dict) -> dict:
+    """Whose eyes the Campaign tab looks through (step C6). Hot-seat: the current fleet's side,
+    behind a hand-over screen whenever that side changes under hidden movement, or the umpire,
+    who sees everything (FT p.34)."""
+    side = fleet.get("campaign_side") or ""
+    umpire = session.get("campaign_umpire") == campaign["id"]
+    seen = session.get("campaign_seen") == f"{campaign['id']}:{side}"
+    return {"side": side, "umpire": umpire, "hidden": campaign["hidden"],
+            "side_name": next((s["name"] for s in campaign["sides"] if s["id"] == side), ""),
+            "handover": campaign["hidden"] and not umpire and not seen}
+
+
+def _sees(campaign: dict, view: dict, force: dict) -> bool:
+    return view["umpire"] or store.sees_force(campaign, view["side"], force)
+
+
+def _knows_orders(campaign: dict, view: dict, force: dict) -> bool:
+    return view["umpire"] or not campaign["hidden"] or force["side"] == view["side"]
 
 
 def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
@@ -1088,7 +1115,7 @@ def _picked_hex(raw: str | None, grid: dict) -> tuple[int, int] | None:
     return (q, r) if 0 <= q < grid["width"] and 0 <= r < grid["height"] else None
 
 
-def _forces_context(campaign: dict, fleet: dict) -> dict:
+def _forces_context(campaign: dict, fleet: dict, view: dict) -> dict:
     """The Task forces panel (step C3): every force with its ships and the jumps open to it, and
     the current fleet's ships that are in no force yet."""
     grid = campaign["map"]
@@ -1099,12 +1126,17 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
     side_class = {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])}
     rows, assigned = [], set()
     for force in campaign["forces"]:
-        system = starmap.system_at(grid, force["q"], force["r"])
-        options, why = store.reachable_systems(campaign, force)
-        order = starmap.system_at(grid, *force["order"]) if force["order"] else None
         ships = store.force_ships(campaign, force, fleets)
         assigned.update((f["id"], s["uid"]) for f, s, _d in ships)
+        if not _sees(campaign, view, force):
+            continue
+        system = starmap.system_at(grid, force["q"], force["r"])
+        options, why = store.reachable_systems(campaign, force)
+        knows = _knows_orders(campaign, view, force)
+        order = starmap.system_at(grid, *force["order"]) if force["order"] and knows else None
         rows.append({
+            # Only the owner (and the umpire) knows what a marker really is (FT p.34).
+            "shown": force["side"] == view["side"] or view["umpire"],
             "force": force, "side": side_names.get(force["side"], ""),
             "side_class": side_class.get(force["side"], ""),
             "where": system["name"] if system else starmap.hex_label(force["q"], force["r"]),
@@ -1115,6 +1147,8 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
     later = []
     for group in campaign["reinforcements"]:
         assigned.update((x["fleet"], x["uid"]) for x in group["ships"])
+        if campaign["hidden"] and not view["umpire"] and group["side"] != view["side"]:
+            continue
         system = starmap.system_at(grid, group["q"], group["r"])
         later.append({"group": group, "side": side_names.get(group["side"], ""),
                       "side_class": side_class.get(group["side"], ""),
@@ -1129,7 +1163,7 @@ def _forces_context(campaign: dict, fleet: dict) -> dict:
     return {"forces": rows, "free_ships": free, "force_systems": systems, "reinforcements": later}
 
 
-def _contacts_context(campaign: dict, fleet: dict) -> dict:
+def _contacts_context(campaign: dict, fleet: dict, view: dict) -> dict:
     """The Contacts panel (step C4): this week's meetings, each with every side's scan report,
     the current fleet's side's choice (the others stay hidden until all have chosen) and, after
     a battle, the ships that were there with links to their damage."""
@@ -1138,6 +1172,8 @@ def _contacts_context(campaign: dict, fleet: dict) -> dict:
     side_class = {s["id"]: f"side-{i}" for i, s in enumerate(campaign["sides"])}
     rows = []
     for contact in store.this_weeks_contacts(campaign):
+        if campaign["hidden"] and not view["umpire"] and view["side"] not in contact["sides"]:
+            continue
         forces = store.contact_forces(campaign, contact)
         sides = []
         for side in contact["sides"]:
@@ -1155,7 +1191,7 @@ def _contacts_context(campaign: dict, fleet: dict) -> dict:
     return {"contacts": rows, "scan_classes": fleet_rules.SCAN_CLASSES}
 
 
-def _starmap_context(campaign: dict) -> dict:
+def _starmap_context(campaign: dict, view: dict) -> dict:
     """The Star map panel: the drawing (each hex links to itself) and the picked hex."""
     grid = campaign["map"]
     if not grid:
@@ -1163,7 +1199,9 @@ def _starmap_context(campaign: dict) -> dict:
     picked = _picked_hex(request.args.get("hex"), grid)
     system = starmap.system_at(grid, *picked) if picked else None
     svg = starmap.to_svg(grid, campaign["sides"], url_for("campaign") + "?hex=", picked,
-                         _("Star map of {name}", name=campaign["name"]), campaign["forces"])
+                         _("Star map of {name}", name=campaign["name"]),
+                         [dict(f, order=f["order"] if _knows_orders(campaign, view, f) else None)
+                          for f in campaign["forces"] if _sees(campaign, view, f)])
     return {"starmap": {
         "grid": grid, "svg": Markup(svg), "picked": picked, "system": system,
         "hex_label": starmap.hex_label(*picked) if picked else "",
@@ -1257,9 +1295,11 @@ def _leave_campaign(fleet: dict) -> tuple[bool, str]:
 def _update_campaign(campaign: dict) -> tuple[bool, str]:
     form = request.form
     sides = {key[5:]: value for key, value in form.items() if key.startswith("side-")}
+    hidden = form.getlist("hidden")
     return store.update_campaign(campaign, name=form.get("name"),
                                  week=int(form["week"]) if form.get("week") else None,
-                                 notes=form.get("notes"), sides=sides)
+                                 notes=form.get("notes"), sides=sides,
+                                 hidden=hidden[-1] == "1" if hidden else None)
 
 
 @register_action("next_week")
@@ -1323,8 +1363,10 @@ def _add_force(campaign: dict) -> tuple[bool, str]:
     picked = _picked_hex(form.get("at"), campaign["map"]) if campaign["map"] else None
     if not picked:
         return False, _("Pick a star system for the task force.")
-    force, msg = store.add_force(campaign, form.get("side", ""), form.get("name", ""), *picked)
-    if force and form.getlist("ship") and (fleet := store.get_fleet(form.get("fleet", ""))):
+    force, msg = store.add_force(campaign, form.get("side", ""), form.get("name", ""), *picked,
+                                 dummy=form.get("dummy") == "on")
+    fleet = store.get_fleet(form.get("fleet", ""))
+    if force and not force["dummy"] and form.getlist("ship") and fleet:
         store.assign_ships(campaign, force["id"], fleet, form.getlist("ship"))
     return force is not None, msg
 
@@ -1428,6 +1470,26 @@ def campaigns_action(campaign_id: str) -> Response:
         store.save_campaign(campaign)
     picked = request.form.get("hex")
     return redirect(url_for("campaign", hex=picked) if picked else url_for("campaign"))
+
+
+@app.route("/campaigns/<campaign_id>/view", methods=["POST"])
+def campaign_view(campaign_id: str) -> Response:
+    """Hot-seat (step C6): show the current side's view after the hand-over screen, or switch the
+    umpire view on and off. Only the session changes."""
+    campaign = store.get_campaign(campaign_id)
+    fleet = current_fleet()
+    if not campaign or not fleet:
+        abort(404)
+    what = request.form.get("view")
+    if what == "umpire":
+        session["campaign_umpire"] = campaign_id
+    else:
+        session.pop("campaign_umpire", None)
+        if what == "show":
+            session["campaign_seen"] = f"{campaign_id}:{fleet.get('campaign_side') or ''}"
+        else:
+            session.pop("campaign_seen", None)
+    return redirect(url_for("campaign"))
 
 
 @app.route("/campaigns/<campaign_id>/map", methods=["POST"])
