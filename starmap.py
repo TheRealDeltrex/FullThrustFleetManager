@@ -277,25 +277,46 @@ def neighbours(q: int, r: int) -> list[tuple[int, int]]:
             (q + 1, r - 1 + down), (q + 1, r + down)]
 
 
+NEUTRAL = "~"                               # a frontline() region held by neutral worlds
+CLUSTER = 2                                 # neutral worlds this near each other form a cluster
+
+
 def frontline(starmap: dict) -> set[tuple[int, int]]:
-    """The hexes on the front between sides (an app rule, Master 2026-10-22): each hex belongs to
-    the side whose held system is strictly nearest. The front is every hex two sides are equally
-    near, and every hex beside one held by another side, so an odd gap gives a front two hexes
-    wide and two opposing systems side by side are both on it."""
+    """The hexes on the front (an app rule, Master 2026-10-22). Each hex belongs to the side whose
+    held system is strictly nearest; the front is every hex two sides are equally near and every
+    hex beside one held by another side, so an odd gap gives a front two hexes wide and two
+    opposing systems side by side are both on it. Neutral worlds (unowned settled worlds and
+    outposts) hold their own hex, and a neutral world in a cluster (another within CLUSTER hexes)
+    the hexes around it too, wherever no side's system is nearer; the hexes beside that region
+    are front, so a lone neutral world is ringed by it however far the sides are, and a cluster
+    projects it up to two hexes out. A neutral hex beside a side's system is front too."""
     held: dict[str, list[tuple[int, int]]] = {}
+    neutral: list[tuple[int, int]] = []
     for s in starmap["systems"]:
         if s["owner"]:
             held.setdefault(s["owner"], []).append((s["q"], s["r"]))
-    if len(held) < 2:
+        elif s["kind"] != "empty":
+            neutral.append((s["q"], s["r"]))
+    if len(held) < 2 and not (held and neutral):
         return set()
+    reach = {w: int(any(o != w and hex_distance(w, o) <= CLUSTER for o in neutral)) for w in neutral}
+    systems = {p: side for side, cells in held.items() for p in cells}
     owner: dict[tuple[int, int], str] = {}
     for q in range(starmap["width"]):
         for r in range(starmap["height"]):
             near = sorted((min(hex_distance((q, r), p) for p in cells), side) for side, cells in held.items())
-            owner[q, r] = "" if near[0][0] == near[1][0] else near[0][1]
+            if any(hex_distance((q, r), w) <= reach[w] and hex_distance((q, r), w) < near[0][0]
+                   for w in neutral):
+                owner[q, r] = NEUTRAL
+            else:
+                owner[q, r] = "" if len(near) > 1 and near[0][0] == near[1][0] else near[0][1]
     front = set()
     for cell, side in owner.items():
-        if not side or any(owner.get(n, side) not in (side, "") for n in neighbours(*cell)):
+        around = [owner[n] for n in neighbours(*cell) if n in owner]
+        if side == NEUTRAL:
+            if any(n in systems for n in neighbours(*cell)):
+                front.add(cell)
+        elif not side or NEUTRAL in around or any(o not in (side, "", NEUTRAL) for o in around):
             front.add(cell)
     return front
 
