@@ -290,7 +290,8 @@ def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int,
     side are both on it) and every side's hex beside open space, so a side's sphere is always
     outlined. Neutral worlds (unowned
     settled worlds and outposts) hold their own hex, and one in a cluster (another within
-    CLUSTER hexes) the hexes around it too, wherever no side's system is nearer. A side's hex
+    CLUSTER hexes) the hexes around it too where every side's system is at least 2 hexes
+    further away (a side 2 empty hexes off keeps the hex beside the neutral world). A side's hex
     beside that region is front, so a lone neutral world inside a side's reach is ringed by it
     and a cluster pushes it two hexes out. A neutral hex beside a side's system is front too."""
     held: dict[str, list[tuple[int, int]]] = {}
@@ -309,8 +310,9 @@ def frontline(starmap: dict, reach: int = DEFAULT_FRONT_REACH) -> set[tuple[int,
         for r in range(starmap["height"]):
             near = sorted((min(hex_distance((q, r), p) for p in cells), side)
                           for side, cells in held.items())
-            if any(hex_distance((q, r), w) <= radius[w] and hex_distance((q, r), w) < near[0][0]
-                   for w in neutral):
+            # A neutral world is weak: past its own hex it holds only what a side is 2+ hexes further from.
+            if any(d == 0 or (d <= radius[w] and d + 1 < near[0][0])
+                   for w in neutral for d in [hex_distance((q, r), w)]):
                 owner[q, r] = NEUTRAL
             elif near[0][0] > reach:
                 owner[q, r] = OPEN
