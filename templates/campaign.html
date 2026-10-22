@@ -240,6 +240,19 @@
                   <input class="input sm" type="number" name="stars" min="1" max="400" value="{{ d.DEFAULT_STARS }}" /></label>
                 <label class="check">{{ _("Seed") }}
                   <input class="input sm" type="number" name="seed" min="1" placeholder="{{ _('any') }}" /></label>
+                <label class="check">{{ _("Spacing") }}
+                  <select class="input" name="spacing">{% for n in d.SPACINGS %}<option value="{{ n }}" {% if n == d.DEFAULT_SPACING %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+                <label class="check">{{ _("Settled") }}
+                  <select class="input" name="settled">{% for n in range(0, 101, 10) %}<option value="{{ n }}" {% if n == d.DEFAULT_SETTLED %}selected{% endif %}>{{ n }}%</option>{% endfor %}</select></label>
+                <label class="check">{{ _("Outposts") }}
+                  <select class="input" name="outposts">{% for n in range(0, 101, 10) %}<option value="{{ n }}" {% if n == d.DEFAULT_OUTPOSTS %}selected{% endif %}>{{ n }}%</option>{% endfor %}</select></label>
+                <label class="check">{{ _("Bases per side") }}
+                  <select class="input" name="bases">{% for n in range(1, d.MAX_BASES + 1) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select></label>
+                <label class="check">{{ _("Names") }}
+                  <select class="input" name="names">
+                    <option value="stars">{{ _("Star names") }}</option>
+                    <option value="catalog">{{ _("Catalogue numbers") }}</option>
+                  </select></label>
                 <button class="btn" type="submit" name="action" value="random_starmap">{{ _("Random map") }}</button>
                 <button class="btn" type="submit" name="action" value="new_starmap">{{ _("Blank map") }}</button>
               </form>
