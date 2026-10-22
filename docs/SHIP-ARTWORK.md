@@ -14,7 +14,9 @@ Current artwork contract, updated 2026-10-22.
 
 Source catalog designs have default portraits. Ruleset adoptions share their source
 design's picture. New miniature-class defaults intentionally share images across variants.
-The photo-v6 defaults cover all 482 source catalog designs using 268 individual portraits.
+The miniature-reference defaults cover all 482 source catalog designs using 268 individual
+portraits. Eight `photo-v7:` finish refinements replace selected `photo-v6:` defaults;
+all earlier records remain valid choices.
 Variants sharing a miniature hull intentionally share a picture. Faction-neutral FT2/MT
 examples use an actual miniature of the matching hull class. There are two current choices
 per custom class group: 38 refreshed miniature-based choices plus the eight retained special
@@ -80,6 +82,34 @@ PNG. Earlier review indexes are retained under `Documentation/Previous-Indexes/`
 
 The SSD/PDF engine and catalog statistics were not changed. Portraits and theme banners do
 not appear in the printed record sheets.
+
+## Owner-approved fleet palettes
+
+Current defaults follow the owner's fleet palettes, overriding miniature paint colours.
+Miniature references remain authoritative for hull architecture and source viewing angle.
+
+| Faction | Hull and accent treatment |
+|---|---|
+| NSL | Sand-tan armour, restrained red accents, bare-metal machinery |
+| NAC | Silver/near-white armour with cobalt-blue painted accents |
+| OUDF | Mid-grey hulls, chrome machinery, dark-red structural panels |
+| FSE | Ivory/light-grey armour with burgundy-red accents |
+| NI | Dark navy/charcoal, silver machinery, gold/yellow accents |
+| UNSC | Light ivory/grey main hull, smaller navy panels, yellow details |
+| IJSF | Red-dominant hulls with secondary ivory panels |
+| ESU | Dark forest-green hulls with gold accents; no red hull paint |
+| ScanFed | Blue main hulls with yellow accents |
+
+`palette-v8:` records use new IDs and files; the previous records remain valid explicit
+selections. Palette changes also refresh current miniature-based custom choices that share
+these reference hulls. Do not rewrite a saved gallery ID to mean a different picture.
+
+Accents follow physical plate/component boundaries. Do not copy colourful miniature
+motifs, painted abstract geometry, crossing decorative bands or cultural graphics into
+these fleet defaults. NAC finish requires particular care: replace oversized moulded
+white bevel frames and dark paint washes with thin flat plates, fine seams and physically
+consistent solar lighting. Fine surface construction can be reconstructed at full scale;
+major hull shapes, openings, pods and fins remain tied to the miniature reference.
 
 ## Maintainable asset contract
 

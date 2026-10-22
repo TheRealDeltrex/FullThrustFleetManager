@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "_portraits.html" import picture with context %}
 {% import "_gunboats.html" as gunboats %}
+{% import "_ssd.html" as ssd %}
 {% block title %}{{ _("Fleet overview") }} · {{ _("Full Thrust Fleet Manager") }}{% endblock %}
 {% block work_class %}cols-2{% endblock %}
 {% block content %}
@@ -106,7 +107,7 @@
         {% for key in selected.option_keys if f.options[key] %}<span class="chip">{{ selected.option_label(key) }}</span>{% endfor %}
         <div class="spacer"></div>
         <nav class="views" aria-label="{{ _('View') }}">
-          {% for value, label in (("cards", _("Cards")), ("roster", _("Roster"))) %}
+          {% for value, label in (("cards", _("Cards")), ("roster", _("Roster")), ("dock", _("Space Dock"))) %}
             <a class="btn sm {% if selected.view == value %}primary{% endif %}"
                href="{{ url_for('fleet_overview', view=value) }}">{{ label }}</a>
           {% endfor %}
@@ -167,6 +168,88 @@
             </tbody>
           </table>
         </div>
+      {% elif selected.view == "dock" %}
+        {% set dock = selected.dock %}
+        {% if not dock %}
+          <div class="panel empty">{{ _("No ships yet.") }}</div>
+        {% else %}
+          {% set ship = dock.ship %}
+          {% set d = dock.design %}
+          <div class="panel">
+            <nav class="body row dock-ships" aria-label="{{ _('Ships') }}">
+              {% for s in f.ships %}
+                <a class="btn sm {% if s.uid == ship.uid %}primary{% endif %}"
+                   href="{{ url_for('fleet_overview', view='dock', ship=s.uid) }}"><b>{{ s.table_id }}</b> {{ s.name }}</a>
+              {% endfor %}
+            </nav>
+          </div>
+          <div class="dock">
+            <div class="panel">
+              <h3 class="fold" data-fold="dock-diagram" tabindex="0">{{ ship.table_id }} {{ ship.name }}
+                <span class="chip st-{{ ship.status }}">{{ ship.status }}</span></h3>
+              <div class="body ssd-wrap">
+                {% if d %}{{ ssd.editable(dock.svg, d) }}{% else %}<span class="muted">{{ _("Missing design") }}</span>{% endif %}
+              </div>
+            </div>
+            {% if d %}
+            <div class="panel">
+              <h3 class="fold" data-fold="dock-specs" tabindex="0">{{ d.name }}
+                <span class="muted">{{ d.type_label }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</span></h3>
+              <div class="body stack">
+                <div class="fleet-portrait">
+                  {{ picture(ship_portrait(d, portrait_target(f.id, ship.uid)), ship.name, True,
+                            url_for('fleet_ship_portrait', fleet_id=f.id, uid=ship.uid)) }}
+                </div>
+                <div class="meter light">
+                  <div class="lbl"><span>{{ _("MASS") }}</span><b>{{ dock.breakdown.mass_used }} / {{ dock.mass_limit }}</b></div>
+                  <div class="bar"><i style="width: {{ (100 * dock.breakdown.mass_used / dock.mass_limit) | round | int if dock.mass_limit else 0 }}%"></i></div>
+                </div>
+                <p class="muted">{{ dock.points }} {{ _("pts") }} · {{ _("Hull") }} {{ d.hull_boxes }} · {{ _("Armour") }} {{ d.armour }}
+                  · {{ _("Thrust") }} {{ d.thrust }}{% if d.ftl %} · {{ _("FTL") }}{% endif %}</p>
+                <table class="tbl">
+                  <thead><tr><th>{{ _("System") }}</th><th class="num">{{ _("MASS") }}</th><th class="num">{{ _("Points") }}</th></tr></thead>
+                  <tbody>
+                    {% for row in dock.breakdown.rows %}
+                      <tr><td>{{ row.label }}</td><td class="num">{{ row.mass }}</td><td class="num">{{ row.points }}</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          <div class="panel">
+            <h3 class="fold" data-fold="dock-refit" tabindex="0">{{ _("Refit") }}</h3>
+            <div class="body row">
+              <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id, view='dock', ship=ship.uid) }}"
+                    class="row grow" data-autosave="refit_ship">
+                <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                <select class="input grow" name="design_id" aria-label="{{ _('Design') }}">
+                  {% if d and not dock.listed %}<option value="{{ d.id }}" selected>{{ d.name }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</option>{% endif %}
+                  {% for g in dock.refit_groups %}
+                    {% if dock.refit_groups|length > 1 %}<optgroup label="{{ g.name }}">{% endif %}
+                    {% for option in g.designs %}
+                      <option value="{{ option.id }}"{% if option.id == ship.design_id %} selected{% endif %}>{{ option.name }}{% if option.type_code %} ({{ option.type_code }}){% endif %} · {{ option.points }} {{ _("pts") }}</option>
+                    {% endfor %}
+                    {% if dock.refit_groups|length > 1 %}</optgroup>{% endif %}
+                  {% endfor %}
+                </select>
+                <noscript><button class="btn sm" type="submit" name="action" value="refit_ship">{{ _("Refit") }}</button></noscript>
+              </form>
+              {% if d %}
+                <form method="post" action="{{ url_for('fleet_action', fleet_id=f.id, view='dock', ship=ship.uid) }}">
+                  <input type="hidden" name="uid" value="{{ ship.uid }}" />
+                  <button class="btn sm" type="submit" name="action" value="refit_variant"
+                          title="{{ _('A new variant for this ship alone') }}">{{ _("Refit as variant") }}</button>
+                </form>
+                {% if not dock.read_only %}
+                  <a class="btn sm" href="{{ url_for('design_detail', design_id=d.id) }}"
+                     {% if dock.used_by > 1 %}title="{{ _('Used by {n} ships', n=dock.used_by) }}"{% endif %}>{{ _("Edit design") }}</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
       {% else %}
         {% for squadron in f.squadrons %}
           <div class="panel">
@@ -236,7 +319,7 @@
            say where designs come from instead of offering a picker with nothing in it. #}
         {% if not selected.library_total %}
         <p class="body muted">{{ _("No ship designs for {ruleset} yet.", ruleset=selected.ruleset.name) }}
-          <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab first.") }}</a></p>
+          <a href="{{ url_for('design') }}">{{ _("Design one in the Ship Design tab first.") }}</a></p>
         {% else %}
         {# Which ships the list offers: the fleet's own faction, all of them, or the factions
            ticked in the Pick popover. Remembered per fleet. #}
@@ -270,7 +353,7 @@
           <p class="body muted">{{ _("Tick one or more factions to list their ships.") }}</p>
           {% else %}
         <p class="body muted">{{ _("No {faction} ship designs yet.", faction=selected.faction_name) }}
-          <a href="{{ url_for('design') }}">{{ _("Design one in the Design tab,") }}</a>
+          <a href="{{ url_for('design') }}">{{ _("Design one in the Ship Design tab,") }}</a>
           {{ _("or show all ships to pick from every faction.") }}</p>
           {% endif %}
         {% else %}

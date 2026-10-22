@@ -36,7 +36,7 @@
         </div>
         <nav class="tabs" aria-label="{{ _('Main') }}">
           <a href="{{ url_for('fleet_overview') }}" class="{% if active_tab == 'fleet_overview' %}on{% endif %}">{{ _("Fleet overview") }}</a>
-          <a href="{{ url_for('design') }}" class="{% if active_tab == 'design' %}on{% endif %}">{{ _("Design") }}</a>
+          <a href="{{ url_for('design') }}" class="{% if active_tab == 'design' %}on{% endif %}">{{ _("Ship Design") }}</a>
           <a href="{{ url_for('campaign') }}" class="{% if active_tab == 'campaign' %}on{% endif %}">{{ _("Campaign") }}</a>
           <a href="{{ url_for('settings') }}" class="{% if active_tab == 'settings' %}on{% endif %}">{{ _("Settings") }}</a>
         </nav>
@@ -100,6 +100,7 @@
     <script src="{{ url_for('static', filename='autosave.js') }}"></script>
     <script src="{{ url_for('static', filename='collapse.js') }}"></script>
     <script src="{{ url_for('static', filename='reorder.js') }}"></script>
+    <script src="{{ url_for('static', filename='ssddrag.js') }}"></script>
     {% if IS_FROZEN %}
       <script>
         (function () {
