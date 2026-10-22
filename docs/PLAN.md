@@ -806,7 +806,18 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
 4. Campaign module (11.3) with installations and the random campaign generator, in steps C1-C8
    (campaign manager) and G1-G4 (generator); see the roadmap doc. C1 (campaigns grouping
    fleets into sides, a week counter, a campaign log, `.FTCampaign`) and C2 (a hex star map:
-   random, drawn by hand, or loaded from an `.FTStarmap` file) are done.
+   random, drawn by hand, or loaded from an `.FTStarmap` file) and C3 (task forces placed on
+   star systems, jump orders of up to 6 hexes a week, Next week moves them and logs contacts)
+   and C4 (contacts: the long-range scan, fight / withdraw / stand off with the catch roll, the
+   battle result and who holds the system) and C5 (repairs only docked at an own naval base,
+   once a week; reinforcements scheduled by week) and C6 (hidden movement: hot-seat hand-over,
+   umpire view, dummy markers) and C7 (objectives, a last week and the result; the Lafayette
+   Incident of FT pp.36-38 as a ready-made campaign) and C8 (installations: stations placed in
+   task forces that stay put, fight where they stand and serve as repair yards) are done, and
+   so is G1 (the map generator's settings: spacing, settled and outpost shares, bases per side,
+   names), G2 (scenario templates: invasion, raid, border war) and G3 (fleets bought from the
+   catalog for a points budget, no class over half the ships, garrisons for settled worlds) and
+   G4 (a weekly 2D6 event per side, and war weariness shortening an attacker's clock).
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)

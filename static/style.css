@@ -239,6 +239,16 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .base.side-0 { stroke: #4fa3ff; } .base.side-1 { stroke: #ff5d5d; } .base.side-2 { stroke: #4fd18b; } .base.side-3 { stroke: #ffb547; }
 .base.side-4 { stroke: #b48cff; } .base.side-5 { stroke: #2de2c8; } .base.side-6 { stroke: #ff7ad9; } .base.side-7 { stroke: #a3a3a3; }
 .starmap .base[class*="side-"] { fill: none; }
+.starmap .pennant { stroke-width: 1.2; pointer-events: none; }
+.starmap .pennant[class*="side-"] { stroke: currentColor; }
+.starmap .order { stroke-width: 1.6; stroke-dasharray: 4 3; fill: none; pointer-events: none; }
+.order.side-0, .pennant.side-0 { stroke: #4fa3ff; color: #4fa3ff; } .order.side-1, .pennant.side-1 { stroke: #ff5d5d; color: #ff5d5d; }
+.order.side-2, .pennant.side-2 { stroke: #4fd18b; color: #4fd18b; } .order.side-3, .pennant.side-3 { stroke: #ffb547; color: #ffb547; }
+.order.side-4, .pennant.side-4 { stroke: #b48cff; color: #b48cff; } .order.side-5, .pennant.side-5 { stroke: #2de2c8; color: #2de2c8; }
+.order.side-6, .pennant.side-6 { stroke: #ff7ad9; color: #ff7ad9; } .order.side-7, .pennant.side-7 { stroke: #a3a3a3; color: #a3a3a3; }
+.task-force { border-top: 1px solid var(--line); padding-top: 8px; }
+.task-force:first-child { border-top: 0; padding-top: 0; }
+.campaign-contacts input[type="number"] { width: 4.5em; }
 @media (max-width: 760px) { .starmap-grid { grid-template-columns: 1fr; } }
 .ssd-click [data-ref] { cursor: pointer; }
 .ssd-click [data-ref]:hover { opacity: .55; }

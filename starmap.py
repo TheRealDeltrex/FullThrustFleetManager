@@ -17,6 +17,12 @@ from html import escape
 KINDS = ("settled", "outpost", "empty")
 MIN_SIZE, MAX_SIZE = 4, 30
 DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_STARS = 12, 10, 16
+SPACINGS = (1, 2, 3, 4)
+DEFAULT_SPACING, DEFAULT_SETTLED, DEFAULT_OUTPOSTS, DEFAULT_BASES = 2, 40, 30, 1
+MAX_BASES = 5
+NAME_STYLES = ("stars", "catalog")
+# Survey catalogue prefixes, as FT p.37 names its minor stars (VN-459, HR-1306).
+CATALOGS = ("BD", "GJ", "HD", "HR", "LHS", "VN")
 
 # Real star names, for random maps and as the suggestion for a new system.
 STAR_NAMES = (
@@ -65,11 +71,25 @@ def unused_name(starmap: dict, rng: random.Random | None = None) -> str:
     return rng.choice(free) if rng else free[0]
 
 
-def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int) -> dict:
-    """A random map (an app rule): stars at least two hexes apart, about 40% settled, 30%
-    outposts and 30% bare stars. The first two sides get a home naval base at opposite ends,
-    and a settled world or outpost belongs to the home clearly nearer to it; the rest is
-    contested. The same seed and settings give the same map."""
+def catalog_name(starmap: dict, rng: random.Random) -> str:
+    taken = {s["name"] for s in starmap["systems"]}
+    while True:
+        name = f"{rng.choice(CATALOGS)}-{rng.randrange(100, 10000)}"
+        if name not in taken:
+            return name
+
+
+def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int, *,
+             spacing: int = DEFAULT_SPACING, settled: int = DEFAULT_SETTLED,
+             outposts: int = DEFAULT_OUTPOSTS, bases: int = DEFAULT_BASES,
+             names: str = "stars") -> dict:
+    """A random map (an app rule, roadmap G1): stars at least `spacing` hexes apart, `settled`
+    and `outposts` per cent of them settled worlds and outposts, the rest bare stars. Every
+    side gets a settled home with a naval base, the first two at opposite ends and any others
+    as far from those as the map allows; a settled world or outpost belongs to the home
+    clearly nearer to it (by more than two hexes) and the rest is contested. A side with more
+    than one base gets them on its own settled worlds furthest from home. Names are real stars
+    or survey catalogue numbers. The same seed and settings give the same map."""
     rng = random.Random(seed)
     starmap = blank(width, height)
     starmap["seed"] = seed
@@ -79,30 +99,50 @@ def generate(width: int, height: int, stars: int, side_ids: list[str], seed: int
     for cell in cells:
         if len(placed) >= stars:
             break
-        if all(hex_distance(cell, p) >= 2 for p in placed):
+        if all(hex_distance(cell, p) >= spacing for p in placed):
             placed.append(cell)
+    settled_cut, outpost_cut = settled / 100, (settled + outposts) / 100
     for q, r in placed:
         roll = rng.random()
-        kind = "settled" if roll < 0.4 else "outpost" if roll < 0.7 else "empty"
-        starmap["systems"].append({"q": q, "r": r, "name": unused_name(starmap, rng),
-                                   "kind": kind, "owner": "", "base": False})
-    homes = []
+        kind = "settled" if roll < settled_cut else "outpost" if roll < outpost_cut else "empty"
+        name = catalog_name(starmap, rng) if names == "catalog" else unused_name(starmap, rng)
+        starmap["systems"].append({"q": q, "r": r, "name": name, "kind": kind, "owner": "", "base": False})
+    systems = starmap["systems"]
+    homes: list[tuple[dict, str]] = []
     if len(side_ids) >= 2 and len(placed) >= 2:
-        west = min(starmap["systems"], key=lambda s: (s["q"], abs(s["r"] - starmap["height"] // 2)))
-        east = max(starmap["systems"], key=lambda s: (s["q"], -abs(s["r"] - starmap["height"] // 2)))
+        west = min(systems, key=lambda s: (s["q"], abs(s["r"] - starmap["height"] // 2)))
+        east = max(systems, key=lambda s: (s["q"], -abs(s["r"] - starmap["height"] // 2)))
         homes = [(west, side_ids[0]), (east, side_ids[1])]
+        for side in side_ids[2:]:
+            free = [s for s in systems if all(s is not h for h, _side in homes)]
+            if not free:
+                break
+            homes.append((max(free, key=lambda s: min(_apart(s, h) for h, _side in homes)), side))
         for home, side in homes:
             home.update(kind="settled", owner=side, base=True)
-    for system in starmap["systems"]:
+    for system in systems:
         if system["owner"] or system["kind"] == "empty" or not homes:
             continue
-        (h1, s1), (h2, s2) = homes
-        d1 = hex_distance((system["q"], system["r"]), (h1["q"], h1["r"]))
-        d2 = hex_distance((system["q"], system["r"]), (h2["q"], h2["r"]))
-        if abs(d1 - d2) > 2:
-            system["owner"] = s1 if d1 < d2 else s2
-    starmap["systems"].sort(key=lambda s: (s["q"], s["r"]))
+        near = sorted((_apart(system, home), side) for home, side in homes)
+        if near[1][0] - near[0][0] > 2:
+            system["owner"] = near[0][1]
+    for home, side in homes:
+        own = [s for s in systems if s["owner"] == side and s["kind"] == "settled" and not s["base"]]
+        for system in sorted(own, key=lambda s: -_apart(s, home))[:max(0, bases - 1)]:
+            system["base"] = True
+    systems.sort(key=lambda s: (s["q"], s["r"]))
     return starmap
+
+
+def _apart(a: dict, b: dict) -> int:
+    return hex_distance((a["q"], a["r"]), (b["q"], b["r"]))
+
+
+def holds(starmap: dict, side: str, count: int, include: str = "") -> bool:
+    """Whether the side holds at least `count` settled systems, `include` (a system name) among
+    them when given: the shape of FT p.36's victory conditions."""
+    held = [s for s in starmap["systems"] if s["owner"] == side and s["kind"] == "settled"]
+    return len(held) >= count and (not include or any(s["name"] == include for s in held))
 
 
 def hex_label(q: int, r: int) -> str:
@@ -126,7 +166,7 @@ def _corners(x: float, y: float) -> str:
 
 
 def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int, int] | None = None,
-           label: str = "") -> str:
+           label: str = "", forces: list[dict] | None = None) -> str:
     """The map as inline SVG. With href ("/campaign?hex="), every hex links to href + "q,r", which
     selects it without any script. Side colours are side-0 ... side-7 classes in style.css."""
     width = SIZE * (1.5 * starmap["width"] + 0.5) + 4
@@ -155,5 +195,22 @@ def to_svg(starmap: dict, sides: list[dict], href: str = "", selected: tuple[int
         out.append(f'<circle class="star {s["kind"]} {side}" cx="{x:.1f}" cy="{y - 3:.1f}" r="{radius}"/>')
         out.append(f'<text class="star-name" x="{x:.1f}" y="{y + 12:.1f}">{escape(s["name"])}</text>')
         out.append("</a>" if href else "</g>")
+    # Task forces: a pennant per side present on a hex, its orders as a dashed line.
+    for f in forces or []:
+        if f.get("order"):
+            (x1, y1), (x2, y2) = _centre(f["q"], f["r"]), _centre(*f["order"])
+            out.append(f'<line class="order {colour.get(f["side"], "unowned")}" x1="{x1:.1f}" y1="{y1:.1f}" '
+                       f'x2="{x2:.1f}" y2="{y2:.1f}"/>')
+    placed: dict[tuple[int, int], list[str]] = {}
+    for f in forces or []:
+        sides_here = placed.setdefault((f["q"], f["r"]), [])
+        if f["side"] in sides_here:
+            continue
+        sides_here.append(f["side"])
+        x, y = _centre(f["q"], f["r"])
+        x, y = x - 11 + 7 * (len(sides_here) - 1), y - 13
+        out.append(f'<path class="pennant {colour.get(f["side"], "unowned")}" '
+                   f'd="M{x:.1f} {y:.1f}v9M{x:.1f} {y:.1f}l6 2.5l-6 2.5z">'
+                   f'<title>{escape(f["name"])}</title></path>')
     out.append("</svg>")
     return "".join(out)

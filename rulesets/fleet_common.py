@@ -56,6 +56,42 @@ def _fits(riders: list[int], bins: list[int]) -> bool:
     return False
 
 
+def installation(design: dict) -> bool:
+    """A station that never moves: a starbase, a gate, or an unpowered construct with neither
+    drive nor FTL (FT p.27: an installation is an unpowered ship; PC p.115: a starbase is always
+    thrust 0, and cannot be towed). A monster ship section is not one: it moves with its ship."""
+    if design.get("hull_kind") == "starbase" or any(
+            x.get("type") in ("jump_gate", "portal") for x in common.systems_of(design)):
+        return True
+    return (design.get("hull_kind") != "section" and design.get("ftl") is not True
+            and _int(design.get("thrust")) == 0)
+
+
+def jump_blockers(ships: list[tuple[dict, dict]]) -> tuple[list[dict], bool]:
+    """For a group travelling together between stars: (ships that cannot travel at all, whether
+    the rest all make the jump). A ship jumps on its own FTL drive, or rides in a tender bay or
+    behind a tug of the group (FT p.27, CD p.34): a ship without FTL, with its main drive
+    knocked out, or a hulk needs carrying (FT p.35 points drive-disabled ships at tugs). An
+    installation never moves. Destroyed ships are left out."""
+    fixed, riders, carriers = [], [], []
+    for s, d in ships:
+        if s.get("status") == "destroyed":
+            continue
+        if installation(d):
+            fixed.append(s)
+            continue
+        disabled = _int((s.get("damage") or {}).get("drive_hits")) >= 2 or s.get("status") == "hulk"
+        if d.get("ftl") is True and not disabled:
+            carriers += _carriers(d)
+        else:
+            riders.append(max(1, _int(d.get("tmf"), 1)))
+    bins = [mass for mass, combines in carriers if not combines]
+    pooled = sum(mass for mass, combines in carriers if combines)
+    if pooled:
+        bins.append(pooled)
+    return fixed, _fits(sorted(riders, reverse=True), bins)
+
+
 def _composition(live: list[tuple[dict, dict]], options: dict, ship_points,
                  ship_class: Callable[[int], str]) -> list[Issue]:
     """CD p.57's fleet composition limits, each a fleet option: a patrol battle has no capitals
