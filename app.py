@@ -1306,11 +1306,12 @@ def _leave_campaign(fleet: dict) -> tuple[bool, str]:
 def _update_campaign(campaign: dict) -> tuple[bool, str]:
     form = request.form
     sides = {key[5:]: value for key, value in form.items() if key.startswith("side-")}
-    hidden = form.getlist("hidden")
+    hidden, events = form.getlist("hidden"), form.getlist("events")
     return store.update_campaign(campaign, name=form.get("name"),
                                  week=int(form["week"]) if form.get("week") else None,
                                  notes=form.get("notes"), sides=sides,
-                                 hidden=hidden[-1] == "1" if hidden else None)
+                                 hidden=hidden[-1] == "1" if hidden else None,
+                                 events=events[-1] == "1" if events else None)
 
 
 @register_action("set_objectives")
