@@ -42,7 +42,7 @@ import starmap
 import store
 from i18n import _
 from idle_watchdog import note_closing, note_heartbeat
-from rulesets import REFERENCE_BOOKS, RULESETS, book_sort_key, common, presets
+from rulesets import REFERENCE_BOOKS, RULESETS, book_sort_key, common, fleet_common, presets
 from rulesets.fb import data as fb_data
 from rulesets.fb import load_star_ranger_rules
 
@@ -1142,6 +1142,7 @@ def _forces_context(campaign: dict, fleet: dict, view: dict) -> dict:
             "where": system["name"] if system else starmap.hex_label(force["q"], force["r"]),
             "ships": ships, "options": options, "why": why, "order": order,
             "own": force["side"] == fleet.get("campaign_side"),
+            "installation": bool(ships) and all(fleet_common.installation(d) for _f, _s, d in ships if d),
         })
     names = {(f["id"], s["uid"]): s for f in fleets.values() for s in f["ships"]}
     later = []
@@ -1179,7 +1180,8 @@ def _contacts_context(campaign: dict, fleet: dict, view: dict) -> dict:
         for side in contact["sides"]:
             ships = [(fl, ship) for force in forces if force["side"] == side
                      for fl, ship, _d in store.force_ships(campaign, force, fleets)]
-            sides.append({"id": side, "name": side_names.get(side, side),
+            fixed = bool(store.installations_at(campaign, side, contact["q"], contact["r"], fleets))
+            sides.append({"id": side, "name": side_names.get(side, side), "fixed": fixed,
                           "class": side_class.get(side, ""),
                           "report": contact["reports"][side], "choice": contact["choices"][side],
                           "forces": [f["name"] for f in forces if f["side"] == side], "ships": ships,
@@ -1187,7 +1189,8 @@ def _contacts_context(campaign: dict, fleet: dict, view: dict) -> dict:
         system = starmap.system_at(campaign["map"], contact["q"], contact["r"]) if campaign["map"] else None
         rows.append({"contact": contact, "sides": sides,
                      "where": system["name"] if system else starmap.hex_label(contact["q"], contact["r"]),
-                     "own": own if (own := fleet.get("campaign_side")) in contact["sides"] else ""})
+                     "own": own if (own := fleet.get("campaign_side")) in contact["sides"] else "",
+                     "own_fixed": any(s["fixed"] for s in sides if s["id"] == own)})
     return {"contacts": rows, "scan_classes": fleet_rules.SCAN_CLASSES}
 
 

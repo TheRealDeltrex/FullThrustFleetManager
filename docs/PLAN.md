@@ -812,7 +812,8 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    battle result and who holds the system) and C5 (repairs only docked at an own naval base,
    once a week; reinforcements scheduled by week) and C6 (hidden movement: hot-seat hand-over,
    umpire view, dummy markers) and C7 (objectives, a last week and the result; the Lafayette
-   Incident of FT pp.36-38 as a ready-made campaign) are done.
+   Incident of FT pp.36-38 as a ready-made campaign) and C8 (installations: stations placed in
+   task forces that stay put, fight where they stand and serve as repair yards) are done.
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)
