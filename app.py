@@ -427,7 +427,12 @@ def _fleet_context(fleet: dict, view: str) -> dict:
 
 
 @app.route("/fleet")
-def fleet_overview() -> str:
+def fleet_overview() -> str | Response:
+    # The top bar's fleet picker submits ?go=<id>; a form, unlike a script-built URL, also
+    # stays inside the web build's frame.
+    if store.get_fleet(request.args.get("go", "")):
+        session["fleet_id"] = request.args["go"]
+        return redirect(url_for("fleet_overview"))
     fleet = current_fleet()
     if not fleet:
         return render_template("fleet.html", active_tab="fleet_overview", selected=None,

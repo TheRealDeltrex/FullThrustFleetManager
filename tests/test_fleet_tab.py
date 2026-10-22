@@ -104,6 +104,18 @@ def test_fleets_are_listed_with_their_ruleset_and_can_be_switched(client):
     assert client.get("/fleet/nope").status_code == 404
 
 
+def test_the_top_bar_fleet_picker_submits_its_form(client):
+    """Master, 2026-10-22: the picker built a "/fleet/<id>" URL in script, which in the web build
+    left the app for a GitHub Pages 404. It now submits its form, which every build handles."""
+    fb = make_fleet(client, "Home Fleet")
+    make_fleet(client, "Task Force", ruleset="ft2")
+    page = text(client.get("/fleet"))
+    assert 'onchange="this.form.submit()"' in page and "location.href" not in page
+    client.get("/fleet", query_string={"go": fb}, follow_redirects=True)
+    assert "ruleset-strip rs-fb" in text(client.get("/fleet"))
+    assert client.get("/fleet", query_string={"go": "nope"}).status_code == 200
+
+
 def test_deleting_a_fleet_clears_the_selection(client):
     fleet_id = make_fleet(client)
     page = text(client.post(f"/fleet/{fleet_id}/action", data={"action": "delete_fleet"},
