@@ -487,3 +487,11 @@ def test_carrierless_gunboats_are_on_the_fleet_pdf(client):
         text_ = " ".join(page.get_text() for page in doc)
     assert "FTL gunboat squadron: Graser gunboats (60 points)" in text_
     assert "Gunboat squadron" in text_                              # the tracker row
+
+
+def test_every_page_keeps_its_scroll_after_a_click(client):
+    """Master, 2026-10-22: a click must not jump the view to the top (static/keepscroll.js)."""
+    for path in ("/fleet", "/design", "/campaign", "/settings"):
+        page = text(client.get(path, follow_redirects=True))
+        assert "keepscroll.js" in page, path
+        assert 'data-path="/' in page, path
