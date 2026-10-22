@@ -29,7 +29,7 @@ import paths
 import portraits
 import starmap
 from i18n import _
-from rulesets import RULESETS, presets
+from rulesets import RULESETS, fleet_common, presets
 
 STATUSES = ("ready", "damaged", "docked", "hulk", "destroyed")
 EXTENSIONS = {"fleet": ".FTFleet", "design": ".FTDesign", "campaign": ".FTCampaign",
@@ -1062,19 +1062,33 @@ def toggle_system_out(fleet: dict, uid: str, system_uid: str) -> tuple[bool, str
     return True, _("System knocked out.")
 
 
+def installations_at(campaign: dict, side: str, q: int, r: int,
+                     fleets: dict[str, dict] | None = None) -> list[tuple[dict, dict, dict]]:
+    """The side's installations (step C8) still standing in task forces at a hex."""
+    return [(fl, ship, design) for force in campaign["forces"]
+            if force["side"] == side and (force["q"], force["r"]) == (q, r)
+            for fl, ship, design in force_ships(campaign, force, fleets)
+            if design and fleet_common.installation(design) and ship["status"] not in ("destroyed", "hulk")]
+
+
 def yard_block(fleet: dict, ship: dict) -> str:
     """Why the ship cannot use a repair yard now, or "". A fleet in a campaign with a star map
     repairs and replenishes only docked in a task force at one of its side's naval bases (FT
-    p.35), and repairs once a week. Without a map nothing is checked."""
+    p.35) or beside one of its side's installations (an app rule), and repairs once a week. An
+    installation repairs where it stands. Without a map nothing is checked."""
     campaign = get_campaign(fleet.get("campaign_id"))
     if not campaign or not campaign["map"]:
         return ""
     force = next((f for f in campaign["forces"]
                   if {"fleet": fleet["id"], "uid": ship["uid"]} in f["ships"]), None)
     system = starmap.system_at(campaign["map"], force["q"], force["r"]) if force else None
-    if not system or not system["base"] or system["owner"] != fleet.get("campaign_side"):
-        return _("Only at a naval base of your side.")
-    if ship["status"] != "docked":
+    side = fleet.get("campaign_side")
+    base = system and system["base"] and system["owner"] == side
+    stations = installations_at(campaign, side, force["q"], force["r"]) if system else []
+    if not base and not stations:
+        return _("Only at a naval base or installation of your side.")
+    itself = any((fl["id"], s["uid"]) == (fleet["id"], ship["uid"]) for fl, s, _d in stations)
+    if ship["status"] != "docked" and not itself:
         return _("Dock the ship at {base} first.", base=system["name"])
     return ""
 
@@ -1749,6 +1763,8 @@ def set_contact_choice(campaign: dict, contact_id: str, side: str, choice: str,
         return False, _("The sides have already chosen.")
     if choice not in fleet_rules.CONTACT_CHOICES:
         return False, _("Choose fight, withdraw or stand off.")
+    if choice == "withdraw" and (fixed := installations_at(campaign, side, contact["q"], contact["r"])):
+        return False, _("{name} cannot leave: fight or stand off.", name=fixed[0][1]["name"])
     contact["choices"][side] = choice
     if not all(contact["choices"].values()):
         return True, _("Choice made.")

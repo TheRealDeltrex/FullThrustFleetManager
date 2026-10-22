@@ -35,7 +35,8 @@ def test_repairs_need_a_dock_at_an_own_base_once_a_week():
     ship = fleet["ships"][0]
     store.set_ship_damage(fleet, ship["uid"], hull=5)
     plan = {"hull": 3, "drive_hits": 0, "systems": []}
-    assert store.repair_ship(fleet, ship["uid"], plan) == (False, "Only at a naval base of your side.")
+    assert store.repair_ship(fleet, ship["uid"], plan) == (
+        False, "Only at a naval base or installation of your side.")
     force, _msg = store.add_force(campaign, "blue", "Yard", 0, 0)
     store.assign_ships(campaign, force["id"], fleet, [ship["uid"]])
     store.save_campaign(campaign)
@@ -87,6 +88,6 @@ def test_the_panel_schedules_and_cancels_reinforcements(client):
                            "week": "4", "name": "Relief", "ship": [fleet["ships"][0]["uid"]]})
     page = client.get("/campaign").get_data(as_text=True)
     assert "Relief" in page and "week 4 at Bravo" in page
-    assert "Only at a naval base of your side." in page
+    assert "Only at a naval base or installation of your side." in page
     client.post(url, data={"action": "cancel_reinforcement", "reinforcement": "rf1"})
     assert store.get_campaign(campaign["id"])["reinforcements"] == []

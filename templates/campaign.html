@@ -301,7 +301,7 @@
                       <option value="">{{ _("Catch roll: app rolls") }}</option>
                       {% for n in range(1, 7) %}<option value="{{ n }}">{{ _("Catch roll: {n}", n=n) }}</option>{% endfor %}
                     </select>
-                    {% for choice in ("fight", "withdraw", "standoff") %}
+                    {% for choice in ("fight", "withdraw", "standoff") if not (choice == "withdraw" and row.own_fixed) %}
                       <button class="btn sm" type="submit" name="choice" value="{{ choice }}">{{ choice_label(choice) }}</button>
                     {% endfor %}
                   </form>
@@ -376,6 +376,7 @@
                 <div class="row">
                   {% if not row.shown %}<span class="muted">{{ _("Ships unknown") }}</span>{% else %}
                   {% if tf.dummy %}<span class="chip">{{ _("Dummy marker") }}</span>{% endif %}
+                  {% if row.installation %}<span class="chip">{{ _("Installation") }}</span>{% endif %}
                   {% for fl, ship, design in row.ships %}
                     <span class="chip">{{ ship.table_id }} {{ ship.name }}{% if fl.id != f.id %} <span class="muted">· {{ fl.name }}</span>{% endif %}
                       {% if row.own %}<button class="btn sm ghost" type="submit" name="action" value="unassign_ship"
