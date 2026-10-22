@@ -810,7 +810,8 @@ Each milestone ends with its tests green, `CLAUDE.md` updated, and the work comm
    star systems, jump orders of up to 6 hexes a week, Next week moves them and logs contacts)
    and C4 (contacts: the long-range scan, fight / withdraw / stand off with the catch roll, the
    battle result and who holds the system) and C5 (repairs only docked at an own naval base,
-   once a week; reinforcements scheduled by week) are done.
+   once a week; reinforcements scheduled by week) and C6 (hidden movement: hot-seat hand-over,
+   umpire view, dummy markers) are done.
 5. Drag-to-arrange SSD layout
 6. Tablet play mode (interactive SSDs instead of paper)
 7. Guided (stepper) design mode for new players (see `layout-b-hangar-deck.html`, screen B2)
