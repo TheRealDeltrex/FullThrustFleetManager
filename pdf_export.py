@@ -10,6 +10,7 @@ per fleet and one shared quick reference. Both fleets must share a ruleset; the 
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date
 from math import ceil
@@ -60,6 +61,7 @@ class FleetPDF(FPDF):
 
     header_title = ""
     header_ruleset = ""
+    header_section = ""  # right of the running title on the landscape sheets
     non_conforming = False
     print_style = "mono"
 
@@ -76,7 +78,12 @@ class FleetPDF(FPDF):
         self.set_font("plex", "B", 9)
         self.set_xy(MARGIN, 8)
         title = f"{self.header_ruleset} · {self.header_title}"
-        self.cell(0, 5, _fit(self, title, self.epw))
+        section = self.header_section
+        self.set_font("plex", "B", 9)
+        room = self.epw - (self.get_string_width(section) + 6 if section else 0)
+        self.cell(room, 5, _fit(self, title, room))
+        if section:
+            self.cell(self.epw - room, 5, section, align="R")
         self.set_draw_color(*self.accent)
         self.set_line_width(.65)
         self.line(MARGIN, 15, self.w - MARGIN, 15)
@@ -126,6 +133,7 @@ def _lines(pdf: FPDF, text: str, width: float) -> list[str]:
 
 
 def _section(pdf: FleetPDF, title: str, eyebrow: str = "") -> None:
+    pdf.header_section = ""
     pdf.add_page()
     if eyebrow:
         pdf.set_font("plex", "B", 8)
@@ -166,16 +174,19 @@ def _table(pdf: FleetPDF, headers: list[str], rows: list[list[str]], widths: lis
 # ---- Drawing the layout primitives -----------------------------------------------------------
 
 
-def draw_diagram(pdf: FPDF, diagram: ssd_layout.Diagram, x: float, y: float, width: float) -> float:
-    """Render a Diagram at (x, y) mm, scaled to `width` mm. Returns its height in mm."""
-    scale = width / diagram.width if diagram.width else 1.0
-    height = diagram.height * scale
+def draw_diagram(pdf: FPDF, diagram: ssd_layout.Diagram, x: float, y: float, width: float,
+                 view: tuple[float, float, float, float] | None = None) -> float:
+    """Render a Diagram at (x, y) mm, scaled to `width` mm. Returns its height in mm. `view`
+    (x0, y0, x1, y1 in the diagram's points) draws just that part of it at (x, y)."""
+    x0, y0, x1, y1 = view or (0.0, 0.0, diagram.width, diagram.height)
+    scale = width / (x1 - x0) if x1 > x0 else 1.0
+    height = (y1 - y0) * scale
 
     def px(value: float) -> float:
-        return x + value * scale
+        return x + (value - x0) * scale
 
     def py(value: float) -> float:
-        return y + value * scale
+        return y + (value - y0) * scale
 
     pdf.set_draw_color(0, 0, 0)
     pdf.set_text_color(0, 0, 0)
@@ -392,99 +403,375 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
 
 
 
-def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
-    """Record sheets packed into rows, largest first (PLAN 10.2)."""
+# ---- Record sheets and the orders plot (after the Full Thrust Light sheets) --------------------
+#
+# Landscape pages of ship cards, as on the FT Light ship record sheets: class up the left edge,
+# an ID tab and the name along the top, the SSD over a hull silhouette. Each page takes the
+# densest grid that keeps its SSDs legible: twelve escorts, eight cruisers or six capital ships.
+# A ship too big for any one slot takes two. The orders plot follows the FT Light movement plot
+# and goes under the last cards when it fits there.
+
+GRIDS = ((4, 3), (4, 2), (3, 2))  # columns, rows; densest first
+GAP = 3.5                  # between cards, mm
+STRIP, BAND = 5.5, 8.0     # class strip and name band, mm
+HULL_SIDE, HULL_TOP, HULL_FOOT = 3.0, 4.5, 2.5  # silhouette around the SSD, mm
+MIN_SCALE, MAX_SCALE = 0.75, 1.0  # SSD points -> PT mm; 1.0 is the screen size
+PLOT_ROW, PLOT_HEAD = 6.5, 6.0
+PLOT_TURNS = 10
+
+
+def _bounds(diagram: ssd_layout.Diagram) -> tuple[float, float, float, float]:
+    """The drawn extent of a diagram, in its own points; its declared size has margins."""
+    xs: list[float] = []
+    ys: list[float] = []
+    for p in diagram.primitives:
+        if isinstance(p, ssd_layout.Rect):
+            xs += [p.x, p.x + p.w]
+            ys += [p.y, p.y + p.h]
+        elif isinstance(p, ssd_layout.Circle):
+            xs += [p.cx - p.r, p.cx + p.r]
+            ys += [p.cy - p.r, p.cy + p.r]
+        elif isinstance(p, ssd_layout.Line):
+            xs += [p.x1, p.x2]
+            ys += [p.y1, p.y2]
+        elif isinstance(p, ssd_layout.Path):
+            tokens = re.findall(r"[MLAZ]|-?\d+(?:\.\d+)?", p.d)
+            index = 0
+            while index < len(tokens):
+                token = tokens[index]
+                if token in ("M", "L"):
+                    xs.append(float(tokens[index + 1]))
+                    ys.append(float(tokens[index + 2]))
+                    index += 3
+                elif token == "A":
+                    xs.append(float(tokens[index + 6]))
+                    ys.append(float(tokens[index + 7]))
+                    index += 8
+                else:
+                    index += 1
+        elif isinstance(p, ssd_layout.Text):
+            half = len(p.text) * p.size * .3
+            left = {"middle": p.x - half, "start": p.x, "end": p.x - 2 * half}[p.anchor]
+            xs += [left, left + 2 * half]
+            ys += [p.y - p.size * .8, p.y + p.size * .2]
+    if not xs:
+        return 0.0, 0.0, max(diagram.width, 1.0), max(diagram.height, 1.0)
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+@dataclass
+class _Card:
+    ship: dict
+    design: dict
+    diagram: ssd_layout.Diagram
+    view: tuple[float, float, float, float]
+    span: tuple[int, int] = (1, 1)
+    slot: tuple[int, int] = (0, 0)
+
+
+@dataclass
+class _Grid:
+    cols: int
+    rows: int
+    top: float
+    cell_w: float
+    cell_h: float
+
+    def size(self, span: tuple[int, int]) -> tuple[float, float]:
+        return (span[0] * self.cell_w + (span[0] - 1) * GAP,
+                span[1] * self.cell_h + (span[1] - 1) * GAP)
+
+    def fit(self, card: _Card, span: tuple[int, int]) -> float:
+        """The largest scale the SSD takes in a card of this span, silhouette margins included."""
+        w, h = self.size(span)
+        x0, y0, x1, y1 = card.view
+        return min((w - STRIP - 2 * HULL_SIDE - 2) / ((x1 - x0) * PT),
+                   (h - BAND - HULL_TOP - HULL_FOOT - 1.5) / ((y1 - y0) * PT))
+
+
+def _sheet_grid(pdf: FleetPDF, cols: int, rows: int) -> _Grid:
+    top = pdf.t_margin
+    return _Grid(cols, rows, top, (pdf.epw - (cols - 1) * GAP) / cols,
+                 (pdf.h - 19 - top - (rows - 1) * GAP) / rows)
+
+
+SPANS = ((1, 1), (2, 1), (1, 2), (2, 2))  # slots a card may take, smallest first
+
+
+def _span(grid: _Grid, card: _Card) -> tuple[int, int]:
+    """The fewest slots that show the SSD at a legible scale, else the most there are."""
+    spans = [s for s in SPANS if s[0] <= grid.cols and s[1] <= grid.rows]
+    return next((s for s in spans if grid.fit(card, s) >= MIN_SCALE),
+                max(spans, key=lambda s: grid.fit(card, s)))
+
+
+def _fill(grid: _Grid, cards: list[_Card]) -> list[tuple[_Card, tuple[int, int], tuple[int, int]]]:
+    """(card, span, slot) for the cards one page of this grid takes, first fit in order; the
+    first card with no room left ends the page."""
+    placed = []
+    taken: set[tuple[int, int]] = set()
+    for card in cards:
+        span = _span(grid, card)
+        cells = None
+        for row in range(grid.rows - span[1] + 1):
+            for col in range(grid.cols - span[0] + 1):
+                want = {(col + c, row + r) for c in range(span[0]) for r in range(span[1])}
+                if not want & taken:
+                    cells, slot = want, (col, row)
+                    break
+            if cells:
+                break
+        if not cells:
+            break
+        taken |= cells
+        placed.append((card, span, slot))
+    return placed
+
+
+def _plot_height(ships: int) -> float:
+    return 6 + PLOT_HEAD + PLOT_ROW * ships  # title, heading, rows
+
+
+def _plot_top(grid: _Grid, cards: list[_Card]) -> float:
+    """Where an orders plot would start: under the lowest card."""
+    used = max(c.slot[1] + c.span[1] for c in cards)
+    return grid.top + used * (grid.cell_h + GAP)
+
+
+def _pages(pdf: FleetPDF, cards: list[_Card], plot: float = 0.0) -> list[tuple[_Grid, list[_Card]]]:
+    """Cards onto pages, in order. Each page takes the grid that holds the most of the next
+    cards; on the last page one that leaves room for a `plot` mm tall orders plot is next
+    best, then the larger scale. A big ship spans slots, as the FT Light battlecruiser does."""
+    pages: list[tuple[_Grid, list[_Card]]] = []
+    rest = list(cards)
+    while rest:
+        options = []
+        for cols, rows in GRIDS:
+            grid = _sheet_grid(pdf, cols, rows)
+            placed = _fill(grid, rest)
+            scale = min(grid.fit(card, span) for card, span, _slot in placed)
+            used = max(slot[1] + span[1] for _card, span, slot in placed)
+            room = (plot and len(placed) == len(rest)
+                    and grid.top + used * (grid.cell_h + GAP) + plot <= pdf.h - 21)
+            options.append((len(placed), bool(room), min(scale, MAX_SCALE), grid, placed))
+        *_score, grid, placed = max(options, key=lambda o: o[:3])
+        for card, span, slot in placed:
+            card.span, card.slot = span, slot
+        pages.append((grid, [card for card, _span_, _slot in placed]))
+        rest = rest[len(placed):]
+    return pages
+
+
+def _sheet_page(pdf: FleetPDF, section: str) -> None:
+    pdf.header_section = section
+    pdf.add_page(orientation="L")
+
+
+def _silhouette(pdf: FleetPDF, left: float, top: float, right: float, bottom: float) -> None:
+    """A plain hull outline behind the SSD, bow up, as the FT Light sheets draw their ships."""
+    width, height = right - left, bottom - top
+    mid = (left + right) / 2
+    bow = top - min(HULL_TOP - 1.5, height * .12)
+    points = [(mid, bow), (mid + width * .16, top), (right, top + height * .2),
+              (right, bottom - height * .1), (right - width * .07, bottom),
+              (left + width * .07, bottom), (left, bottom - height * .1),
+              (left, top + height * .2), (mid - width * .16, top)]
+    colour = pdf.print_style == "color"
+    pdf.set_line_width(.25)
+    pdf.set_draw_color(*((150, 182, 208) if colour else (175, 175, 175)))
+    pdf.set_fill_color(*((219, 232, 243) if colour else (255, 255, 255)))
+    pdf.polygon(points, style="DF" if colour else "D")
+
+
+def _ship_card(pdf: FleetPDF, card: _Card, x: float, y: float, w: float, h: float,
+               scale: float, points: int) -> None:
+    ship, design = card.ship, card.design
+    colour = pdf.print_style == "color"
+    accent = pdf.accent
+    ink = (255, 255, 255) if colour else (25, 25, 25)
+    strip = accent if colour else (228, 228, 228)
+    pdf.set_line_width(.35)
+    pdf.set_draw_color(*accent)
+    pdf.set_fill_color(255)
+    pdf.rect(x, y, w, h, style="DF", round_corners=True, corner_radius=2)
+    pdf.set_fill_color(*strip)
+    pdf.rect(x, y, STRIP, h, style="F", round_corners=("TOP_LEFT", "BOTTOM_LEFT"), corner_radius=2)
+    pdf.set_draw_color(*accent)
+    pdf.line(x + STRIP, y, x + STRIP, y + h)
+
+    # Class up the strip, reading bottom to top and ending near the top, as FT Light prints it.
+    label = (design.get("type_label") or design.get("type_code") or "").upper()
+    pdf.set_font("plex", "B", 7)
+    label = _fit(pdf, label, h - 4)
+    pdf.set_text_color(*ink)
+    base_x, base_y = x + STRIP / 2 + 1.25, y + 3 + pdf.get_string_width(label)
+    with pdf.rotation(90, base_x, base_y):
+        pdf.text(base_x, base_y, label)
+
+    # ID tab top right; ship name, then design, MASS and points, beside it.
+    pdf.set_font("plex", "B", 8.5)
+    tab = pdf.get_string_width(ship["table_id"]) + 5
+    pdf.set_fill_color(*strip)
+    pdf.rect(x + w - tab, y, tab, 6, style="F", round_corners=("TOP_RIGHT", "BOTTOM_LEFT"),
+             corner_radius=2)
+    pdf.set_xy(x + w - tab, y + .5)
+    pdf.cell(tab, 5, ship["table_id"], align="C")
+    left = x + STRIP + 2.5
+    room = w - STRIP - tab - 5
+    pdf.set_text_color(*accent)
+    pdf.set_xy(left, y + 1.2)
+    name = _fit(pdf, ship["name"], room * .7)
+    pdf.cell(pdf.get_string_width(name) + 2, 5, name)
+    pdf.set_font("plex", "", 6.8)
+    pdf.set_text_color(70)
+    rest = room - pdf.get_string_width(name) - 2
+    stats = f"{_('MASS')} {design['tmf']} · {points} {_('pts')}"
+    meta = f"{design['name']} · {stats}"
+    if design["name"] == ship["name"] or pdf.get_string_width(meta) > rest - 2:
+        meta = stats                  # the design name goes first when there is no room
+    pdf.cell(rest, 5, _fit(pdf, meta, rest))
+    pdf.set_draw_color(205)
+    pdf.set_line_width(.2)
+    pdf.line(left, y + BAND - .5, x + w - tab - 1, y + BAND - .5)
+
+    # The SSD, centred in what is left, over its silhouette.
+    x0, y0, x1, y1 = card.view
+    dw, dh = (x1 - x0) * PT * scale, (y1 - y0) * PT * scale
+    area_x, area_y = x + STRIP, y + BAND
+    area_w, area_h = w - STRIP, h - BAND
+    dx = area_x + (area_w - dw) / 2
+    dy = area_y + (area_h + HULL_TOP - HULL_FOOT - dh) / 2
+    _silhouette(pdf, dx - HULL_SIDE + .5, dy - 1.5, dx + dw + HULL_SIDE - .5, dy + dh + 1.5)
+    draw_diagram(pdf, card.diagram, dx, dy, dw, card.view)
+
+
+def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> bool:
+    """Ship cards, nine to a landscape page (PLAN 10.2). True when the orders plot went under
+    the cards, so the pack needs no orders page for this fleet."""
     ships = _printable_ships(fleet, options)
     if not ships:
-        return
-    _section(pdf, _("Record sheets"))
-    usable = pdf.epw
-    ordered = sorted(ships, key=lambda s: -ssd_layout.BOX_WIDTHS[
-        ssd_layout.box_size(designs[s["design_id"]])] if s["design_id"] in designs else 0)
-    x, y, row_height = MARGIN, pdf.get_y(), 0.0
-    for ship in ordered:
+        return False
+    cards = []
+    for ship in ships:
         design = designs.get(ship["design_id"])
         if not design:
             continue
         diagram = ssd_layout.layout(design, damage=_ship_damage(ship, options),
                                     loadout=_sheet_loadout(ship, design, options))
-        # A tall SSD must fit a fresh page as well as the available row width.
-        inner = min(usable - 6, diagram.width * PT * 1.35,
-                    (pdf.h - 19 - 24 - 28) * diagram.width / diagram.height)
-        width = inner + 6
-        pdf.set_font("plex", "B", 9)
-        title_lines = _lines(pdf, f"{ship['table_id']} · {ship['name']}", width - 6)
-        pdf.set_font("plex", "", 8)
-        meta_lines = _lines(pdf, f"{design['name']} · {_('MASS')} {design['tmf']}", width - 6)
-        band = 5 + 4 * (len(title_lines) + len(meta_lines))
-        # Account for wrapped identities before the final height constraint.
-        inner = min(inner, (pdf.h - 19 - 24 - band - 4) * diagram.width / diagram.height)
-        height = band + diagram.height / diagram.width * inner + 4
-        if x + width > MARGIN + usable + .1:
-            x, y, row_height = MARGIN, y + row_height + 4, 0.0
-        if y + height > pdf.h - 19:
-            pdf.add_page()
-            x, y, row_height = MARGIN, pdf.get_y(), 0.0
-        pdf.set_line_width(.25)
-        pdf.set_draw_color(160)
-        pdf.set_fill_color(255)
-        pdf.rect(x, y, width, height, style="DF")
-        pdf.set_fill_color(*pdf.tint)
-        pdf.rect(x, y, width, band, style="F")
-        pdf.set_xy(x + 3, y + 2)
-        pdf.set_text_color(*pdf.accent)
-        pdf.set_font("plex", "B", 9)
-        pdf.multi_cell(width - 6, 4, chr(10).join(title_lines), new_x="LEFT", new_y="NEXT", align="L")
-        pdf.set_font("plex", "", 8)
-        pdf.set_text_color(35)
-        pdf.multi_cell(width - 6, 4, chr(10).join(meta_lines), align="L")
-        draw_diagram(pdf, diagram, x + (width - inner) / 2, y + band + 1, inner)
-        row_height = max(row_height, height)
-        x += width + 4
+        cards.append(_Card(ship, design, diagram, _bounds(diagram)))
+    # Largest first, so ships of a size share a page and its grid.
+    cards.sort(key=lambda c: -c.design["tmf"])
+    _sheet_page(pdf, _("Record sheets"))      # the grids measure a landscape page
+    inline = options.orders and options.turns <= PLOT_TURNS
+    pages = _pages(pdf, cards, _plot_height(len(_plot_ships(fleet))) if inline else 0.0)
+    fleet_options = fleet_rules.fleet_options(fleet)
+    plotted = False
+    for number, (grid, page) in enumerate(pages):
+        if number:
+            _sheet_page(pdf, _("Record sheets"))
+        # One scale per page, so every hull box and icon on a sheet is the same size.
+        scale = min([MAX_SCALE, *(grid.fit(c, c.span) for c in page)])
+        for card in page:
+            col, row = card.slot
+            w, h = grid.size(card.span)
+            _ship_card(pdf, card, MARGIN + col * (grid.cell_w + GAP),
+                       grid.top + row * (grid.cell_h + GAP), w, h, scale,
+                       fleet_rules.ship_points(card.ship, card.design, fleet_options))
+        if inline and number == len(pages) - 1:
+            top = _plot_top(grid, page)
+            plot = _plot_ships(fleet)
+            if top + _plot_height(len(plot)) <= pdf.h - 21:
+                pdf.set_xy(MARGIN, top)
+                pdf.set_font("plex", "B", 9)
+                pdf.set_text_color(*pdf.accent)
+                pdf.cell(0, 5, _("Orders chart"))
+                _orders_plot(pdf, plot, range(1, options.turns + 1), MARGIN, top + 6, pdf.epw)
+                plotted = True
     left_off = [s for s in fleet["ships"] if s not in ships]
     if left_off:
-        pdf.set_xy(MARGIN, y + row_height + 5)
-        pdf.set_font("plex", "I", 8)
-        pdf.multi_cell(0, 4, _("Not printed: {ships}",
-            ships=", ".join(f"{s['table_id']} ({s['status']})" for s in left_off)), align="L")
+        pdf.set_xy(MARGIN, pdf.h - 19.5)
+        pdf.set_font("plex", "I", 7)
+        pdf.set_text_color(60)
+        pdf.cell(0, 4, _fit(pdf, _("Not printed: {ships}", ships=", ".join(
+            f"{s['table_id']} ({s['status']})" for s in left_off)), pdf.epw))
+    return plotted
 
+
+def _plot_ships(fleet: dict) -> list[dict]:
+    return [s for s in fleet["ships"] if s["status"] not in ("destroyed", "hulk")]
+
+
+def _orders_plot(pdf: FleetPDF, ships: list[dict], turns: range, x: float, y: float,
+                 width: float) -> float:
+    """The FT Light movement plot: a row per ship, an orders and a velocity box per turn."""
+    colour = pdf.print_style == "color"
+    id_w, start_w = 34.0, 11.0
+    turn_w = (width - id_w - start_w) / max(1, len(turns))
+    v_w = max(6.0, turn_w * .3)
+    head_fill = pdf.accent if colour else (226, 226, 226)
+    head_ink = (255, 255, 255) if colour else (25, 25, 25)
+    height = PLOT_HEAD + PLOT_ROW * len(ships)
+
+    pdf.set_fill_color(*head_fill)
+    pdf.rect(x, y, width, PLOT_HEAD, style="F")
+    pdf.set_text_color(*head_ink)
+    pdf.set_font("plex", "B", 7.5)
+    pdf.set_xy(x + 1.5, y + .5)
+    pdf.cell(id_w - 2, PLOT_HEAD - 1, _("Ship"))
+    pdf.set_xy(x + id_w, y + .5)
+    pdf.cell(start_w, PLOT_HEAD - 1, _("Start V"), align="C")
+    for index, turn in enumerate(turns):
+        left = x + id_w + start_w + index * turn_w
+        pdf.set_xy(left, y + .5)
+        pdf.cell(turn_w - v_w, PLOT_HEAD - 1, _("Turn {n}", n=turn), align="C")
+        pdf.cell(v_w, PLOT_HEAD - 1, _("V"), align="C")
+
+    for number, ship in enumerate(ships):
+        top = y + PLOT_HEAD + number * PLOT_ROW
+        if number % 2:
+            pdf.set_fill_color(*pdf.tint)
+            pdf.rect(x, top, width, PLOT_ROW, style="F")
+        pdf.set_xy(x + 1.5, top + .9)
+        pdf.set_font("plex", "B", 7.5)
+        pdf.set_text_color(*pdf.accent)
+        ident = ship["table_id"]
+        pdf.cell(pdf.get_string_width(ident) + 1.5, PLOT_ROW - 1.8, ident)
+        pdf.set_font("plex", "", 6.5)
+        pdf.set_text_color(70)
+        room = id_w - pdf.get_string_width(ident) - 5
+        pdf.cell(room, PLOT_ROW - 1.8, _fit(pdf, ship["name"], room))
+
+    pdf.set_draw_color(170)
+    pdf.set_line_width(.15)
+    for number in range(len(ships) + 1):
+        top = y + PLOT_HEAD + number * PLOT_ROW
+        pdf.line(x, top, x + width, top)
+    for index in range(len(turns)):
+        left = x + id_w + start_w + index * turn_w
+        pdf.line(left + turn_w - v_w, y + PLOT_HEAD, left + turn_w - v_w, y + height)
+    pdf.set_draw_color(*pdf.accent)
+    pdf.set_line_width(.4)
+    for left in [x + id_w, *(x + id_w + start_w + i * turn_w for i in range(len(turns)))]:
+        pdf.line(left, y, left, y + height)
+    pdf.rect(x, y, width, height)
+    return height
 
 
 def orders_page(pdf: FleetPDF, fleet: dict, options: PrintOptions) -> None:
-    """Ship ID x turns with a velocity column each (FB1 p.47 style)."""
+    """The orders plot on its own landscape pages: ten turns and as many ships as fit a page."""
     turns = max(1, options.turns)
-    for first in range(1, turns + 1, 10):
-        chart_turns = range(first, min(first + 10, turns + 1))
-        _section(pdf, _("Orders chart"))
-        pdf.set_font("plex", "", 8)
-        pdf.multi_cell(0, 4.5, _("V = velocity. Write movement orders beside it for each turn."),
-                       new_x="LMARGIN", new_y="NEXT")
-        pdf.ln(3)
-        pdf.set_font("plex", "", 7)
-        pdf.set_draw_color(155)
-        pdf.set_fill_color(255)
-        pdf.set_line_width(.15)
-        with pdf.table(width=pdf.epw, col_widths=[34, *([4.5, 10.7] * len(chart_turns))],
-                       line_height=3.7, min_row_height=12, padding=(1.5, .8), text_align="LEFT",
-                       num_heading_rows=2, headings_style=FontFace(emphasis="B", color=pdf.accent,
-                       fill_color=pdf.tint)) as table:
-            heading = table.row()
-            heading.cell(_("Ship"))
-            for turn in chart_turns:
-                heading.cell(str(turn), colspan=2, align="CENTER")
-            labels = table.row()
-            labels.cell(_("ID") + " / " + _("Name"))
-            for _turn in chart_turns:
-                labels.cell(_("V"))
-                labels.cell(_("Orders"))
-            for ship in fleet["ships"]:
-                if ship["status"] in ("destroyed", "hulk"):
-                    continue
-                row = table.row()
-                row.cell(f"{ship['table_id']} {ship['name']}")
-                for _turn in chart_turns:
-                    row.cell("")
-                    row.cell("")
+    ships = _plot_ships(fleet)
+    for first in range(1, turns + 1, PLOT_TURNS):
+        chart_turns = range(first, min(first + PLOT_TURNS, turns + 1))
+        start = 0
+        while True:
+            _sheet_page(pdf, _("Orders chart"))
+            per_page = max(1, int((pdf.h - 21 - pdf.get_y() - PLOT_HEAD) // PLOT_ROW))
+            _orders_plot(pdf, ships[start:start + per_page], chart_turns, MARGIN, pdf.get_y(),
+                         pdf.epw)
+            start += per_page
+            if start >= len(ships):
+                break
 
 
 def _tracker_rows(ship: dict, design: dict) -> list[tuple[str, int, int, str]]:
@@ -706,6 +993,7 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
     options = options or PrintOptions()
     pdf = _new_pdf(options.paper, options.style)
     pdf.set_title(" / ".join(f["name"] for f in fleets))
+    plotted: set[str] = set()  # fleets whose orders plot went under their record sheets
     for fleet, designs in zip(fleets, designs_by_fleet):
         ruleset = RULESETS.get(fleet["ruleset"])
         pdf.header_title = fleet["name"]
@@ -713,11 +1001,13 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
         pdf.non_conforming = not fleet_rules.fleet_conforming(fleet, designs)
         if options.roster:
             roster_page(pdf, fleet, designs, options)
-        if options.sheets:
-            sheets_pages(pdf, fleet, designs, options)
+        if options.sheets and sheets_pages(pdf, fleet, designs, options):
+            plotted.add(fleet["id"])
         if options.tracker:
             tracker_page(pdf, fleet, designs, options)
     for fleet, designs in zip(fleets, designs_by_fleet) if options.orders else []:
+        if fleet["id"] in plotted:
+            continue
         ruleset = RULESETS.get(fleet["ruleset"])
         pdf.header_title = fleet["name"]
         pdf.header_ruleset = ruleset.short_label if ruleset else fleet["ruleset"]
