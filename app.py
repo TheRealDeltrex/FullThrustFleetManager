@@ -1361,8 +1361,12 @@ def _new_starmap(campaign: dict) -> tuple[bool, str]:
 def _random_starmap(campaign: dict) -> tuple[bool, str]:
     form = request.form
     seed = form.get("seed", "").strip()
+    settings = {key: _as_count(form[key])
+                for key in ("spacing", "settled", "outposts", "bases") if key in form}
+    if "names" in form:
+        settings["names"] = form["names"]
     return store.random_starmap(campaign, *_map_size(form), int(form.get("stars") or starmap.DEFAULT_STARS),
-                                int(seed) if seed else None)
+                                int(seed) if seed else None, **settings)
 
 
 def _form_hex(campaign: dict) -> tuple[int, int] | None:
