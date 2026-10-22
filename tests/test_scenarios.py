@@ -19,7 +19,7 @@ def library(tmp_path, monkeypatch):
 
 
 def a_map() -> dict:
-    return starmap.generate(16, 12, 20, ["blue", "red"], 11, settled=60, outposts=20)
+    return starmap.generate(16, 12, 20, ["blue", "red"], 11)
 
 
 def test_an_invasion_hands_the_defender_the_sector():
@@ -52,7 +52,8 @@ def test_a_raid_targets_the_nearest_enemy_world_and_a_border_war_needs_a_majorit
 def test_the_campaign_bar_sets_up_a_scenario(client):
     fleet, _msg = store.create_fleet("fb", "Home Fleet", faction="NAC")
     campaign, _msg = store.create_campaign(fleet, "Border")
-    store.random_starmap(campaign, 16, 12, 20, 11, settled=60, outposts=20)
+    store.random_starmap(campaign, 16, 12, 20, 11)
+    store.finalize_starmap(campaign)
     store.save_campaign(campaign)
     store.save_fleet(fleet)
     client.get(f"/fleet/{fleet['id']}")
