@@ -242,6 +242,8 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .starmap .unowned, .starmap-swatch .unowned { fill: #c9d1e6; } .starmap .base.unowned { stroke: #c9d1e6; fill: none; }
 .side-0 { fill: #4fa3ff; } .side-1 { fill: #ff5d5d; } .side-2 { fill: #4fd18b; } .side-3 { fill: #ffb547; }
 .side-4 { fill: #b48cff; } .side-5 { fill: #2de2c8; } .side-6 { fill: #ff7ad9; } .side-7 { fill: #a3a3a3; }
+.starmap .star.empty.side-0 { stroke: #4fa3ff; } .starmap .star.empty.side-1 { stroke: #ff5d5d; } .starmap .star.empty.side-2 { stroke: #4fd18b; } .starmap .star.empty.side-3 { stroke: #ffb547; }
+.starmap .star.empty.side-4 { stroke: #b48cff; } .starmap .star.empty.side-5 { stroke: #2de2c8; } .starmap .star.empty.side-6 { stroke: #ff7ad9; } .starmap .star.empty.side-7 { stroke: #a3a3a3; }
 .base.side-0 { stroke: #4fa3ff; } .base.side-1 { stroke: #ff5d5d; } .base.side-2 { stroke: #4fd18b; } .base.side-3 { stroke: #ffb547; }
 .base.side-4 { stroke: #b48cff; } .base.side-5 { stroke: #2de2c8; } .base.side-6 { stroke: #ff7ad9; } .base.side-7 { stroke: #a3a3a3; }
 .starmap .base[class*="side-"] { fill: none; }
