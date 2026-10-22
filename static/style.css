@@ -226,11 +226,12 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .ship-grid { display: grid; grid-template-columns: minmax(200px, 320px) minmax(0, 1fr); gap: 16px; }
 .campaign-ship h3 { display: flex; align-items: center; gap: 8px; }
 /* Star map (starmap.py): a dark sky in every look, like the record sheets keep a light ground. */
-.map-counts { width: auto; }
+.tbl.map-counts { width: auto; }
 .starmap-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 240px); gap: 16px; align-items: start; }
 .starmap-wrap svg.starmap { width: 100%; height: auto; display: block; background: #0b1020; border-radius: 6px; }
 .starmap .hex { fill: #0b1020; stroke: #26304d; stroke-width: 1; }
 .starmap a:hover .hex, .starmap .hex:hover { fill: #141c36; }
+.starmap .hex.front { fill: #2a1830; }
 .starmap .hex.sel { fill: #1c2747; }
 .starmap .hex-ring { fill: none; stroke: #ffd166; stroke-width: 2; pointer-events: none; }
 .starmap .star { stroke: #0b1020; stroke-width: .8; }

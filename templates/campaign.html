@@ -261,6 +261,11 @@
                     {% endfor %}
                     <span class="muted">{{ _("Large dot settled, small outpost, ring naval base. 1 hex = 1 light year.") }}</span>
                     {% if sm.grid.seed %}<span class="muted">{{ _("Seed {seed}", seed=sm.grid.seed) }}</span>{% endif %}
+                    <form method="post" action="{{ to_campaign }}" data-autosave="set_frontline">
+                      <label class="check"><input type="checkbox" name="frontline" {% if sm.grid.frontline %}checked{% endif %} />
+                        {{ _("Frontline") }}</label>
+                      <noscript><button class="btn" type="submit" name="action" value="set_frontline">{{ _("Apply") }}</button></noscript>
+                    </form>
                   </div>
                   <a class="btn" href="{{ url_for('export_starmap', campaign_id=c.id) }}">{{ _("Download map") }}</a>
                 </div>
@@ -290,22 +295,28 @@
                     <select class="input" name="sides">{% for n in range(2, [d.MAX_GENERATED_SIDES, c.sides|length]|max + 1) %}<option value="{{ n }}" {% if n == c.sides|length %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
                 </div>
                 <table class="tbl map-counts">
-                  <thead><tr><th></th><th>{{ _("Settled") }}</th><th>{{ _("Outposts") }}</th><th>{{ _("Bases") }}</th></tr></thead>
+                  <thead><tr><th></th><th>{{ _("Settled") }}</th><th>{{ _("Outposts") }}</th><th>{{ _("Bases") }}</th><th>{{ _("Core worlds") }}</th></tr></thead>
                   <tbody>
                     {% for side in c.sides %}
                       {% set n = (g.sides.get(side.id) if g else none) or d.DEFAULT_COUNTS %}
                       <tr><td>{{ side.name }}</td>
-                        <td><input class="input sm" type="number" name="s-{{ side.id }}-settled" min="1" max="{{ d.MAX_STARS }}" value="{{ n.settled }}" aria-label="{{ _('Settled') }}" /></td>
+                        <td><input class="input sm" type="number" name="s-{{ side.id }}-settled" min="0" max="{{ d.MAX_STARS }}" value="{{ n.settled }}" aria-label="{{ _('Settled') }}" /></td>
                         <td><input class="input sm" type="number" name="s-{{ side.id }}-outposts" min="0" max="{{ d.MAX_STARS }}" value="{{ n.outposts }}" aria-label="{{ _('Outposts') }}" /></td>
-                        <td><input class="input sm" type="number" name="s-{{ side.id }}-bases" min="1" max="{{ d.MAX_STARS }}" value="{{ n.bases }}" aria-label="{{ _('Bases') }}" /></td></tr>
+                        <td><input class="input sm" type="number" name="s-{{ side.id }}-bases" min="0" max="{{ d.MAX_STARS }}" value="{{ n.bases }}" aria-label="{{ _('Bases') }}" /></td>
+                        <td><input type="checkbox" name="s-{{ side.id }}-core" {% if n.core %}checked{% endif %} aria-label="{{ _('Core worlds') }}" /></td></tr>
                     {% endfor %}
                     {% set n = g.neutral if g else d.DEFAULT_NEUTRAL %}
                     <tr><td>{{ _("Neutral") }}</td>
                       <td><input class="input sm" type="number" name="n-settled" min="0" max="{{ d.MAX_STARS }}" value="{{ n.settled }}" aria-label="{{ _('Settled') }}" /></td>
                       <td><input class="input sm" type="number" name="n-outposts" min="0" max="{{ d.MAX_STARS }}" value="{{ n.outposts }}" aria-label="{{ _('Outposts') }}" /></td>
-                      <td></td></tr>
+                      <td colspan="2"><select class="input" name="n-place" aria-label="{{ _('Neutral systems') }}">
+                        {% for place, label in [("none", _("None")), ("random", _("Random")), ("border", _("Border region"))] %}
+                          <option value="{{ place }}" {% if n.place == place %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select></td></tr>
                   </tbody>
                 </table>
+                <input type="hidden" name="core-present" value="1" />
                 <div class="row">
                   {% if g %}
                     <noscript><button class="btn" type="submit" name="action" value="random_starmap">{{ _("Apply") }}</button></noscript>

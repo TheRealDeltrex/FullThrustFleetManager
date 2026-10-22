@@ -213,10 +213,14 @@ What exists:
   `starmap.py` is pure: flat-topped hexes in odd-q offset coordinates (`hex_distance`, labels
   "0304" from 01), the seeded `generate()` (an app rule, step G1: spacing, star names from a pool
   of 1200+ (proper names and Bayer designations) or catalogue numbers; up to 5 sides, each with
-  exact counts of settled worlds, outposts and bases, plus neutral settled worlds and outposts.
-  Counts are a hard rule (Master 2026-10-22): `CountsError` when the stars can't hold them, never
-  fewer. Homes at opposite ends, sides claim nearest stars in turn) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
-  so picking one needs no script. The map keeps a dark sky in every look. `.FTStarmap` files
+  exact counts of settled worlds, outposts and (optional) bases and a core-worlds toggle, plus
+  neutral settled worlds and outposts placed none / random / border. Counts are a hard rule
+  (Master 2026-10-22): `CountsError` when the stars can't hold them, never fewer. Homes at
+  opposite ends, sides claim nearest stars in turn), `frontline()` (hexes shaded when
+  `map["frontline"]`: ties between sides' nearest held systems and hexes beside another side's
+  region) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
+  so picking one needs no script. `scenarios.home` is a side's first base, else settled world,
+  else outpost. The map keeps a dark sky in every look. `.FTStarmap` files
   carry the map and the sides; loading one maps owners onto this campaign's sides by position.
   Settings > Import refuses them and points to the Star map panel. A generated map is a draft
   (`map["draft"]` holds its settings) that its inputs regenerate live with the same seed until
