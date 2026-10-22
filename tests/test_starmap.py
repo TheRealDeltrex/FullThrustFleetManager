@@ -238,20 +238,21 @@ def a_line(*owners: str) -> dict:
 def test_the_frontline_lies_between_opposing_systems():
     """Master 2026-10-22: one hex wide where the systems are an even number of hexes apart, two
     wide otherwise, and two opposing neighbours are both on it."""
-    on_row = {cell for cell in starmap.frontline(a_line((0, "blue"), (4, "red"))) if cell[1] == 0}
+    on_row = {cell for cell in starmap.frontline(a_line((0, "blue"), (4, "red")), reach=30) if cell[1] == 0}
     assert on_row == {(2, 0)}                                # distance 4: three hexes between
-    on_row = {cell for cell in starmap.frontline(a_line((0, "blue"), (3, "red"))) if cell[1] == 0}
+    on_row = {cell for cell in starmap.frontline(a_line((0, "blue"), (3, "red")), reach=30) if cell[1] == 0}
     assert on_row == {(1, 0), (2, 0)}                        # distance 3: two hexes between
-    on_row = {cell for cell in starmap.frontline(a_line((4, "blue"), (5, "red"))) if cell[1] == 0}
+    on_row = {cell for cell in starmap.frontline(a_line((4, "blue"), (5, "red")), reach=30) if cell[1] == 0}
     assert on_row == {(4, 0), (5, 0)}                        # side by side
-    assert starmap.frontline(a_line((0, "blue"), (4, "blue"))) == set()
 
 
 def test_sides_project_their_front_only_so_far():
     """Master 2026-10-22: 4 hexes by default, set per campaign."""
     apart = a_line((0, "blue"), (10, "red"))
-    assert starmap.frontline(apart) == set()
+    assert {cell for cell in starmap.frontline(apart) if cell[1] == 0} == {(4, 0), (6, 0)}
     assert {cell for cell in starmap.frontline(apart, reach=5) if cell[1] == 0} == {(5, 0)}
+    lone = a_line((5, "blue"))                            # a side alone still outlines its sphere
+    assert {cell for cell in starmap.frontline(lone, reach=2) if cell[1] == 0} == {(3, 0), (7, 0)}
     odd = a_line((0, "blue"), (9, "red"))
     assert {cell for cell in starmap.frontline(odd) if cell[1] == 0} == {(4, 0), (5, 0)}
 
@@ -268,7 +269,7 @@ def test_neutral_worlds_project_a_frontline():
     add(0, 0, "blue")
     add(10, 6, "")
     lone = (10, 6)
-    assert starmap.frontline(grid) == set()                  # beyond blue's reach: open space
+    assert not set(starmap.neighbours(*lone)) & starmap.frontline(grid)   # beyond blue's reach
     assert starmap.frontline(grid, reach=30) == set(starmap.neighbours(*lone))
     add(10, 8, "")                                     # two hexes away: a cluster
     front = starmap.frontline(grid, reach=30)
