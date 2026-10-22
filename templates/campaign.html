@@ -85,6 +85,18 @@
                   {% endfor %}
                 </select>
               {% endmacro %}
+              {% if c.week == 1 %}
+                <form method="post" action="{{ to_campaign }}" class="row">
+                  <select class="input" name="scenario" aria-label="{{ _('Scenario') }}">
+                    {% for kind in scenario_kinds %}<option value="{{ kind }}">{{ scenario_label(kind) }}</option>{% endfor %}
+                  </select>
+                  <label class="check">{{ _("Attacker") }}
+                    <select class="input" name="attacker">
+                      {% for side in c.sides %}<option value="{{ side.id }}" {% if loop.index == 2 %}selected{% endif %}>{{ side.name }}</option>{% endfor %}
+                    </select></label>
+                  <button class="btn" type="submit" name="action" value="apply_scenario">{{ _("Set up scenario") }}</button>
+                </form>
+              {% endif %}
               <form method="post" action="{{ to_campaign }}" class="stack objectives" data-autosave="set_objectives">
                 <div class="row">
                   <b>{{ _("Objectives") }}</b>

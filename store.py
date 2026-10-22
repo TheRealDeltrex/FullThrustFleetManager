@@ -27,6 +27,7 @@ import fleet_rules
 import migrations
 import paths
 import portraits
+import scenarios
 import starmap
 from i18n import _
 from rulesets import RULESETS, fleet_common, presets
@@ -1640,6 +1641,24 @@ def _verdict(campaign: dict) -> dict | None:
     return {"winner": defenders[0]["id"], "week": campaign["week"],
             "text": _("{side} wins: the attack ran out of time.",
                       side=", ".join(s["name"] for s in defenders))}
+
+
+def apply_scenario(campaign: dict, kind: str, attacker: str) -> tuple[bool, str]:
+    """Sets up a scenario template (step G2) on the campaign's map: owners, objectives, the
+    last week and a note on what each side must do. Only before anything has happened."""
+    if not campaign["map"]:
+        return False, _("Make a star map first.")
+    if campaign["week"] > 1 or campaign["contacts"]:
+        return False, _("Only in week 1, before any contact.")
+    setup, why = scenarios.build(kind, campaign["map"], campaign["sides"], attacker)
+    if not setup:
+        return False, why
+    for system in campaign["map"]["systems"]:
+        system["owner"] = setup["owners"].get(system["name"], system["owner"])
+    campaign["objectives"] = _norm_objectives(setup["objectives"], {s["id"] for s in campaign["sides"]})
+    campaign["end_week"], campaign["result"] = setup["end_week"], None
+    campaign["notes"] = (setup["notes"] + ("\n" + campaign["notes"] if campaign["notes"] else ""))[:4000]
+    return True, _("{scenario} set up.", scenario=scenarios.label(kind))
 
 
 def reopen_campaign(campaign: dict) -> tuple[bool, str]:
