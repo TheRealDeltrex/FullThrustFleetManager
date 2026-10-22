@@ -89,6 +89,9 @@ not appear in the printed record sheets.
 - Atlas files in `static/ships/` and banners in `static/themes/` are committed as WebP
   (quality 85–90), not PNG: the generated PNGs are about 3 MB each and would bloat the repo and
   the online build. Convert new art with Pillow before adding it.
+- Individual portraits are committed at most 512 pixels on the long side (WebP quality 85).
+  The app shows them at 256 pixels or less, and the full-size generator output (about 250 KB
+  each, 66 MB for 268) belongs in the picture library, not in the repo or the download.
 - Atlas files normally have four equal columns and rows. Optional per-portrait `columns`
   and `rows` metadata supports other grids or a single image (1 by 1). Individual
   images use `background-size:contain` and centered positioning so a portrait/landscape
