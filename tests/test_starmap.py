@@ -63,31 +63,118 @@ def test_the_generator_is_seeded_and_spaces_its_stars():
 
 def test_the_generator_settings_shape_the_map():
     sides = ["blue", "red", "green"]
-    grid = starmap.generate(20, 16, 30, sides, 9, spacing=3, settled=100, outposts=0, bases=3,
-                            names="catalog")
+    grid = starmap.generate(20, 16, 30, sides, 9, spacing=3, names="catalog",
+                            counts={side: {"settled": 4, "outposts": 0, "bases": 3} for side in sides},
+                            neutral={"settled": 0, "outposts": 0})
     cells = [(s["q"], s["r"]) for s in grid["systems"]]
     assert all(starmap.hex_distance(a, b) >= 3 for a in cells for b in cells if a != b)
-    assert {s["kind"] for s in grid["systems"]} == {"settled"}
     assert all(re.fullmatch(r"[A-Z]+-\d{3,4}", s["name"]) for s in grid["systems"])
-    homes = {s["owner"] for s in grid["systems"] if s["base"]}
-    assert homes == set(sides)
     for side in sides:
-        assert 1 <= sum(s["base"] and s["owner"] == side for s in grid["systems"]) <= 3
-    bare = starmap.generate(12, 10, 16, ["blue", "red"], 4, settled=0, outposts=0)
-    assert [s["kind"] for s in bare["systems"] if not s["base"]] == ["empty"] * 14
+        assert sum(s["base"] and s["owner"] == side for s in grid["systems"]) == 3
+    assert sum(s["kind"] == "settled" for s in grid["systems"]) == 12
+    assert {s["kind"] for s in grid["systems"] if not s["owner"]} == {"empty"}
+
+
+def tally(grid: dict) -> dict:
+    out: dict = {}
+    for s in grid["systems"]:
+        row = out.setdefault(s["owner"], {"settled": 0, "outposts": 0, "bases": 0})
+        if s["kind"] != "empty":
+            row["settled" if s["kind"] == "settled" else "outposts"] += 1
+        row["bases"] += s["base"]
+    return out
+
+
+@pytest.mark.parametrize("seed", range(1, 30))
+def test_counts_are_exact_for_every_side(seed):
+    """Master 2026-10-22: counts are a hard rule, not a suggestion, and sides may differ."""
+    counts = {"a": {"settled": 6, "outposts": 3, "bases": 3}, "b": {"settled": 1, "outposts": 0, "bases": 1},
+              "c": {"settled": 2, "outposts": 4, "bases": 2}, "d": {"settled": 3, "outposts": 1, "bases": 1},
+              "e": {"settled": 1, "outposts": 2, "bases": 1}}
+    grid = starmap.generate(24, 18, 40, list(counts), seed, counts=counts,
+                            neutral={"settled": 3, "outposts": 2})
+    got = tally(grid)
+    assert {side: got[side] for side in counts} == counts
+    assert (got[""]["settled"], got[""]["outposts"], got[""]["bases"]) == (3, 2, 0)
+    for side in counts:
+        home = next(s for s in grid["systems"] if s["owner"] == side and s["base"])
+        assert home["kind"] == "settled"
+
+
+def test_counts_that_do_not_fit_are_refused():
+    with pytest.raises(starmap.CountsError) as e:
+        starmap.generate(12, 10, 8, ["blue", "red"], 1, counts={"blue": {"settled": 5}})
+    assert (e.value.needed, e.value.placed) == (11, 8)
+
+
+def test_the_name_pool_is_large_and_unique():
+    assert len(starmap.NAME_POOL) >= 1200
+    assert len(set(starmap.NAME_POOL)) == len(starmap.NAME_POOL)
+    assert max(len(n) for n in starmap.NAME_POOL) <= 40
+    grid = starmap.generate(30, 30, 400, ["blue", "red"], 5, spacing=1)
+    names = [s["name"] for s in grid["systems"]]
+    assert len(names) == 400 and len(set(names)) == 400
 
 
 def test_the_panel_passes_the_generator_settings(client):
     _fleet, campaign = a_campaign()
     post(client, campaign, action="random_starmap", width="12", height="10", stars="16", seed="3",
-         spacing="3", settled="20", outposts="90", bases="9", names="catalog")
+         spacing="3", names="catalog", **{"s-blue-settled": "3", "s-blue-outposts": "2", "s-blue-bases": "2",
+                                          "s-red-settled": "1", "s-red-outposts": "0", "s-red-bases": "1",
+                                          "n-settled": "0", "n-outposts": "1"})
     grid = store.get_campaign(campaign["id"])["map"]
-    assert grid == starmap.generate(12, 10, 16, ["blue", "red"], 3, spacing=3, settled=20,
-                                    outposts=80, bases=5, names="catalog")
+    assert grid == starmap.generate(12, 10, 16, ["blue", "red"], 3, spacing=3, names="catalog", counts={
+        "blue": {"settled": 3, "outposts": 2, "bases": 2}, "red": {"settled": 1, "outposts": 0, "bases": 1}},
+        neutral={"settled": 0, "outposts": 1})
+    assert grid["draft"]["sides"]["blue"] == {"settled": 3, "outposts": 2, "bases": 2}
+
+
+def test_bad_counts_say_why_and_keep_the_old_map(client):
+    _fleet, campaign = a_campaign()
+    post(client, campaign, action="random_starmap", stars="16", seed="3")
+    before = store.get_campaign(campaign["id"])["map"]
+    page = text(post(client, campaign, action="random_starmap", stars="16", seed="3",
+                     **{"s-red-settled": "20"}))
+    assert "These counts need 26 systems; the map has 16 stars." in page
+    page = text(post(client, campaign, action="random_starmap", stars="16", seed="3",
+                     **{"s-red-settled": "2", "s-red-bases": "3"}))
+    assert "Red: more bases than settled worlds." in page
+    assert store.get_campaign(campaign["id"])["map"] == before
+
+
+def test_a_draft_follows_its_inputs_until_finalized(client):
+    _fleet, campaign = a_campaign()
+    page = text(post(client, campaign, action="random_starmap", stars="20", seed="8"))
+    assert "Finalize" in page and 'data-autosave="random_starmap"' in page
+    first = store.get_campaign(campaign["id"])["map"]
+    post(client, campaign, action="random_starmap", stars="20", seed="8", autosave="1",
+         **{"s-blue-outposts": "4"})
+    second = store.get_campaign(campaign["id"])["map"]
+    assert [(s["q"], s["r"]) for s in second["systems"]] == [(s["q"], s["r"]) for s in first["systems"]]
+    assert tally(second)["blue"]["outposts"] == 4
+    assert "Finalize the star map first" in text(post(client, campaign, action="set_star_system", hex="0,0",
+                                                     name="X", kind="settled"))
+    post(client, campaign, action="reroll_starmap", stars="20", seed="8")
+    assert store.get_campaign(campaign["id"])["map"]["seed"] != 8
+    page = text(post(client, campaign, action="finalize_starmap"))
+    assert "Star map finalised" in page and 'data-autosave="random_starmap"' not in page
+    assert store.get_campaign(campaign["id"])["map"]["draft"] is None
+
+
+def test_the_generator_sets_the_number_of_sides(client):
+    _fleet, campaign = a_campaign()
+    post(client, campaign, action="random_starmap", stars="30", sides="5")
+    grid = store.get_campaign(campaign["id"])["map"]
+    assert len(store.get_campaign(campaign["id"])["sides"]) == 5 and len(grid["draft"]["sides"]) == 5
+    assert len({s["owner"] for s in grid["systems"] if s["base"]}) == 5
+    post(client, campaign, action="random_starmap", stars="30", sides="3")
+    assert len(store.get_campaign(campaign["id"])["sides"]) == 3
 
 
 def test_a_crowded_map_stops_when_no_hex_is_free():
-    grid = starmap.generate(4, 4, 100, ["blue", "red"], 1)
+    one = {"settled": 1, "outposts": 0, "bases": 1}
+    grid = starmap.generate(4, 4, 100, ["blue", "red"], 1, counts={"blue": one, "red": one},
+                            neutral={"settled": 0, "outposts": 0})
     assert 1 < len(grid["systems"]) < 16
 
 

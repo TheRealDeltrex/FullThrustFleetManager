@@ -209,14 +209,19 @@ What exists:
   `/campaign/<fleet>/action` and campaign actions to `/campaigns/<id>/action`. `.FTCampaign`
   exports the campaign with its fleets and their designs; backups carry `campaigns/`.
 - Star maps (step C2): `campaign["map"]` = {width, height, seed, systems [{q, r, name, kind
-  settled|outpost|empty, owner side id or "", base}]}, normalised by `store.normalize_starmap`.
+  settled|outpost|empty, owner side id or "", base}], draft}, normalised by `store.normalize_starmap`.
   `starmap.py` is pure: flat-topped hexes in odd-q offset coordinates (`hex_distance`, labels
-  "0304" from 01), the seeded `generate()` (an app rule, step G1: spacing, settled and outpost
-  shares, bases per side, star or catalogue names; a home base for every side, the first two at
-  opposite ends) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
+  "0304" from 01), the seeded `generate()` (an app rule, step G1: spacing, star names from a pool
+  of 1200+ (proper names and Bayer designations) or catalogue numbers; up to 5 sides, each with
+  exact counts of settled worlds, outposts and bases, plus neutral settled worlds and outposts.
+  Counts are a hard rule (Master 2026-10-22): `CountsError` when the stars can't hold them, never
+  fewer. Homes at opposite ends, sides claim nearest stars in turn) and `to_svg()`, where every hex is an `<a href="/campaign?hex=q,r">`
   so picking one needs no script. The map keeps a dark sky in every look. `.FTStarmap` files
   carry the map and the sides; loading one maps owners onto this campaign's sides by position.
-  Settings > Import refuses them and points to the Star map panel.
+  Settings > Import refuses them and points to the Star map panel. A generated map is a draft
+  (`map["draft"]` holds its settings) that its inputs regenerate live with the same seed until
+  Finalize (`finalize_starmap`; Master's exception to no-Save/Apply); `app.NEEDS_FINAL_MAP`
+  actions refuse while it is a draft.
 - Task forces (step C3): `campaign["forces"]` [{id tf1.., side, name, q, r, order [q, r] or
   null, ships [{fleet, uid}]}], normalised by `store._norm_forces` (on a map, a known side, a ship
   in one force only). A force sits on a star system and jumps up to `FTL_HEXES_PER_WEEK` (6, FT

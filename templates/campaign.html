@@ -220,7 +220,9 @@
               <div class="starmap-grid">
                 <div class="starmap-wrap">{{ sm.svg }}</div>
                 <div class="stack">
-                  {% if sm.picked %}
+                  {% if sm.grid.draft %}
+                    <span class="muted">{{ _("Finalize to edit systems.") }}</span>
+                  {% elif sm.picked %}
                     {% set sys = sm.system %}
                     <form method="post" action="{{ to_campaign }}" class="stack"
                           {% if sys %}data-autosave="set_star_system"{% endif %}>
@@ -264,33 +266,64 @@
                 </div>
               </div>
             {% endif %}
+            {% set g = sm.grid.draft if sm else none %}
+            {% macro generator(g, c, d, sm, to_campaign) %}
+              <form method="post" action="{{ to_campaign }}" class="stack"
+                    {% if g %}data-autosave="random_starmap"{% endif %}>
+                <div class="row">
+                  <label class="check">{{ _("Width") }}
+                    <input class="input sm" type="number" name="width" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ g.width if g else d.DEFAULT_WIDTH }}" /></label>
+                  <label class="check">{{ _("Height") }}
+                    <input class="input sm" type="number" name="height" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ g.height if g else d.DEFAULT_HEIGHT }}" /></label>
+                  <label class="check">{{ _("Stars") }}
+                    <input class="input sm" type="number" name="stars" min="1" max="{{ d.MAX_STARS }}" value="{{ g.stars if g else d.DEFAULT_STARS }}" /></label>
+                  <label class="check">{{ _("Seed") }}
+                    <input class="input sm" type="number" name="seed" min="1" placeholder="{{ _('any') }}" value="{{ sm.grid.seed if g else '' }}" /></label>
+                  <label class="check">{{ _("Spacing") }}
+                    <select class="input" name="spacing">{% for n in d.SPACINGS %}<option value="{{ n }}" {% if n == (g.spacing if g else d.DEFAULT_SPACING) %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+                  <label class="check">{{ _("Names") }}
+                    <select class="input" name="names">
+                      <option value="stars">{{ _("Star names") }}</option>
+                      <option value="catalog" {% if g and g.names == "catalog" %}selected{% endif %}>{{ _("Catalogue numbers") }}</option>
+                    </select></label>
+                  <label class="check">{{ _("Sides") }}
+                    <select class="input" name="sides">{% for n in range(2, [d.MAX_GENERATED_SIDES, c.sides|length]|max + 1) %}<option value="{{ n }}" {% if n == c.sides|length %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
+                </div>
+                <table class="tbl map-counts">
+                  <thead><tr><th></th><th>{{ _("Settled") }}</th><th>{{ _("Outposts") }}</th><th>{{ _("Bases") }}</th></tr></thead>
+                  <tbody>
+                    {% for side in c.sides %}
+                      {% set n = (g.sides.get(side.id) if g else none) or d.DEFAULT_COUNTS %}
+                      <tr><td>{{ side.name }}</td>
+                        <td><input class="input sm" type="number" name="s-{{ side.id }}-settled" min="1" max="{{ d.MAX_STARS }}" value="{{ n.settled }}" aria-label="{{ _('Settled') }}" /></td>
+                        <td><input class="input sm" type="number" name="s-{{ side.id }}-outposts" min="0" max="{{ d.MAX_STARS }}" value="{{ n.outposts }}" aria-label="{{ _('Outposts') }}" /></td>
+                        <td><input class="input sm" type="number" name="s-{{ side.id }}-bases" min="1" max="{{ d.MAX_STARS }}" value="{{ n.bases }}" aria-label="{{ _('Bases') }}" /></td></tr>
+                    {% endfor %}
+                    {% set n = g.neutral if g else d.DEFAULT_NEUTRAL %}
+                    <tr><td>{{ _("Neutral") }}</td>
+                      <td><input class="input sm" type="number" name="n-settled" min="0" max="{{ d.MAX_STARS }}" value="{{ n.settled }}" aria-label="{{ _('Settled') }}" /></td>
+                      <td><input class="input sm" type="number" name="n-outposts" min="0" max="{{ d.MAX_STARS }}" value="{{ n.outposts }}" aria-label="{{ _('Outposts') }}" /></td>
+                      <td></td></tr>
+                  </tbody>
+                </table>
+                <div class="row">
+                  {% if g %}
+                    <noscript><button class="btn" type="submit" name="action" value="random_starmap">{{ _("Apply") }}</button></noscript>
+                    <button class="btn" type="submit" name="action" value="reroll_starmap">{{ _("New seed") }}</button>
+                    <button class="btn primary" type="submit" name="action" value="finalize_starmap">{{ _("Finalize") }}</button>
+                  {% else %}
+                    <button class="btn" type="submit" name="action" value="random_starmap">{{ _("Random map") }}</button>
+                    <button class="btn" type="submit" name="action" value="new_starmap">{{ _("Blank map") }}</button>
+                  {% endif %}
+                </div>
+              </form>
+            {% endmacro %}
+            {% if g %}
+              {{ generator(g, c, d, sm, to_campaign) }}
+            {% endif %}
             <details class="stack" {% if not sm %}open{% endif %}>
               <summary>{{ _("New map") if sm else _("Make a star map") }}</summary>
-              <form method="post" action="{{ to_campaign }}" class="row">
-                <label class="check">{{ _("Width") }}
-                  <input class="input sm" type="number" name="width" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ d.DEFAULT_WIDTH }}" /></label>
-                <label class="check">{{ _("Height") }}
-                  <input class="input sm" type="number" name="height" min="{{ d.MIN_SIZE }}" max="{{ d.MAX_SIZE }}" value="{{ d.DEFAULT_HEIGHT }}" /></label>
-                <label class="check">{{ _("Stars") }}
-                  <input class="input sm" type="number" name="stars" min="1" max="400" value="{{ d.DEFAULT_STARS }}" /></label>
-                <label class="check">{{ _("Seed") }}
-                  <input class="input sm" type="number" name="seed" min="1" placeholder="{{ _('any') }}" /></label>
-                <label class="check">{{ _("Spacing") }}
-                  <select class="input" name="spacing">{% for n in d.SPACINGS %}<option value="{{ n }}" {% if n == d.DEFAULT_SPACING %}selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
-                <label class="check">{{ _("Settled") }}
-                  <select class="input" name="settled">{% for n in range(0, 101, 10) %}<option value="{{ n }}" {% if n == d.DEFAULT_SETTLED %}selected{% endif %}>{{ n }}%</option>{% endfor %}</select></label>
-                <label class="check">{{ _("Outposts") }}
-                  <select class="input" name="outposts">{% for n in range(0, 101, 10) %}<option value="{{ n }}" {% if n == d.DEFAULT_OUTPOSTS %}selected{% endif %}>{{ n }}%</option>{% endfor %}</select></label>
-                <label class="check">{{ _("Bases per side") }}
-                  <select class="input" name="bases">{% for n in range(1, d.MAX_BASES + 1) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select></label>
-                <label class="check">{{ _("Names") }}
-                  <select class="input" name="names">
-                    <option value="stars">{{ _("Star names") }}</option>
-                    <option value="catalog">{{ _("Catalogue numbers") }}</option>
-                  </select></label>
-                <button class="btn" type="submit" name="action" value="random_starmap">{{ _("Random map") }}</button>
-                <button class="btn" type="submit" name="action" value="new_starmap">{{ _("Blank map") }}</button>
-              </form>
+              {{ generator(none, c, d, sm, to_campaign) }}
               <form method="post" action="{{ url_for('campaign_map_upload', campaign_id=c.id) }}"
                     enctype="multipart/form-data" class="row">
                 <input class="input" type="file" name="file" accept=".FTStarmap" required
