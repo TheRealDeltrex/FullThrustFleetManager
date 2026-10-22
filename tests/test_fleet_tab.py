@@ -347,7 +347,7 @@ def test_a_faction_with_no_designs_points_to_the_design_tab_and_the_toggle(clien
     _ok, _m, fid = store.add_custom_faction("Free Traders")
     make_fleet(client, faction=fid)
     page = text(client.get("/fleet"))
-    assert "No Free Traders ship designs yet." in page and "Design one in the Design tab" in page
+    assert "No Free Traders ship designs yet." in page and "Design one in the Ship Design tab" in page
     assert "All ships" in page and 'name="design_id"' not in page
 
 
