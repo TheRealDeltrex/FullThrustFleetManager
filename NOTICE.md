@@ -3,10 +3,10 @@
 The **code** of Full Thrust Fleet Manager is licensed under the GNU General Public License v3.0
 (see `LICENSE`).
 
-**Full Thrust**, **More Thrust**, **Fleet Book 1** and **Fleet Book 2**, their rules text, ship
-designs, ship diagrams and icons are © Jon Tuffley and Ground Zero Games. They are not covered by
+**Full Thrust**, **More Thrust**, **Fleet Book 1**, **Fleet Book 2** and **Full Thrust Light**,
+their rules text, ship designs, ship diagrams and icons are © Jon Tuffley and Ground Zero Games. They are not covered by
 the GPL. The rulebook PDFs in `rulebooks/` are processed copies (added text layer and bookmarks)
-of the books GZG provides as free downloads at https://shop.groundzerogames.co.uk/rules.html.
+(Full Thrust Light unchanged) of the books GZG provides as free downloads at https://shop.groundzerogames.co.uk/rules.html.
 Rules wording and published ship data are used in this app to help people play GZG's game.
 
 **Cross Dimensions** is © Hugh Fisher (June 2021, revision 1.2, ISBN 978-0-6451938-2-4), text,

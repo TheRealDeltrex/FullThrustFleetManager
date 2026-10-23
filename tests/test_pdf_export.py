@@ -3,10 +3,13 @@ eye on rendered pages (see CLAUDE.md)."""
 
 from __future__ import annotations
 
+import re
+
 import fitz  # pymupdf
 import pytest
 
 import pdf_export
+import ssd_layout
 import store
 from rulesets import RULESETS
 
@@ -416,3 +419,96 @@ def test_long_orders_charts_keep_every_turn_at_a_writable_width():
     assert all("Orders chart" in page and "Furious" in page for page in pages)
     with fitz.open("pdf", data) as doc:
         _assert_page_bounds(doc)
+
+
+# ---- Record sheets after the FT Light layout -----------------------------------------------------
+
+NAC_MIXED = [f"fb:fb1:nac-{s}" for s in (
+    "harrison", "minerva", "minerva", "tacoma", "ticonderoga", "ticonderoga", "huron", "furious",
+    "vandenburg", "majestic", "victoria", "excalibur", "valley-forge", "ark-royal")]
+ESCORTS = [f"fb:fb1:nac-{s}" for s in ("harrison", "minerva", "tacoma", "ticonderoga", "ticonderoga")]
+
+
+def _sheet_pages(data):
+    with fitz.open("pdf", data) as doc:
+        return [(page.rect.width > page.rect.height, page.get_text()) for page in doc
+                if "Record sheets" in page.get_text()]
+
+
+def test_record_sheets_are_landscape_with_at_least_six_ships_a_page():
+    fleet = a_fleet(ships=NAC_MIXED)
+    data, _pages = render([fleet], pdf_export.PrintOptions(roster=False, tracker=False,
+                                                          quickref=False, orders=False))
+    sheets = _sheet_pages(data)
+    assert all(landscape for landscape, _text in sheets)
+    counts = [len(set(re.findall(r"\b[A-Z]{2,4}-\d+\b", text))) for _l, text in sheets]
+    assert sum(counts) == len(NAC_MIXED)
+    assert len(sheets) == 2 and min(counts) >= 6
+
+
+def test_one_scale_per_page_and_legible(monkeypatch):
+    """Every SSD on a sheet page is drawn at the same scale, never below MIN_SCALE when a
+    span can avoid it."""
+    fleet = a_fleet(ships=NAC_MIXED + ["fb:fb2:sv-shyy-tha-var"])
+    designs = store.designs_for_fleet(fleet)
+    scales = []
+    original = pdf_export._ship_card
+
+    def capture(pdf, card, x, y, w, h, scale, points):
+        scales.append((pdf.page_no(), round(scale, 4)))
+        return original(pdf, card, x, y, w, h, scale, points)
+
+    monkeypatch.setattr(pdf_export, "_ship_card", capture)
+    pdf_export.fleet_pdf([fleet], [designs], pdf_export.PrintOptions(roster=False))
+    assert len(scales) == len(fleet["ships"])
+    for page in {p for p, _s in scales}:
+        assert len({s for p, s in scales if p == page}) == 1
+    assert min(s for _p, s in scales) >= pdf_export.MIN_SCALE
+
+
+def test_a_ship_too_tall_for_a_slot_spans_two():
+    fleet = a_fleet(ships=["fb:fb2:sv-shyy-tha-var", *ESCORTS])
+    designs = store.designs_for_fleet(fleet)
+    pdf = pdf_export._new_pdf("A4")
+    pdf.add_page(orientation="L")
+    cards = [pdf_export._Card(s, designs[s["design_id"]], d := ssd_layout.layout(designs[s["design_id"]]),
+                              pdf_export._bounds(d)) for s in fleet["ships"]]
+    pages = pdf_export._pages(pdf, cards)
+    assert len(pages) == 1
+    assert cards[0].span != (1, 1)
+    occupied = [(c.slot[0] + dc, c.slot[1] + dr) for c in cards
+                for dc in range(c.span[0]) for dr in range(c.span[1])]
+    assert len(occupied) == len(set(occupied))                # no two cards overlap
+
+
+def test_the_orders_plot_always_has_pages_of_its_own():
+    """Master: even a fleet small enough to leave room under its cards."""
+    for ships in (ESCORTS, NAC_MIXED):
+        fleet = a_fleet(ships=ships)
+        _data, pages = render([fleet], pdf_export.PrintOptions(roster=False, quickref=False))
+        plotted = [p for p in pages if "Orders chart" in p]
+        assert plotted and all("Record sheets" not in p for p in plotted)
+        assert all(ship["table_id"] in plotted[0] for ship in fleet["ships"])
+        assert "Turn 10" in plotted[0] and "Start V" in plotted[0]
+
+
+@pytest.mark.parametrize("paper", ["A4", "Letter"])
+@pytest.mark.parametrize("style", ["mono", "color"])
+def test_record_sheets_and_plot_stay_on_the_page(paper, style):
+    fleet = a_fleet(ships=NAC_MIXED[:5])
+    for ship in fleet["ships"]:
+        ship["name"] = "A Deliberately Long Ship Name That Will Not Fit The Card Band"
+    data, _pages = render([fleet], pdf_export.PrintOptions(paper=paper, style=style, roster=False,
+                                                          quickref=False))
+    with fitz.open("pdf", data) as doc:
+        _assert_page_bounds(doc)
+
+
+@pytest.mark.parametrize("style", ["mono", "color"])
+def test_ship_cards_draw_a_hull_silhouette_in_both_styles(style):
+    data, _pages = render([a_fleet(ships=NAC_MIXED)],
+                          pdf_export.PrintOptions(style=style, roster=False, quickref=False))
+    with fitz.open("pdf", data) as doc:
+        silhouettes = [d for page in doc for d in page.get_drawings()
+                       if len(d["items"]) == 9 and all(i[0] == "l" for i in d["items"])]
+    assert len(silhouettes) >= len(NAC_MIXED)

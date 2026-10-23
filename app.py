@@ -1707,7 +1707,7 @@ def books() -> dict[str, object]:
 
 
 def books_in_order() -> list:
-    """The shipped books in publication order (FT, MT, FB1, FB2, CD, PC, PCE)."""
+    """The shipped books in publication order (FT, MT, FB1, FB2, CD, FTL, PC, PCE)."""
     return sorted(books().values(), key=lambda b: book_sort_key(b.code))
 
 

@@ -183,14 +183,16 @@ def get_ruleset(ruleset_id: str) -> Ruleset:
 # are its rules sources: the things a "FB1 p.16" link in the UI points into, and the things the
 # quick reference quotes. These are neither, so they are kept apart rather than hung off a
 # ruleset they do not belong to. The viewer and the Settings list show both (see app.books()).
-# Cross Dimensions and Project Continuum both started here and moved to their rulesets' books;
-# the list is empty until the app ships another book only to be read.
-REFERENCE_BOOKS: tuple[BookRef, ...] = ()
+# Cross Dimensions and Project Continuum both started here and moved to their rulesets' books.
+# Full Thrust Light (2008) is GZG's free introductory game; the app ships it to read.
+REFERENCE_BOOKS: tuple[BookRef, ...] = (
+    BookRef("FTL", "Full Thrust Light", "Full Thrust Light.pdf", 0),
+)
 
 
 # Book codes in publication order, for every list of rulebooks the player sees. A code missing
 # here sorts after these, by code.
-BOOK_ORDER: tuple[str, ...] = ("FT", "MT", "FB1", "FB2", "CD", "PC", "PCE")
+BOOK_ORDER: tuple[str, ...] = ("FT", "MT", "FB1", "FB2", "CD", "FTL", "PC", "PCE")
 
 
 def book_sort_key(code: str) -> tuple[int, str]:
