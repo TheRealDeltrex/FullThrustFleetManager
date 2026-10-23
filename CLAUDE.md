@@ -180,9 +180,8 @@ What exists:
   grid in `GRIDS` (4x3, 4x2, 3x2) that holds the most of the next cards with every SSD at
   `MIN_SCALE` or more, spanning slots (`SPANS`) for a ship no single slot holds. One scale per
   page, so every box on a sheet is the same size; `draw_diagram(view=)` crops to the drawn
-  extent (`_bounds`). The orders plot (ship rows, Start V, orders + V per turn) goes under the
-  last cards when it fits and the last page prefers a grid that leaves it room; otherwise it
-  gets its own landscape pages.
+  extent (`_bounds`). The orders plot (ship rows, Start V, orders + V per turn) always gets
+  its own landscape pages, never under the cards (Master).
 - The tracker (`_tracker_rows`) and the quick reference read what a ship carries: its own
   loadout, else the design's default. Empty bays print nothing, a light wing is 8 fighters and
   4 endurance (PC p.75), a magazine shows its loaded salvos; with damage printed, lost fighters,
