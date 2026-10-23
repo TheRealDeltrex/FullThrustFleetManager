@@ -328,7 +328,8 @@ What exists:
   centre from its arcs, bigger classes first (`_weight`), then fore rows across the top, the
   side columns flanking a central block of all-round systems, aft weapons under it, the armour
   circles and damage track (stars on the crew-factor boxes), and a bottom row with FTL, the
-  drive lozenge with its thrust, the FB core-systems box and any holds or tug drives.
+  drive lozenge with its thrust, the FB core-systems box (beside the drive, no more than twice the
+  FTL-to-drive gap away) and any holds or tug drives.
   Directly above the armour and hull boxes, bottom up: all fire controls in one row that never
   wraps (squeezed if needed), PDS after them when the row has room else in rows above, then
   hangars (`FIRE_CONTROLS` / `POINT_DEFENCE` / `HANGARS`).

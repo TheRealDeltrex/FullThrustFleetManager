@@ -1075,7 +1075,8 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     # and not a Sa'Vasku one: a construct has no bridge or life support, and the FB2 p.25 key
     # lists no such box. The ruleset says which, through derived["core_systems"].
     if derived.get("core_systems", rs.id == "fb"):
-        bx = width - 86
+        # Beside the drive, at most twice the FTL-to-drive gap away (owner's layout rule).
+        bx = 66 + 2 * 7
         prims.append(Rect(bx, y - 2, 70, 20, r=4, fill=WHITE, stroke=1.1))
         for i, letter in enumerate((_("B"), _("L"), _("P"))):
             prims.append(Rect(bx + 5 + i * 21, y + 1, 16, 14, fill=BLACK, stroke=0))
