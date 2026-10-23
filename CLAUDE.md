@@ -182,10 +182,6 @@ What exists:
   page, so every box on a sheet is the same size; `draw_diagram(view=)` crops to the drawn
   extent (`_bounds`). The orders plot (ship rows, Start V, orders + V per turn) always gets
   its own landscape pages, never under the cards (Master).
-- Two sheet designs, each in mono or colour (Master): `PrintOptions.design` `graphic`
-  (the FT Light cards above) or `plain` (`_plain_card`: a ruled box, one identity line, no
-  strip or silhouette, so `_Grid` margins shrink; the orders plot drops its filled heading and
-  zebra rows). The print dialog's "Record sheet design" picks it.
 - The tracker (`_tracker_rows`) and the quick reference read what a ship carries: its own
   loadout, else the design's default. Empty bays print nothing, a light wing is 8 fighters and
   4 endurance (PC p.75), a magazine shows its loaded salvos; with damage printed, lost fighters,

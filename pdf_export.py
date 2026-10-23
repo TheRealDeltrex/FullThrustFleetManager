@@ -46,7 +46,6 @@ class PrintOptions:
     turns: int = 10
     fields: dict = field(default_factory=dict)
     style: str = "mono"          # mono remains the ink-saving default; colour is optional
-    design: str = "graphic"      # record sheets: "graphic" (FT Light cards) or "plain"
 
 
 FONT_DIR = "static/fonts"
@@ -65,7 +64,6 @@ class FleetPDF(FPDF):
     header_section = ""  # right of the running title on the landscape sheets
     non_conforming = False
     print_style = "mono"
-    sheet_design = "graphic"
 
     @property
     def accent(self) -> tuple[int, int, int]:
@@ -478,10 +476,6 @@ class _Grid:
     top: float
     cell_w: float
     cell_h: float
-    strip: float = STRIP     # the plain design has no class strip
-    side: float = HULL_SIDE  # and no silhouette to leave room for
-    above: float = HULL_TOP
-    below: float = HULL_FOOT
 
     def size(self, span: tuple[int, int]) -> tuple[float, float]:
         return (span[0] * self.cell_w + (span[0] - 1) * GAP,
@@ -491,17 +485,14 @@ class _Grid:
         """The largest scale the SSD takes in a card of this span, silhouette margins included."""
         w, h = self.size(span)
         x0, y0, x1, y1 = card.view
-        return min((w - self.strip - 2 * self.side - 2) / ((x1 - x0) * PT),
-                   (h - BAND - self.above - self.below - 1.5) / ((y1 - y0) * PT))
+        return min((w - STRIP - 2 * HULL_SIDE - 2) / ((x1 - x0) * PT),
+                   (h - BAND - HULL_TOP - HULL_FOOT - 1.5) / ((y1 - y0) * PT))
 
 
 def _sheet_grid(pdf: FleetPDF, cols: int, rows: int) -> _Grid:
     top = pdf.t_margin
-    grid = _Grid(cols, rows, top, (pdf.epw - (cols - 1) * GAP) / cols,
+    return _Grid(cols, rows, top, (pdf.epw - (cols - 1) * GAP) / cols,
                  (pdf.h - 19 - top - (rows - 1) * GAP) / rows)
-    if pdf.sheet_design == "plain":
-        grid.strip, grid.side, grid.above, grid.below = 0.0, 1.5, 1.5, 1.5
-    return grid
 
 
 SPANS = ((1, 1), (2, 1), (1, 2), (2, 2))  # slots a card may take, smallest first
@@ -579,43 +570,8 @@ def _silhouette(pdf: FleetPDF, left: float, top: float, right: float, bottom: fl
     pdf.polygon(points, style="DF" if colour else "D")
 
 
-def _plain_card(pdf: FleetPDF, card: _Card, x: float, y: float, w: float, h: float,
-                scale: float, points: int) -> None:
-    """The plain design: a ruled box, one line of identity, the SSD."""
-    ship, design = card.ship, card.design
-    accent = pdf.accent
-    pdf.set_line_width(.3)
-    pdf.set_draw_color(*accent)
-    pdf.rect(x, y, w, h)
-    room = w - 4
-    pdf.set_xy(x + 2, y + 1.2)
-    pdf.set_font("plex", "B", 8.5)
-    pdf.set_text_color(*accent)
-    ident = f"{ship['table_id']}  {_fit(pdf, ship['name'], room * .55)}"
-    pdf.cell(pdf.get_string_width(ident) + 2, 5, ident)
-    pdf.set_font("plex", "", 6.8)
-    pdf.set_text_color(70)
-    rest = x + w - 2 - pdf.get_x()
-    kind = design.get("type_label") or design.get("type_code") or ""
-    stats = f"{_('MASS')} {design['tmf']} · {points} {_('pts')}"
-    meta = f"{kind} · {stats}" if kind else stats
-    if pdf.get_string_width(meta) > rest - 3:
-        meta = stats
-    pdf.cell(rest, 5, _fit(pdf, meta, rest - 1), align="R")
-    pdf.set_draw_color(190)
-    pdf.set_line_width(.2)
-    pdf.line(x + 2, y + BAND - 1, x + w - 2, y + BAND - 1)
-    x0, y0, x1, y1 = card.view
-    dw, dh = (x1 - x0) * PT * scale, (y1 - y0) * PT * scale
-    draw_diagram(pdf, card.diagram, x + (w - dw) / 2, y + BAND + (h - BAND - dh) / 2, dw,
-                 card.view)
-
-
 def _ship_card(pdf: FleetPDF, card: _Card, x: float, y: float, w: float, h: float,
                scale: float, points: int) -> None:
-    if pdf.sheet_design == "plain":
-        _plain_card(pdf, card, x, y, w, h, scale, points)
-        return
     ship, design = card.ship, card.design
     colour = pdf.print_style == "color"
     accent = pdf.accent
@@ -722,17 +678,15 @@ def _orders_plot(pdf: FleetPDF, ships: list[dict], turns: range, x: float, y: fl
                  width: float) -> float:
     """The FT Light movement plot: a row per ship, an orders and a velocity box per turn."""
     colour = pdf.print_style == "color"
-    plain = pdf.sheet_design == "plain"
     id_w, start_w = 34.0, 11.0
     turn_w = (width - id_w - start_w) / max(1, len(turns))
     v_w = max(6.0, turn_w * .3)
     head_fill = pdf.accent if colour else (226, 226, 226)
-    head_ink = (255, 255, 255) if colour and not plain else pdf.accent
+    head_ink = (255, 255, 255) if colour else (25, 25, 25)
     height = PLOT_HEAD + PLOT_ROW * len(ships)
 
-    if not plain:
-        pdf.set_fill_color(*head_fill)
-        pdf.rect(x, y, width, PLOT_HEAD, style="F")
+    pdf.set_fill_color(*head_fill)
+    pdf.rect(x, y, width, PLOT_HEAD, style="F")
     pdf.set_text_color(*head_ink)
     pdf.set_font("plex", "B", 7.5)
     pdf.set_xy(x + 1.5, y + .5)
@@ -747,7 +701,7 @@ def _orders_plot(pdf: FleetPDF, ships: list[dict], turns: range, x: float, y: fl
 
     for number, ship in enumerate(ships):
         top = y + PLOT_HEAD + number * PLOT_ROW
-        if number % 2 and not plain:
+        if number % 2:
             pdf.set_fill_color(*pdf.tint)
             pdf.rect(x, top, width, PLOT_ROW, style="F")
         pdf.set_xy(x + 1.5, top + .9)
@@ -769,7 +723,7 @@ def _orders_plot(pdf: FleetPDF, ships: list[dict], turns: range, x: float, y: fl
         left = x + id_w + start_w + index * turn_w
         pdf.line(left + turn_w - v_w, y + PLOT_HEAD, left + turn_w - v_w, y + height)
     pdf.set_draw_color(*pdf.accent)
-    pdf.set_line_width(.25 if plain else .4)
+    pdf.set_line_width(.4)
     for left in [x + id_w, *(x + id_w + start_w + i * turn_w for i in range(len(turns)))]:
         pdf.line(left, y, left, y + height)
     pdf.rect(x, y, width, height)
@@ -1011,7 +965,6 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
               options: PrintOptions | None = None) -> bytes:
     options = options or PrintOptions()
     pdf = _new_pdf(options.paper, options.style)
-    pdf.sheet_design = options.design if options.design in ("graphic", "plain") else "graphic"
     pdf.set_title(" / ".join(f["name"] for f in fleets))
     for fleet, designs in zip(fleets, designs_by_fleet):
         ruleset = RULESETS.get(fleet["ruleset"])
