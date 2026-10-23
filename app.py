@@ -1089,6 +1089,7 @@ def print_pdf() -> Response:
     options = pdf_export.PrintOptions(
         paper=form.get("paper", "A4"),
         style=form.get("print_style", "mono"),
+        design=form.get("sheet_design", "graphic"),
         roster=form.get("roster") == "on",
         sheets=form.get("sheets") == "on",
         orders=form.get("orders") == "on",

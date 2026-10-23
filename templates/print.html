@@ -29,6 +29,12 @@
           </select>
         </label>
         <p class="muted">{{ _("Both styles keep record-sheet symbols black on white. Colour adds restrained blue headings and table accents.") }}</p>
+        <label>{{ _("Record sheet design") }}
+          <select class="input" name="sheet_design">
+            <option value="graphic">{{ _("Illustrated") }}</option>
+            <option value="plain">{{ _("Plain") }}</option>
+          </select>
+        </label>
         <label>{{ _("Paper") }}
           <select class="input" name="paper">
             {% for value in ("A4", "Letter") %}
