@@ -45,7 +45,7 @@ class PrintOptions:
     turns: int = 10
     fields: dict = field(default_factory=dict)
     style: str = "mono"          # mono remains the ink-saving default; colour is optional
-    sheet_layout: str = "six"    # six ships per page, or the spacious variable-size layout
+    sheet_layout: str = "six"    # six, landscape, panorama (integrated orders), or spacious
 
 
 FONT_DIR = "static/fonts"
@@ -126,8 +126,8 @@ def _lines(pdf: FPDF, text: str, width: float) -> list[str]:
     return pdf.multi_cell(width, 4, text, dry_run=True, output="LINES", align="L")
 
 
-def _section(pdf: FleetPDF, title: str, eyebrow: str = "") -> None:
-    pdf.add_page()
+def _section(pdf: FleetPDF, title: str, eyebrow: str = "", *, orientation: str = "") -> None:
+    pdf.add_page(orientation=orientation)
     if eyebrow:
         pdf.set_font("plex", "B", 8)
         pdf.set_text_color(*pdf.accent)
@@ -395,6 +395,9 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
 
 def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
     """Choose fixed six-ship pages or the original spacious packing (PLAN 10.2)."""
+    if options.sheet_layout == "panorama":
+        panorama_pages(pdf, fleet, designs, options)
+        return
     if options.sheet_layout != "spacious":
         six_ship_pages(pdf, fleet, designs, options)
         return
@@ -455,7 +458,7 @@ def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
 
 
 def six_ship_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
-    """Two columns by three rows. The original SSD is scaled uniformly, never redrawn.
+    """Six stations: 2 by 3 in portrait or 3 by 2 in landscape; unchanged SSDs.
 
     Inspired by Full Thrust Light's fleet sheets: strong IDs, compact headers and a compact
     fleet at a glance. Keep fleet order so the roster and movement chart agree with the sheet.
@@ -465,11 +468,12 @@ def six_ship_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOpti
     if not ships:
         return
     gap = 4.0
-    width = (pdf.epw - gap) / 2
-    top, bottom = 38.0, pdf.h - 26.0
-    height = (bottom - top - 2 * gap) / 3
+    columns, rows = (3, 2) if options.sheet_layout == "landscape" else (2, 3)
     for start in range(0, len(ships), 6):
-        pdf.add_page()
+        pdf.add_page(orientation="L" if options.sheet_layout == "landscape" else "P")
+        width = (pdf.epw - gap * (columns - 1)) / columns
+        top, bottom = 38.0, pdf.h - 26.0
+        height = (bottom - top - gap * (rows - 1)) / rows
         pdf.set_xy(MARGIN, 24)
         pdf.set_font("plex", "B", 14)
         pdf.set_text_color(*pdf.accent)
@@ -483,8 +487,8 @@ def six_ship_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOpti
         pdf.cell(0, 4, _("Fleet sheet / six ship stations"))
         for position, ship in enumerate(ships[start:start + 6]):
             design = designs[ship["design_id"]]
-            x = MARGIN + position % 2 * (width + gap)
-            y = top + position // 2 * (height + gap)
+            x = MARGIN + position % columns * (width + gap)
+            y = top + position // columns * (height + gap)
             _six_ship_card(pdf, ship, design, options, fleet_rules.fleet_options(fleet),
                            x, y, width, height)
         pdf.set_xy(MARGIN, bottom + 2)
@@ -500,7 +504,7 @@ def six_ship_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOpti
 
 
 def _six_ship_card(pdf: FleetPDF, ship: dict, design: dict, options: PrintOptions, fleet_options: dict,
-                   x: float, y: float, width: float, height: float) -> None:
+                   x: float, y: float, width: float, height: float, *, narrow: bool = False) -> None:
     pdf.set_draw_color(145)
     pdf.set_line_width(.2)
     pdf.set_fill_color(255)
@@ -521,7 +525,7 @@ def _six_ship_card(pdf: FleetPDF, ship: dict, design: dict, options: PrintOption
     pdf.cell(width - id_width - 4, 6,
              design['type_code'], align="R")
     # Full identities wrap; long names consume space above, never overlap the diagram.
-    pdf.set_font("plex", "B", 8.5)
+    pdf.set_font("plex", "B", 7.5 if narrow else 8.5)
     identity = ship['name'] if ship['name'] == design['name'] else f"{ship['name']} / {design['name']}"
     name_lines = _lines(pdf, identity, width - 6)
     pdf.set_xy(x + 3, y + 8)
@@ -531,12 +535,13 @@ def _six_ship_card(pdf: FleetPDF, ship: dict, design: dict, options: PrintOption
     pdf.set_draw_color(205)
     pdf.set_line_width(.15)
     pdf.line(x + 3, name_bottom + 1, x + width - 3, name_bottom + 1)
-    band = 6.5
+    band = 14 if narrow else 6.5
     diagram_top = name_bottom + 3
     diagram_bottom = y + height - band - 1.5
     diagram = ssd_layout.layout(design, damage=_ship_damage(ship, options),
                                 loadout=_sheet_loadout(ship, design, options))
-    inner = min(width - 8, max(1, diagram_bottom - diagram_top) * diagram.width / diagram.height)
+    inner = min(width - (4 if narrow else 8),
+                max(1, diagram_bottom - diagram_top) * diagram.width / diagram.height)
     diagram_height = inner * diagram.height / diagram.width
     draw_diagram(pdf, diagram, x + (width - inner) / 2,
                  diagram_top + (diagram_bottom - diagram_top - diagram_height) / 2, inner)
@@ -546,8 +551,101 @@ def _six_ship_card(pdf: FleetPDF, ship: dict, design: dict, options: PrintOption
     pdf.set_font("plex", "", 7)
     pdf.set_text_color(35)
     points = fleet_rules.ship_points(ship, design, fleet_options)
-    pdf.cell(width - 6, 5, f"{_('MASS')} {design['tmf']}     {_('Thrust')} {design['thrust']}"
-             f"     {_('Points')} {points}")
+    if narrow:
+        for label, value in ((_('MASS'), design['tmf']), (_('Thrust'), design['thrust']),
+                             (_('Points'), points)):
+            pdf.set_x(x + 3)
+            pdf.cell(width - 6, 4, f"{label} {value}", new_x="LEFT", new_y="NEXT")
+    else:
+        pdf.cell(width - 6, 5, f"{_('MASS')} {design['tmf']}     {_('Thrust')} {design['thrust']}"
+                 f"     {_('Points')} {points}")
+
+
+def panorama_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
+    """Light-inspired landscape fleet board: six hulls over their movement grid.
+
+    Allocate wider stations to wider SSDs so damage boxes and system symbols have a similar
+    scale across the row. A partial last page retains six slots rather than inflating its ships.
+    """
+    ships = [s for s in _printable_ships(fleet, options) if s['design_id'] in designs]
+    for start in range(0, len(ships), 6):
+        group = ships[start:start + 6]
+        pdf.add_page(orientation="L")
+        pdf.set_xy(MARGIN, 24)
+        pdf.set_font("plex", "B", 16)
+        pdf.set_text_color(*pdf.accent)
+        pdf.cell(pdf.epw * .65, 8, _("Fleet battle sheet"))
+        pdf.set_font("plex", "", 8)
+        pdf.cell(pdf.epw * .35, 8, _("Ships {first}-{last} / {total}",
+                 first=start + 1, last=start + len(group), total=len(ships)), align="R")
+        pdf.set_xy(MARGIN, 33)
+        pdf.set_font("plex", "", 7)
+        pdf.set_text_color(60)
+        pdf.cell(0, 4, _("Record sheets") + " / " + _("Orders chart") if options.orders
+                 else _("Record sheets"))
+        top = 40.0
+        chart_top = pdf.h - 75
+        bottom = chart_top - 5 if options.orders else pdf.h - 22
+        weights = [ssd_layout.layout(designs[s['design_id']]).width for s in group]
+        weights += [sum(weights) / len(weights)] * (6 - len(weights))
+        scale = (pdf.epw - 5 * 2 - 6 * 4) / sum(weights)
+        x = MARGIN
+        for ship, weight in zip(group, weights):
+            width = 4 + weight * scale
+            _six_ship_card(pdf, ship, designs[ship['design_id']], options,
+                           fleet_rules.fleet_options(fleet), x, top, width, bottom - top, narrow=True)
+            x += width + 2
+        if options.orders:
+            for first in range(1, max(1, options.turns) + 1, 10):
+                if first > 1:
+                    pdf.add_page(orientation="L")
+                    chart_top = 34
+                _panorama_orders(pdf, group, chart_top, first, min(first + 9, max(1, options.turns)))
+
+
+def _panorama_orders(pdf: FleetPDF, ships: list[dict], top: float, first: int, last: int) -> None:
+    """Ten turns with writable velocity/order cells, aligned below the same six ship IDs."""
+    pdf.set_xy(MARGIN, top)
+    pdf.set_font("plex", "B", 8)
+    pdf.set_text_color(*pdf.accent)
+    pdf.cell(pdf.epw * .5, 5, _("Orders chart"))
+    pdf.set_font("plex", "", 7)
+    pdf.cell(pdf.epw * .5, 5, _("V = velocity. Write movement orders beside it for each turn."), align="R")
+    y = top + 6
+    id_width = 24.0
+    turn_width = (pdf.epw - id_width) / (last - first + 1)
+    pdf.set_draw_color(150)
+    pdf.set_line_width(.15)
+    pdf.set_fill_color(*pdf.accent)
+    pdf.rect(MARGIN, y, pdf.epw, 10, style="F")
+    pdf.set_text_color(255)
+    pdf.set_font("plex", "B", 7)
+    pdf.set_xy(MARGIN + 2, y + 2)
+    pdf.cell(id_width - 4, 6, _("Ship ID"))
+    for index, turn in enumerate(range(first, last + 1)):
+        x = MARGIN + id_width + index * turn_width
+        pdf.set_xy(x, y)
+        pdf.cell(turn_width, 5, str(turn), align="C")
+        pdf.set_xy(x, y + 5)
+        pdf.cell(5, 5, _("V"), align="C")
+        pdf.cell(turn_width - 5, 5, _("Orders"), align="C")
+    y += 10
+    pdf.set_text_color(25)
+    for row in range(6):
+        pdf.set_fill_color(*(pdf.tint if row % 2 == 0 else (255, 255, 255)))
+        pdf.rect(MARGIN, y, pdf.epw, 6, style="DF")
+        if row < len(ships):
+            label = ships[row]['table_id']
+            pdf.set_font("plex", "B", 7)
+            font_size = 7 * min(1, (id_width - 4) / max(1, pdf.get_string_width(label)))
+            pdf.set_font("plex", "B", font_size)
+            pdf.set_xy(MARGIN + 2, y)
+            pdf.cell(id_width - 4, 6, label)
+        for col in range(last - first + 1):
+            x = MARGIN + id_width + col * turn_width
+            pdf.line(x, y, x, y + 6)
+            pdf.line(x + 5, y, x + 5, y + 6)
+        y += 6
 
 
 def orders_page(pdf: FleetPDF, fleet: dict, options: PrintOptions) -> None:
@@ -555,7 +653,8 @@ def orders_page(pdf: FleetPDF, fleet: dict, options: PrintOptions) -> None:
     turns = max(1, options.turns)
     for first in range(1, turns + 1, 10):
         chart_turns = range(first, min(first + 10, turns + 1))
-        _section(pdf, _("Orders chart"))
+        _section(pdf, _("Orders chart"),
+                 orientation="L" if options.sheet_layout == "landscape" else "")
         pdf.set_font("plex", "", 8)
         pdf.multi_cell(0, 4.5, _("V = velocity. Write movement orders beside it for each turn."),
                        new_x="LMARGIN", new_y="NEXT")
@@ -565,7 +664,8 @@ def orders_page(pdf: FleetPDF, fleet: dict, options: PrintOptions) -> None:
         pdf.set_fill_color(255)
         pdf.set_line_width(.15)
         with pdf.table(width=pdf.epw, col_widths=[34, *([4.5, 10.7] * len(chart_turns))],
-                       line_height=3.7, min_row_height=12, padding=(1.5, .8), text_align="LEFT",
+                       line_height=3.7, min_row_height=8 if options.sheet_layout == "landscape" else 12,
+                       padding=(1.5, .8), text_align="LEFT",
                        num_heading_rows=2, headings_style=FontFace(emphasis="B", color=pdf.accent,
                        fill_color=pdf.tint)) as table:
             heading = table.row()
@@ -822,7 +922,15 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
         pdf.header_title = fleet["name"]
         pdf.header_ruleset = ruleset.short_label if ruleset else fleet["ruleset"]
         pdf.non_conforming = not fleet_rules.fleet_conforming(fleet, designs)
-        orders_page(pdf, fleet, options)
+        if options.sheets and options.sheet_layout == "panorama":
+            printed = {s['uid'] for s in _printable_ships(fleet, options)
+                       if s['design_id'] in designs}
+            remaining = [s for s in fleet['ships']
+                         if s['uid'] not in printed and s['status'] not in ('destroyed', 'hulk')]
+            if remaining:
+                orders_page(pdf, {**fleet, 'ships': remaining}, options)
+        else:
+            orders_page(pdf, fleet, options)
     if options.quickref:
         quickref_pages(pdf, fleets, designs_by_fleet)
     return bytes(pdf.output())

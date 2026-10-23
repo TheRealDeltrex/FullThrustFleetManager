@@ -1335,5 +1335,8 @@
  "{system}: stand off.": "{system}: stand off.",
  "{system}: {sides} got away (catch roll {roll}).": "{system}: {sides} got away (catch roll {roll}).",
  "{used} points": "{used} points",
- "{used} points exceed the limit of {limit}.": "{used} points exceed the limit of {limit}."
+ "{used} points exceed the limit of {limit}.": "{used} points exceed the limit of {limit}.",
+ "Panorama fleet sheet (landscape, with orders)": "Panorama fleet sheet (landscape, with orders)",
+ "Fleet battle sheet": "Fleet battle sheet",
+ "Landscape fleet sheets (separate orders chart)": "Landscape fleet sheets (separate orders chart)"
 }

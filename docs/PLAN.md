@@ -687,7 +687,11 @@ on/off, **blank copy** (clean SSDs, no campaign state), **battle pack**: pick a 
 roster + sheets + trackers for fleet 1, the same for fleet 2, one orders chart per fleet and one
 shared quick reference.
 
-Record-sheet layout: fleet sheet (six ships per page, default) or spacious sheets.
+Record-sheet layout: fleet sheet (six ships per page, default), panorama fleet sheet
+(landscape with six stations and their movement grid), landscape sheets (three columns
+by two rows with a separate landscape movement chart for the whole fleet), or spacious sheets. Panorama uses
+proportional station widths for the unchanged SSDs; orders continue in ten-turn blocks.
+Other pack sections keep their portrait orientation.
 Black and white by default, photocopy-safe, with an optional colour dossier style. Both
 styles preserve black-on-white record-sheet symbols; fonts are bundled (no system-font dependency).
 

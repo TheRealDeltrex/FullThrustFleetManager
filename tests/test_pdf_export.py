@@ -408,6 +408,69 @@ def test_compact_ship_id_is_never_truncated_and_long_identities_wrap():
         _assert_page_bounds(doc)
 
 
+@pytest.mark.parametrize("paper", ["A4", "Letter"])
+@pytest.mark.parametrize("style", ["mono", "color"])
+@pytest.mark.parametrize("layout", ["panorama", "landscape"])
+def test_landscape_modes_keep_twelve_ships_and_their_orders(paper, style, layout):
+    fleet = a_fleet(ships=FB_SHIPS * 4)
+    for index, ship in enumerate(fleet['ships']):
+        ship['name'] = f"Vessel {index + 1}"
+    options = pdf_export.PrintOptions(paper=paper, style=style, sheet_layout=layout,
+                                      roster=False, tracker=False, quickref=False)
+    data, pages = render([fleet], options)
+    assert len(pages) == (2 if layout == 'panorama' else 3)
+    assert 'Ships 1-6 / 12' in pages[0] and 'Ships 7-12 / 12' in pages[1]
+    if layout == 'landscape':
+        assert all('Orders chart' not in page for page in pages[:2])
+        assert all(ship['table_id'] in pages[2] for ship in fleet['ships'])
+    else:
+        assert all('Orders chart' in page for page in pages)
+    with fitz.open('pdf', data) as doc:
+        assert all(p.rect.width > p.rect.height for p in doc)
+        _assert_page_bounds(doc)
+
+
+@pytest.mark.parametrize("layout", ["panorama", "landscape"])
+def test_landscape_modes_honour_orders_checkbox(layout):
+    fleet = a_fleet(ships=FB_SHIPS * 2)
+    data, pages = render([fleet], pdf_export.PrintOptions(sheet_layout=layout, roster=False,
+                                                        orders=False, tracker=False, quickref=False))
+    assert len(pages) == 1 and 'Orders chart' not in pages[0]
+    with fitz.open('pdf', data) as doc:
+        _assert_page_bounds(doc)
+
+
+def test_panorama_continues_extra_turns_without_repeating_ship_sheets():
+    fleet = a_fleet(ships=FB_SHIPS * 2)
+    data, pages = render([fleet], pdf_export.PrintOptions(sheet_layout='panorama', turns=21,
+                                                        roster=False, tracker=False, quickref=False))
+    assert len(pages) == 3
+    assert 'Fleet battle sheet' in pages[0]
+    assert all('Fleet battle sheet' not in page for page in pages[1:])
+    assert '21' in pages[2]
+    assert all(ship['table_id'] in pages[2] for ship in fleet['ships'])
+    with fitz.open('pdf', data) as doc:
+        _assert_page_bounds(doc)
+
+
+def test_panorama_pack_restores_portrait_orientation_for_other_sections():
+    fleet = a_fleet()
+    data, pages = render([fleet], pdf_export.PrintOptions(sheet_layout='panorama'))
+    with fitz.open('pdf', data) as doc:
+        for page, text in zip(doc, pages):
+            assert (page.rect.width > page.rect.height) == ('Fleet battle sheet' in text)
+        _assert_page_bounds(doc)
+
+
+def test_panorama_preserves_orders_for_a_docked_ship_without_a_record_sheet():
+    fleet = a_fleet()
+    fleet['ships'][0]['status'] = 'docked'
+    _, pages = render([fleet], pdf_export.PrintOptions(sheet_layout='panorama', roster=False,
+                                                     tracker=False, quickref=False))
+    assert len(pages) == 2
+    assert fleet['ships'][0]['table_id'] in pages[-1]
+
+
 def _assert_page_bounds(doc):
     """Body text, headers and footers must stay on the printable page."""
     for page in doc:

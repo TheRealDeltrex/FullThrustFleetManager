@@ -173,6 +173,12 @@ What exists:
   grid inspired by Full Thrust Light's fleet sheets) or `spacious` (the previous variable-size
   packing for larger diagrams). Six-ship pages keep fleet order, full wrapped identities and
   uniformly scaled, unchanged SSD primitives. Incomplete final pages keep the same card sizes.
+  `panorama` adds landscape sheets with six stations across, widths proportional to their
+  SSDs, and (when orders are enabled) a ten-turn V/orders grid for those ships below them.
+  Extra turns continue on landscape charts. Orders for ships omitted from the SSDs still
+  receive a separate chart. `landscape` instead uses three columns by two rows and prints
+  one separate landscape movement chart for the whole fleet, not one chart per six ships.
+  Other pack sections keep their portrait orientation.
   Shared page furniture, wrapping/repeating roster tables, framed ship sheets,
   orders grids with velocity columns, bounded tracker cards and two-column references
   use the same print-first layout on A4 and Letter. Rulebook text and SSD primitives stay
