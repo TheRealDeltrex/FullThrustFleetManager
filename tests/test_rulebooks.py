@@ -47,7 +47,7 @@ def test_every_book_is_offered_and_listed(client):
     import app as app_module
 
     shipped = app_module.books()
-    assert {"FT", "MT", "FB1", "FB2", "CD", "PC", "PCE"} <= set(shipped)
+    assert {"FT", "MT", "FB1", "FB2", "CD", "FTL", "PC", "PCE"} <= set(shipped)
     page = text(client.get("/settings"))
     assert all(book.title in page for book in shipped.values())   # listed where a reader finds them
 
@@ -60,6 +60,13 @@ def test_cd_and_pc_are_rules_sources_not_reference_books():
     assert [b.code for b in RULESETS["ftpc"].books] == ["PC", "PCE"]
 
 
+def test_ft_light_is_shipped_to_read_only():
+    from rulesets import REFERENCE_BOOKS
+
+    assert [b.code for b in REFERENCE_BOOKS] == ["FTL"]
+    assert all("FTL" not in {b.code for b in rs.books} for rs in RULESETS.values())
+
+
 def test_a_reference_book_opens_and_serves_its_file(client):
     assert "rulebook/CD/file" in text(client.get("/rulebook/CD"))
     response = client.get("/rulebook/CD/file")
@@ -67,7 +74,8 @@ def test_a_reference_book_opens_and_serves_its_file(client):
 
 
 def test_the_reference_book_offsets_match_the_printed_folios():
-    """Cross Dimensions prints 9 on its 10th PDF page; Project Continuum's numbering matches."""
+    """Cross Dimensions prints 9 on its 10th PDF page; Project Continuum's and FT Light's
+    numbering matches."""
     import fitz  # pymupdf
 
     from rulesets import REFERENCE_BOOKS
@@ -76,7 +84,7 @@ def test_the_reference_book_offsets_match_the_printed_folios():
         if book.code == "PCE":
             continue                                   # 8-page errata, no printed folios
         with fitz.open(paths.bundle_dir() / "rulebooks" / book.file) as doc:
-            for printed in (20, 30):
+            for printed in (5, 10) if book.code == "FTL" else (20, 30):   # FTL: 14 pages
                 page = doc[printed + book.page_offset - 1]      # printed -> 0-based PDF index
                 bottom = [s for blk in page.get_text("dict")["blocks"]
                           for line in blk.get("lines", []) for s in line["spans"]
@@ -232,7 +240,7 @@ def test_the_viewer_may_be_framed_by_its_own_page(client):
 def test_books_are_listed_in_publication_order(client):
     import app as app_module
 
-    order = ["FT", "MT", "FB1", "FB2", "CD", "PC", "PCE"]
+    order = ["FT", "MT", "FB1", "FB2", "CD", "FTL", "PC", "PCE"]
     assert [b.code for b in app_module.books_in_order()] == order
     page = text(client.get("/rulebook/FT"))
     assert [page.index(f">{code}</a>") for code in order] == sorted(
