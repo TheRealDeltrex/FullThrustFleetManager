@@ -169,10 +169,19 @@ What exists:
 - Fonts are the bundled IBM Plex TTFs; no system font is used. `PrintOptions.style` is
   `mono` (default, ink-saving black and white) or `color` (blue dossier accents), selected
   independently of the screen theme in the print dialog. Both retain black-on-white SSDs.
-  Shared page furniture, wrapping/repeating roster tables, framed packed ship sheets,
-  orders grids with velocity columns, bounded tracker cards and two-column references
-  use the same print-first layout on A4 and Letter. Rulebook text and SSD primitives stay
-  unchanged. Running headers abbreviate long fleet names; body identities wrap in full.
+  Shared page furniture, wrapping/repeating roster tables, bounded tracker cards and
+  two-column references use the same print-first layout on A4 and Letter. Rulebook text and
+  SSD primitives stay unchanged. Running headers abbreviate long fleet names; body identities
+  wrap in full.
+- Record sheets and the orders plot follow the **Full Thrust Light** ship record sheets
+  (Master, 2026-10-22: at least six ships a page): landscape pages of cards with the class up
+  a left strip, an ID tab, name and MASS/points along the top and the SSD over a hull
+  silhouette (filled in colour, outline in mono). Ships go largest first; each page takes the
+  grid in `GRIDS` (4x3, 4x2, 3x2) that holds the most of the next cards with every SSD at
+  `MIN_SCALE` or more, spanning slots (`SPANS`) for a ship no single slot holds. One scale per
+  page, so every box on a sheet is the same size; `draw_diagram(view=)` crops to the drawn
+  extent (`_bounds`). The orders plot (ship rows, Start V, orders + V per turn) always gets
+  its own landscape pages, never under the cards (Master).
 - The tracker (`_tracker_rows`) and the quick reference read what a ship carries: its own
   loadout, else the design's default. Empty bays print nothing, a light wing is 8 fighters and
   4 endurance (PC p.75), a magazine shows its loaded salvos; with damage printed, lost fighters,
@@ -816,8 +825,9 @@ image (`page.get_pixmap(dpi=200)`).
 - A ruleset's `books` are its **rules sources**: what a `book_url()` link points into and what
   the quick reference quotes. Books the app ships only to be read go in `REFERENCE_BOOKS`
   (`rulesets/__init__.py`) instead, so a code can never resolve a page reference into a book
-  whose rules nothing implements. It is empty now: Cross Dimensions (`CD`) and Project
-  Continuum (`PC`, errata `PCE`) were there until their rulesets made them rules sources. Both are free
+  whose rules nothing implements. It holds Full Thrust Light (`FTL`, GZG's free 2008 intro
+  game, shipped unchanged; Master: no FTL mechanics in the app). Cross Dimensions (`CD`) and
+  Project Continuum (`PC`, errata `PCE`) were there until their rulesets made them rules sources. Both are free
   non-commercial publications distributed with GZG's agreement, credited in `NOTICE.md`.
   `app.books()` merges the two, rulesets winning a clash.
 - A new PDF needs no spec or workflow change: `fleetmanager.spec` and `deploy-pages.yml` both

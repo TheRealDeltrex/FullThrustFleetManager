@@ -88,7 +88,8 @@ class under each fleet's "Ship Designs" entry.
 
 Three more books are bundled, given the same treatment: *Cross Dimensions*, and *Project
 Continuum* with its errata, both free non-commercial publications distributed with Ground Zero
-Games' agreement. They are the rules sources of the FTCD and FTPC rulesets.
+Games' agreement. They are the rules sources of the FTCD and FTPC rulesets. GZG's free
+*Full Thrust Light* introductory rules ship unchanged, to read only.
 
 The pipeline that produces them is in `tools/` (`build_rulebooks.py`, with bookmark lists in
 `tocs.py` and the overprint fix in `dedup_text.py`). It needs PyMuPDF, pypdf and Tesseract, and
