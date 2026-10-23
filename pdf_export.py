@@ -225,11 +225,13 @@ def draw_diagram(pdf: FPDF, diagram: ssd_layout.Diagram, x: float, y: float, wid
 
 
 def _draw_path(pdf: FPDF, p: ssd_layout.Path, px, py, scale: float) -> None:
-    """The primitives use only M / L / A / Z; arcs are drawn as their chord, which at icon size
-    is a hair's difference and keeps the PDF dependency-free."""
+    """The primitives use only M / L / C / A / Z; arcs are drawn as their chord, which at icon
+    size is a hair's difference and keeps the PDF dependency-free, and cubic curves (the
+    Sa'Vasku drone womb) as a polyline through them."""
     pdf.set_line_width(max(0.1, (p.stroke or 0.4) * scale * 0.5))
     points: list[tuple[float, float]] = []
-    tokens = p.d.replace("M", " M ").replace("L", " L ").replace("A", " A ").replace("Z", " Z ").split()
+    tokens = p.d.replace("M", " M ").replace("L", " L ").replace("A", " A ").replace("C", " C ")
+    tokens = tokens.replace("Z", " Z ").split()
     index = 0
     fill = p.fill == "black"
     polygon: list[tuple[float, float]] = []
@@ -242,16 +244,32 @@ def _draw_path(pdf: FPDF, p: ssd_layout.Path, px, py, scale: float) -> None:
                 if len(points) > 1 and not fill:
                     _stroke(pdf, points)
                 points = [point]
+                start = point
             else:
                 points.append(point)
             polygon.append(point)
             index += 3
+        elif token == "C" and polygon:
+            # "C x1 y1 x2 y2 x y" from the current point, sampled into eight segments.
+            (sx, sy), c = polygon[-1], [float(t) for t in tokens[index + 1:index + 7]]
+            ctrl = [(px(c[0]), py(c[1])), (px(c[2]), py(c[3])), (px(c[4]), py(c[5]))]
+            for step in range(1, 9):
+                t = step / 8
+                u = 1 - t
+                point = tuple(u ** 3 * a + 3 * u * u * t * b + 3 * u * t * t * d + t ** 3 * e
+                              for a, b, d, e in zip((sx, sy), *ctrl))
+                points.append(point)
+                polygon.append(point)
+            index += 7
         elif token == "A":
             # "A rx ry rot large sweep x y": keep the end point, drop the curvature.
             x, y = float(tokens[index + 6]), float(tokens[index + 7])
             points.append((px(x), py(y)))
             polygon.append((px(x), py(y)))
             index += 8
+        elif token == "Z" and points:
+            points.append(start)  # closes the outline, so a drive's base or a hexagon's last edge shows
+            index += 1
         else:
             index += 1
     if fill and len(polygon) > 2:
@@ -456,7 +474,10 @@ def _bounds(diagram: ssd_layout.Diagram) -> tuple[float, float, float, float]:
             ys += [p.y - p.size * .8, p.y + p.size * .2]
     if not xs:
         return diagram.left, 0.0, diagram.left + max(diagram.width, 1.0), max(diagram.height, 1.0)
-    return min(xs), min(ys), max(xs), max(ys)
+    # Even about the diagram's centre line, so its rows sit in the middle of the silhouette.
+    axis = diagram.left + diagram.width / 2
+    half = max(axis - min(xs), max(xs) - axis)
+    return axis - half, min(ys), axis + half, max(ys)
 
 
 @dataclass

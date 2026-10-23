@@ -1134,11 +1134,12 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         y += 20
 
     y = _play_aids(prims, derived, width, y)
-    # Cropped to what it draws, with a small margin, so no sheet is wider than it needs to be.
+    # Cropped to what it draws, with a small margin, so no sheet is wider than it needs to be;
+    # evenly on both sides, so the centre line every row sits on stays the sheet's centre (and
+    # the middle of the PDF's hull silhouette).
     lo, hi = _x_extent(prims)
-    lo, hi = max(0.0, lo - 8), min(width, hi + 8)
-    if hi <= lo:
-        lo, hi = 0.0, width
+    half = min(width / 2, max(width / 2 - lo, hi - width / 2) + 8) if hi > lo else width / 2
+    lo, hi = width / 2 - half, width / 2 + half
     return Diagram(round(hi - lo, 2), round(max(y + 6, lowest), 2), tuple(prims), anchors, round(lo, 2))
 
 
