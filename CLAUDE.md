@@ -350,7 +350,9 @@ What exists:
   magazines below launchers; a magazine wraps at 8 salvos a row. The sheet is then cropped to
   what is drawn: `Diagram.left` is the crop's x offset (the SVG viewBox and `pdf_export` use it;
   anchors and hints stay in uncropped coordinates). `test_no_two_systems_overlap_on_any_catalog_sheet`
-  guards overlaps.
+  guards overlaps. Every row is centred (Master): system rows, each armour row, the
+  FTL/drive/core row and the Sa'Vasku thrust table with its power box (under the table when the
+  sheet is too narrow for both); the hull track is one centred block, its rows left-aligned.
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
 - **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
   wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`
