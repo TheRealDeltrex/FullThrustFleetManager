@@ -224,9 +224,12 @@ def test_port_and_starboard_batteries_flank_the_centre():
         {"uid": "p", "type": "beam", "class": 2, "arcs": ["FP", "AP"]},
         {"uid": "s", "type": "beam", "class": 2, "arcs": ["FS", "AS"]},
     ]
-    circles = [p for p in ssd_layout.layout(d).primitives if isinstance(p, ssd_layout.Circle)]
-    xs = sorted(c.cx for c in circles)
-    assert xs[0] < ssd_layout.BOX_WIDTHS["medium"] / 2 < xs[-1]
+    diagram = ssd_layout.layout(d)
+    port, starboard = diagram.anchors["p"], diagram.anchors["s"]
+    middle = diagram.left + diagram.width / 2
+    assert port[0] < middle < starboard[0] and port[1] == starboard[1]
+    # They hug the centre rather than the box edges: no wide empty space between them.
+    assert starboard[0] - port[0] < 50
 
 
 def test_larger_classes_sit_nearer_the_top():
@@ -402,7 +405,7 @@ def test_box_sizes_grow_with_the_ship():
     assert ssd_layout.box_size(design("fb:fb1:nac-vandenburg")) in ("medium", "large")
     assert ssd_layout.BOX_WIDTHS["small"] < ssd_layout.BOX_WIDTHS["xlarge"]
     d = design("ft2:ft:courier")
-    assert ssd_layout.layout(d, box="large").width == ssd_layout.BOX_WIDTHS["large"]
+    assert ssd_layout.layout(d, box="large").width <= ssd_layout.BOX_WIDTHS["large"]
 
 
 def test_svg_is_well_formed_and_escapes_text():
@@ -433,8 +436,41 @@ def test_every_catalog_design_fits_inside_its_box():
             elif isinstance(p, ssd_layout.Text):
                 xs.append(p.x)
                 ys.append(p.y)
-        assert min(xs) >= -1 and max(xs) <= diagram.width + 1, d["id"]
+        assert min(xs) >= diagram.left - 1 and max(xs) <= diagram.left + diagram.width + 1, d["id"]
+        assert min(xs) >= -1 and max(xs) <= ssd_layout.BOX_WIDTHS[ssd_layout.box_size(d)] + 1, d["id"]
         assert max(ys) <= diagram.height + 1, d["id"]
+
+
+def _system_boxes(diagram) -> dict[str, tuple[float, float, float, float]]:
+    shapes: dict[str, list] = {}
+    for p in diagram.primitives:
+        if p.ref.startswith("system:"):
+            shapes.setdefault(p.ref[7:], []).append(p)
+    return {uid: ssd_layout._bbox(ps) for uid, ps in shapes.items()}
+
+
+def _overlaps(diagram) -> list[tuple[str, str]]:
+    boxes = sorted(_system_boxes(diagram).items())
+    return [(a, b) for i, (a, (ax0, ay0, ax1, ay1)) in enumerate(boxes)
+            for b, (bx0, by0, bx1, by1) in boxes[i + 1:]
+            if ax0 < bx1 - 0.5 and bx0 < ax1 - 0.5 and ay0 < by1 - 0.5 and by0 < ay1 - 0.5]
+
+
+def test_no_two_systems_overlap_on_any_catalog_sheet():
+    bad = {d["id"]: o for d in store.catalog_designs() if (o := _overlaps(ssd_layout.layout(d)))}
+    assert bad == {}
+
+
+def test_a_big_magazine_wraps_and_overlaps_nothing():
+    d = design("fb:fb1:nac-furious")
+    d["systems"] = [{"uid": "m", "type": "sm_magazine", "capacity": 60, "feeds": ["l"]},
+                    {"uid": "l", "type": "sm_launcher", "arcs": ["F"]},
+                    {"uid": "s", "type": "screen", "level": 2},
+                    {"uid": "b", "type": "beam", "class": 1, "arcs": []}]
+    diagram = ssd_layout.layout(d)
+    assert _overlaps(diagram) == []
+    x0, _y0, x1, _y1 = _system_boxes(diagram)["m"]
+    assert x1 - x0 < 70
 
 
 # ---- Snapshots -----------------------------------------------------------------------------------
