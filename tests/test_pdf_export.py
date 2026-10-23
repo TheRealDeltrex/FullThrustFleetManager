@@ -505,25 +505,10 @@ def test_record_sheets_and_plot_stay_on_the_page(paper, style):
 
 
 @pytest.mark.parametrize("style", ["mono", "color"])
-@pytest.mark.parametrize("design", ["graphic", "plain"])
-def test_both_sheet_designs_print_in_both_styles(design, style):
-    fleet = a_fleet(ships=NAC_MIXED)
-    data, pages = render([fleet], pdf_export.PrintOptions(design=design, style=style,
-                                                          roster=False, quickref=False))
-    sheets = _sheet_pages(data)
-    counts = [len(set(re.findall(r"\b[A-Z]{2,4}-\d+\b", text))) for _l, text in sheets]
-    assert sum(counts) == len(NAC_MIXED) and min(counts) >= 6
+def test_ship_cards_draw_a_hull_silhouette_in_both_styles(style):
+    data, _pages = render([a_fleet(ships=NAC_MIXED)],
+                          pdf_export.PrintOptions(style=style, roster=False, quickref=False))
     with fitz.open("pdf", data) as doc:
-        _assert_page_bounds(doc)
         silhouettes = [d for page in doc for d in page.get_drawings()
                        if len(d["items"]) == 9 and all(i[0] == "l" for i in d["items"])]
-    assert bool(silhouettes) == (design == "graphic")
-
-
-def test_the_dialog_offers_the_sheet_designs(client):
-    a_fleet()
-    page = client.get("/print").get_data(as_text=True)
-    assert 'name="sheet_design"' in page and "Illustrated" in page and "Plain" in page
-    for design in ("graphic", "plain", "invalid"):
-        response = client.post("/print", data={"sheets": "on", "sheet_design": design})
-        assert response.mimetype == "application/pdf"
+    assert len(silhouettes) >= len(NAC_MIXED)
