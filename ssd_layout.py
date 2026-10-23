@@ -96,6 +96,9 @@ class Diagram:
     primitives: tuple[Primitive, ...] = field(default_factory=tuple)
     # uid -> (x, y): where each system's icon is centred, for drag-to-arrange.
     anchors: dict[str, tuple[float, float]] = field(default_factory=dict, compare=False)
+    # The x the visible sheet starts at: a sheet is cropped to what it draws, so `width` runs
+    # from here (pinned positions keep the coordinates of the uncropped box).
+    left: float = 0.0
 
 
 # ---- Geometry helpers ---------------------------------------------------------------------------
@@ -218,13 +221,18 @@ def _rack(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primi
 def _magazine(system: dict, x: float, y: float, arcs: tuple[str, ...]) -> list[Primitive]:
     """Salvo boxes, one per salvo the magazine holds (2 MASS each)."""
     salvos = max(1, int(system.get("capacity", 2) or 2) // 2)
-    box = 7.0
-    left = x - salvos * box / 2
-    out: list[Primitive] = [Rect(left - 2, y - 7, salvos * box + 4, 14, fill=WHITE, stroke=1.2)]
+    box, per_row = 7.0, 8  # a big magazine wraps into rows rather than running off the sheet
+    across = min(salvos, per_row)
+    rows = math.ceil(salvos / per_row)
+    left = x - across * box / 2
+    top = y - (rows - 1) * 4.5
+    out: list[Primitive] = [Rect(left - 2, top - 7, across * box + 4, 14 + (rows - 1) * 9,
+                                 fill=WHITE, stroke=1.2)]
     for i in range(salvos):
-        cx = left + i * box + box / 2
-        out.append(Path(f"M{_fmt(cx - 2.4)} {_fmt(y + 3)} L{_fmt(cx)} {_fmt(y - 3)} "
-                        f"L{_fmt(cx + 2.4)} {_fmt(y + 3)} Z", fill=WHITE, stroke=0.8))
+        cx = left + (i % per_row) * box + box / 2
+        cy = top + (i // per_row) * 9
+        out.append(Path(f"M{_fmt(cx - 2.4)} {_fmt(cy + 3)} L{_fmt(cx)} {_fmt(cy - 3)} "
+                        f"L{_fmt(cx + 2.4)} {_fmt(cy + 3)} Z", fill=WHITE, stroke=0.8))
     return out
 
 
@@ -764,6 +772,9 @@ BOTTOM_ROW = {"hold", "tug_drive", "tender_bay", "jump_gate", "portal"}
 FIRE_CONTROLS = {"fire_control", "adfc", "advanced_fire_control", "aadfc"}
 POINT_DEFENCE = {"pds", "pdaf"}
 HANGARS = {"hangar", "fighter_group", "hangar_bay"}
+# Missiles and their magazines sit together at the bottom of the weapon space (owner's rule).
+MISSILES = {"sm_launcher", "sm_rack", "sm_magazine", "mt_missile", "heavy_missile", "am_missile",
+            "rocket_pod"}
 
 
 def _side(arcs_of_system: list[str], all_arcs: tuple[str, ...]) -> str:
@@ -797,7 +808,7 @@ def _weight(system: dict) -> int:
 
 def _classify(design: dict, all_arcs: tuple[str, ...]) -> dict[str, list[dict]]:
     groups: dict[str, list[dict]] = {k: [] for k in ("fore", "port", "starboard", "aft", "centre", "bottom",
-                                                     "fire_control", "pds", "hangar")}
+                                                     "fire_control", "pds", "hangar", "missiles")}
     for system in design.get("systems", []):
         if not isinstance(system, dict):
             continue
@@ -810,27 +821,23 @@ def _classify(design: dict, all_arcs: tuple[str, ...]) -> dict[str, list[dict]]:
             groups["pds"].append(system)
         elif stype in HANGARS:
             groups["hangar"].append(system)
+        elif stype in MISSILES:
+            groups["missiles"].append(system)
         elif stype in WEAPONS:
             groups[_side(system.get("arcs", []), all_arcs)].append(system)
         else:
             groups["centre"].append(system)
     for key in ("fore", "port", "starboard", "aft", "centre"):
         groups[key].sort(key=lambda s: -_weight(s))
+    # Launchers and racks first, their magazines after them.
+    groups["missiles"].sort(key=lambda s: (s.get("type") == "sm_magazine", -_weight(s)))
     return groups
 
 
-def _icon_extent(icon_set: str, system: dict, arcs: tuple[str, ...]) -> float:
-    """How far an icon reaches left and right of its centre, from the shapes it draws."""
-    reach = 6.0
-    for p in _icon(icon_set, system, 0.0, 0.0, arcs, False):
-        if isinstance(p, Rect):
-            reach = max(reach, abs(p.x), abs(p.x + p.w))
-        elif isinstance(p, Circle):
-            reach = max(reach, abs(p.cx) + p.r)
-        elif isinstance(p, Path):
-            xs = re.findall(r"(-?\d+(?:\.\d+)?)\s+-?\d+(?:\.\d+)?", p.d)
-            reach = max([reach] + [abs(float(x)) for x in xs])
-    return reach
+def _icon_extent(icon_set: str, system: dict, arcs: tuple[str, ...]) -> tuple[float, float]:
+    """How far an icon reaches from its centre: (across, up or down), from what it draws."""
+    x0, y0, x1, y1 = _bbox(_icon(icon_set, system, 0.0, 0.0, arcs, False))
+    return max(6.0, -x0, x1), max(6.0, -y0, y1)
 
 
 # ---- The diagram ------------------------------------------------------------------------------------
@@ -895,8 +902,10 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     anchors: dict[str, tuple[float, float]] = {}
     lowest = 0.0  # the lowest pinned icon; the sheet grows to keep it on the page
 
+    drawn_low = 0.0  # the bottom edge of the auto-placed icons so far
+
     def place(system: dict, x: float, cy: float) -> None:
-        nonlocal lowest
+        nonlocal lowest, drawn_low
         pinned = hints.get(system.get("uid")) if isinstance(hints.get(system.get("uid")), dict) else None
         if pinned:
             x = min(max(float(pinned.get("x", x)), 0.0), width)
@@ -910,74 +919,104 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         if system.get("uid") in modes:
             extra["mode"] = modes[system["uid"]]
         shown = {**system, **extra} if extra else system
-        prims.extend(_icon(icon_set, shown, x, cy, arcs, system.get("uid") in systems_out))
+        icon = _icon(icon_set, shown, x, cy, arcs, system.get("uid") in systems_out)
+        prims.extend(icon)
+        if not pinned:
+            drawn_low = max(drawn_low, _bbox(icon)[3])
 
-    # Fore weapons: rows across the top, largest first.
-    per_row = max(1, int((width - 40) // gap))
-    fore = groups["fore"]
-    for start in range(0, len(fore), per_row):
-        row = fore[start:start + per_row]
-        x0 = width / 2 - (len(row) - 1) * gap / 2
-        for i, system in enumerate(row):
-            place(system, x0 + i * gap, y)
-        y += gap
+    # Rows are packed by each icon's own width with a small gap: room to read, nothing wider
+    # (owner's layout rule).
+    Row = list[tuple[dict, float, float]]  # (system, half width, half height)
 
-    # Port and starboard columns flank the centre block.
-    side_rows = max(len(groups["port"]), len(groups["starboard"]))
-    centre_top = y
-    for i, system in enumerate(groups["port"]):
-        place(system, 22.0, centre_top + i * gap)
-    for i, system in enumerate(groups["starboard"]):
-        place(system, width - 22.0, centre_top + i * gap)
-
-    # All-round systems (C1 beams, PDS, fire controls) in central rows between the columns.
-    inner = max(1, int((width - 100) // (2 * ICON_RADIUS)))
-    centre = groups["centre"]
-    cy = centre_top
-    for start in range(0, len(centre), inner):
-        row = centre[start:start + inner]
-        step = 2 * ICON_RADIUS
-        x0 = width / 2 - (len(row) - 1) * step / 2
-        for i, system in enumerate(row):
-            place(system, x0 + i * step, cy)
-        cy += step
-    y = max(cy, centre_top + side_rows * gap)
-
-    # Aft-only weapons along the bottom of the system block.
-    for start in range(0, len(groups["aft"]), per_row):
-        row = groups["aft"][start:start + per_row]
-        x0 = width / 2 - (len(row) - 1) * gap / 2
-        for i, system in enumerate(row):
-            place(system, x0 + i * gap, y)
-        y += gap
-
-    # Hangars, point defence and the fire-control row, stacked down onto the armour and hull.
-    def packed(systems: list[dict], wrap: bool = True) -> list[list[tuple[dict, float]]]:
-        """Rows of (system, half width), each as wide as the box allows. Unwrapped, it is one
-        row however long."""
-        rows: list[list[tuple[dict, float]]] = [[]]
+    def packed(systems: list[dict], wrap: bool = True, room: float | None = None) -> list[Row]:
+        """Rows each as wide as `room` (the box) allows. Unwrapped, it is one row however
+        long."""
+        room = width - 16 if room is None else room
+        rows: list[Row] = [[]]
         used = 0.0
         for system in systems:
-            half = _icon_extent(icon_set, system, arcs)
-            if wrap and rows[-1] and used + 2 * half + 4 > width - 16:
+            half, tall = _icon_extent(icon_set, system, arcs)
+            if wrap and rows[-1] and used + 2 * half + 4 > room:
                 rows.append([])
                 used = 0.0
-            rows[-1].append((system, half))
+            rows[-1].append((system, half, tall))
             used += 2 * half + 4
         return [r for r in rows if r]
 
-    def draw_row(row: list[tuple[dict, float]]) -> None:
-        nonlocal y
-        span = sum(2 * half + 4 for _s, half in row) - 4
-        # A row too long for the box (the fire controls never wrap) is squeezed to fit.
-        squeeze = min(1.0, (width - 16) / span) if span > 0 else 1.0
-        x = width / 2 - span * squeeze / 2
-        tall = max(half for _s, half in row)
-        cy = y + min(tall, ICON_RADIUS)
-        for system, half in row:
+    def span(row: Row) -> float:
+        return sum(2 * half + 4 for _s, half, _t in row) - 4
+
+    def tall(row: Row) -> float:
+        return max(t for _s, _h, t in row)
+
+    def mirrored(row: Row) -> Row:
+        """One symmetric row, smallest in the middle and the bigger ones paired outwards, so
+        two class-1 and two class-2 guns read 2-1-1-2 (owner's rule). Rows only split, larger
+        above smaller, when the box is too narrow for one."""
+        out: Row = []
+        for i, item in enumerate(reversed(row)):
+            out.insert(0 if i % 2 else len(out), item)
+        return out
+
+    def place_row(row: Row, cy: float, squeeze: float = 1.0) -> None:
+        x = width / 2 - span(row) * squeeze / 2
+        for system, half, _t in row:
             place(system, x + half * squeeze, cy)
             x += (2 * half + 4) * squeeze
-        y = cy + min(tall, ICON_RADIUS) + 4
+
+    def step(row: Row, least: float) -> float:
+        """From one row's centre to the next: `least`, or more for a tall icon."""
+        return max(least, 2 * tall(row) + 4)
+
+    # Fore weapons: rows across the top, largest first.
+    for row in packed(groups["fore"]):
+        y += max(0.0, tall(row) - ICON_RADIUS)
+        place_row(mirrored(row), y)
+        y += step(row, gap) - max(0.0, tall(row) - ICON_RADIUS)
+
+    # Port and starboard columns hug the centre block of all-round systems (C1 beams, screens).
+    port_half = max((_icon_extent(icon_set, s, arcs)[0] for s in groups["port"]), default=0.0)
+    star_half = max((_icon_extent(icon_set, s, arcs)[0] for s in groups["starboard"]), default=0.0)
+    sides = (2 * port_half + 6 if groups["port"] else 0) + (2 * star_half + 6 if groups["starboard"] else 0)
+    # All-round guns in their own symmetric rows, then the other all-round systems (screens).
+    room = max(2 * ICON_RADIUS, width - 16 - sides)
+    centre_rows = (packed([s for s in groups["centre"] if s.get("type") in WEAPONS], room=room)
+                   + packed([s for s in groups["centre"] if s.get("type") not in WEAPONS], room=room))
+    block = max((span(r) for r in centre_rows), default=0.0)
+    centre_top = y
+    cy = centre_top
+    for row in centre_rows:
+        cy += max(0.0, tall(row) - ICON_RADIUS)
+        place_row(mirrored(row), cy)
+        cy += step(row, 2 * ICON_RADIUS) - max(0.0, tall(row) - ICON_RADIUS)
+    port_x = max(8 + port_half, width / 2 - block / 2 - 6 - port_half)
+    star_x = min(width - 8 - star_half, width / 2 + block / 2 + 6 + star_half)
+    side_end = centre_top
+    for column, x in ((groups["port"], port_x), (groups["starboard"], star_x)):
+        sy = centre_top
+        for system in column:
+            row = packed([system])[0]
+            sy += max(0.0, tall(row) - ICON_RADIUS)
+            place(system, x, sy)
+            sy += step(row, gap) - max(0.0, tall(row) - ICON_RADIUS)
+        side_end = max(side_end, sy)
+    y = max(cy, side_end)
+
+    # Aft-only weapons along the bottom of the system block, then the missiles and magazines.
+    for rows, arrange in ((packed(groups["aft"]), mirrored), (packed(groups["missiles"]), None)):
+        for row in rows:
+            y += max(0.0, tall(row) - ICON_RADIUS)
+            place_row(arrange(row) if arrange else row, y)
+            y += step(row, gap) - max(0.0, tall(row) - ICON_RADIUS)
+
+    # Hangars, point defence and the fire-control row, stacked down onto the armour and hull.
+    def draw_row(row: Row) -> None:
+        nonlocal y
+        # A row too long for the box (the fire controls never wrap) is squeezed to fit.
+        squeeze = min(1.0, (width - 16) / span(row)) if span(row) > 0 else 1.0
+        cy = y + tall(row)
+        place_row(row, cy, squeeze)
+        y = cy + tall(row) + 4
 
     fc_row = packed(groups["fire_control"], wrap=False)
     pds_rows = packed(groups["pds"])
@@ -985,8 +1024,8 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         fc_row = [fc_row[0] + pds_rows[0]]
         pds_rows = []
     stack = packed(groups["hangar"]) + pds_rows + fc_row
-    if stack:
-        y -= ICON_RADIUS  # y is the next row's centre; the stack is laid from its top edge
+    if drawn_low:
+        y = drawn_low + 6  # from the next row's centre to just under the icons drawn so far
     for row in stack:
         draw_row(row)
     y += 4
@@ -1091,7 +1130,53 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         y += 20
 
     y = _play_aids(prims, derived, width, y)
-    return Diagram(width, round(max(y + 6, lowest), 2), tuple(prims), anchors)
+    # Cropped to what it draws, with a small margin, so no sheet is wider than it needs to be.
+    lo, hi = _x_extent(prims)
+    lo, hi = max(0.0, lo - 8), min(width, hi + 8)
+    if hi <= lo:
+        lo, hi = 0.0, width
+    return Diagram(round(hi - lo, 2), round(max(y + 6, lowest), 2), tuple(prims), anchors, round(lo, 2))
+
+
+def _x_extent(prims: list[Primitive]) -> tuple[float, float]:
+    """The leftmost and rightmost x the primitives reach."""
+    x0, _y0, x1, _y1 = _bbox(prims)
+    return x0, x1
+
+
+def _bbox(prims) -> tuple[float, float, float, float]:
+    """(left, top, right, bottom) of the primitives; text by an estimate of its size."""
+    xs: list[float] = []
+    ys: list[float] = []
+    for p in prims:
+        if isinstance(p, Rect):
+            xs += [p.x, p.x + p.w]
+            ys += [p.y, p.y + p.h]
+        elif isinstance(p, Circle):
+            xs += [p.cx - p.r, p.cx + p.r]
+            ys += [p.cy - p.r, p.cy + p.r]
+        elif isinstance(p, Line):
+            xs += [p.x1, p.x2]
+            ys += [p.y1, p.y2]
+        elif isinstance(p, Path):
+            points = _path_points(p.d)
+            xs += [x for x, _y in points]
+            ys += [y for _x, y in points]
+        elif isinstance(p, Text):
+            w = len(p.text) * p.size * 0.6
+            x0 = {"middle": p.x - w / 2, "end": p.x - w}.get(p.anchor, p.x)
+            xs += [x0, x0 + w]
+            ys += [p.y - p.size * 0.75, p.y + p.size * 0.2]
+    return (min(xs), min(ys), max(xs), max(ys)) if xs else (0.0, 0.0, 0.0, 0.0)
+
+
+def _path_points(d: str) -> list[tuple[float, float]]:
+    """Every point of an absolute M/L/C/Z path."""
+    points: list[tuple[float, float]] = []
+    for chunk in re.split(r"[A-Za-z]", d):
+        numbers = [float(n) for n in re.findall(r"-?\d+(?:\.\d+)?", chunk)]
+        points += list(zip(numbers[0::2], numbers[1::2]))
+    return points
 
 
 def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) -> float:
@@ -1123,7 +1208,9 @@ def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) ->
 
     if power:
         # Empty boxes: allocation is rewritten every turn and never stored (FB2 p.22).
-        bx = width - 96
+        # Beside the thrust table rather than at the far edge.
+        columns = (1 if len(table) <= 8 else 2) if table else 0
+        bx = min(width - 96, 16 + columns * 52 + 10) if table else 16
         prims.append(Text(bx + 40, top + 7, _("Power {n} per turn", n=power), size=6.5, bold=True))
         for i, pool in enumerate((_("M"), _("A"), _("D"), _("R"))):
             px = bx + i * 20
@@ -1144,7 +1231,7 @@ def to_svg(diagram: Diagram, class_name: str = "ssd", draggable: bool = False) -
     """The diagram as inline SVG. `draggable` wraps each system's shapes in a
     `<g class="sys" data-uid data-x data-y>` (its anchor) for static/ssddrag.js."""
     parts = [
-        f'<svg viewBox="0 0 {_fmt(diagram.width)} {_fmt(diagram.height)}" '
+        f'<svg viewBox="{_fmt(diagram.left)} 0 {_fmt(diagram.width)} {_fmt(diagram.height)}" '
         f'xmlns="http://www.w3.org/2000/svg" class="{class_name}">'
     ]
     group = None

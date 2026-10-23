@@ -172,7 +172,7 @@ def draw_diagram(pdf: FPDF, diagram: ssd_layout.Diagram, x: float, y: float, wid
     height = diagram.height * scale
 
     def px(value: float) -> float:
-        return x + value * scale
+        return x + (value - diagram.left) * scale
 
     def py(value: float) -> float:
         return y + value * scale
