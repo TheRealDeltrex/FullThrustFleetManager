@@ -345,6 +345,16 @@ def test_ft2_has_no_core_systems_box_and_fb_does():
     assert core_boxes("ft2:ft:battleship") == []
 
 
+def test_ftl_drive_and_core_systems_sit_close_together():
+    prims = ssd_layout.layout(design("fb:fb1:nac-vandenburg")).primitives
+    texts = {p.text: p for p in prims if isinstance(p, ssd_layout.Text)}
+    ftl_box = next(p for p in prims if isinstance(p, ssd_layout.Rect) and p.w == 20 and p.h == 16)
+    core = next(p for p in prims if isinstance(p, ssd_layout.Rect) and p.w == 70)
+    drive_right = texts["6"].x + 11
+    ftl_gap = (texts["6"].x - 11) - (ftl_box.x + ftl_box.w)
+    assert 0 < core.x - drive_right <= 2 * ftl_gap
+
+
 def test_ftl_and_thrust_are_on_the_bottom_row():
     d = design("fb:fb1:nac-furious")
     texts = {p.text for p in ssd_layout.layout(d).primitives if isinstance(p, ssd_layout.Text)}
