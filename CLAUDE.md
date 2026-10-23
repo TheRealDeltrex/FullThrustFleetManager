@@ -342,6 +342,15 @@ What exists:
   Directly above the armour and hull boxes, bottom up: all fire controls in one row that never
   wraps (squeezed if needed), PDS after them when the row has room else in rows above, then
   hangars (`FIRE_CONTROLS` / `POINT_DEFENCE` / `HANGARS`).
+  Master's packing rules: icons are packed by their real extent (`_icon_extent`, `_bbox`) with a
+  small fixed gap, never spread across the band; the port and starboard columns hug the centre
+  block. A weapon row is mirrored, smallest in the middle (two class-1 and two class-2 beams read
+  2-1-1-2); larger-over-smaller only happens because rows wrap. Screens and other non-weapons get
+  their own centre rows. Missiles and magazines (`MISSILES`) come last in the weapon space,
+  magazines below launchers; a magazine wraps at 8 salvos a row. The sheet is then cropped to
+  what is drawn: `Diagram.left` is the crop's x offset (the SVG viewBox and `pdf_export` use it;
+  anchors and hints stay in uncropped coordinates). `test_no_two_systems_overlap_on_any_catalog_sheet`
+  guards overlaps.
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
 - **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
   wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`

@@ -467,7 +467,7 @@ def test_one_scale_per_page_and_legible(monkeypatch):
 
 
 def test_a_ship_too_tall_for_a_slot_spans_two():
-    fleet = a_fleet(ships=["fb:fb2:sv-shyy-tha-var", *ESCORTS])
+    fleet = a_fleet(ships=["fb:fb2:sv-sa-kess-tha", *ESCORTS])
     designs = store.designs_for_fleet(fleet)
     pdf = pdf_export._new_pdf("A4")
     pdf.add_page(orientation="L")

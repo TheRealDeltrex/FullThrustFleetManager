@@ -178,7 +178,7 @@ def draw_diagram(pdf: FPDF, diagram: ssd_layout.Diagram, x: float, y: float, wid
                  view: tuple[float, float, float, float] | None = None) -> float:
     """Render a Diagram at (x, y) mm, scaled to `width` mm. Returns its height in mm. `view`
     (x0, y0, x1, y1 in the diagram's points) draws just that part of it at (x, y)."""
-    x0, y0, x1, y1 = view or (0.0, 0.0, diagram.width, diagram.height)
+    x0, y0, x1, y1 = view or (diagram.left, 0.0, diagram.left + diagram.width, diagram.height)
     scale = width / (x1 - x0) if x1 > x0 else 1.0
     height = (y1 - y0) * scale
 
@@ -455,7 +455,7 @@ def _bounds(diagram: ssd_layout.Diagram) -> tuple[float, float, float, float]:
             xs += [left, left + 2 * half]
             ys += [p.y - p.size * .8, p.y + p.size * .2]
     if not xs:
-        return 0.0, 0.0, max(diagram.width, 1.0), max(diagram.height, 1.0)
+        return diagram.left, 0.0, diagram.left + max(diagram.width, 1.0), max(diagram.height, 1.0)
     return min(xs), min(ys), max(xs), max(ys)
 
 
