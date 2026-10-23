@@ -1192,21 +1192,14 @@ def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) ->
 
     y += 6
     top = y
-    # Two columns when the table is long, so a big ship's sheet does not grow a tail.
-    columns = (1 if len(table) <= 8 else 2) if table else 0
-    col_w, row_h = 46.0, 9.5
-    table_w = columns * (col_w + 6) - 6 if table else 0.0
-    # The table and the power box side by side, centred like every row (owner's layout rule).
-    # The power box goes under the table when the sheet is too narrow for both in one row.
-    beside = bool(table) and table_w + 10 + 78 <= width - 16
-    group = table_w + (10 + 78 if beside and power else 0) if table else 78.0
-    x0 = max(8.0, width / 2 - group / 2)
     if table:
-        per_column = len(table) if columns == 1 else (len(table) + 1) // 2
-        prims.append(Text(x0 + col_w / 2, y + 7, _("Thrust / power"), size=6.5, bold=True))
+        # Two columns when the table is long, so a big ship's sheet does not grow a tail.
+        per_column = len(table) if len(table) <= 8 else (len(table) + 1) // 2
+        col_w, row_h = 46.0, 9.5
+        prims.append(Text(16 + col_w / 2, y + 7, _("Thrust / power"), size=6.5, bold=True))
         y += 10
         for index, (thrust, cost, damaged) in enumerate(table):
-            cx = x0 + (index // per_column) * (col_w + 6)
+            cx = 16 + (index // per_column) * (col_w + 6)
             cy = y + (index % per_column) * row_h
             prims.append(Rect(cx, cy, 18, row_h - 1, fill=WHITE, stroke=0.6))
             prims.append(Text(cx + 9, cy + row_h - 3, str(thrust), size=6.5))
@@ -1218,11 +1211,8 @@ def _play_aids(prims: list[Primitive], derived: dict, width: float, y: float) ->
     if power:
         # Empty boxes: allocation is rewritten every turn and never stored (FB2 p.22).
         # Beside the thrust table rather than at the far edge.
-        if beside:
-            bx = x0 + table_w + 10
-        else:
-            bx = width / 2 - 39
-            top = y + 4 if table else top
+        columns = (1 if len(table) <= 8 else 2) if table else 0
+        bx = min(width - 96, 16 + columns * 52 + 10) if table else 16
         prims.append(Text(bx + 40, top + 7, _("Power {n} per turn", n=power), size=6.5, bold=True))
         for i, pool in enumerate((_("M"), _("A"), _("D"), _("R"))):
             px = bx + i * 20

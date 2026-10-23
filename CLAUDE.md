@@ -351,8 +351,8 @@ What exists:
   what is drawn: `Diagram.left` is the crop's x offset (the SVG viewBox and `pdf_export` use it;
   anchors and hints stay in uncropped coordinates). `test_no_two_systems_overlap_on_any_catalog_sheet`
   guards overlaps. Every row is centred (Master): system rows, each armour row, the
-  FTL/drive/core row and the Sa'Vasku thrust table with its power box (under the table when the
-  sheet is too narrow for both); the hull track is one centred block, its rows left-aligned.
+  FTL/drive/core row; the hull track is one centred block, its rows left-aligned. The Sa'Vasku
+  thrust table and power box are play aids, not systems, and stay on the left (Master).
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
 - **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
   wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`
