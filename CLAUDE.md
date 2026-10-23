@@ -348,9 +348,12 @@ What exists:
   2-1-1-2); larger-over-smaller only happens because rows wrap. Screens and other non-weapons get
   their own centre rows. Missiles and magazines (`MISSILES`) come last in the weapon space,
   magazines below launchers; a magazine wraps at 8 salvos a row. The sheet is then cropped to
-  what is drawn: `Diagram.left` is the crop's x offset (the SVG viewBox and `pdf_export` use it;
+  what is drawn, evenly on both sides so the centre line stays central (`pdf_export._bounds`
+  likewise, so rows sit mid-silhouette): `Diagram.left` is the crop's x offset (the SVG viewBox and `pdf_export` use it;
   anchors and hints stay in uncropped coordinates). `test_no_two_systems_overlap_on_any_catalog_sheet`
-  guards overlaps.
+  guards overlaps. Every row of systems is centred (Master), the FTL/drive/core row too. Not
+  systems, so not centred: the armour rows start on the left of the hit-point block (a centred
+  block, rows left-aligned), and the Sa'Vasku thrust table and power box stay on the left.
   `layout_hints[uid] = {"x": .., "y": ..}` pins a system (the sheet grows to keep a pin on it).
 - **Drag-to-arrange**: `Diagram.anchors` holds each icon's centre; `to_svg(..., draggable=True)`
   wraps each system in `<g class="sys" data-uid data-x data-y>`, `templates/_ssd.html`

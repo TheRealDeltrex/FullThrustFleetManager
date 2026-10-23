@@ -1088,14 +1088,17 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
             prims.append(_cross(gx, gy, 7.0))
     y += len(track) * cell + 8
 
-    # Bottom row: FTL, main drive with its thrust, core systems (FB), holds and tugs.
+    # Bottom row: FTL, main drive with its thrust, core systems (FB), holds and tugs; centred,
+    # like every row (owner's layout rule). Drawn from x 16 and shifted by `ox`.
+    core = derived.get("core_systems", rs.id == "fb")
+    ox = width / 2 - (16 + (66 + 2 * 7 + 70 if core else 66)) / 2
     if design.get("ftl"):
         if derived.get("advanced_ftl"):
             # CD figure 27: the advanced FTL is a hexagon where the standard one is a box.
-            prims.append(Path(_hexagon(26, y + 8, 10.5), fill=WHITE, stroke=1.2))
+            prims.append(Path(_hexagon(ox + 26, y + 8, 10.5), fill=WHITE, stroke=1.2))
         else:
-            prims.append(Rect(16, y, 20, 16, fill=WHITE, stroke=1.2))
-        prims.append(Text(26, y + 11.5, _("FTL"), size=7, bold=True))
+            prims.append(Rect(ox + 16, y, 20, 16, fill=WHITE, stroke=1.2))
+        prims.append(Text(ox + 26, y + 11.5, _("FTL"), size=7, bold=True))
     thrust = int(design.get("thrust") or 0)
     # An icon set may draw the main drive itself: FB2 p.9 gives the Kra'Vak Advanced Grav Drive
     # its own icon and writes the rating with an "A".
@@ -1103,19 +1106,20 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     if draw_drive is None and derived.get("advanced_drive"):
         draw_drive = _kv_drive  # CD p.11: the advanced drive's own icon, rating written "nA"
     if draw_drive:
-        prims.extend(draw_drive({"type": "main_drive", "thrust": thrust}, 55, y + 7.5, arcs))
+        prims.extend(draw_drive({"type": "main_drive", "thrust": thrust}, ox + 55, y + 7.5, arcs))
     else:
-        prims.append(Path(f"M44 {_fmt(y + 16)} L44 {_fmt(y + 5)} L55 {_fmt(y - 1)} L66 {_fmt(y + 5)} "
-                          f"L66 {_fmt(y + 16)} Z", fill=WHITE, stroke=1.3))
-        prims.append(Text(55, y + 13.5, str(thrust), size=9.5, bold=True))
+        a, m, b = _fmt(ox + 44), _fmt(ox + 55), _fmt(ox + 66)
+        prims.append(Path(f"M{a} {_fmt(y + 16)} L{a} {_fmt(y + 5)} L{m} {_fmt(y - 1)} L{b} {_fmt(y + 5)} "
+                          f"L{b} {_fmt(y + 16)} Z", fill=WHITE, stroke=1.3))
+        prims.append(Text(ox + 55, y + 13.5, str(thrust), size=9.5, bold=True))
     if int(damage.get("drive_hits") or 0):
-        prims.append(_cross(55, y + 8, 9))
+        prims.append(_cross(ox + 55, y + 8, 9))
     # The core systems box is part of a human or Kra'Vak FB sheet but not an FT2 one (FT p.14),
     # and not a Sa'Vasku one: a construct has no bridge or life support, and the FB2 p.25 key
     # lists no such box. The ruleset says which, through derived["core_systems"].
-    if derived.get("core_systems", rs.id == "fb"):
+    if core:
         # Beside the drive, at most twice the FTL-to-drive gap away (owner's layout rule).
-        bx = 66 + 2 * 7
+        bx = ox + 66 + 2 * 7
         prims.append(Rect(bx, y - 2, 70, 20, r=4, fill=WHITE, stroke=1.1))
         for i, letter in enumerate((_("B"), _("L"), _("P"))):
             prims.append(Rect(bx + 5 + i * 21, y + 1, 16, 14, fill=BLACK, stroke=0))
@@ -1130,11 +1134,12 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
         y += 20
 
     y = _play_aids(prims, derived, width, y)
-    # Cropped to what it draws, with a small margin, so no sheet is wider than it needs to be.
+    # Cropped to what it draws, with a small margin, so no sheet is wider than it needs to be;
+    # evenly on both sides, so the centre line every row sits on stays the sheet's centre (and
+    # the middle of the PDF's hull silhouette).
     lo, hi = _x_extent(prims)
-    lo, hi = max(0.0, lo - 8), min(width, hi + 8)
-    if hi <= lo:
-        lo, hi = 0.0, width
+    half = min(width / 2, max(width / 2 - lo, hi - width / 2) + 8) if hi > lo else width / 2
+    lo, hi = width / 2 - half, width / 2 + half
     return Diagram(round(hi - lo, 2), round(max(y + 6, lowest), 2), tuple(prims), anchors, round(lo, 2))
 
 
