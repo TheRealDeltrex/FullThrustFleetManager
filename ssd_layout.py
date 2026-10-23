@@ -1045,10 +1045,12 @@ def layout(design: dict, ruleset=None, damage: dict | None = None, loadout: dict
     layers = derived.get("shell_layers") or ([armour] if armour else [])
     box_index = 0
     for row_len in reversed(layers):
+        # A row that would run off the box's right edge is centred on its own width instead.
+        armour_left = left
+        if left + min(row_len, per) * cell > width - 12:
+            armour_left = width / 2 - min(row_len, per) * cell / 2
         for i in range(row_len):
-            # Every row centred on its own width (owner's layout rule), the last one too.
-            in_row = min(per, row_len - (i // per) * per)
-            ccx = width / 2 - in_row * cell / 2 + (i % per) * cell + cell / 2
+            ccx = armour_left + (i % per) * cell + cell / 2
             ccy = y + (i // per) * cell + cell / 2
             box_index += 1
             prims.append(Circle(ccx, ccy, cell / 2 - 0.8, fill=WHITE, stroke=0.9,
