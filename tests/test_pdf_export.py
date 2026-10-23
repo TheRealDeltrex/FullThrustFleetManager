@@ -481,20 +481,15 @@ def test_a_ship_too_tall_for_a_slot_spans_two():
     assert len(occupied) == len(set(occupied))                # no two cards overlap
 
 
-def test_a_small_fleet_gets_its_orders_plot_under_the_cards():
-    fleet = a_fleet(ships=ESCORTS)
-    _data, pages = render([fleet], pdf_export.PrintOptions(roster=False, quickref=False))
-    plotted = [p for p in pages if "Orders chart" in p]
-    assert len(plotted) == 1 and "Record sheets" in plotted[0]
-    assert "Turn 10" in plotted[0] and "Start V" in plotted[0]
-
-
-def test_a_big_fleet_gets_orders_pages_of_their_own():
-    fleet = a_fleet(ships=NAC_MIXED)
-    _data, pages = render([fleet], pdf_export.PrintOptions(roster=False, quickref=False))
-    plotted = [p for p in pages if "Orders chart" in p]
-    assert plotted and all("Record sheets" not in p for p in plotted)
-    assert all(ship["table_id"] in plotted[0] for ship in fleet["ships"])
+def test_the_orders_plot_always_has_pages_of_its_own():
+    """Master: even a fleet small enough to leave room under its cards."""
+    for ships in (ESCORTS, NAC_MIXED):
+        fleet = a_fleet(ships=ships)
+        _data, pages = render([fleet], pdf_export.PrintOptions(roster=False, quickref=False))
+        plotted = [p for p in pages if "Orders chart" in p]
+        assert plotted and all("Record sheets" not in p for p in plotted)
+        assert all(ship["table_id"] in plotted[0] for ship in fleet["ships"])
+        assert "Turn 10" in plotted[0] and "Start V" in plotted[0]
 
 
 @pytest.mark.parametrize("paper", ["A4", "Letter"])

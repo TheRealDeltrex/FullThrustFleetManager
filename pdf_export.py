@@ -408,8 +408,8 @@ def roster_page(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions
 # Landscape pages of ship cards, as on the FT Light ship record sheets: class up the left edge,
 # an ID tab and the name along the top, the SSD over a hull silhouette. Each page takes the
 # densest grid that keeps its SSDs legible: twelve escorts, eight cruisers or six capital ships.
-# A ship too big for any one slot takes two. The orders plot follows the FT Light movement plot
-# and goes under the last cards when it fits there.
+# A ship too big for any one slot takes two. The orders plot follows the FT Light movement plot,
+# always on pages of its own (Master).
 
 GRIDS = ((4, 3), (4, 2), (3, 2))  # columns, rows; densest first
 GAP = 3.5                  # between cards, mm
@@ -528,20 +528,10 @@ def _fill(grid: _Grid, cards: list[_Card]) -> list[tuple[_Card, tuple[int, int],
     return placed
 
 
-def _plot_height(ships: int) -> float:
-    return 6 + PLOT_HEAD + PLOT_ROW * ships  # title, heading, rows
-
-
-def _plot_top(grid: _Grid, cards: list[_Card]) -> float:
-    """Where an orders plot would start: under the lowest card."""
-    used = max(c.slot[1] + c.span[1] for c in cards)
-    return grid.top + used * (grid.cell_h + GAP)
-
-
-def _pages(pdf: FleetPDF, cards: list[_Card], plot: float = 0.0) -> list[tuple[_Grid, list[_Card]]]:
+def _pages(pdf: FleetPDF, cards: list[_Card]) -> list[tuple[_Grid, list[_Card]]]:
     """Cards onto pages, in order. Each page takes the grid that holds the most of the next
-    cards; on the last page one that leaves room for a `plot` mm tall orders plot is next
-    best, then the larger scale. A big ship spans slots, as the FT Light battlecruiser does."""
+    cards, the larger scale breaking a tie. A big ship spans slots, as the FT Light
+    battlecruiser does."""
     pages: list[tuple[_Grid, list[_Card]]] = []
     rest = list(cards)
     while rest:
@@ -550,11 +540,8 @@ def _pages(pdf: FleetPDF, cards: list[_Card], plot: float = 0.0) -> list[tuple[_
             grid = _sheet_grid(pdf, cols, rows)
             placed = _fill(grid, rest)
             scale = min(grid.fit(card, span) for card, span, _slot in placed)
-            used = max(slot[1] + span[1] for _card, span, slot in placed)
-            room = (plot and len(placed) == len(rest)
-                    and grid.top + used * (grid.cell_h + GAP) + plot <= pdf.h - 21)
-            options.append((len(placed), bool(room), min(scale, MAX_SCALE), grid, placed))
-        *_score, grid, placed = max(options, key=lambda o: o[:3])
+            options.append((len(placed), min(scale, MAX_SCALE), grid, placed))
+        *_score, grid, placed = max(options, key=lambda o: o[:2])
         for card, span, slot in placed:
             card.span, card.slot = span, slot
         pages.append((grid, [card for card, _span_, _slot in placed]))
@@ -645,12 +632,11 @@ def _ship_card(pdf: FleetPDF, card: _Card, x: float, y: float, w: float, h: floa
     draw_diagram(pdf, card.diagram, dx, dy, dw, card.view)
 
 
-def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> bool:
-    """Ship cards, nine to a landscape page (PLAN 10.2). True when the orders plot went under
-    the cards, so the pack needs no orders page for this fleet."""
+def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOptions) -> None:
+    """Ship cards, six to twelve to a landscape page (PLAN 10.2)."""
     ships = _printable_ships(fleet, options)
     if not ships:
-        return False
+        return
     cards = []
     for ship in ships:
         design = designs.get(ship["design_id"])
@@ -662,10 +648,8 @@ def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
     # Largest first, so ships of a size share a page and its grid.
     cards.sort(key=lambda c: -c.design["tmf"])
     _sheet_page(pdf, _("Record sheets"))      # the grids measure a landscape page
-    inline = options.orders and options.turns <= PLOT_TURNS
-    pages = _pages(pdf, cards, _plot_height(len(_plot_ships(fleet))) if inline else 0.0)
+    pages = _pages(pdf, cards)
     fleet_options = fleet_rules.fleet_options(fleet)
-    plotted = False
     for number, (grid, page) in enumerate(pages):
         if number:
             _sheet_page(pdf, _("Record sheets"))
@@ -677,16 +661,6 @@ def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
             _ship_card(pdf, card, MARGIN + col * (grid.cell_w + GAP),
                        grid.top + row * (grid.cell_h + GAP), w, h, scale,
                        fleet_rules.ship_points(card.ship, card.design, fleet_options))
-        if inline and number == len(pages) - 1:
-            top = _plot_top(grid, page)
-            plot = _plot_ships(fleet)
-            if top + _plot_height(len(plot)) <= pdf.h - 21:
-                pdf.set_xy(MARGIN, top)
-                pdf.set_font("plex", "B", 9)
-                pdf.set_text_color(*pdf.accent)
-                pdf.cell(0, 5, _("Orders chart"))
-                _orders_plot(pdf, plot, range(1, options.turns + 1), MARGIN, top + 6, pdf.epw)
-                plotted = True
     left_off = [s for s in fleet["ships"] if s not in ships]
     if left_off:
         pdf.set_xy(MARGIN, pdf.h - 19.5)
@@ -694,7 +668,6 @@ def sheets_pages(pdf: FleetPDF, fleet: dict, designs: dict, options: PrintOption
         pdf.set_text_color(60)
         pdf.cell(0, 4, _fit(pdf, _("Not printed: {ships}", ships=", ".join(
             f"{s['table_id']} ({s['status']})" for s in left_off)), pdf.epw))
-    return plotted
 
 
 def _plot_ships(fleet: dict) -> list[dict]:
@@ -993,7 +966,6 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
     options = options or PrintOptions()
     pdf = _new_pdf(options.paper, options.style)
     pdf.set_title(" / ".join(f["name"] for f in fleets))
-    plotted: set[str] = set()  # fleets whose orders plot went under their record sheets
     for fleet, designs in zip(fleets, designs_by_fleet):
         ruleset = RULESETS.get(fleet["ruleset"])
         pdf.header_title = fleet["name"]
@@ -1001,13 +973,11 @@ def fleet_pdf(fleets: list[dict], designs_by_fleet: list[dict],
         pdf.non_conforming = not fleet_rules.fleet_conforming(fleet, designs)
         if options.roster:
             roster_page(pdf, fleet, designs, options)
-        if options.sheets and sheets_pages(pdf, fleet, designs, options):
-            plotted.add(fleet["id"])
+        if options.sheets:
+            sheets_pages(pdf, fleet, designs, options)
         if options.tracker:
             tracker_page(pdf, fleet, designs, options)
     for fleet, designs in zip(fleets, designs_by_fleet) if options.orders else []:
-        if fleet["id"] in plotted:
-            continue
         ruleset = RULESETS.get(fleet["ruleset"])
         pdf.header_title = fleet["name"]
         pdf.header_ruleset = ruleset.short_label if ruleset else fleet["ruleset"]
