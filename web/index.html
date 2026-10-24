@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    // iOS Safari zooms in on any field under 16 px when it takes focus; pinch zoom still works.
+    if (/iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1))
+      document.querySelector('meta[name="viewport"]').content += ", maximum-scale=1";
+  </script>
   <title>Full Thrust Fleet Manager (online)</title>
   <link rel="icon" href="static/favicon.png" />
   <!--

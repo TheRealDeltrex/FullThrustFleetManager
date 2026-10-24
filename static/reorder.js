@@ -1,7 +1,9 @@
 /* Ships in a squadron are reordered by dragging a card by its handle, within the squadron or
    into another one; the arrow keys on a focused handle move it one place. The new order is
    posted through autosave.js as soon as the card is dropped (the squadron's hidden ship-order
-   form). Handlers are bound to the document, so they outlast autosave's page swaps. */
+   form). Handlers are bound to the document, so they outlast autosave's page swaps. Touch and pen
+   drags skip the browser's drag and drop, which most tablets lack: the card follows the finger,
+   and the page scrolls when it nears the top or bottom edge. */
 (function () {
   "use strict";
 
@@ -36,15 +38,68 @@
     return { card: best, after: after };
   }
 
+  // Puts the dragged card where the pointer is over a squadron's list.
+  function place(list, x, y) {
+    var t = target(list, x, y);
+    if (!t.card) list.appendChild(dragged);
+    else if (t.after) t.card.after(dragged);
+    else t.card.before(dragged);
+  }
+
+  var touch = null;
+
+  function scroll() {
+    if (!touch) return;
+    var edge = 60, h = window.innerHeight;
+    if (touch.y < edge) window.scrollBy(0, -Math.ceil((edge - touch.y) / 4));
+    else if (touch.y > h - edge) window.scrollBy(0, Math.ceil((touch.y - h + edge) / 4));
+    requestAnimationFrame(scroll);
+  }
+
+  function endTouch(cancelled) {
+    var card = dragged;
+    touch = null;
+    dragged = null;
+    card.classList.remove("dragging");
+    if (cancelled) home.parent.insertBefore(card, home.next);
+    else if (card.parentNode !== home.parent || card.nextSibling !== home.next) save(card.parentNode);
+  }
+
   document.addEventListener("pointerdown", function (event) {
     var handle = event.target.closest && event.target.closest(".drag-handle");
-    if (handle) handle.closest(".card").draggable = true;
+    if (!handle) return;
+    var card = handle.closest(".card");
+    if (event.pointerType === "mouse") {
+      card.draggable = true;
+      return;
+    }
+    if (touch || !card.matches(".card[data-uid]")) return;
+    event.preventDefault();
+    dragged = card;
+    home = { parent: card.parentNode, next: card.nextSibling };
+    touch = { id: event.pointerId, y: event.clientY };
+    card.classList.add("dragging");
+    requestAnimationFrame(scroll);
   });
 
-  document.addEventListener("pointerup", function () {
+  document.addEventListener("pointermove", function (event) {
+    if (!touch || event.pointerId !== touch.id) return;
+    event.preventDefault();
+    touch.y = event.clientY;
+    var under = document.elementFromPoint(event.clientX, event.clientY);
+    var list = under && under.closest(".cards[data-squadron]");
+    if (list) place(list, event.clientX, event.clientY);
+  });
+
+  document.addEventListener("pointerup", function (event) {
+    if (touch && event.pointerId === touch.id) return endTouch(false);
     document.querySelectorAll(".card[draggable]").forEach(function (c) {
       if (c !== dragged) c.removeAttribute("draggable");
     });
+  });
+
+  document.addEventListener("pointercancel", function (event) {
+    if (touch && event.pointerId === touch.id) endTouch(true);
   });
 
   document.addEventListener("dragstart", function (event) {
@@ -63,10 +118,7 @@
     if (!list) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    var t = target(list, event.clientX, event.clientY);
-    if (!t.card) list.appendChild(dragged);
-    else if (t.after) t.card.after(dragged);
-    else t.card.before(dragged);
+    place(list, event.clientX, event.clientY);
   });
 
   document.addEventListener("drop", function (event) {
