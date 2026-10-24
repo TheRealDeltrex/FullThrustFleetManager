@@ -34,6 +34,13 @@ def test_the_dock_shows_the_picked_ship_with_its_diagram_and_specs(client):
     assert "Hangar bay" in client.get("/fleet?view=dock").get_data(as_text=True)
 
 
+def test_the_dock_diagram_offers_arrange_for_touch_screens(client):
+    fleet = fleet_with(FURIOUS)
+    client.get(f"/fleet/{fleet['id']}")
+    page = client.get("/fleet?view=dock").get_data(as_text=True)
+    assert 'class="btn sm ghost ssd-arrange" type="button" aria-pressed="false"' in page
+
+
 def test_an_empty_fleet_has_an_empty_dock(client):
     fleet = fleet_with()
     client.get(f"/fleet/{fleet['id']}")

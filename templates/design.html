@@ -18,7 +18,7 @@
     </div>
 
     <h3 class="sep fold" data-fold="design-mine" tabindex="0">{{ _("My designs") }}</h3>
-    <div class="body">
+    <div class="body lib-books">
       {% for ruleset_id, designs in library.mine.items() %}
         <div class="lib-group">
           <span class="badge rs-{{ ruleset_id }}">{{ ruleset_id|upper }}</span>
@@ -36,7 +36,7 @@
     </div>
 
     <h3 class="sep fold" data-fold="design-catalog" tabindex="0">{{ _("Catalog") }}</h3>
-    <div class="body">
+    <div class="body lib-books">
       {% for book, designs in library.catalog.items() %}
         <details class="lib-group" {% if library.query %}open{% endif %}>
           <summary>{{ book|upper }} <span class="muted">({{ designs|length }})</span></summary>

@@ -21,6 +21,7 @@
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
 body { background: var(--bg); color: var(--ink);
   font: 14px/1.45 "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
 a { color: var(--accent); }
@@ -216,11 +217,46 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
   gap: 14px; flex-wrap: wrap; }
 .options legend { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
 
-/* Below ~1100 px the panes stack (PLAN 9.7). */
+/* Below ~1100 px the panes stack (PLAN 9.7); the Fleet overview keeps a narrow left pane down to
+   tablet portrait width. A stacked library runs its books and the New design form in columns,
+   and the Design tab's right pane sits under the workbench, diagram beside budget and issues. */
 @media (max-width: 1100px) {
-  .work.cols-2, .work.cols-3 { grid-template-columns: minmax(0, 1fr); }
+  .work.cols-2 { grid-template-columns: 210px minmax(0, 1fr); }
+  .work.cols-3 { grid-template-columns: minmax(0, 1fr); }
   .meter { min-width: 140px; }
+  .work.cols-3 .lib-books { columns: 14rem; column-gap: 20px; }
+  .work.cols-3 .lib-books > * { break-inside: avoid; }
+  .work.cols-3 .lib form.stack { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); align-items: start; }
+  .work.cols-3 > .side-col { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    grid-template-rows: auto 1fr; align-items: start; }
+  .work.cols-3 > .side-col > .panel:first-child { grid-row: span 2; }
 }
+/* Phones: one column with the Fleet overview's left pane last, a top bar that scrolls away, and
+   tabs that scroll sideways if they still do not fit. The look is picked in Settings there. */
+@media (max-width: 760px) {
+  .work { padding: 8px; gap: 8px; }
+  .work.cols-2 { grid-template-columns: minmax(0, 1fr); }
+  .work.cols-2 > .lib { order: 1; }
+  .work.cols-3 > .side-col { display: flex; }
+  .topbar { position: static; }
+  .topbar-row { gap: 8px 10px; padding: 8px 10px; }
+  .fleet-select { flex: 1; min-width: 0; }
+  .fleet-select select { min-width: 0; width: 100%; max-width: none; }
+  .tabs { flex: 1 1 100%; overflow-x: auto; scrollbar-width: none; }
+  .tabs a { padding: 6px 9px; }
+  .theme-select { display: none; }
+  .topbar-end { flex: 1; gap: 10px; }
+  .meter { min-width: 0; flex: 1; }
+  .meter .lbl { gap: 6px; white-space: nowrap; }
+  .tiles { grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)); gap: 8px; }
+  .row > .input.grow { min-width: 8rem; }
+}
+/* Touch: larger small controls. Hover effects sit in (hover: hover), so a tap leaves none stuck. */
+@media (pointer: coarse) {
+  .btn.sm { padding: 6px 10px; }
+  .drag-handle { padding: 4px 8px; }
+}
+.scroll-x { overflow-x: auto; }
 
 /* Campaign tab (PLAN 9.5) */
 .ship-grid { display: grid; grid-template-columns: minmax(200px, 320px) minmax(0, 1fr); gap: 16px; }
@@ -259,7 +295,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 .campaign-contacts input[type="number"] { width: 4.5em; }
 @media (max-width: 760px) { .starmap-grid { grid-template-columns: 1fr; } }
 .ssd-click [data-ref] { cursor: pointer; }
-.ssd-click [data-ref]:hover { opacity: .55; }
+@media (hover: hover) { .ssd-click [data-ref]:hover { opacity: .55; } }
 .repair { border-top: 1px solid var(--line); padding-top: 10px; }
 @media (max-width: 800px) { .ship-grid { grid-template-columns: minmax(0, 1fr); } }
 
@@ -576,11 +612,20 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 
 /* Drag-to-arrange ship diagrams (static/ssddrag.js) */
 .ssd-edit g.sys { cursor: grab; touch-action: none; }
-.ssd-edit g.sys:hover { opacity: .6; }
+@media (hover: hover) { .ssd-edit g.sys:hover { opacity: .6; } }
 .ssd-edit g.sys.dragging { cursor: grabbing; opacity: .8; }
 .ssd-edit svg { touch-action: pan-y; }
 .ssd-edit .ssd-layout { justify-content: flex-end; margin-top: 4px; }
-.ssd-edit .ssd-layout:not(:has(button)) { display: none; }
+.ssd-edit .ssd-layout:not(:has(button:not(.ssd-arrange))) { display: none; }
+/* On a touch screen the diagram scrolls like the page until Arrange is on. */
+.ssd-edit .ssd-arrange { display: none; }
+@media (any-pointer: coarse) {
+  .ssd-edit .ssd-layout { display: flex !important; }
+  .ssd-edit .ssd-arrange { display: inline-flex; }
+  .ssd-edit .ssd-arrange[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .ssd-edit:not(.arranging) :is(svg, g.sys) { touch-action: auto; cursor: auto; }
+  .ssd-edit.arranging svg { outline: 2px dashed var(--accent); outline-offset: -2px; }
+}
 
 /* Space Dock (Fleet overview): the ship's diagram beside its specs */
 .dock { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 12px; align-items: start; }
