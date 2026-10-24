@@ -102,6 +102,18 @@ What exists:
 - `ssd_layout.py` — the record sheet; see Ship diagram below.
 - The Ship Design tab (`/design`, `/design/<id>`) — see Ship Design tab below.
 
+## Tablets and phones
+
+`static/style.css` has three widths: desktop (> 1100 px, panes side by side), tablet portrait
+(761-1100: Fleet overview keeps a 210 px left pane; Ship Design stacks with the library's books and
+New design form in columns and the diagram beside budget/issues under the workbench) and phones
+(<= 760: one column, Fleet overview's left pane last, static top bar, look picker hidden as it is
+in Settings). Hover effects go in `@media (hover: hover)`. Squadron drag reorder
+(`static/reorder.js`) uses HTML drag and drop for a mouse and its own pointer drag for touch/pen.
+Inline scripts in `base.html` and `web/index.html` add `maximum-scale=1` on iOS only, which stops
+focus zoom on small fields and still allows pinch zoom. Check changes at 820x1180, 1180x820 and
+390x844 with touch emulation; `document.documentElement.scrollWidth` must equal the viewport.
+
 ## Ship Design tab
 
 - Routes: `GET /design` (library, no selection), `GET /design/<id>` (workbench),
@@ -361,6 +373,8 @@ What exists:
   through autosave to `POST /design/<id>/layout`. `store.set_layout_hint` saves at once (drawing,
   not rules): into a library design and its draft, or for catalog designs into `layouts.json`
   (merged by `get_design`, carried by backups). Used on the design tab and the Space Dock.
+  On touch screens (`any-pointer: coarse`) a finger drags icons only while the diagram's
+  "Arrange" toggle is on (client-side, kept across autosave swaps); otherwise it scrolls the page.
 - Damage: a slash through each spent hull box and armour circle, a cross over dead systems and
   a damaged drive; black on paper. `damage=None` is a blank copy.
 - Icons live in `ICON_SETS[<icon_set>]`, keyed by system type; a ruleset names its set per race

@@ -1,5 +1,6 @@
 {# A ship diagram whose system icons can be dragged into place (static/ssddrag.js). The place is
-   saved per design, catalog designs included; "Reset layout" goes back to the automatic one. #}
+   saved per design, catalog designs included; "Reset layout" goes back to the automatic one. On a
+   touch screen "Arrange" turns dragging on, so the diagram otherwise scrolls with the page. #}
 {% macro editable(svg, design) -%}
   <div class="ssd-edit">
     {{ svg }}
@@ -9,6 +10,7 @@
       <input type="hidden" name="x" value="" />
       <input type="hidden" name="y" value="" />
       <input type="hidden" name="next" value="{{ request.full_path }}" />
+      <button class="btn sm ghost ssd-arrange" type="button" aria-pressed="false">{{ _("Arrange") }}</button>
       {% if design.layout_hints %}
         <button class="btn sm ghost" type="submit" name="action" value="reset_layout"
                 data-autosave-click>{{ _("Reset layout") }}</button>

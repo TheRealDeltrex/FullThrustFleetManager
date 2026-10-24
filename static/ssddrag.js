@@ -1,11 +1,29 @@
 /* System icons on an editable ship diagram (.ssd-edit) are dragged to a new place. On drop the
    icon's new centre, in diagram points, goes into the diagram's hidden layout form and is posted
    through autosave.js, which pins the system there for this design. Handlers are bound to the
-   document, so they outlast autosave's page swaps. */
+   document, so they outlast autosave's page swaps. On a touch screen a finger drags only while
+   the diagram's Arrange button is on; otherwise it scrolls the page. */
 (function () {
   "use strict";
 
   var drag = null;
+  var coarse = window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches;
+  var arranging = false;
+
+  function mark() {
+    document.querySelectorAll(".ssd-edit").forEach(function (box) {
+      box.classList.toggle("arranging", arranging);
+      var button = box.querySelector(".ssd-arrange");
+      if (button) button.setAttribute("aria-pressed", arranging ? "true" : "false");
+    });
+  }
+
+  document.addEventListener("click", function (event) {
+    if (!event.target.closest || !event.target.closest(".ssd-arrange")) return;
+    arranging = !arranging;
+    mark();
+  });
+  document.addEventListener("ft:swapped", mark);
 
   function point(svg, event) {
     var p = svg.createSVGPoint();
@@ -18,6 +36,7 @@
     if (event.button !== 0) return;
     var group = event.target.closest && event.target.closest(".ssd-edit g.sys");
     if (!group) return;
+    if (coarse && event.pointerType !== "mouse" && !arranging) return;
     var svg = group.ownerSVGElement;
     event.preventDefault();
     drag = { group: group, svg: svg, start: point(svg, event), dx: 0, dy: 0 };

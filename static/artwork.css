@@ -63,7 +63,9 @@ html:is([data-theme="orbital-foundry"],[data-theme="celestial-archive"]) .tabs a
 }
 html[data-theme="orbital-foundry"] .btn.primary { color:#101416; }
 html[data-theme="orbital-foundry"] .lib-list a.on { color:var(--ink); background:var(--accent-soft); }
+@media (max-height:600px) { .theme-art { max-height:25vh; } }
 @media (max-width:600px) {
+  .theme-art { height:clamp(56px,17vw,100px); }
   .portrait-summary .ship-portrait { width:160px; }
   .portrait-gallery { gap:4px; padding:6px; }
   .portrait-choice .ship-portrait { width:112px; }
