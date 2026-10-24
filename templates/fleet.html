@@ -147,7 +147,7 @@
       {% if selected.view == "roster" %}
         <div class="panel">
           <h3 class="fold" data-fold="fleet-roster" tabindex="0">{{ _("Roster") }}</h3>
-          <table class="tbl">
+          <div class="scroll-x"><table class="tbl">
             <thead><tr><th>{{ _("ID") }}</th><th>{{ _("Name") }}</th><th>{{ _("Class") }}</th>
               <th>{{ _("TMF") }}</th><th>{{ _("Thrust") }}</th><th>{{ _("Status") }}</th>
               <th>{{ _("Source") }}</th><th class="num">{{ _("Points") }}</th></tr></thead>
@@ -166,7 +166,7 @@
                 <tr><td colspan="8" class="muted">{{ _("No ships yet.") }}</td></tr>
               {% endfor %}
             </tbody>
-          </table>
+          </table></div>
         </div>
       {% elif selected.view == "dock" %}
         {% set dock = selected.dock %}
