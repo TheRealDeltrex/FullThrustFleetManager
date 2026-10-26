@@ -178,8 +178,13 @@ def class_code(design: dict) -> str:
 
 def gallery(design: dict) -> list[dict]:
     code = class_code(design)
-    choices = [dict(v, id=k) for k, v in manifest()["portraits"].items() if k.startswith("custom:")]
-    return sorted(choices, key=lambda x: (x["code"] != code, x["code"], x["id"]))
+    doc = manifest()
+    ids = doc.get("gallery_ids")
+    if ids is None:
+        ids = [k for k in doc["portraits"] if k.startswith("custom:")]
+    choices = [dict(doc["portraits"][k], id=k) for k in ids if k in doc["portraits"]]
+    order = {key: index for index, key in enumerate(ids)}
+    return sorted(choices, key=lambda x: (x["code"] != code, x["code"], order[x["id"]]))
 
 
 def resolve(design: dict | None, overrides: dict, target: str = "") -> dict | None:
