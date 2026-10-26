@@ -90,14 +90,14 @@ Miniature references remain authoritative for hull architecture and source viewi
 
 | Faction | Hull and accent treatment |
 |---|---|
-| NSL | Sand-tan armour, restrained red accents, bare-metal machinery |
-| NAC | Silver/near-white armour with cobalt-blue painted accents |
+| NSL | Plain sand-tan armour, bare-metal machinery; white eagle forward and a two-digit number aft on the sides only |
+| NAC | Clean pale armour, cobalt structural panels, steel/chrome machinery, restrained bronze (the Midway is the baseline) |
 | OUDF | Mid-grey hulls, chrome machinery, dark-red structural panels |
 | FSE | Ivory/light-grey armour with burgundy-red accents |
 | NI | Dark navy/charcoal, silver machinery, gold/yellow accents |
 | UNSC | Light ivory/grey main hull, smaller navy panels, yellow details |
 | IJSF | Red-dominant hulls with secondary ivory panels |
-| ESU | Dark forest-green hulls with gold accents; no red hull paint |
+| ESU | Muted Soviet olive hulls, charcoal machinery, steel weapons and subdued ochre/brass fittings; no markings |
 | ScanFed | Blue main hulls with yellow accents |
 
 `palette-v8:` records use new IDs and files; the previous records remain valid explicit
@@ -110,6 +110,26 @@ these fleet defaults. NAC finish requires particular care: replace oversized mou
 white bevel frames and dark paint washes with thin flat plates, fine seams and physically
 consistent solar lighting. Fine surface construction can be reconstructed at full scale;
 major hull shapes, openings, pods and fins remain tied to the miniature reference.
+
+## Neutral picker and original-ruleset defaults (v11)
+
+The 31 FT and More Thrust example designs use `neutral-v11:` generic portraits, not faction
+art. The picture picker shows only the ids in the manifest's `gallery_ids`, in that order
+(`portraits.gallery()`; without the key every `custom:` id is shown, as before): four neutral
+choices per ship class group (1 and 2 the original custom-design art, 3 the grey generic
+set, 4 the FT2/More Thrust set) and two for BASE, SECTION, JG and PT. Faction pictures are
+not offered there. Older ids left out of `gallery_ids` still resolve for saved choices, so
+never delete a portrait record. NAC defaults are `midway-v11:`: 20 hulls refinished to match
+the unchanged Midway. Crusty (`satin-gold-v9:`) and NSL side markings (`insignia-v9/v10:`)
+are the current defaults for those fleets. `tests/test_artwork_v11.py` holds these rules.
+
+## Kra’Vak dark-grey and bronze defaults
+
+The 33 `grey-bronze-v12:` hull portraits use charcoal/graphite armour, secondary satin-bronze panels and fittings, and exposed steel weapons. They replace 48 canonical Kra’Vak default mappings, preserving each existing source view and hull design. The earlier miniature and illustration reference metadata is retained. Previous IDs, saved explicit selections and uploads retain their meaning and precedence. Original PNG masters and superseded versions remain in the external faction archive.
+
+## ESU Soviet olive defaults
+
+The 16 `soviet-olive-v13:` hull portraits serve 46 canonical ESU design defaults. The two approved Pobyeda and Zhukov samples are reused unchanged. All hulls follow their muted olive, charcoal, steel and low-contrast ochre/brass palette, without decals or symbols. The color-only edit preserves the existing hull architecture and viewing angles. Previous IDs, explicit selections and uploads retain their meaning and precedence. Original masters and superseded versions are retained in the external ESU archive.
 
 ## Maintainable asset contract
 
