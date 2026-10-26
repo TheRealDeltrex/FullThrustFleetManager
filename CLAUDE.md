@@ -71,6 +71,11 @@ What exists:
   viewing angles. Accents follow structural panels; no painted decorative motifs. NAC
   uses thinner flush plates and rebuilt lighting to reduce miniature shading.
   All prior IDs remain valid; explicit selections and uploads keep precedence.
+  Kra’Vak defaults use `grey-bronze-v12:`: 33 individual dark-graphite hull portraits with satin-bronze fittings and steel weapons; prior IDs and uploads remain valid.
+  NAC defaults use `midway-v11:` (refinished to the Midway); FT/MT examples use neutral
+  `neutral-v11:` portraits. The picker shows only the manifest's `gallery_ids` (four neutral
+  choices a class), falling back to every `custom:` id; hidden ids still resolve.
+  ESU defaults use `soviet-olive-v13:`: 16 individual muted-olive hull portraits with charcoal machinery, steel weapons and subdued ochre/brass fittings; no markings. Earlier IDs and uploads remain valid.
   Portraits are separate from rules, SSD primitives and PDF output; do not replace meaningful
   record-sheet symbols with generated art. Design-level overrides use canonical catalog IDs
   across FB/CD/PC; fleet-instance overrides use fleet ID plus ship UID. `portraits.json` holds
