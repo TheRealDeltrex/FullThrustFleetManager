@@ -253,3 +253,25 @@ def test_individual_portraits_are_stored_small():
         if art.get("columns", 4) == 1 and art.get("rows", 4) == 1:
             with Image.open(paths.bundle_dir() / "static" / art["file"]) as im:
                 assert max(im.size) <= 512, art["file"]
+
+
+def test_new_design_takes_its_factions_picture_and_follows_faction_changes(client):
+    design = {"id": "x1", "faction": "NSL", "type_code": "CL", "source": {"kind": "custom"}}
+    nsl = portraits.faction_default(design)
+    meta = portraits.manifest()["portraits"][nsl]
+    assert (meta["faction"], meta["code"]) == ("NSL", "CL")
+    assert portraits.resolve(design, {}) == meta
+    assert portraits.gallery(design)[0]["id"] == nsl
+    assert sum(a["code"] == "CL" for a in portraits.gallery(design)) == 5
+    nac = portraits.resolve(dict(design, faction="NAC"), {})
+    assert nac["faction"] == "NAC" and nac != meta
+    neutral = portraits.resolve(dict(design, faction="My Pirates"), {})
+    assert neutral == portraits.resolve(dict(design, faction=None), {})
+    assert neutral["faction"] == "generic"
+    chosen = {"design:x1": {"art": "custom:CL:neutral-v11-3"}}
+    assert portraits.resolve(dict(design, faction="NAC"), chosen)["variant"] == 3
+    cl = next(i for i, p in enumerate(presets.class_presets("fb")) if p.code == "CL")
+    made, _ = store.new_design("fb", faction="NSL", class_preset=presets.preset_key("fb", cl))
+    assert portraits.resolve(made, {}) == meta
+    page = client.get("/portrait/design/" + made["id"])
+    assert page.status_code == 200 and b"CL \xc2\xb7 NSL" in page.data

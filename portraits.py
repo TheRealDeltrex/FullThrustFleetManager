@@ -176,12 +176,32 @@ def class_code(design: dict) -> str:
     return design.get("type_code") or "GENERIC"
 
 
+@lru_cache(maxsize=1)
+def _faction_index() -> dict:
+    """(faction, class) -> the first catalog ship's picture: the faction's own default."""
+    doc = manifest()
+    index: dict = {}
+    for art in doc["official"].values():
+        meta = doc["portraits"].get(art, {})
+        if meta.get("faction") and meta.get("code"):
+            index.setdefault((meta["faction"], meta["code"]), art)
+    return index
+
+
+def faction_default(design: dict) -> str | None:
+    faction = design.get("faction")
+    return _faction_index().get((faction, class_code(design))) if faction else None
+
+
 def gallery(design: dict) -> list[dict]:
     code = class_code(design)
     doc = manifest()
     ids = doc.get("gallery_ids")
     if ids is None:
         ids = [k for k in doc["portraits"] if k.startswith("custom:")]
+    own = faction_default(design)
+    if own and own not in ids:
+        ids = [own, *ids]
     choices = [dict(doc["portraits"][k], id=k) for k in ids if k in doc["portraits"]]
     order = {key: index for index, key in enumerate(ids)}
     return sorted(choices, key=lambda x: (x["code"] != code, x["code"], order[x["id"]]))
@@ -198,6 +218,8 @@ def resolve(design: dict | None, overrides: dict, target: str = "") -> dict | No
         identity = canonical(design["id"])
         source_id = canonical(design.get("source", {}).get("of", ""))
         art = manifest()["official"].get(identity) or manifest()["official"].get(source_id)
+    if not art:
+        art = faction_default(design)
     if not art:
         art = manifest().get("class_defaults", {}).get(class_code(design),
                                                         f"custom:{class_code(design)}:1")
