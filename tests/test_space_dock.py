@@ -112,3 +112,17 @@ def test_backups_carry_catalog_layouts():
     store.set_layout_hint(FURIOUS, None)
     assert store.import_file("b.FTBackup", data)[0]
     assert store.get_design(FURIOUS)["layout_hints"] == {uid: {"x": 5, "y": 6}}
+
+
+def test_a_ship_whose_design_was_deleted_shows_a_placeholder_until_replaced(client):
+    design, _msg = store.new_design("fb", faction="NAC", name="Doomed")
+    fleet = fleet_with(design["id"])
+    store.delete_design(design["id"])
+    client.get(f"/fleet/{fleet['id']}")
+    cards = client.get("/fleet").get_data(as_text=True)
+    assert "Deleted design" in cards and "Doomed" in cards and "Pick a replacement" in cards
+    dock = client.get("/fleet?view=dock").get_data(as_text=True)
+    assert '<option value="" selected disabled>Pick a replacement</option>' in dock
+    client.post(f"/fleet/{fleet['id']}/action",
+                data={"action": "refit_ship", "uid": "sh1", "design_id": FURIOUS})
+    assert store.get_fleet(fleet["id"])["ships"][0]["placeholder"] is None

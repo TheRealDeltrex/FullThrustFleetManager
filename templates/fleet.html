@@ -156,8 +156,9 @@
                 {% set d = selected.designs.get(ship.design_id) %}
                 <tr class="st-{{ ship.status }}">
                   <td>{{ ship.table_id }}</td><td>{{ ship.name }}</td>
-                  <td>{{ d.name if d else _("Missing design") }}</td>
-                  <td>{{ d.tmf if d else "–" }}</td><td>{{ d.thrust if d else "–" }}</td>
+                  {% set ph = ship.placeholder %}
+                  <td>{% if d %}{{ d.name }}{% elif ph %}{{ ph.name }}{% if ph.type_code %} ({{ ph.type_code }}){% endif %} · {{ _("deleted") }}{% else %}{{ _("Missing design") }}{% endif %}</td>
+                  <td>{{ d.tmf if d else (ph.tmf if ph else "–") }}</td><td>{{ d.thrust if d else "–" }}</td>
                   <td>{{ ship.status }}</td>
                   <td>{{ d.source.kind if d else "–" }}</td>
                   <td class="num">{{ selected.ship_points[ship.uid] }}</td>
@@ -188,7 +189,7 @@
               <h3 class="fold" data-fold="dock-diagram" tabindex="0">{{ ship.table_id }} {{ ship.name }}
                 <span class="chip st-{{ ship.status }}">{{ ship.status }}</span></h3>
               <div class="body ssd-wrap">
-                {% if d %}{{ ssd.editable(dock.svg, d) }}{% else %}<span class="muted">{{ _("Missing design") }}</span>{% endif %}
+                {% if d %}{{ ssd.editable(dock.svg, d) }}{% elif ship.placeholder %}{% set ph = ship.placeholder %}<span class="muted">{{ _("Deleted design") }}: {{ ph.name }}{% if ph.type_code %} ({{ ph.type_code }}){% endif %} · {{ _("MASS") }} {{ ph.tmf }} · {{ ph.points }} {{ _("pts") }}</span>{% else %}<span class="muted">{{ _("Missing design") }}</span>{% endif %}
               </div>
             </div>
             {% if d %}
@@ -225,6 +226,7 @@
                     class="row grow" data-autosave="refit_ship">
                 <input type="hidden" name="uid" value="{{ ship.uid }}" />
                 <select class="input grow" name="design_id" aria-label="{{ _('Design') }}">
+                  {% if not d %}<option value="" selected disabled>{{ _("Pick a replacement") }}</option>{% endif %}
                   {% if d and not dock.listed %}<option value="{{ d.id }}" selected>{{ d.name }}{% if d.type_code %} ({{ d.type_code }}){% endif %}</option>{% endif %}
                   {% for g in dock.refit_groups %}
                     {% if dock.refit_groups|length > 1 %}<optgroup label="{{ g.name }}">{% endif %}
@@ -279,6 +281,10 @@
                     {% if d %}
                       <a href="{{ url_for('design_detail', design_id=d.id) }}">{{ d.name }}</a>
                       · {{ _("TMF") }} {{ d.tmf }} · {{ _("Thrust") }} {{ d.thrust }}
+                    {% elif ship.placeholder %}
+                      {% set ph = ship.placeholder %}{{ _("Deleted design") }}: {{ ph.name }}{% if ph.type_code %} ({{ ph.type_code }}){% endif %}
+                      · {{ _("MASS") }} {{ ph.tmf }}
+                      · <a href="{{ url_for('fleet_overview', view='dock', ship=ship.uid) }}">{{ _("Pick a replacement") }}</a>
                     {% else %}{{ _("Missing design") }}{% endif %}
                     · {{ selected.ship_points[ship.uid] }} {{ _("pts") }}
                   </footer>

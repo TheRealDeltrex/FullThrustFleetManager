@@ -796,3 +796,10 @@ def test_a_carried_gunboat_squadron_may_mix_types(client):
     draft, _dirty = store.working_design(design_id)
     assert draft["default_loadout"]["gunboats"] == [
         {"carrier": uid, "type": "needle", "types": ["rocket"] + ["needle"] * 5}]
+
+
+def test_delete_asks_first(client):
+    design_id = make(client)
+    page = client.get(f"/design/{design_id}").get_data(as_text=True)
+    assert 'onsubmit="return confirm(this.dataset.confirm)"' in page
+    assert 'value="delete"' not in client.get("/design/fb:fb1:nac-harrison").get_data(as_text=True)
