@@ -26,7 +26,7 @@
     <fieldset class="portrait-gallery"><legend>{{ _("Pictures for this class") }} · {{ class_code }}</legend>
     {% for art in choices if art.code == class_code %}
       <label class="portrait-choice"><input type="radio" name="art" value="{{ art.id }}" required />
-        {{ picture(art, art.label, True) }}<span>{{ art.code }} · {{ art.variant }}</span></label>
+        {{ picture(art, art.label, True) }}<span>{{ art.code }} · {{ art.variant or art.faction }}</span></label>
     {% endfor %}
     </fieldset>
     <details><summary>{{ _("Browse all classes") }}</summary>
