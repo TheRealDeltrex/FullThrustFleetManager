@@ -453,7 +453,7 @@ label.field { display: flex; flex-direction: column; gap: 3px; font-size: 12px; 
 [data-theme="night-sky"] .tbl th { color: var(--lavender); }
 [data-theme="night-sky"] .notice { border-color: #6a4f2c; }
 [data-theme="night-sky"] .card .mini svg, [data-theme="night-sky"] .ssd-wrap svg, [data-theme="night-sky"] .sheet svg { background: #eef0fa; border-radius: 8px; }
-[data-theme="night-sky"] input[type=checkbox] { accent-color: var(--lavender); }
+[data-theme="night-sky"] input[type=checkbox] { accent-color: var(--accent); }
 
 /* Lunar: pale full-moon greys, silvery panels with a soft moonglow and faint mare shadows, and a deep teal accent. */
 :root[data-theme="lunar"] { --bg: #d6d8db; --panel: #eceded; --panel-2: #e2e4e6; --ink: #1d2126; --muted: #535961; --line: #c4c8cd; --accent: #0e6f7e; --accent-soft: #dcf0f2; --ok: #256b42; --ok-soft: #e1f2e7; --warn: #875500; --warn-soft: #fbefd9; --bad: #b3261e; --bad-soft: #fbe6e4; --chrome: #e6e7e9; --chrome-ink: #1d2126; --chrome-muted: #5d636b; --st-ready: #2b7a4b; --st-damaged: #d98a00; --st-docked: #0e6f7e; --st-lost: #9aa1ab; --rs-ft2: #d98a00; --rs-fb: #2c64b0; --rs-ftcd: #2b7a4b; --rs-ftpc: #6b3fa0; --rs-current: #b7bdc6; }
