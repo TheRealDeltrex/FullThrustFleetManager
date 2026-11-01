@@ -323,6 +323,19 @@ def _norm_ship(s: object) -> dict | None:
             "one_shot_used": _as_str_list(dmg.get("one_shot_used")),
         },
         "notes": _as_str(s.get("notes"), limit=2000),
+        # What a deleted design was, kept until the player picks a replacement (delete_design).
+        "placeholder": _norm_placeholder(s.get("placeholder")),
+    }
+
+
+def _norm_placeholder(p: object) -> dict | None:
+    if not isinstance(p, dict):
+        return None
+    return {
+        "name": _as_str(p.get("name"), limit=80),
+        "type_code": _as_str(p.get("type_code"), limit=8),
+        "tmf": _as_int(p.get("tmf"), 0, 0, 100000),
+        "points": _as_int(p.get("points"), 0, 0, 1000000),
     }
 
 
@@ -534,14 +547,48 @@ def ships_using(design_id: str) -> list[tuple[str, str]]:
     return [(f["id"], s["uid"]) for f in list_fleets() for s in f["ships"] if s["design_id"] == design_id]
 
 
+def official_ancestor(design: dict) -> str | None:
+    """The catalog design a variant (of a variant ...) was made from, if it still exists."""
+    seen = set()
+    while design and design["source"].get("kind") == "variant" and design["id"] not in seen:
+        seen.add(design["id"])
+        parent = design["source"].get("of")
+        if not isinstance(parent, str):
+            return None
+        if is_catalog(parent):
+            return parent if get_design(parent) else None
+        design = get_design(parent)
+    return None
+
+
 def delete_design(design_id: str) -> tuple[bool, str]:
+    """Ships built to the design fall back to its official ancestor (same ruleset), else keep a
+    placeholder with its class, MASS and points until the player picks a replacement."""
     if is_catalog(design_id):
         return False, _("Catalog designs cannot be deleted.")
-    if ships_using(design_id):
-        return False, _("Ships still use this design.")
     path = _design_path(design_id)
-    if not path or not path.is_file():
+    design = get_design(design_id)
+    if not path or not path.is_file() or not design:
         return False, _("Design not found.")
+    ancestor = official_ancestor(design)
+    for fleet in list_fleets():
+        ships = [s for s in fleet["ships"] if s["design_id"] == design_id]
+        if not ships:
+            continue
+        options = fleet_rules.fleet_options(fleet)
+        for ship in ships:
+            if not (ancestor and refit_ship(fleet, ship["uid"], ancestor)[0]):
+                ship["placeholder"] = {
+                    "name": design["name"], "type_code": design.get("type_code") or "",
+                    "tmf": design["tmf"], "points": fleet_rules.ship_points(ship, design, options),
+                }
+        save_fleet(fleet)
+    # Its own variants now descend from its parent, so their official ancestor is still found.
+    for child in list_designs():
+        if child["source"].get("kind") == "variant" and child["source"].get("of") == design_id:
+            child["source"] = dict(design["source"]) if design["source"].get("kind") == "variant" \
+                else {"kind": "custom"}
+            _write_design(child)
     path.unlink()
     discard_draft(design_id)
     return True, _("Design deleted.")
@@ -1079,6 +1126,7 @@ def refit_ship(fleet: dict, uid: str, design_id: str) -> tuple[bool, str]:
     if ship["design_id"] == design_id:
         return True, ""
     ship["design_id"] = design_id
+    ship["placeholder"] = None
     known = {s["uid"] for s in design["systems"]}
     damage = ship["damage"]
     damage["systems_out"] = [u for u in damage["systems_out"] if u in known]

@@ -18,6 +18,11 @@ Read before changing fleet maths, persistence, import/export or the schema.
   so `_safe_id()` rejects them as file names too. Strict mode blocks saving a design with
   violations unless `allow_rule_breaking`; a blank `new_design()` is under its TMF, so tests that
   save one set that flag.
+  `delete_design()` (Ship Design's Delete, confirmed in the browser) refits ships using the design
+  to its official ancestor (`official_ancestor()`, following `source.of` to a catalog design of
+  the same ruleset); others keep a `placeholder` (name, class, MASS, points) that counts in fleet
+  points and shows "Deleted design" until a refit clears it (Master's ruling). Its own variants
+  are re-parented to its parent so their chain stays intact.
 - **Normalisation is the trust boundary.** Everything read from the library or an import goes
   through `normalize_design()` / `normalize_fleet()`, which clamp types and drop junk and are the
   only place new fields are accepted. Add every new field there in the same commit.

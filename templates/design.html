@@ -144,6 +144,13 @@
         {% elif selected.saved %}
           <a class="btn sm" href="{{ url_for('export_design', design_id=d.id) }}">{{ _("Export") }}</a>
         {% endif %}
+        {% if not selected.read_only %}
+          <form method="post" action="{{ url_for('design_update', design_id=d.id) }}"
+                onsubmit="return confirm(this.dataset.confirm)"
+                data-confirm="{{ _('Delete {name}?', name=d.name) }}{% if selected.used_by %} {{ _('{n} ships use it.', n=selected.used_by|length) }}{% endif %}">
+            <button class="btn sm ghost" type="submit" name="action" value="delete">{{ _("Delete") }}</button>
+          </form>
+        {% endif %}
       </div>
 
       <div class="panel body portrait-summary">
