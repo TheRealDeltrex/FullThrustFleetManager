@@ -6,6 +6,7 @@ import json
 
 import pytest
 
+import fleet_rules
 import migrations
 import store
 from rulesets import RULESETS
@@ -113,17 +114,36 @@ def test_strict_mode_blocks_a_violating_design_unless_rule_breaking_is_allowed()
     assert store.save_design(dict(d, allow_rule_breaking=True))[0]
 
 
-def test_delete_design_guards_ships_using_it():
+def test_deleting_a_design_leaves_its_ships_a_placeholder():
     d = a_design()
     f = a_fleet()
     store.add_ship(f, d["id"])
     store.save_fleet(f)
-    assert not store.delete_design(d["id"])[0]
-    store.remove_ship(f, f["ships"][0]["uid"])
-    store.save_fleet(f)
+    points = fleet_rules.ship_points(f["ships"][0], store.get_design(d["id"]), {})
     assert store.delete_design(d["id"])[0]
     assert store.get_design(d["id"]) is None
     assert not store.delete_design(d["id"])[0]
+    ship = store.get_fleet(f["id"])["ships"][0]
+    assert ship["placeholder"] == {"name": "Test", "type_code": d["type_code"], "tmf": d["tmf"],
+                                   "points": points}
+    assert fleet_rules.ship_points(ship, None, {}) == points
+    fleet = store.get_fleet(f["id"])
+    assert store.refit_ship(fleet, ship["uid"], CATALOG_FB)[0]
+    assert fleet["ships"][0]["placeholder"] is None
+
+
+def test_deleting_a_variant_falls_back_to_the_official_design():
+    v, _m = store.make_variant(CATALOG_FB)
+    vv, _m = store.make_variant(v["id"])
+    f = a_fleet()
+    store.add_ship(f, v["id"])
+    store.add_ship(f, vv["id"])
+    store.save_fleet(f)
+    assert store.delete_design(v["id"])[0]
+    assert store.get_design(vv["id"])["source"] == {"kind": "variant", "of": CATALOG_FB}
+    assert store.delete_design(vv["id"])[0]
+    ships = store.get_fleet(f["id"])["ships"]
+    assert [(s["design_id"], s["placeholder"]) for s in ships] == [(CATALOG_FB, None)] * 2
 
 
 def test_ships_using_lists_fleet_and_ship():

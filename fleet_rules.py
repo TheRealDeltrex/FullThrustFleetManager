@@ -97,9 +97,10 @@ def design_points(design: dict, options: dict) -> int:
 
 
 def ship_points(ship: dict, design: dict | None, options: dict) -> int:
-    """NPV plus the ship's loadout (its own, else the design default; PLAN 5.4)."""
+    """NPV plus the ship's loadout (its own, else the design default; PLAN 5.4). A ship whose
+    design was deleted counts what it cost then (store.delete_design)."""
     if not design:
-        return 0
+        return (ship.get("placeholder") or {}).get("points", 0)
     rs = RULESETS.get(design.get("ruleset"))
     if not rs:
         return 0
@@ -189,7 +190,9 @@ class FleetReport:
 
 def _ship_report(fleet: dict, ship: dict, design: dict | None, options: dict) -> ShipReport:
     if design is None:
-        missing = Issue("missing_design", "violation", _("This ship's design is missing."))
+        missing = Issue("missing_design", "violation",
+                        _("Design deleted: pick a replacement.") if ship.get("placeholder")
+                        else _("This ship's design is missing."))
         return ShipReport(ship, None, [missing])
     # The ship's own loadout, when it has one, is what it carries (and what it costs), so that
     # is what is checked: rulesets read the loadout from `default_loadout`.
