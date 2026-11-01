@@ -163,8 +163,9 @@ The 16 `soviet-olive-v13:` hull portraits serve 46 canonical ESU design defaults
 - Use `art_url` for bitmap paths: Flask uses `/static/`, the Pages iframe uses `static/`
   relative to its hosting project. `web/index.html` also rewrites relative theme CSS URLs.
 - Portrait priority: fleet-instance override, design override, official default (including
-  a direct official variant source), class default, generic default. A design reset restores
-  its default; an instance reset restores its design picture. Official FB/CD/PC identities
+  a direct official variant source), faction default (the first official ship of the
+  design's faction and class; it follows faction changes and leads that class's gallery),
+  class default, generic default. A design reset restores its default; an instance reset restores its design picture. Official FB/CD/PC identities
   intentionally share design-level overrides.
 
 ## Uploads and persistence
