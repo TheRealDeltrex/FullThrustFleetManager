@@ -21,8 +21,8 @@ Learned the hard way on v0.4.0 and v0.4.1. Split the work by what each place can
   logs nothing. The cloud also has no tool that creates a release. So never tag in the cloud, and
   never leave a local tag there either.
 - **Owner's Windows PC**, through a Remote Control session started in
-  `E:\ClaudeCodeFolder` (the checkout is `E:\ClaudeCodeFolder\FullThrustFleetManager`;
-  `E:\ClaudeOnlineFolder` is empty): steps 2 to 4. PyInstaller and the signing key only exist
+  the parent folder of the checkout (exact paths in the gitignored `CLAUDE.local.md`):
+  steps 2 to 4. PyInstaller and the signing key only exist
   there.
 - **The PC's permission check blocks `gh release create`** (and a tag push) as "Create Public
   Surface" unless **the owner's own message** saying to ship this version has reached the PC
