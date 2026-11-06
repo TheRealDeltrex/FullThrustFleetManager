@@ -73,8 +73,8 @@ Stands, mounting posts, bases, sprues, loose kit components and neighbouring mod
 not become ship parts. Assembled photographs were found for KEYSTONE and KEROSENE;
 their new portraits use those photographs rather than the unassembled-parts listings.
 
-All generated PNGs, including discarded drafts, are preserved under
-`E:\ClaudeOnlineFolder\Full Thrust Pictures`, organized by faction. A faction root holds
+All generated PNGs, including discarded drafts, are preserved in the owner's
+local `Full Thrust Pictures` folder (path in the gitignored `CLAUDE.local.md`), organized by faction. A faction root holds
 current portraits; `Discarded/` holds rejected and superseded versions. `References/`
 holds source images, and `Prompts/` holds generation prompts. `Index.html` links per-faction
 current and archive galleries. `Picture-Inventory.json` records checksums for every stored
