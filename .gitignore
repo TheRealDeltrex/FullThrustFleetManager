@@ -23,3 +23,6 @@ userdata/
 # Logo mock-ups and other working artwork. Nothing builds from these: the shipped emblem is
 # static/logo.jpg. They are tens of megabytes of PNG that git would keep in history forever.
 Pictures/
+
+# Machine-specific agent notes (absolute paths). Never published.
+CLAUDE.local.md

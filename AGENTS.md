@@ -13,7 +13,7 @@ what is built. This file only adds how Codex and Claude work together; it does n
   like any other PR.
 - Notes for Claude (what changed, open questions, what is left for a later PR) go in the PR
   description or PR comments, not in local files. Read Claude's review comments there too.
-- The owner's checkout (`<workspace>\FullThrustFleetManager`) is shared with Claude
+- The owner's local checkout (path in the gitignored `CLAUDE.local.md`) is shared with Claude
   sessions. Commit or stash before switching branches; never switch, pull or reset with
   uncommitted changes in the tree.
 - Ship artwork is stored as WebP; keep original PNGs out of the repo
