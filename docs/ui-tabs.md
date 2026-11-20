@@ -46,7 +46,8 @@ Read before changing those routes in `app.py`, their templates, or `static/style
 - Views: cards per squadron (mini SSD with the ship's damage, status and squadron selectors),
   the roster table, and the Space Dock (`?view=dock&ship=<uid>`, the pick remembered per fleet in
   `session["dock_ship"]`): one ship's draggable diagram beside its design breakdown, a Refit
-  select (`refit_ship` -> `store.refit_ship`, drops damage/loadout entries the new design lacks),
+  select (`refit_ship` -> `store.refit_ship`, keeps per-system damage and loadout entries only
+  for matching system IDs and types between a design and its ancestor or descendant),
   "Refit as variant" (`store.refit_as_variant`, then opens the variant in Ship Design) and "Edit
   design". All use the same `ssd_layout` diagrams the PDF does.
 - A ship's name and table ID are editable on its card; table IDs are unique per fleet,

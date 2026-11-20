@@ -63,6 +63,45 @@ def test_a_backup_round_trips_through_the_app(client):
     assert "Last backup" in client.get("/settings").get_data(as_text=True)
 
 
+def test_backup_restores_settings_with_confirmation_for_conflicts(client, library, monkeypatch):
+    store.save_settings(paper="Letter", theme="night-sky", show_custom_factions=False)
+    backup = client.post("/backup").data
+
+    monkeypatch.setenv("FTFM_DATA_DIR", str(library / "restored"))
+    page = upload(client, "settings.FTBackup", backup).get_data(as_text=True)
+    assert "restored from the backup" in page
+    settings = store.load_settings()
+    assert settings["paper"] == "Letter" and settings["theme"] == "night-sky"
+    assert settings["show_custom_factions"] is False
+
+    stamp = "2026-04-02T00:00:00+00:00"
+    store.save_settings(paper="A4", last_backup=stamp)
+    page = upload(client, "settings.FTBackup", backup).get_data(as_text=True)
+    assert "Local copies kept here: Settings." in page
+    assert store.load_settings()["paper"] == "A4"
+    client.post("/import/held", data={"action": "replace"})
+    assert store.load_settings()["paper"] == "Letter"
+    assert store.load_settings()["last_backup"] == stamp
+
+
+@pytest.mark.parametrize("kind", ["fleet", "campaign"])
+def test_export_round_trips_with_deleted_design_placeholder(client, library, monkeypatch, kind):
+    fleet, design = a_fleet(), a_design()
+    campaign, _ = store.create_campaign(fleet, "Campaign")
+    assert store.add_ship(fleet, design["id"])[0]
+    assert store.save_fleet(fleet)[0]
+    assert store.delete_design(design["id"])[0]
+    expected = store.get_fleet(fleet["id"])["ships"][-1]["placeholder"]
+    target = fleet if kind == "fleet" else campaign
+    resp = client.get(f"/export/{kind}/{target['id']}")
+    assert resp.status_code == 200
+
+    monkeypatch.setenv("FTFM_DATA_DIR", str(library / "restored"))
+    upload(client, f"saved{store.EXTENSIONS[kind]}", resp.data)
+    restored = store.get_fleet(fleet["id"])
+    assert restored and restored["ships"][-1]["placeholder"] == expected
+
+
 def test_a_fleet_and_a_design_export_from_their_tabs(client):
     fleet, design = a_fleet(), a_design()
     client.get(f"/fleet/{fleet['id']}")
@@ -83,12 +122,12 @@ def test_a_newer_local_copy_waits_for_the_players_answer(client):
     # The file is made older than the library copy.
     old = blob.replace(design["modified"].encode(), b"2000-01-01T00:00:00+00:00")
     page = upload(client, "x.FTDesign", old).get_data(as_text=True)
-    assert "Newer copies kept here: Sentinel." in page
+    assert "Local copies kept here: Sentinel." in page
     assert store.get_design(design["id"])["name"] == "Newer here"
     resp = client.post("/import/held", data={"action": "replace"}, follow_redirects=True)
     page = resp.get_data(as_text=True)
     assert store.get_design(design["id"])["name"] == "Sentinel"
-    assert "Newer copies kept here" not in page
+    assert "Local copies kept here" not in page
 
 
 def test_keeping_mine_drops_the_held_import(client):

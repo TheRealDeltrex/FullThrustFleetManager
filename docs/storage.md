@@ -22,7 +22,8 @@ Read before changing fleet maths, persistence, import/export or the schema.
   to its official ancestor (`official_ancestor()`, following `source.of` to a catalog design of
   the same ruleset); others keep a `placeholder` (name, class, MASS, points) that counts in fleet
   points and shows "Deleted design" until a refit clears it (Master's ruling). Its own variants
-  are re-parented to its parent so their chain stays intact.
+  are re-parented to its parent so their chain stays intact. Fleet and campaign imports accept
+  missing designs for ships with placeholders.
 - **Normalisation is the trust boundary.** Everything read from the library or an import goes
   through `normalize_design()` / `normalize_fleet()`, which clamp types and drop junk and are the
   only place new fields are accepted. Add every new field there in the same commit.
@@ -33,7 +34,9 @@ Read before changing fleet maths, persistence, import/export or the schema.
   confirms. `modified` is an ISO string at second resolution, so tests that need "strictly
   newer" backdate the local copy. The whole file is read and checked (`_read_document` /
   `_read_backup`, raising `_Refused` or `TooNewError`) before anything is written; a backup entry
-  that is not a usable design or fleet is skipped and counted.
+  that is not a usable design or fleet is skipped and counted. Full backups restore preferences
+  on a fresh install. Different local preferences require confirmation to replace, and backup
+  reminder dates stay local.
 - In the app: Settings > Files (`POST /backup`, `POST /import`), and an Export button on the
   Fleet tab and on a saved custom design (`/export/fleet/<id>`, `/export/design/<id>`). An import
   with conflicts is held in `pending_import.json` (`store.hold_import`) until the player answers
