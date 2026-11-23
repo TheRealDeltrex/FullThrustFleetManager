@@ -48,7 +48,7 @@
         </form>
         {% if held_import %}
           <form method="post" action="{{ url_for('import_held') }}" class="notice row">
-            <span>{{ _("Newer copies kept here: {names}.", names=held_import.conflicts|join(", ")) }}</span>
+            <span>{{ _("Local copies kept here: {names}.", names=held_import.conflicts|join(", ")) }}</span>
             <button class="btn sm" type="submit" name="action" value="replace">{{ _("Replace them") }}</button>
             <button class="btn sm ghost" type="submit" name="action" value="keep">{{ _("Keep mine") }}</button>
           </form>

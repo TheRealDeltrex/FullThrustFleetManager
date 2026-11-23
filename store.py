@@ -561,6 +561,19 @@ def official_ancestor(design: dict) -> str | None:
     return None
 
 
+def _descends_from(design: dict, ancestor_id: str) -> bool:
+    seen = {design["id"]}
+    while design and design["source"].get("kind") == "variant":
+        parent = design["source"].get("of")
+        if not isinstance(parent, str) or parent in seen:
+            return False
+        if parent == ancestor_id:
+            return True
+        seen.add(parent)
+        design = get_design(parent)
+    return False
+
+
 def delete_design(design_id: str) -> tuple[bool, str]:
     """Ships built to the design fall back to its official ancestor (same ruleset), else keep a
     placeholder with its class, MASS and points until the player picks a replacement."""
@@ -1113,8 +1126,7 @@ def update_ship(fleet: dict, uid: str, *, name: str | None = None, table_id: str
 
 
 def refit_ship(fleet: dict, uid: str, design_id: str) -> tuple[bool, str]:
-    """Rebuilds a ship to another design of the fleet's ruleset. Damage and loadout entries
-    that name systems the new design lacks are dropped."""
+    """Rebuild a ship, carrying system state only between a variant and its ancestor."""
     ship = _ship(fleet, uid)
     if not ship:
         return False, _("Ship not found.")
@@ -1125,9 +1137,13 @@ def refit_ship(fleet: dict, uid: str, design_id: str) -> tuple[bool, str]:
         return False, _("That design belongs to another ruleset.")
     if ship["design_id"] == design_id:
         return True, ""
+    previous = get_design(ship["design_id"])
+    known = set()
+    if previous and (_descends_from(previous, design_id) or _descends_from(design, previous["id"])):
+        old_types = {s["uid"]: s["type"] for s in previous["systems"]}
+        known = {s["uid"] for s in design["systems"] if old_types.get(s["uid"]) == s["type"]}
     ship["design_id"] = design_id
     ship["placeholder"] = None
-    known = {s["uid"] for s in design["systems"]}
     damage = ship["damage"]
     damage["systems_out"] = [u for u in damage["systems_out"] if u in known]
     damage["one_shot_used"] = [u for u in damage["one_shot_used"] if u in known]
@@ -1135,7 +1151,9 @@ def refit_ship(fleet: dict, uid: str, design_id: str) -> tuple[bool, str]:
         damage[key] = {k: v for k, v in damage[key].items() if k.split(":")[0] in known}
     damage["hull"] = min(damage["hull"], fleet_rules.hull_boxes(design) or damage["hull"])
     damage["armour"] = min(damage["armour"], design["armour"])
-    if ship["loadout"]:
+    if not known:
+        ship["loadout"] = None
+    elif ship["loadout"]:
         refs = {"fighters": "hangar", "magazines": "magazine", "pulsers": "pulser", "craft": "hangar",
                 "gunboats": "carrier"}
         ship["loadout"] = _norm_loadout({key: [e for e in entries if e.get(refs.get(key, "")) in known]
@@ -2438,8 +2456,8 @@ def delete_campaign(campaign_id: str) -> tuple[bool, str]:
 # ---- Settings -------------------------------------------------------------------------------------
 
 
-def load_settings() -> dict:
-    doc = migrations.upgrade("settings", _read_json(paths.user_data_dir() / "settings.json") or {})
+def _normalize_settings(doc: dict) -> dict:
+    doc = migrations.upgrade("settings", doc)
     out = dict(DEFAULT_SETTINGS)
     if doc.get("paper") in ("A4", "Letter"):
         out["paper"] = doc["paper"]
@@ -2460,6 +2478,10 @@ def load_settings() -> dict:
         if isinstance(doc.get(key), bool):
             out[key] = doc[key]
     return out
+
+
+def load_settings() -> dict:
+    return _normalize_settings(_read_json(paths.user_data_dir() / "settings.json") or {})
 
 
 def save_settings(**changes) -> tuple[bool, str]:
@@ -2626,7 +2648,7 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     written, so a refused file leaves the library as it was."""
     try:
         if data[:2] == b"PK":
-            factions, designs, fleets, campaigns, art, skipped = _read_backup(data)
+            factions, designs, fleets, campaigns, art, settings, skipped = _read_backup(data)
         else:
             factions, designs, fleets, campaigns, art = _read_document(data)
             skipped = 0
@@ -2654,6 +2676,19 @@ def import_file(filename: str, data: bytes, overwrite_newer: bool = False) -> tu
     if data[:2] == b"PK":
         written += art_written
         _restore_layouts(data, overwrite_newer)
+        if settings is not None:
+            path = paths.user_data_dir() / "settings.json"
+            local = load_settings()
+            # Backup reminders describe this installation's own backup history.
+            for key in ("last_backup", "backup_snoozed"):
+                settings[key] = local[key]
+            if settings != local:
+                if path.is_file() and not overwrite_newer:
+                    conflicts.append(_("Settings"))
+                else:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    _write_json(path, {"schema_version": migrations.CURRENT, **settings})
+                    written += 1
         msg = _("{n} items restored from the backup.", n=written)
         if skipped:
             msg += " " + _("{n} unreadable entries skipped.", n=skipped)
@@ -2691,7 +2726,7 @@ def _restore_layouts(data: bytes, overwrite: bool) -> None:
 def _fleets_need_only(fleets: list[dict], designs: list[dict], ruleset: str) -> None:
     """Refuses fleets whose designs are neither in the file nor known here, or of another ruleset."""
     known = {d["id"] for d in designs} | set(_catalog()) | {d["id"] for d in list_designs()}
-    missing = {s["design_id"] for f in fleets for s in f["ships"]} - known
+    missing = {s["design_id"] for f in fleets for s in f["ships"] if s["placeholder"] is None} - known
     if missing:
         names = ", ".join(sorted(missing))
         raise _Refused(_("The fleet uses designs that are not in the file: {ids}.", ids=names))
@@ -2747,11 +2782,13 @@ def _read_document(data: bytes) -> tuple[list[dict], list[dict], list[dict], lis
     raise _Refused(_("Not a Fleet Manager file."))
 
 
-def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[dict], dict, int]:
-    """(factions, designs, fleets, campaigns, ship pictures, entries skipped) of an .FTBackup; raises
-    _Refused. An entry
-    that cannot be read as a design or fleet of this app is skipped and counted, not guessed at;
-    one from a newer app refuses the whole backup."""
+def _read_backup(
+    data: bytes,
+) -> tuple[list[dict], list[dict], list[dict], list[dict], dict, dict | None, int]:
+    """Read factions, designs, fleets, campaigns, pictures and settings from a backup.
+
+    Count unreadable entries. A document from a newer app refuses the whole backup.
+    """
     try:
         z = zipfile.ZipFile(io.BytesIO(data))
     except zipfile.BadZipFile:
@@ -2761,6 +2798,7 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[
     campaigns: list[dict] = []
     factions: list[dict] = []
     art: dict = {}
+    settings = None
     skipped = 0
     with z:
         if sum(info.file_size for info in z.infolist()) > MAX_BACKUP_BYTES:
@@ -2772,6 +2810,12 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[
                 factions = _import_factions(doc.get("factions") if isinstance(doc, dict) else None)
             if "portraits.json" in names:
                 art = portraits.normalize(json.loads(z.read("portraits.json").decode("utf-8")))
+            if "settings.json" in names:
+                raw_settings = json.loads(z.read("settings.json").decode("utf-8"))
+                if isinstance(raw_settings, dict):
+                    settings = _normalize_settings(raw_settings)
+                else:
+                    skipped += 1
             for name in names:
                 m = re.fullmatch(r"(designs|fleets|campaigns)/([A-Za-z0-9_-]{1,64})\.json", name)
                 if not m:
@@ -2792,6 +2836,6 @@ def _read_backup(data: bytes) -> tuple[list[dict], list[dict], list[dict], list[
             if isinstance(error, migrations.TooNewError):
                 raise
             raise _Refused(_("Not a Fleet Manager backup.")) from None
-    if not designs and not fleets and not campaigns:
+    if not designs and not fleets and not campaigns and settings is None:
         raise _Refused(_("The backup is empty."))
-    return factions, designs, fleets, campaigns, art, skipped
+    return factions, designs, fleets, campaigns, art, settings, skipped

@@ -63,6 +63,27 @@ def test_refit_refuses_a_design_of_another_ruleset():
     assert not ok and fleet["ships"][0]["design_id"] == FURIOUS
 
 
+def test_refit_disambiguates_system_ids_between_designs(client):
+    original, _ = store.new_design("fb", name="Beam scout")
+    replacement, _ = store.new_design("fb", name="Torpedo scout")
+    for design, system_type in ((original, "beam"), (replacement, "pulse_torpedo")):
+        assert store.add_system(design, system_type)[0]
+        assert store.save_design(dict(design, allow_rule_breaking=True))[0]
+        assert design["systems"][0]["uid"] == "s1"
+    variant, _ = store.make_variant(original["id"])
+    fleet = fleet_with(original["id"])
+    assert store.set_ship_damage(fleet, "sh1", systems_out=["s1"])[0]
+    assert store.save_fleet(fleet)[0]
+
+    for design_id, expected in ((variant["id"], ["s1"]), (replacement["id"], [])):
+        client.post(
+            f"/fleet/{fleet['id']}/action",
+            data={"action": "refit_ship", "uid": "sh1", "design_id": design_id},
+        )
+        ship = store.get_fleet(fleet["id"])["ships"][0]
+        assert ship["design_id"] == design_id and ship["damage"]["systems_out"] == expected
+
+
 def test_refit_as_variant_gives_the_ship_its_own_design_and_opens_it(client):
     fleet = fleet_with(FURIOUS, FURIOUS)
     response = client.post(f"/fleet/{fleet['id']}/action", data={"action": "refit_variant", "uid": "sh1"})
